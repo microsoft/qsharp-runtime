@@ -44,10 +44,94 @@ endmacro()
 #===============================================================================
 # Common flags
 
+# Always use available Spectre mitigations where available
+if (NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mspeculative-load-hardening -mretpoline")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mspeculative-load-hardening -mretpoline")
+endif()
+
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
 
+#===============================================================================
+# Warnings
+
+# Treat warnings as errors:
+# https://clang.llvm.org/docs/UsersManual.html#options-to-control-error-and-warning-messages
+set(WARNING_FLAGS "-Werror")
+
+# Enable all warnings:
+# https://clang.llvm.org/docs/UsersManual.html#enabling-all-diagnostics
+# https://clang.llvm.org/docs/DiagnosticsReference.html
+set(WARNING_FLAGS "${WARNING_FLAGS} -Weverything")
+
+# Disable these warnings:
+
+# We don't care about keeping compatibility with C++98/03, C++11, C++14. Any new features unknown to our compiler version will be reported as errors.
+# -Wc++98-compat-pedantic
+#   -Wc++98-compat, 
+#       -Wc++98-compat-local-type-template-args, -Wc++98-compat-unnamed-type-template-args, -Wpre-c++14-compat, 
+#       -Wpre-c++17-compat, -Wpre-c++20-compat, -Wpre-c++2b-compat.
+#   -Wc++98-compat-bind-to-temporary-copy, -Wc++98-compat-extra-semi, 
+#   -Wpre-c++14-compat-pedantic, 
+#       -Wc++98-c++11-compat-binary-literal, -Wpre-c++14-compat.
+#   -Wpre-c++17-compat-pedantic, 
+#       -Wpre-c++17-compat.
+#   -Wpre-c++20-compat-pedantic, 
+#       -Wpre-c++20-compat.
+#   -Wpre-c++2b-compat-pedantic (= -Wpre-c++2b-compat).
+
+# https://clang.llvm.org/docs/DiagnosticsReference.html#wc-98-compat-pedantic
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-c++98-compat-pedantic")
+
+# Old-style casts increase readability as opposed to `reinterpret_cast<..>()`. We want to be able to use the old-style casts.
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-old-style-cast")
+
+# Even if the `switch` covers all the enumerators, it is still good to have `default` label to cover the potential newly added (but not handled) enumerators.
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-covered-switch-default")
+
+# We are OK using C99 features.
+# -Wc99-extension
+#   -Wc99-designator
+#       -Wc++20-designator
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-c99-extensions")
+
+# We are OK that the structs are padded to align the fields.
+# https://clang.llvm.org/docs/DiagnosticsReference.html#wpadded
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-padded")
+
+# We are OK with abstract classes.
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-weak-vtables")
+
+# Temporarily disable the following warnings (until QIR RT is refactored to expose C interface).
+
+# Looks like the `-Wglobal-constructors` warns that the instance of the `__dllexport` class/struct (or a static member var of such class/struct) 
+# needs to be constructible by calling a global `__dllexport` function (to guarantee that a single instance is created and the same instance is used 
+# both inside and outside of the binary (dynamic library or executable)).
+# Or it warns about the constructor that is invoked for a global (or static member) variable _before_ the `main()` is invoked, thus slowing down the start,
+# see https://stackoverflow.com/a/15708829/6362941
+
+# https://clang.llvm.org/docs/DiagnosticsReference.html#wglobal-constructors
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-global-constructors")
+
+# Looks like the `-Wexit-time-destructors` warns that the destructor of a global or static member variable will be invoked
+# _after_ the `main()` returns (thus slowing down the termination/restart).
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-exit-time-destructors")
+
+# Temporarily disable "-Wextra-semi-stmt" that warns about redundant `;` in the end of `INFO(id);` of Catch tests framework (which looks fixed in the latest Catch version).
+# Disable until the Catch header "src\Qir\Common\Externals\catch2\catch.hpp" is updated to a version newer than v2.12.1 (from https://github.com/catchorg/Catch2).
+
+# https://clang.llvm.org/docs/DiagnosticsReference.html#wextra-semi-stmt
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-extra-semi-stmt")
+
+# Save the assembled warnings
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
+
+
+#===============================================================================
 # Sanitizers (https://clang.llvm.org/docs/UsersManual.html#controlling-code-generation):
+
 if (NOT WIN32)
     set(SANITIZE_FLAGS "")
 
@@ -124,78 +208,3 @@ if (NOT WIN32)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZE_FLAGS}")
 endif()
 
-# Treat warnings as errors:
-# https://clang.llvm.org/docs/UsersManual.html#options-to-control-error-and-warning-messages
-set(WARNING_FLAGS "-Werror")
-
-# Enable all warnings:
-# https://clang.llvm.org/docs/UsersManual.html#enabling-all-diagnostics
-# https://clang.llvm.org/docs/DiagnosticsReference.html
-set(WARNING_FLAGS "${WARNING_FLAGS} -Weverything")
-
-# Disable these warnings:
-
-# We don't care about keeping compatibility with C++98/03, C++11, C++14. Any new features unknown to our compiler version will be reported as errors.
-# -Wc++98-compat-pedantic
-#   -Wc++98-compat, 
-#       -Wc++98-compat-local-type-template-args, -Wc++98-compat-unnamed-type-template-args, -Wpre-c++14-compat, 
-#       -Wpre-c++17-compat, -Wpre-c++20-compat, -Wpre-c++2b-compat.
-#   -Wc++98-compat-bind-to-temporary-copy, -Wc++98-compat-extra-semi, 
-#   -Wpre-c++14-compat-pedantic, 
-#       -Wc++98-c++11-compat-binary-literal, -Wpre-c++14-compat.
-#   -Wpre-c++17-compat-pedantic, 
-#       -Wpre-c++17-compat.
-#   -Wpre-c++20-compat-pedantic, 
-#       -Wpre-c++20-compat.
-#   -Wpre-c++2b-compat-pedantic (= -Wpre-c++2b-compat).
-
-# https://clang.llvm.org/docs/DiagnosticsReference.html#wc-98-compat-pedantic
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-c++98-compat-pedantic")
-
-# Old-style casts increase readability as opposed to `reinterpret_cast<..>()`. We want to be able to use the old-style casts.
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-old-style-cast")
-
-# Even if the `switch` covers all the enumerators, it is still good to have `default` label to cover the potential newly added (but not handled) enumerators.
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-covered-switch-default")
-
-# We are OK using C99 features.
-# -Wc99-extension
-#   -Wc99-designator
-#       -Wc++20-designator
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-c99-extensions")
-
-# We are OK that the structs are padded to align the fields.
-# https://clang.llvm.org/docs/DiagnosticsReference.html#wpadded
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-padded")
-
-# We are OK with abstract classes.
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-weak-vtables")
-
-# Temporarily disable the following warnings (until QIR RT is refactored to expose C interface).
-
-# Looks like the `-Wglobal-constructors` warns that the instance of the `__dllexport` class/struct (or a static member var of such class/struct) 
-# needs to be constructible by calling a global `__dllexport` function (to guarantee that a single instance is created and the same instance is used 
-# both inside and outside of the binary (dynamic library or executable)).
-# Or it warns about the constructor that is invoked for a global (or static member) variable _before_ the `main()` is invoked, thus slowing down the start,
-# see https://stackoverflow.com/a/15708829/6362941
-
-# https://clang.llvm.org/docs/DiagnosticsReference.html#wglobal-constructors
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-global-constructors")
-
-# Looks like the `-Wexit-time-destructors` warns that the destructor of a global or static member variable will be invoked
-# _after_ the `main()` returns (thus slowing down the termination/restart).
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-exit-time-destructors")
-
-# Temporarily disable "-Wextra-semi-stmt" that warns about redundant `;` in the end of `INFO(id);` of Catch tests framework (which looks fixed in the latest Catch version).
-# Disable until the Catch header "src\Qir\Common\Externals\catch2\catch.hpp" is updated to a version newer than v2.12.1 (from https://github.com/catchorg/Catch2).
-
-# https://clang.llvm.org/docs/DiagnosticsReference.html#wextra-semi-stmt
-set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-extra-semi-stmt")
-
-# Always use available Spectre mitigations where available
-if (NOT APPLE)
-    set(WARNING_FLAGS "${WARNING_FLAGS} -mspeculative-load-hardening -mretpoline")
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
