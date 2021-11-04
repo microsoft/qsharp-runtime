@@ -34,27 +34,10 @@ function Build-CMakeProject {
     )
 
     Write-Host "##[info]Build $Name"
+
     $CMAKE_C_COMPILER = ""
     $CMAKE_CXX_COMPILER = ""
-
-    $oldCFLAGS = $env:CFLAGS
-    $oldCXXFLAGS = $env:CXXFLAGS
-
     $clangTidy = ""
-
-    if ($Env:BUILD_CONFIGURATION -eq "Debug") { 
-        # Sanitizers (https://clang.llvm.org/docs/UsersManual.html#controlling-code-generation):
-        if (-not ($IsWindows)) {
-            # Common for all sanitizers:
-            $sanitizeFlags = " -fsanitize-blacklist="      # https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#suppressing-errors-in-recompiled-code-ignorelist
-            # https://releases.llvm.org/11.0.1/tools/clang/docs/SanitizerSpecialCaseList.html
-            $sanitizeFlags += (Join-Path $Path .. UBSan.ignore)
-            $env:CFLAGS += $sanitizeFlags
-            $env:CXXFLAGS += $sanitizeFlags
-        } # if (-not ($IsWindows))
-
-    } # if ($Env:BUILD_CONFIGURATION -eq "Debug") 
-
 
     if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
         Write-Host "On MacOS build $Name using the default C/C++ compiler (should be AppleClang)"
@@ -115,9 +98,6 @@ function Build-CMakeProject {
     }
 
     Pop-Location
-
-    $env:CXXFLAGS = $oldCXXFLAGS
-    $env:CFLAGS = $oldCFLAGS
 
     return $all_ok
 }
