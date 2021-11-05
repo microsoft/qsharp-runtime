@@ -27,6 +27,7 @@ target_link_libraries(Microsoft.Quantum.Qir.QSharp.Core
   simulators-obj
   "-L${CMAKE_BINARY_DIR}/lib/QIR"
   -lMicrosoft.Quantum.Qir.Runtime
+  ${SPECTRE_LIBS}
 )
 add_dependencies(Microsoft.Quantum.Qir.QSharp.Core Microsoft.Quantum.Qir.Runtime)
 

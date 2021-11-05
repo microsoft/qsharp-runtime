@@ -136,19 +136,20 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
         }
 
-        internal string? TrimmedUserAgent() {
-            var userAgent = (UserAgent ?? System.Environment.GetEnvironmentVariable("USER_AGENT"))?.Trim();
-
-            return (userAgent == null || userAgent.Length < 25)
-                ? userAgent
-                : userAgent.Substring(0, 24);
-            }
-
-
         internal QuantumJobClientOptions CreateClientOptions()
         {
             var options = new QuantumJobClientOptions();
-            options.Diagnostics.ApplicationId = TrimmedUserAgent();
+
+            // This value will be added as a prefix in the UserAgent when
+            // calling the Azure Quantum API
+            // It cannot be larger than 24 characters.
+            var applicationId = string.Join('@', "Q#Run", UserAgent?.Trim()).Trim(' ', '@');
+            if (applicationId?.Length > 24)
+            {
+                applicationId = applicationId.Substring(0, 24);
+            }
+
+            options.Diagnostics.ApplicationId = applicationId;
             return options;
         }
 
@@ -187,7 +188,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             $"Location: {Location ?? ExtractLocation(BaseUri)}",
             $"Credential: {Credential}",
             $"AadToken: {AadToken?.Substring(0, 5)}",
-            $"UserAgent: {TrimmedUserAgent()}",
+            $"UserAgent: {UserAgent}",
             $"Job Name: {JobName}",
             $"Job Parameters: {string.Join(", ", JobParams.OrderBy(item => item.Key))}",
             $"Shots: {Shots}",
