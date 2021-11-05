@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Canon;
 
     /// # Summary
     /// Applies the Pauli $Y$ gate.
@@ -27,19 +28,14 @@ namespace Microsoft.Quantum.Intrinsic {
                 ApplyUncontrolledY(qubit);
             }
             elif (Length(ctls) == 1) {
-                within {
-                    MapPauli(qubit, PauliX, PauliY);
-                }
-                apply {
-                    CNOT(ctls[0], qubit);
-                }
+                CY(ctls[0], qubit);
             }
             elif (Length(ctls) == 2) {
                 within {
                     MapPauli(qubit, PauliZ, PauliY);
                 }
                 apply {
-                    Controlled Z(ctls, qubit);
+                    CCZ(ctls[0], ctls[1], qubit);
                 }
             }
             else {
