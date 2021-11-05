@@ -39,17 +39,9 @@ target_compile_definitions(qir-rt-support-obj PRIVATE EXPORT_QIR_API)
 #===============================================================================
 # Produce the Microsoft.Quantum.Qir.Runtime dynamic library
 #
-
 add_library(Microsoft.Quantum.Qir.Runtime SHARED)
-add_library(Microsoft.Quantum.Qir.Runtime.Static STATIC)
 
 target_link_libraries(Microsoft.Quantum.Qir.Runtime
-  ${CMAKE_DL_LIBS}
-  qir-rt-support-obj
-  ${SPECTRE_LIBS}
-)
-
-target_link_libraries(Microsoft.Quantum.Qir.Runtime.Static
   ${CMAKE_DL_LIBS}
   qir-rt-support-obj
   ${SPECTRE_LIBS}
@@ -58,20 +50,9 @@ target_link_libraries(Microsoft.Quantum.Qir.Runtime.Static
 target_include_directories(Microsoft.Quantum.Qir.Runtime PUBLIC ${public_includes})
 target_compile_definitions(Microsoft.Quantum.Qir.Runtime PRIVATE EXPORT_QIR_API)
 
-target_include_directories(Microsoft.Quantum.Qir.Runtime.Static PUBLIC ${public_includes})
-target_compile_definitions(Microsoft.Quantum.Qir.Runtime.Static PRIVATE EXPORT_QIR_API)
-
 set_property(TARGET Microsoft.Quantum.Qir.Runtime PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-set_property(TARGET Microsoft.Quantum.Qir.Runtime.Static PROPERTY POSITION_INDEPENDENT_CODE ON)
-
 install(TARGETS Microsoft.Quantum.Qir.Runtime
-  RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin"
-  LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
-  ARCHIVE DESTINATION "${CMAKE_BINARY_DIR}/bin"
-)
-
-install(TARGETS Microsoft.Quantum.Qir.Runtime.Static
   RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin"
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
   ARCHIVE DESTINATION "${CMAKE_BINARY_DIR}/bin"
