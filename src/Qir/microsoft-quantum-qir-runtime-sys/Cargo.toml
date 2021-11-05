@@ -1,0 +1,29 @@
+[package]
+name = "microsoft-quantum-qir-runtime-sys"
+version = "0.1.0"
+edition = "2018"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cty = "0.2.1"
+libloading = "0.7.0"
+log = "0.4.14"
+tempfile = "3.2.0"
+llvm-sys = "110"
+inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", default-features = false, features = ["llvm11-0", "target-x86"] }
+lazy_static = "1.4.0"
+mut_static = "5.0.0"
+
+[build-dependencies]
+cmake = "0.1.46"
+bindgen = "0.59.1"
+
+[lib]
+
+
+[features]
+runtime = []
+foundation = []
+default = ["runtime", "foundation"]
