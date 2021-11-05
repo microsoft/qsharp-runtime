@@ -14,7 +14,6 @@ tempfile = "3.2.0"
 llvm-sys = "110"
 inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", default-features = false, features = ["llvm11-0", "target-x86"] }
 lazy_static = "1.4.0"
-mut_static = "5.0.0"
 
 [build-dependencies]
 cmake = "0.1.46"

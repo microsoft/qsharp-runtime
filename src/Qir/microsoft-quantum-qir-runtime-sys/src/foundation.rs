@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 use lazy_static::lazy_static;
-use mut_static::MutStatic;
 
 use libloading::Library;
 
@@ -25,14 +24,12 @@ const FOUNDATION_BYTES: &'static [u8] = include_bytes!(concat!(
 ));
 
 lazy_static! {
-    pub(crate) static ref FOUNDATION_LIBRARY: MutStatic<Library> = unsafe {
-        MutStatic::from(
-            crate::qir_libloading::load_library_bytes(
-                "Microsoft.Quantum.Qir.QSharp.Foundation",
-                FOUNDATION_BYTES,
-            )
-            .unwrap(),
+    pub(crate) static ref FOUNDATION_LIBRARY: Library = unsafe {
+        crate::qir_libloading::load_library_bytes(
+            "Microsoft.Quantum.Qir.QSharp.Foundation",
+            FOUNDATION_BYTES,
         )
+        .unwrap()
     };
 }
 
@@ -40,13 +37,15 @@ pub struct QSharpFoundation {}
 
 impl QSharpFoundation {
     pub fn new() -> QSharpFoundation {
-        let _ = FOUNDATION_LIBRARY.read();
+        let _ = FOUNDATION_LIBRARY;
         QSharpFoundation {}
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::foundation::QSharpFoundation;
+
     #[test]
     fn library_loads_on_new() {
         let _ = QSharpFoundation::new();

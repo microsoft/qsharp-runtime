@@ -37,7 +37,7 @@ fn set_compiler(config: &mut Config) {
         config.define("CMAKE_C_COMPILER", "clang");
         config.define("CMAKE_CXX_COMPILER", "clang++");
     } else if cfg!(target_os = "macos") {
-        todo!("Identify the clang compiler on macos")
+        // Use macos default
     } else {
         panic!("Unsupported platform")
     }

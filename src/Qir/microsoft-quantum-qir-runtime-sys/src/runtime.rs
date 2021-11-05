@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 use lazy_static::lazy_static;
-use mut_static::MutStatic;
 
 use std::ffi::CString;
 
@@ -28,14 +27,9 @@ const RUNTIME_BYTES: &'static [u8] = include_bytes!(concat!(
 ));
 
 lazy_static! {
-    pub(crate) static ref RUNTIME_LIBRARY: MutStatic<Library> = unsafe {
-        MutStatic::from(
-            crate::qir_libloading::load_library_bytes(
-                "Microsoft.Quantum.Qir.Runtime",
-                RUNTIME_BYTES,
-            )
-            .unwrap(),
-        )
+    pub(crate) static ref RUNTIME_LIBRARY: Library = unsafe {
+        crate::qir_libloading::load_library_bytes("Microsoft.Quantum.Qir.Runtime", RUNTIME_BYTES)
+            .unwrap()
     };
 }
 
@@ -63,8 +57,13 @@ impl BasicRuntimeDriver {
 pub struct QirRuntime {}
 
 impl QirRuntime {
+    pub fn new() -> QirRuntime {
+        let _ = RUNTIME_LIBRARY;
+        QirRuntime {}
+    }
+
     pub unsafe fn create_basic_runtime_driver() -> *mut cty::c_void {
-        let library = RUNTIME_LIBRARY.read().unwrap();
+        let library = &RUNTIME_LIBRARY;
         let create = library
             .get::<fn() -> *mut IRuntimeDriver>(
                 CString::new("CreateBasicRuntimeDriver")
@@ -76,7 +75,7 @@ impl QirRuntime {
     }
 
     pub unsafe fn initialize_qir_context(driver: *mut cty::c_void, track_allocated_objects: bool) {
-        let library = RUNTIME_LIBRARY.read().unwrap();
+        let library = &RUNTIME_LIBRARY;
         let init = library
             .get::<fn(*mut cty::c_void, bool)>(
                 CString::new("InitializeQirContext")
@@ -91,7 +90,7 @@ impl QirRuntime {
         array: *mut QirArray,
         index: i64,
     ) -> *mut cty::c_char {
-        let library = RUNTIME_LIBRARY.read().unwrap();
+        let library = &RUNTIME_LIBRARY;
         let get_element_ptr = library
             .get::<fn(*mut QirArray, arg2: i64) -> *mut cty::c_char>(
                 CString::new("__quantum__rt__array_get_element_ptr_1d")
@@ -105,6 +104,7 @@ impl QirRuntime {
 
 #[cfg(test)]
 mod tests {
+    use crate::runtime::QirRuntime;
     #[test]
     fn library_loads_on_new() {
         let _ = QirRuntime::new();
