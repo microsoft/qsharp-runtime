@@ -11,8 +11,8 @@ cty = "0.2.1"
 libloading = "0.7.0"
 log = "0.4.14"
 tempfile = "3.2.0"
-llvm-sys = "110"
-inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", default-features = false, features = ["llvm11-0", "target-x86"] }
+llvm-sys = { version = "110", optional = true }
+inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", default-features = false, features = ["llvm11-0", "target-x86"], optional = true }
 lazy_static = "1.4.0"
 
 [build-dependencies]
@@ -26,4 +26,5 @@ cc = "1.0.71"
 [features]
 runtime = []
 foundation = []
+llvm-libloading = ["llvm-sys", "inkwell"]
 default = ["runtime", "foundation"]

@@ -33,7 +33,15 @@ pub(crate) unsafe fn load_library_bytes(
 pub(crate) unsafe fn load_library<P: AsRef<Path>>(path: P) -> Result<Library, Box<dyn Error>> {
     log::debug!("Loading {}", path.as_ref().display());
     let library = Library::new(path.as_ref().as_os_str())?;
+    
+    #[cfg(feature = "llvm-libloading")]
+    load_library_with_llvm(path);
 
+    Ok(library)
+}
+
+#[cfg(feature = "llvm-libloading")]
+fn load_library_with_llvm<P: AsRef<Path>>(path: P) {
     let library_path = path
         .as_ref()
         .to_str()
@@ -44,5 +52,4 @@ pub(crate) unsafe fn load_library<P: AsRef<Path>>(path: P) -> Result<Library, Bo
     } else {
         log::debug!("Loaded {} into LLVM", library_path);
     }
-    Ok(library)
 }
