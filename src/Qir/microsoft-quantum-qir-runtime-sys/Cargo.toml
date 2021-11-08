@@ -18,6 +18,7 @@ lazy_static = "1.4.0"
 [build-dependencies]
 cmake = "0.1.46"
 bindgen = "0.59.1"
+cc = "1.0.71"
 
 [lib]
 
