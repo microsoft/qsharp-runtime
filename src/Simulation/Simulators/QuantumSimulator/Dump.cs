@@ -63,8 +63,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        public class QsimDumpMachine<T> : Quantum.Diagnostics.DumpMachine<T>
-        {
+        public class QsimDumpMachine<T> : Quantum.Diagnostics.DumpMachine<T> // Is inherited (and replaced at runtime)
+        {                                                                    // by (iqsharp's) JupyterDumpMachine<T>.
             private QuantumSimulator Simulator { get; }
 
             public QsimDumpMachine(QuantumSimulator m) : base(m)
@@ -80,8 +80,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimDumpRegister<T> : Quantum.Diagnostics.DumpRegister<T>
-        {
+        public class QSimDumpRegister<T> : Quantum.Diagnostics.DumpRegister<T> // Is inherited (and replaced at runtime)
+        {                                                                      // by (iqsharp's) JupyterDumpRegister<T>.
             private QuantumSimulator Simulator { get; }
 
             public QSimDumpRegister(QuantumSimulator m) : base(m)

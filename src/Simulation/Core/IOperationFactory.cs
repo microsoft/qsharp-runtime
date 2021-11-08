@@ -24,8 +24,8 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <summary>
         /// Returns an instance of the requested operation.
         /// </summary>
-        I Get<I>(Type T);
-
+        I Get<I>(Type T);   // TODO(rokuzmin): Why is the param name capital? Makes an impression of a template param,
+                            // but it's not.
         /// <summary>
         /// Returns an instance of the requested operation.
         /// </summary>

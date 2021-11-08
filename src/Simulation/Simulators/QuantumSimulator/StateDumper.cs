@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The callback function is triggered for every state basis
         /// vector in the wavefunction.
         /// </summary>
-        public abstract class StateDumper
+        public abstract class StateDumper // Is inherited by (iqsharp's) JupyterDisplayDumper.
         {
             /// <summary>
             /// Basic constructor. Takes the simulator to probe.
