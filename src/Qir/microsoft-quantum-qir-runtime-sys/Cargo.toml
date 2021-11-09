@@ -19,6 +19,7 @@ lazy_static = "1.4.0"
 cmake = "0.1.46"
 bindgen = "0.59.1"
 cc = "1.0.71"
+which = "4.2.2"
 
 [lib]
 
