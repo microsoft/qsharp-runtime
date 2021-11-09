@@ -144,4 +144,11 @@ namespace Microsoft.Quantum.Core {
         body intrinsic;
     }
 
+    /// # Summary
+    /// Uses hardware specific implementation to get the current cpu cycle counter. Not
+    /// implemented on all hardware and may return 0.
+    operation GetHardwareCycleCounter() : Int {
+        body intrinsic;
+    }
+
 }

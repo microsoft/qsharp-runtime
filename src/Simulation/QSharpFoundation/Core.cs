@@ -50,4 +50,14 @@ namespace Microsoft.Quantum.Core
             public override Func<QRange, QRange> __Body__ => (arg) => (arg.Reverse());
         }
     }
+
+    public partial class GetHardwareCycleCounter
+    {
+        public class Native : GetHardwareCycleCounter
+        {
+            public Native(IOperationFactory m) : base(m) { }
+
+            public override Func<QVoid, long> __Body__ => (arg) => 0;
+        }
+    }
 }
