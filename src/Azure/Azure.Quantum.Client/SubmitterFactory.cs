@@ -27,11 +27,11 @@ namespace Microsoft.Azure.Quantum
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
                 "QirSubmitter"),
             new SubmitterInfo(
-                new Regex(@"\Ahoneywell\.qir\.([\w]+\.)*[\w]+\z"),
+                new Regex(@"\Ahoneywell\.([\w]+\.)*[\w]+\z"),
                 "Microsoft.Quantum.Providers.Honeywell.Targets.HoneywellQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
                 "QirSubmitter"),
             new SubmitterInfo(
-                new Regex(@"\Aqci\.qir\.([\w]+\.)*[\w]+\z"),
+                new Regex(@"\Aqci\.([\w]+\.)*[\w]+\z"),
                 "Microsoft.Quantum.Providers.QCI.Targets.QCIQirSubmitter, Microsoft.Quantum.Providers.QCI",
                 "QirSubmitter"));
 
