@@ -23,26 +23,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             var filename = (target is QVoid) ? "" : target.ToString();
 
-            // QVoid process(Action<string> channel)
-            // {
-            //     var ids = qubits?.Select(q => (uint)q.Id).ToArray() ?? QubitIds;
-
-            //     var dumper = new SimpleDumper(this, channel);
-            //     channel($"# wave function for qubits with ids (least to most significant): {string.Join(";", ids)}");
-
-            //     if (!dumper.Dump(qubits))
-            //     {
-            //         channel("## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##");
-            //     }
-
-            //     return QVoid.Instance;
-            // }
-
-            // If no file provided, use `Message` to generate the message into the console;
+            // If no file provided, output to the console;
             if (string.IsNullOrWhiteSpace(filename))
             {
-                // var op = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
-                // return process((msg) => op.Apply(msg));
                 new DisplayableStateDumper(this)
                     .Dump(qubits);
             }
