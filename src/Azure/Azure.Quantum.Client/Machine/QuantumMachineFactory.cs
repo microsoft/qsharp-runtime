@@ -23,6 +23,9 @@ namespace Microsoft.Azure.Quantum
         public static IQuantumMachine? CreateMachine(
             IWorkspace workspace, string targetName, string? storageConnectionString = null)
         {
+            // We normalize the case of the provided target name to lower.
+            targetName is null ? null : targetName.ToLowerInvariant();
+
             var machineName =
                 targetName is null
                 ? null
