@@ -43,8 +43,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // If no file provided, use `Message` to generate the message into the console;
             if (string.IsNullOrWhiteSpace(filename))
             {
-                var op = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
-                return process((msg) => op.Apply(msg));
+                // var op = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
+                // return process((msg) => op.Apply(msg));
+                new JupyterDisplayDumper(this/*, channel*/)
+                    //.Configure(configurationSource)
+                    .Dump(qubits);
             }
             else
             {
@@ -58,14 +61,19 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 catch (Exception e)
                 {
                     logMessage.Apply($"[warning] Unable to write state to '{filename}' ({e.Message})");
-                    return QVoid.Instance;
                 }
             }
+            return QVoid.Instance;
         }
 
         public class QsimDumpMachine<T> : Quantum.Diagnostics.DumpMachine<T> // Is inherited (and replaced at runtime)
         {                                                                    // by (iqsharp's) JupyterDumpMachine<T>.
             private QuantumSimulator Simulator { get; }
+            ////
+            // internal IConfigurationSource? ConfigurationSource = null;
+            // internal IChannel? Channel = null;
+            // internal ICommsRouter? Router = null;
+            ////
 
             public QsimDumpMachine(QuantumSimulator m) : base(m)
             {
@@ -75,6 +83,36 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public override Func<T, QVoid> __Body__ => (location) =>
             {
                 if (location == null) { throw new ArgumentNullException(nameof(location)); }
+
+                // ////
+                // if (!(location is QVoid) && location.ToString().Length != 0)
+                // {
+                //     Console.Out.WriteLine("Falling back to base DumpMachine.");
+                //     return Simulator.Dump(location);
+                // }
+                // // Debug.Assert(
+                // //     Channel != null,
+                // //     "No display channel was provided when this operation was registered. " +
+                // //     "This is an internal error, and should never occur."
+                // // );
+                // // Debug.Assert(
+                // //     ConfigurationSource != null,
+                // //     "No configuration source was provided when this operation was registered. " +
+                // //     "This is an internal error, and should never occur."
+                // // );
+                // // Debug.Assert(
+                // //     Channel.CommsRouter != null,
+                // //     "No comms router was provided when this operation was registered. " +
+                // //     "This is an internal error, and should never occur."
+                // // );
+                // // return JupyterDisplayDumper.DumpToChannel(Simulator, Channel, ConfigurationSource);
+
+
+                // // Generate DisplayableState instance.
+
+                // Simulator.MaybeDisplayDiagnostic(/*DisplayableState instance*/ /*Simulator.QubitIds*/);
+                // return QVoid.Instance;                
+                // ////
 
                 return Simulator.Dump(location);
             };
@@ -97,6 +135,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 Simulator.CheckAndPreserveQubits(qubits);
 
                 return Simulator.Dump(location, qubits);
+                // var qIds = qubits.Select(q => (uint)q.Id).ToArray();
+                // Simulator.MaybeDisplayDiagnostic(qIds);
+                // return QVoid.Instance;                
             };
         }
     }
