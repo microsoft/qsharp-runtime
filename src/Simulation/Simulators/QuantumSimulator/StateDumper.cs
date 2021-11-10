@@ -66,122 +66,122 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        /// <summary>
-        /// A simple implementation of a <see cref="StateDumper"/>. It outputs the
-        /// a string representation of the state to the given channel.
-        /// </summary>
-        public class SimpleDumper : StateDumper
-        {
-            private int _maxCharsStateId;
+        // /// <summary>
+        // /// A simple implementation of a <see cref="StateDumper"/>. It outputs the
+        // /// a string representation of the state to the given channel.
+        // /// </summary>
+        // public class SimpleDumper : StateDumper
+        // {
+        //     private int _maxCharsStateId;
 
-            public SimpleDumper(QuantumSimulator qsim, Action<string> channel) : base(qsim)
-            {
-                this.Channel = channel;
-            }
+        //     public SimpleDumper(QuantumSimulator qsim, Action<string> channel) : base(qsim)
+        //     {
+        //         this.Channel = channel;
+        //     }
 
-            /// <summary>
-            /// A method to call to output a string representation of the amplitude of each
-            /// state basis vector.
-            /// </summary>
-            public virtual Action<string> Channel { get; }
+        //     /// <summary>
+        //     /// A method to call to output a string representation of the amplitude of each
+        //     /// state basis vector.
+        //     /// </summary>
+        //     public virtual Action<string> Channel { get; }
 
-            /// <summary>
-            /// Returns a string that represents the label for the given base state.
-            /// </summary>
-            public virtual string FormatBaseState(uint idx) =>
-                $"∣{idx.ToString().PadLeft(_maxCharsStateId, ' ')}❭";
+        //     /// <summary>
+        //     /// Returns a string that represents the label for the given base state.
+        //     /// </summary>
+        //     public virtual string FormatBaseState(uint idx) =>
+        //         $"∣{idx.ToString().PadLeft(_maxCharsStateId, ' ')}❭";
 
-            /// <summary>
-            /// Returns a string that represents the magnitude of the  amplitude.
-            /// </summary>
-            public virtual string FormatMagnitude(double magnitude, double phase) =>
-                (new String('*', (int)System.Math.Ceiling(20.0 * magnitude))).PadRight(20) + $" [ {magnitude:F6} ]";
+        //     /// <summary>
+        //     /// Returns a string that represents the magnitude of the  amplitude.
+        //     /// </summary>
+        //     public virtual string FormatMagnitude(double magnitude, double phase) =>
+        //         (new String('*', (int)System.Math.Ceiling(20.0 * magnitude))).PadRight(20) + $" [ {magnitude:F6} ]";
 
-            /// <summary>
-            /// Returns a string that represents the phase of the amplitude.
-            /// </summary>
-            public virtual string FormatAngle(double magnitude, double angle)
-            {
-                var PI = System.Math.PI;
-                var offset = PI / 16.0;
-                if (magnitude == 0.0)
-                {
-                    return "                   ";
-                }
+        //     /// <summary>
+        //     /// Returns a string that represents the phase of the amplitude.
+        //     /// </summary>
+        //     public virtual string FormatAngle(double magnitude, double angle)
+        //     {
+        //         var PI = System.Math.PI;
+        //         var offset = PI / 16.0;
+        //         if (magnitude == 0.0)
+        //         {
+        //             return "                   ";
+        //         }
 
-                var chart = "    ---";
-                if (angle > 0)
-                {
-                    if (angle >= (0 * PI / 8) + offset && angle < ((1 * PI / 8) + offset)) { chart = "     /-"; }
-                    if (angle >= (1 * PI / 8) + offset && angle < ((2 * PI / 8) + offset)) { chart = "     / "; }
-                    if (angle >= (2 * PI / 8) + offset && angle < ((3 * PI / 8) + offset)) { chart = "    +/ "; }
-                    if (angle >= (3 * PI / 8) + offset && angle < ((4 * PI / 8) + offset)) { chart = "   ↑   "; }
-                    if (angle >= (4 * PI / 8) + offset && angle < ((5 * PI / 8) + offset)) { chart = " \\-    "; }
-                    if (angle >= (5 * PI / 8) + offset && angle < ((6 * PI / 8) + offset)) { chart = " \\     "; }
-                    if (angle >= (6 * PI / 8) + offset && angle < ((7 * PI / 8) + offset)) { chart = "+\\     "; }
-                    if (angle >= (7 * PI / 8) + offset) { chart = "---    "; }
-                }
-                else  if (angle < 0)
-                {
-                    var abs_angle = System.Math.Abs(angle);
-                    if (abs_angle >= (0 * PI / 8) + offset && abs_angle < ((1 * PI / 8) + offset)) { chart = "     \\+"; }
-                    if (abs_angle >= (1 * PI / 8) + offset && abs_angle < ((2 * PI / 8) + offset)) { chart = "     \\ "; }
-                    if (abs_angle >= (2 * PI / 8) + offset && abs_angle < ((3 * PI / 8) + offset)) { chart = "    -\\ "; }
-                    if (abs_angle >= (3 * PI / 8) + offset && abs_angle < ((4 * PI / 8) + offset)) { chart = "   ↓   "; }
-                    if (abs_angle >= (4 * PI / 8) + offset && abs_angle < ((5 * PI / 8) + offset)) { chart = " /+    "; }
-                    if (abs_angle >= (5 * PI / 8) + offset && abs_angle < ((6 * PI / 8) + offset)) { chart = " /     "; }
-                    if (abs_angle >= (6 * PI / 8) + offset && abs_angle < ((7 * PI / 8) + offset)) { chart = "-/     "; }
-                }
+        //         var chart = "    ---";
+        //         if (angle > 0)
+        //         {
+        //             if (angle >= (0 * PI / 8) + offset && angle < ((1 * PI / 8) + offset)) { chart = "     /-"; }
+        //             if (angle >= (1 * PI / 8) + offset && angle < ((2 * PI / 8) + offset)) { chart = "     / "; }
+        //             if (angle >= (2 * PI / 8) + offset && angle < ((3 * PI / 8) + offset)) { chart = "    +/ "; }
+        //             if (angle >= (3 * PI / 8) + offset && angle < ((4 * PI / 8) + offset)) { chart = "   ↑   "; }
+        //             if (angle >= (4 * PI / 8) + offset && angle < ((5 * PI / 8) + offset)) { chart = " \\-    "; }
+        //             if (angle >= (5 * PI / 8) + offset && angle < ((6 * PI / 8) + offset)) { chart = " \\     "; }
+        //             if (angle >= (6 * PI / 8) + offset && angle < ((7 * PI / 8) + offset)) { chart = "+\\     "; }
+        //             if (angle >= (7 * PI / 8) + offset) { chart = "---    "; }
+        //         }
+        //         else  if (angle < 0)
+        //         {
+        //             var abs_angle = System.Math.Abs(angle);
+        //             if (abs_angle >= (0 * PI / 8) + offset && abs_angle < ((1 * PI / 8) + offset)) { chart = "     \\+"; }
+        //             if (abs_angle >= (1 * PI / 8) + offset && abs_angle < ((2 * PI / 8) + offset)) { chart = "     \\ "; }
+        //             if (abs_angle >= (2 * PI / 8) + offset && abs_angle < ((3 * PI / 8) + offset)) { chart = "    -\\ "; }
+        //             if (abs_angle >= (3 * PI / 8) + offset && abs_angle < ((4 * PI / 8) + offset)) { chart = "   ↓   "; }
+        //             if (abs_angle >= (4 * PI / 8) + offset && abs_angle < ((5 * PI / 8) + offset)) { chart = " /+    "; }
+        //             if (abs_angle >= (5 * PI / 8) + offset && abs_angle < ((6 * PI / 8) + offset)) { chart = " /     "; }
+        //             if (abs_angle >= (6 * PI / 8) + offset && abs_angle < ((7 * PI / 8) + offset)) { chart = "-/     "; }
+        //         }
 
-                return $" {chart} [ {angle,8:F5} rad ]";
-            }
+        //         return $" {chart} [ {angle,8:F5} rad ]";
+        //     }
 
-            /// <summary>
-            /// Returns a string for the amplitude's polar representation (magnitude/angle).
-            /// </summary>
-            public virtual string FormatPolar(double magnitude, double angle) =>
-                $"{FormatMagnitude(magnitude, angle)}{FormatAngle(magnitude, angle)}";
+        //     /// <summary>
+        //     /// Returns a string for the amplitude's polar representation (magnitude/angle).
+        //     /// </summary>
+        //     public virtual string FormatPolar(double magnitude, double angle) =>
+        //         $"{FormatMagnitude(magnitude, angle)}{FormatAngle(magnitude, angle)}";
 
-            /// <summary>
-            /// Returns a string for the amplitude's cartesian representation (real + imagnary).
-            /// </summary>
-            public virtual string FormatCartesian(double real, double img) =>
-                $"{real,9:F6} + {img,9:F6} i";
+        //     /// <summary>
+        //     /// Returns a string for the amplitude's cartesian representation (real + imagnary).
+        //     /// </summary>
+        //     public virtual string FormatCartesian(double real, double img) =>
+        //         $"{real,9:F6} + {img,9:F6} i";
 
-            /// <summary>
-            /// The method to use to format the amplitude into a string.
-            /// </summary>
-            public virtual string Format(uint idx, double real, double img)
-            {
-                var amplitude = (real * real) + (img * img);
-                var angle = System.Math.Atan2(img, real);
+        //     /// <summary>
+        //     /// The method to use to format the amplitude into a string.
+        //     /// </summary>
+        //     public virtual string Format(uint idx, double real, double img)
+        //     {
+        //         var amplitude = (real * real) + (img * img);
+        //         var angle = System.Math.Atan2(img, real);
 
-                return $"{FormatBaseState(idx)}:\t" +
-                       $"{FormatCartesian(real, img)}\t == \t" +
-                       $"{FormatPolar(amplitude, angle)}";
+        //         return $"{FormatBaseState(idx)}:\t" +
+        //                $"{FormatCartesian(real, img)}\t == \t" +
+        //                $"{FormatPolar(amplitude, angle)}";
 
-            }
+        //     }
 
-            /// <summary>
-            /// The callback method. Formats the given state and invokes the <see cref="Channel"/>
-            /// </summary>
-            /// <returns>True, so the entire wave function is dumped.</returns>
-            public override bool Callback(uint idx, double real, double img)
-            {
-                Channel(Format(idx, real, img));
-                return true;
-            }
+        //     /// <summary>
+        //     /// The callback method. Formats the given state and invokes the <see cref="Channel"/>
+        //     /// </summary>
+        //     /// <returns>True, so the entire wave function is dumped.</returns>
+        //     public override bool Callback(uint idx, double real, double img)
+        //     {
+        //         Channel(Format(idx, real, img));
+        //         return true;
+        //     }
 
-            public override bool Dump(IQArray<Qubit>? qubits = null)
-            {
-                var count = qubits == null
-                    ? this.Simulator.QubitManager.AllocatedQubitsCount
-                    : qubits.Length;
-                this._maxCharsStateId = ((1 << (int)count) - 1).ToString().Length;
+        //     public override bool Dump(IQArray<Qubit>? qubits = null)
+        //     {
+        //         var count = qubits == null
+        //             ? this.Simulator.QubitManager.AllocatedQubitsCount
+        //             : qubits.Length;
+        //         this._maxCharsStateId = ((1 << (int)count) - 1).ToString().Length;
 
-                return base.Dump(qubits);
-            }
-        } // class SimpleDumper
+        //         return base.Dump(qubits);
+        //     }
+        // } // class SimpleDumper
 
         /// <summary>
         ///     The convention to be used in labeling computational basis states
@@ -357,6 +357,108 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")
                 };
 
+
+            /// <summary>
+            /// Returns a string that represents the label for the given base state.
+            /// </summary>
+            public virtual string FormatBaseState(uint idx) 
+            {
+                int qubitCount = Amplitudes?.Length ?? 0;
+                int maxCharsStateId = ((1 << qubitCount) - 1).ToString().Length;
+
+                return $"∣{idx.ToString().PadLeft(maxCharsStateId, ' ')}❭";
+            }
+
+            /// <summary>
+            /// Returns a string that represents the magnitude of the  amplitude.
+            /// </summary>
+            public virtual string FormatMagnitude(double magnitude, double phase) =>
+                (new String('*', (int)System.Math.Ceiling(20.0 * magnitude))).PadRight(20) + $" [ {magnitude:F6} ]";
+
+            /// <summary>
+            /// Returns a string that represents the phase of the amplitude.
+            /// </summary>
+            public virtual string FormatAngle(double magnitude, double angle)
+            {
+                var PI = System.Math.PI;
+                var offset = PI / 16.0;
+                if (magnitude == 0.0)
+                {
+                    return "                   ";
+                }
+
+                var chart = "    ---";
+                if (angle > 0)
+                {
+                    if (angle >= (0 * PI / 8) + offset && angle < ((1 * PI / 8) + offset)) { chart = "     /-"; }
+                    if (angle >= (1 * PI / 8) + offset && angle < ((2 * PI / 8) + offset)) { chart = "     / "; }
+                    if (angle >= (2 * PI / 8) + offset && angle < ((3 * PI / 8) + offset)) { chart = "    +/ "; }
+                    if (angle >= (3 * PI / 8) + offset && angle < ((4 * PI / 8) + offset)) { chart = "   ↑   "; }
+                    if (angle >= (4 * PI / 8) + offset && angle < ((5 * PI / 8) + offset)) { chart = " \\-    "; }
+                    if (angle >= (5 * PI / 8) + offset && angle < ((6 * PI / 8) + offset)) { chart = " \\     "; }
+                    if (angle >= (6 * PI / 8) + offset && angle < ((7 * PI / 8) + offset)) { chart = "+\\     "; }
+                    if (angle >= (7 * PI / 8) + offset) { chart = "---    "; }
+                }
+                else  if (angle < 0)
+                {
+                    var abs_angle = System.Math.Abs(angle);
+                    if (abs_angle >= (0 * PI / 8) + offset && abs_angle < ((1 * PI / 8) + offset)) { chart = "     \\+"; }
+                    if (abs_angle >= (1 * PI / 8) + offset && abs_angle < ((2 * PI / 8) + offset)) { chart = "     \\ "; }
+                    if (abs_angle >= (2 * PI / 8) + offset && abs_angle < ((3 * PI / 8) + offset)) { chart = "    -\\ "; }
+                    if (abs_angle >= (3 * PI / 8) + offset && abs_angle < ((4 * PI / 8) + offset)) { chart = "   ↓   "; }
+                    if (abs_angle >= (4 * PI / 8) + offset && abs_angle < ((5 * PI / 8) + offset)) { chart = " /+    "; }
+                    if (abs_angle >= (5 * PI / 8) + offset && abs_angle < ((6 * PI / 8) + offset)) { chart = " /     "; }
+                    if (abs_angle >= (6 * PI / 8) + offset && abs_angle < ((7 * PI / 8) + offset)) { chart = "-/     "; }
+                }
+
+                return $" {chart} [ {angle,8:F5} rad ]";
+            }
+
+            /// <summary>
+            /// Returns a string for the amplitude's polar representation (magnitude/angle).
+            /// </summary>
+            public virtual string FormatPolar(double magnitude, double angle) =>
+                $"{FormatMagnitude(magnitude, angle)}{FormatAngle(magnitude, angle)}";
+
+            /// <summary>
+            /// Returns a string for the amplitude's cartesian representation (real + imagnary).
+            /// </summary>
+            public virtual string FormatCartesian(double real, double img) =>
+                $"{real,9:F6} + {img,9:F6} i";
+
+            /// <summary>
+            /// The method to use to format the amplitude into a string.
+            /// </summary>
+            public virtual string Format(uint idx, double real, double img)
+            {
+                var amplitude = (real * real) + (img * img);
+                var angle = System.Math.Atan2(img, real);
+
+                return $"{FormatBaseState(idx)}:\t" +
+                       $"{FormatCartesian(real, img)}\t == \t" +
+                       $"{FormatPolar(amplitude, angle)}";
+
+            }
+
+            public override string ToString()
+            {
+                if(Amplitudes == null)
+                {
+                    return "";
+                }
+
+                string retVal = "";
+                uint idx = 0;
+                foreach (Complex complexNum in Amplitudes)
+                {
+                    // Prepend all the lines with '\n', except the first-most one:
+                    retVal = ((retVal == "") ? "" : '\n' + retVal)
+                           + Format(idx, complexNum.Real, complexNum.Imaginary);
+                    ++idx;
+                }
+
+                return retVal;
+            }
         } // public class DisplayableState
 
 
@@ -364,7 +466,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         ///     A state dumper that encodes dumped states into displayable
         ///     objects.
         /// </summary>
-        public class JupyterDisplayDumper : StateDumper
+        public class DisplayableStateDumper : StateDumper
         {
             private long _count = -1;
             private Complex[]? _data = null;
@@ -414,11 +516,16 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // }
 
             /// <summary>
-            ///     Constructs a new display dumper for a given simulator, using a
-            ///     given Jupyter display channel to output dumped states.
+            /// A method to call to output a string representation.
             /// </summary>
-            public JupyterDisplayDumper(QuantumSimulator sim) : base(sim)
+            public virtual Action<string>? FileWriter { get; }
+
+            /// <summary>
+            ///     Constructs a new display dumper for a given simulator.
+            /// </summary>
+            public DisplayableStateDumper(QuantumSimulator sim, Action<string>? fileWriter = null) : base(sim)
             {
+                this.FileWriter = fileWriter;
             }
 
             /// <summary>
@@ -460,7 +567,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     DivId = $"dump-machine-div-{id}" 
                 };
 
-                Simulator.MaybeDisplayDiagnostic(state);
+                if(this.FileWriter != null)
+                {
+                    this.FileWriter(state.ToString());
+                }
+                else
+                {
+                    Simulator.MaybeDisplayDiagnostic(state);
+                }
 
 
                 // TODO(rokuzmin): Work on this thoroughly on the IQSharp side:

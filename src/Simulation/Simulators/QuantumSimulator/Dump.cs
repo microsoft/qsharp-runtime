@@ -23,29 +23,27 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             var filename = (target is QVoid) ? "" : target.ToString();
 
-            QVoid process(Action<string> channel)
-            {
-                var ids = qubits?.Select(q => (uint)q.Id).ToArray() ?? QubitIds;
+            // QVoid process(Action<string> channel)
+            // {
+            //     var ids = qubits?.Select(q => (uint)q.Id).ToArray() ?? QubitIds;
 
-                var dumper = new SimpleDumper(this, channel);
-                channel($"# wave function for qubits with ids (least to most significant): {string.Join(";", ids)}");
+            //     var dumper = new SimpleDumper(this, channel);
+            //     channel($"# wave function for qubits with ids (least to most significant): {string.Join(";", ids)}");
 
-                if (!dumper.Dump(qubits))
-                {
-                    channel("## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##");
-                }
+            //     if (!dumper.Dump(qubits))
+            //     {
+            //         channel("## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##");
+            //     }
 
-                return QVoid.Instance;
-            }
-
-            var logMessage = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
+            //     return QVoid.Instance;
+            // }
 
             // If no file provided, use `Message` to generate the message into the console;
             if (string.IsNullOrWhiteSpace(filename))
             {
                 // var op = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
                 // return process((msg) => op.Apply(msg));
-                new JupyterDisplayDumper(this)
+                new DisplayableStateDumper(this)
                     .Dump(qubits);
             }
             else
@@ -54,11 +52,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 {
                     using (var file = new StreamWriter(filename))
                     {
-                        return process(file.WriteLine);
+                        //return process(file.WriteLine);
+                        new DisplayableStateDumper(this, file.WriteLine)
+                            .Dump(qubits);
                     }
                 }
                 catch (Exception e)
                 {
+                    var logMessage = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
                     logMessage.Apply($"[warning] Unable to write state to '{filename}' ({e.Message})");
                 }
             }
