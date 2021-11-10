@@ -361,12 +361,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
 
         /// <summary>
-        ///     A state dumper that encodes dumped states into Jupyter-display
+        ///     A state dumper that encodes dumped states into displayable
         ///     objects.
         /// </summary>
-        public class JupyterDisplayDumper : /*QuantumSimulator.*/StateDumper
+        public class JupyterDisplayDumper : StateDumper
         {
-            //private readonly IChannel Channel;
             private long _count = -1;
             private Complex[]? _data = null;
 
@@ -418,9 +417,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     Constructs a new display dumper for a given simulator, using a
             ///     given Jupyter display channel to output dumped states.
             /// </summary>
-            public JupyterDisplayDumper(QuantumSimulator sim/*, IChannel channel*/) : base(sim)
+            public JupyterDisplayDumper(QuantumSimulator sim) : base(sim)
             {
-                //Channel = channel;
             }
 
             /// <summary>
@@ -442,7 +440,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public override bool Dump(IQArray<Qubit>? qubits = null)
             {
                 _count = qubits == null
-                            ? this.Simulator/*?*/.QubitManager?.AllocatedQubitsCount ?? 0
+                            ? this.Simulator.QubitManager?.AllocatedQubitsCount ?? 0
                             : qubits.Length;
                 _data = new Complex[1 << ((int)_count)];
                 var result = base.Dump(qubits);
@@ -456,12 +454,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 {
                     // We cast here as we don't support a large enough number
                     // of qubits to saturate an int.
-                    QubitIds = qubits?.Select(q => q.Id) ?? Simulator/*?*/.QubitIds.Select(q => (int)q) ?? Enumerable.Empty<int>(),
+                    QubitIds = qubits?.Select(q => q.Id) ?? Simulator.QubitIds.Select(q => (int)q) ?? Enumerable.Empty<int>(),
                     NQubits = (int)_count,
                     Amplitudes = _data,
                     DivId = $"dump-machine-div-{id}" 
                 };
-                //Channel.Display(state);
+
                 Simulator.MaybeDisplayDiagnostic(state);
 
 
@@ -485,14 +483,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return result;
             }
 
-            // internal static QVoid DumpToChannel(QuantumSimulator sim, IChannel channel, IConfigurationSource configurationSource, IQArray<Qubit>? qubits = null)
-            // {
-            //     new JupyterDisplayDumper(sim/*, channel*/)
-            //         //.Configure(configurationSource)
-            //         .Dump(qubits);
-            //     return QVoid.Instance;
-            // }
         }
-
     }
 }
