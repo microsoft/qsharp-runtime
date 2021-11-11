@@ -111,7 +111,6 @@ namespace Microsoft.Azure.Quantum
             IEnumerable<SubmitterInfo> submitters, string target, IWorkspace workspace, string? storageConnection)
             where T : class
         {
-            Console.Error.WriteLine($"submitters count: {submitters.Count()}");
             var constructorInfo = ConstructorInfo(submitters, target);
             if (constructorInfo is null)
             {
@@ -132,6 +131,13 @@ namespace Microsoft.Azure.Quantum
         /// <returns>A name and type tuple.</returns>
         private static (string Name, Type Type)? ConstructorInfo(IEnumerable<SubmitterInfo> submitters, string target)
         {
+            Console.Error.WriteLine($"Target: {target}");
+            Console.Error.WriteLine($"submitters count: {submitters.Count()}");
+            foreach(var s in submitters)
+            {
+                Console.Error.WriteLine($"Pattern: {s.TargetPattern.ToString()}");
+            }
+
             var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
             if (submitter is null)
             {
