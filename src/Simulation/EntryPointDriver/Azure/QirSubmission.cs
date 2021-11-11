@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Runtime;
+using System;
 using System.Collections.Immutable;
 using System.IO;
 
@@ -33,7 +34,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="qirStream">The QIR bitcode stream.</param>
         /// <param name="entryPointName">The entry point name.</param>
         /// <param name="arguments">The entry point arguments.</param>
-        public QirSubmission(Stream qirStream, string entryPointName, ImmutableList<Argument> arguments) =>
+        public QirSubmission(Stream qirStream, string entryPointName, ImmutableList<Argument> arguments)
+        {
+            Console.Error.WriteLine($"QirSubmission - entryPointName: {entryPointName}");
             (this.QirStream, this.EntryPointName, this.Arguments) = (qirStream, entryPointName, arguments);
+        }
     }
 }

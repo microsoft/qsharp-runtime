@@ -73,18 +73,22 @@ namespace Microsoft.Quantum.EntryPointDriver
                 DisplayError($"Either --location or --base-uri must be provided.", null);
             }
 
+            LogIfVerbose(settings, $"qirSubmission is null: {(qirSubmission is null).ToString()}");
             if (!(qirSubmission is null) && QirSubmitter(settings) is { } qirSubmitter)
             {
+                LogIfVerbose(settings, "SubmitQir");
                 return SubmitQir(settings, qirSubmitter, qirSubmission);
             }
 
             if (QSharpSubmitter(settings) is { } qsSubmitter)
             {
+                LogIfVerbose(settings, "SubmitQSharp");
                 return SubmitQSharp(settings, qsSubmitter, qsSubmission);
             }
 
             if (QSharpMachine(settings) is { } machine)
             {
+                LogIfVerbose(settings, "SubmitQSharpMachine");
                 return SubmitQSharpMachine(settings, machine, qsSubmission);
             }
 
