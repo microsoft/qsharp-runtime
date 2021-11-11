@@ -61,11 +61,8 @@ namespace Microsoft.Azure.Quantum
         /// <param name="workspace">The workspace used to manage jobs.</param>
         /// <param name="storageConnection">The connection string for the storage account.</param>
         /// <returns>A QIR submitter.</returns>
-        public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection)
-        {
-            Console.Error.WriteLine("QirSubmitter");
-            return Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection);
-        }
+        public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection) =>
+            Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection);
 
         /// <summary>
         /// Returns a Q# submitter.
@@ -131,17 +128,9 @@ namespace Microsoft.Azure.Quantum
         /// <returns>A name and type tuple.</returns>
         private static (string Name, Type Type)? ConstructorInfo(IEnumerable<SubmitterInfo> submitters, string target)
         {
-            Console.Error.WriteLine($"Target: {target}");
-            Console.Error.WriteLine($"submitters count: {submitters.Count()}");
-            foreach(var s in submitters)
-            {
-                Console.Error.WriteLine($"Pattern: {s.TargetPattern.ToString()}");
-            }
-
             var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
             if (submitter is null)
             {
-                Console.Error.WriteLine("Submitter is null");
                 return null;
             }
 
