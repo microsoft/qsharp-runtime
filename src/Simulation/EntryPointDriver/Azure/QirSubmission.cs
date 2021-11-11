@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using Microsoft.Quantum.Runtime;
-using System;
 using System.Collections.Immutable;
 using System.IO;
 
