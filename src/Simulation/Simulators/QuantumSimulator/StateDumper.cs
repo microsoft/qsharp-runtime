@@ -323,12 +323,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             }
 
-            // public override string ToString()
-            // {
-            //     return string.Join('\n', Amplitudes.Select((amplitude, idx) => 
-            //         Format((uint)idx, amplitude.Real, amplitude.Imaginary)));
-            // }
-
             public string ToString(BasisStateLabelingConvention convention,   // Non-override. Parameterized.
                                    bool truncateSmallAmplitudes, 
                                    double truncationThreshold)
