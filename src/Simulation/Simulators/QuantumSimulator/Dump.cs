@@ -26,19 +26,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // If no file provided, output to the console;
             if (string.IsNullOrWhiteSpace(filename))
             {
-                new DisplayableStateDumper(this)
-                    .Dump(qubits);
+                new DisplayableStateDumper(this).Dump(qubits);
             }
             else
             {
                 try
                 {
-                    using (var file = new StreamWriter(filename))
-                    {
-                        //return process(file.WriteLine);
-                        new DisplayableStateDumper(this, file.WriteLine)
-                            .Dump(qubits);
-                    }
+                    using var file = new StreamWriter(filename);
+                    new DisplayableStateDumper(this, file.WriteLine).Dump(qubits);
                 }
                 catch (Exception e)
                 {

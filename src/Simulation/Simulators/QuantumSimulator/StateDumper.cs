@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;   // IComparer
-using System.Linq;      // Select
-using System.Numerics;  // Complex
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using Microsoft.Quantum.Simulation.Core;
-using Newtonsoft.Json;  // JsonProperty
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 
@@ -124,12 +124,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
             [JsonProperty("diagnostic_kind")]
             private string DiagnosticKind => "state-vector";
 
-            /// <summary>
-            ///     ID for an HTML element where the vertical measurement probability histogram
-            ///     will be displayed.
-            /// </summary>
-            [JsonProperty("div_id")]
-            public string DivId { get; set; } = string.Empty;
+            // TODO(rokuzmin): Get back to this after the IQ#-side PR:
+            // /// <summary>
+            // ///     ID for an HTML element where the vertical measurement probability histogram
+            // ///     will be displayed.
+            // /// </summary>
+            // [JsonProperty("div_id")]
+            // public string DivId { get; set; } = string.Empty;
 
             /// <summary>
             ///     The indexes of each qubit on which this state is defined, or
@@ -154,7 +155,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
 
             // TODO(rokuzmin): Make this an extension method for `QuantumSimulator.DisplayableState` in IQSharp repo:
-
             // /// <summary>
             // ///     An enumerable source of the significant amplitudes of this state
             // ///     vector and their labels, where significance and labels are
@@ -323,25 +323,32 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             }
 
-            public override string ToString()
+            // public override string ToString()
+            // {
+            //     return string.Join('\n', Amplitudes.Select((amplitude, idx) => 
+            //         Format((uint)idx, amplitude.Real, amplitude.Imaginary)));
+            // }
+
+            public string ToString(BasisStateLabelingConvention convention,   // Non-override. Parameterized.
+                                   bool truncateSmallAmplitudes, 
+                                   double truncationThreshold)
             {
-                if(Amplitudes == null)
-                {
-                    return "";
-                }
-
-                string retVal = "";
-                uint idx = 0;
-                foreach (Complex complexNum in Amplitudes)
-                {
-                    // Prepend all the lines with '\n', except the first-most one:
-                    retVal = ((retVal == "") ? "" : '\n' + retVal)
-                           + Format(idx, complexNum.Real, complexNum.Imaginary);
-                    ++idx;
-                }
-
-                return retVal;
+                return string.Join('\n', 
+                    SignificantAmplitudes(convention, truncateSmallAmplitudes, truncationThreshold)
+                        .Select(
+                            item =>
+                            {
+                                var (cmplx, basisLabel) = item;
+                                var amplitude = (cmplx.Real * cmplx.Real) + (cmplx.Imaginary * cmplx.Imaginary);
+                                var angle = System.Math.Atan2(cmplx.Imaginary, cmplx.Real);
+                                return $"|{basisLabel}⟩\t{FormatCartesian(cmplx.Real, cmplx.Imaginary)}\t == \t" +
+                                                       $"{FormatPolar(amplitude, angle)}";
+                            }));
             }
+
+            public override string ToString() => // An override of the `object.ToString()`.
+                ToString(BasisStateLabelingConvention.LittleEndian, false, 0.0);
+
         } // public class DisplayableState
 
 
@@ -354,6 +361,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             private long _count = -1;
             private Complex[]? _data = null;
 
+            // TODO(rokuzmin): Remove the commented-out code below once everything works on IQSharp side.
             // /// <summary>
             // ///     Whether small amplitudes should be truncated when dumping
             // ///     states.
@@ -423,23 +431,27 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
 
             /// <summary>
-            ///     Dumps the state of a register of qubits as a Jupyter displayable
-            ///     object.
+            ///     Dumps the state of a register of qubits as a displayable object.
             /// </summary>
             // TODO(rokuzmin): What does it return?
             public override bool Dump(IQArray<Qubit>? qubits = null)
             {
+                System.Diagnostics.Debug.Assert(this.Simulator.QubitManager != null, 
+                    "Internal logic error, QubitManager must be assigned");
+
                 _count = qubits == null
-                            ? this.Simulator.QubitManager?.AllocatedQubitsCount ?? 0
+                            ? this.Simulator.QubitManager.AllocatedQubitsCount
                             : qubits.Length;
-                _data = new Complex[1 << ((int)_count)];
+                _data = new Complex[1 << ((int)_count)];    // If 0 qubits are allocated then the array has 
+                                                            // a single element. The Hilbert space of the system is 
+                                                            // ℂ¹ (that is, complex-valued scalars).
                 var result = base.Dump(qubits);
 
                 // At this point, _data should be filled with the full state
                 // vector, so let's display it, counting on the right display
                 // encoder to be there to pack it into a table.
 
-                var id = System.Guid.NewGuid();
+                // var id = System.Guid.NewGuid();
                 var state = new DisplayableState
                 {
                     // We cast here as we don't support a large enough number
@@ -447,10 +459,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     QubitIds = qubits?.Select(q => q.Id) ?? Simulator.QubitIds.Select(q => (int)q) ?? Enumerable.Empty<int>(),
                     NQubits = (int)_count,
                     Amplitudes = _data,
-                    DivId = $"dump-machine-div-{id}" 
+                    // DivId = $"dump-machine-div-{id}" 
                 };
 
-                if(this.FileWriter != null)
+                if (this.FileWriter != null)
                 {
                     this.FileWriter(state.ToString());
                 }
@@ -461,7 +473,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
 
                 // TODO(rokuzmin): Work on this thoroughly on the IQSharp side:
-
                 // if (ShowMeasurementDisplayHistogram)
                 // {
                 //     Debug.Assert(Channel.CommsRouter != null, "Display dumper requires comms router.");

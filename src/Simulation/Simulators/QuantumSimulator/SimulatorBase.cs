@@ -93,9 +93,9 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        public I Get<I>(Type T)  // TODO(rokuzmin): Param T is not a template param, make non-capital.
+        public I Get<I>(Type t)
         {
-            return (I)this.GetInstance(T);  
+            return (I)this.GetInstance(t);
         }
 
         /// <summary>
