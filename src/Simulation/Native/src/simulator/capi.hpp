@@ -22,6 +22,8 @@ extern "C"
     MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned sid); // NOLINT
     MICROSOFT_QUANTUM_DECL void seed(_In_ unsigned sid, _In_ unsigned s); // NOLINT
     MICROSOFT_QUANTUM_DECL void Dump(_In_ unsigned sid, _In_ bool (*callback)(size_t, double, double));
+    
+    // TODO(rokuzmin): What does it return?
     MICROSOFT_QUANTUM_DECL bool DumpQubits(
         _In_ unsigned sid,
         _In_ unsigned n,

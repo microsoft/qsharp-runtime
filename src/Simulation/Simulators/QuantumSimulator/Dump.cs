@@ -23,48 +23,29 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             var filename = (target is QVoid) ? "" : target.ToString();
 
-            QVoid process(Action<string> channel)
-            {
-                var ids = qubits?.Select(q => (uint)q.Id).ToArray() ?? QubitIds;
-
-                var dumper = new SimpleDumper(this, channel);
-                channel($"# wave function for qubits with ids (least to most significant): {string.Join(";", ids)}");
-
-                if (!dumper.Dump(qubits))
-                {
-                    channel("## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##");
-                }
-
-                return QVoid.Instance;
-            }
-
-            var logMessage = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
-
-            // If no file provided, use `Message` to generate the message into the console;
+            // If no file provided, output to the console;
             if (string.IsNullOrWhiteSpace(filename))
             {
-                var op = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
-                return process((msg) => op.Apply(msg));
+                new DisplayableStateDumper(this).Dump(qubits);
             }
             else
             {
                 try
                 {
-                    using (var file = new StreamWriter(filename))
-                    {
-                        return process(file.WriteLine);
-                    }
+                    using var file = new StreamWriter(filename);
+                    new DisplayableStateDumper(this, file.WriteLine).Dump(qubits);
                 }
                 catch (Exception e)
                 {
+                    var logMessage = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
                     logMessage.Apply($"[warning] Unable to write state to '{filename}' ({e.Message})");
-                    return QVoid.Instance;
                 }
             }
+            return QVoid.Instance;
         }
 
-        public class QsimDumpMachine<T> : Quantum.Diagnostics.DumpMachine<T>
-        {
+        public class QsimDumpMachine<T> : Quantum.Diagnostics.DumpMachine<T> // Is inherited (and replaced at runtime)
+        {                                                                    // by (iqsharp's) JupyterDumpMachine<T>.
             private QuantumSimulator Simulator { get; }
 
             public QsimDumpMachine(QuantumSimulator m) : base(m)
@@ -80,8 +61,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             };
         }
 
-        public class QSimDumpRegister<T> : Quantum.Diagnostics.DumpRegister<T>
-        {
+        public class QSimDumpRegister<T> : Quantum.Diagnostics.DumpRegister<T> // Is inherited (and replaced at runtime)
+        {                                                                      // by (iqsharp's) JupyterDumpRegister<T>.
             private QuantumSimulator Simulator { get; }
 
             public QSimDumpRegister(QuantumSimulator m) : base(m)
