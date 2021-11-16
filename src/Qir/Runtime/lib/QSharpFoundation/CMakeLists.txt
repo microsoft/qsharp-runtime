@@ -47,4 +47,3 @@ install(TARGETS Microsoft.Quantum.Qir.QSharp.Foundation
   LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/bin"
   ARCHIVE DESTINATION "${CMAKE_BINARY_DIR}/bin"
 )
-
