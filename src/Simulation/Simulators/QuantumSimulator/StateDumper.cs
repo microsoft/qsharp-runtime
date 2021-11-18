@@ -2,7 +2,13 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using Microsoft.Quantum.Simulation.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
@@ -14,7 +20,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The callback function is triggered for every state basis
         /// vector in the wavefunction.
         /// </summary>
-        public abstract class StateDumper
+        public abstract class StateDumper // Is inherited by (iqsharp's) JupyterDisplayDumper.
         {
             /// <summary>
             /// Basic constructor. Takes the simulator to probe.
@@ -44,6 +50,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// Entry method to get the dump of the wave function.
             /// </summary>
+            // TODO(rokuzmin): What does it return?
             public virtual bool Dump(IQArray<Qubit>? qubits = null)
             {
                 if (qubits == null)
@@ -60,29 +67,190 @@ namespace Microsoft.Quantum.Simulation.Simulators
         }
 
         /// <summary>
-        /// A simple implementation of a <see cref="StateDumper"/>. It outputs the
-        /// a string representation of the state to the given channel.
+        ///     The convention to be used in labeling computational basis states
+        ///     given their representations as strings of classical bits.
         /// </summary>
-        public class SimpleDumper : StateDumper
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum BasisStateLabelingConvention
         {
-            private int _maxCharsStateId;
-
-            public SimpleDumper(QuantumSimulator qsim, Action<string> channel) : base(qsim)
-            {
-                this.Channel = channel;
-            }
+            /// <summary>
+            ///     Label computational states directly by their bit strings.
+            /// </summary>
+            /// <example>
+            ///     Following this convention, the state |0⟩ ⊗ |1⟩ ⊗ |1⟩ is labeled
+            ///     by |011⟩.
+            /// </example>
+            Bitstring,
 
             /// <summary>
-            /// A method to call to output a string representation of the amplitude of each
-            /// state basis vector.
+            ///     Label computational states directly by interpreting their bit
+            ///     strings as little-endian encoded integers.
             /// </summary>
-            public virtual Action<string> Channel { get; }
+            /// <example>
+            ///     Following this convention, the state |0⟩ ⊗ |1⟩ ⊗ |1⟩ is labeled
+            ///     by |6⟩.
+            /// </example>
+            LittleEndian,
+
+            /// <summary>
+            ///     Label computational states directly by interpreting their bit
+            ///     strings as big-endian encoded integers.
+            /// </summary>
+            /// <example>
+            ///     Following this convention, the state |0⟩ ⊗ |1⟩ ⊗ |1⟩ is labeled
+            ///     by |3⟩.
+            /// </example>
+            BigEndian
+        }
+
+        /// <summary>
+        ///     Represents a quantum state vector and all metadata needed to display
+        ///     that state vector.
+        /// </summary>
+        public class DisplayableState
+        {
+            private static readonly IComparer<string> ToIntComparer =
+                Comparer<string>.Create((label1, label2) =>
+                    Comparer<int>.Default.Compare(
+                        Int32.Parse(label1), Int32.Parse(label2)
+                    )
+                );
+
+            /// <summary>
+            ///     Metadata to be used when serializing to JSON, allowing code
+            ///     in other languages to determine what representation is used
+            ///     for this state.
+            /// </summary>
+            [JsonProperty("diagnostic_kind")]
+            private string DiagnosticKind => "state-vector";
+
+            // TODO(rokuzmin): Get back to this after the IQ#-side PR:
+            // /// <summary>
+            // ///     ID for an HTML element where the vertical measurement probability histogram
+            // ///     will be displayed.
+            // /// </summary>
+            // [JsonProperty("div_id")]
+            // public string DivId { get; set; } = string.Empty;
+
+            /// <summary>
+            ///     The indexes of each qubit on which this state is defined, or
+            ///     <c>null</c> if these indexes are not known.
+            /// </summary>
+            [JsonProperty("qubit_ids")]
+            public IEnumerable<int>? QubitIds { get; set; }
+
+            /// <summary>
+            ///     The number of qubits on which this state is defined.
+            /// </summary>
+            [JsonProperty("n_qubits")]
+            public int NQubits { get; set; }
+
+            /// <remarks>
+            ///     These amplitudes represent the computational basis states
+            ///     labeled in little-endian order, as per the behavior of
+            ///     <see cref="Microsoft.Quantum.Simulation.Simulators.QuantumSimulator.StateDumper.Dump" />.
+            /// </remarks>
+            [JsonProperty("amplitudes")]
+            public Complex[]? Amplitudes { get; set; }
+
+
+            // TODO(rokuzmin): Make this an extension method for `QuantumSimulator.DisplayableState` in IQSharp repo:
+            // /// <summary>
+            // ///     An enumerable source of the significant amplitudes of this state
+            // ///     vector and their labels, where significance and labels are
+            // ///     defined by the values loaded from <paramref name="configurationSource" />.
+            // /// </summary>
+            // public IEnumerable<(Complex, string)> SignificantAmplitudes(
+            //     IConfigurationSource configurationSource
+            // ) => SignificantAmplitudes(
+            //     configurationSource.BasisStateLabelingConvention,
+            //     configurationSource.TruncateSmallAmplitudes,
+            //     configurationSource.TruncationThreshold
+            // );
+
+            /// <summary>
+            ///     An enumerable source of the significant amplitudes of this state
+            ///     vector and their labels.
+            /// </summary>
+            /// <param name="convention">
+            ///     The convention to be used in labeling each computational basis state.
+            /// </param>
+            /// <param name="truncateSmallAmplitudes">
+            ///     Whether to truncate small amplitudes.
+            /// </param>
+            /// <param name="truncationThreshold">
+            ///     If <paramref name="truncateSmallAmplitudes" /> is <c>true</c>,
+            ///     then amplitudes whose absolute value squared are below this
+            ///     threshold are suppressed.
+            /// </param>
+            public IEnumerable<(Complex, string)> SignificantAmplitudes(
+                BasisStateLabelingConvention convention,
+                bool truncateSmallAmplitudes, double truncationThreshold
+            ) =>
+                (
+                    truncateSmallAmplitudes
+                    ? Amplitudes
+                        .Select((amplitude, idx) => (amplitude, idx))
+                        .Where(item =>
+                            System.Math.Pow(item.amplitude.Magnitude, 2.0) >= truncationThreshold
+                        )
+                    : Amplitudes.Select((amplitude, idx) => (amplitude, idx))
+                )
+                .Select(
+                    item => (item.amplitude, BasisStateLabel(convention, item.idx))
+                )
+                .OrderBy(
+                    item => item.Item2,
+                    // If a basis state label is numeric, we want to compare
+                    // numerically rather than lexographically.
+                    convention switch {
+                        BasisStateLabelingConvention.BigEndian => ToIntComparer,
+                        BasisStateLabelingConvention.LittleEndian => ToIntComparer,
+                        _ => Comparer<string>.Default
+                    }
+                );
+
+            /// <summary>
+            ///     Using the given labeling convention, returns the label for a
+            ///     computational basis state described by its bit string as encoded
+            ///     into an integer index in the little-endian encoding.
+            /// </summary>
+            public string BasisStateLabel(
+                BasisStateLabelingConvention convention, int index
+            ) => convention switch
+                {
+                    BasisStateLabelingConvention.Bitstring =>
+                        String.Concat(
+                            System
+                                .Convert
+                                .ToString(index, 2)
+                                .PadLeft(NQubits, '0')
+                                .Reverse()
+                        ),
+                    BasisStateLabelingConvention.BigEndian =>
+                        System.Convert.ToInt64(
+                            String.Concat(
+                                System.Convert.ToString(index, 2).PadLeft(NQubits, '0').Reverse()
+                            ),
+                            fromBase: 2
+                        )
+                        .ToString(),
+                    BasisStateLabelingConvention.LittleEndian =>
+                        index.ToString(),
+                    _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")
+                };
+
 
             /// <summary>
             /// Returns a string that represents the label for the given base state.
             /// </summary>
-            public virtual string FormatBaseState(uint idx) =>
-                $"∣{idx.ToString().PadLeft(_maxCharsStateId, ' ')}❭";
+            public virtual string FormatBaseState(uint idx) 
+            {
+                int qubitCount = Amplitudes?.Length ?? 0;
+                int maxCharsStateId = ((1 << qubitCount) - 1).ToString().Length;
+
+                return $"∣{idx.ToString().PadLeft(maxCharsStateId, ' ')}❭";
+            }
 
             /// <summary>
             /// Returns a string that represents the magnitude of the  amplitude.
@@ -155,25 +323,168 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             }
 
+            public string ToString(BasisStateLabelingConvention convention,   // Non-override. Parameterized.
+                                   bool truncateSmallAmplitudes, 
+                                   double truncationThreshold)
+            {
+                return string.Join('\n', 
+                    SignificantAmplitudes(convention, truncateSmallAmplitudes, truncationThreshold)
+                        .Select(
+                            item =>
+                            {
+                                var (cmplx, basisLabel) = item;
+                                var amplitude = (cmplx.Real * cmplx.Real) + (cmplx.Imaginary * cmplx.Imaginary);
+                                var angle = System.Math.Atan2(cmplx.Imaginary, cmplx.Real);
+                                return $"|{basisLabel}⟩\t{FormatCartesian(cmplx.Real, cmplx.Imaginary)}\t == \t" +
+                                                       $"{FormatPolar(amplitude, angle)}";
+                            }));
+            }
+
+            public override string ToString() => // An override of the `object.ToString()`.
+                ToString(BasisStateLabelingConvention.LittleEndian, false, 0.0);
+
+        } // public class DisplayableState
+
+
+        /// <summary>
+        ///     A state dumper that encodes dumped states into displayable
+        ///     objects.
+        /// </summary>
+        public class DisplayableStateDumper : StateDumper
+        {
+            private long _count = -1;
+            private Complex[]? _data = null;
+
+            // TODO(rokuzmin): Remove the commented-out code below once everything works on IQSharp side.
+            // /// <summary>
+            // ///     Whether small amplitudes should be truncated when dumping
+            // ///     states.
+            // /// </summary>
+            // public bool TruncateSmallAmplitudes { get; set; } = false;
+
+            // /// <summary>
+            // ///     The threshold for truncating measurement probabilities when
+            // ///     dumping states. Computational basis states whose measurement
+            // ///     probabilities (i.e: squared magnitudes) are below this threshold
+            // ///     are subject to truncation when
+            // ///     <see cref="IConfigurationSource.TruncateSmallAmplitudes" />
+            // ///     is <c>true</c>.
+            // /// </summary>
+            // public double TruncationThreshold { get; set; } = 1e-10;
+
+            // /// <summary>
+            // ///     The labeling convention to be used when labeling computational
+            // ///     basis states.
+            // /// </summary>
+            // public BasisStateLabelingConvention BasisStateLabelingConvention { get; set; } = BasisStateLabelingConvention.Bitstring;
+
+            // /// <summary>
+            // ///     Whether the measurement probabilities will be displayed as an
+            // ///     interactive histogram.
+            // /// </summary>
+            // private bool ShowMeasurementDisplayHistogram { get; set; } = false;
+
+            // /// <summary>
+            // ///     Sets the properties of this display dumper from a given
+            // ///     configuration source.
+            // /// </summary>
+            // public JupyterDisplayDumper Configure(IConfigurationSource configurationSource)
+            // {
+            //     configurationSource
+            //         .ApplyConfiguration<bool>("dump.measurementDisplayHistogram", value => ShowMeasurementDisplayHistogram = value)
+            //         .ApplyConfiguration<bool>("dump.truncateSmallAmplitudes", value => TruncateSmallAmplitudes = value)
+            //         .ApplyConfiguration<double>("dump.truncationThreshold", value => TruncationThreshold = value)
+            //         .ApplyConfiguration<BasisStateLabelingConvention>(
+            //             "dump.basisStateLabelingConvention", value => BasisStateLabelingConvention = value
+            //         );
+            //     return this;
+            // }
+
             /// <summary>
-            /// The callback method. Formats the given state and invokes the <see cref="Channel"/>
+            /// A method to call to output a string representation.
             /// </summary>
-            /// <returns>True, so the entire wave function is dumped.</returns>
+            public virtual Action<string>? FileWriter { get; }
+
+            /// <summary>
+            ///     Constructs a new display dumper for a given simulator.
+            /// </summary>
+            public DisplayableStateDumper(QuantumSimulator sim, Action<string>? fileWriter = null) : base(sim)
+            {
+                this.FileWriter = fileWriter;
+            }
+
+            /// <summary>
+            ///     Used by the simulator to provide states when dumping.
+            ///     Not intended to be called directly.
+            /// </summary>
             public override bool Callback(uint idx, double real, double img)
             {
-                Channel(Format(idx, real, img));
+                if (_data == null) throw new Exception("Expected data buffer to be initialized before callback, but it was null.");
+                _data[idx] = new Complex(real, img);
                 return true;
             }
 
+            /// <summary>
+            ///     Dumps the state of a register of qubits as a displayable object.
+            /// </summary>
+            // TODO(rokuzmin): What does it return?
             public override bool Dump(IQArray<Qubit>? qubits = null)
             {
-                var count = qubits == null
-                    ? this.Simulator.QubitManager.AllocatedQubitsCount
-                    : qubits.Length;
-                this._maxCharsStateId = ((1 << (int)count) - 1).ToString().Length;
+                System.Diagnostics.Debug.Assert(this.Simulator.QubitManager != null, 
+                    "Internal logic error, QubitManager must be assigned");
 
-                return base.Dump(qubits);
+                _count = qubits == null
+                            ? this.Simulator.QubitManager.AllocatedQubitsCount
+                            : qubits.Length;
+                _data = new Complex[1 << ((int)_count)];    // If 0 qubits are allocated then the array has 
+                                                            // a single element. The Hilbert space of the system is 
+                                                            // ℂ¹ (that is, complex-valued scalars).
+                var result = base.Dump(qubits);
+
+                // At this point, _data should be filled with the full state
+                // vector, so let's display it, counting on the right display
+                // encoder to be there to pack it into a table.
+
+                // var id = System.Guid.NewGuid();
+                var state = new DisplayableState
+                {
+                    // We cast here as we don't support a large enough number
+                    // of qubits to saturate an int.
+                    QubitIds = qubits?.Select(q => q.Id) ?? Simulator.QubitIds.Select(q => (int)q) ?? Enumerable.Empty<int>(),
+                    NQubits = (int)_count,
+                    Amplitudes = _data,
+                    // DivId = $"dump-machine-div-{id}" 
+                };
+
+                if (this.FileWriter != null)
+                {
+                    this.FileWriter(state.ToString());
+                }
+                else
+                {
+                    Simulator.MaybeDisplayDiagnostic(state);
+                }
+
+
+                // TODO(rokuzmin): Work on this thoroughly on the IQSharp side:
+                // if (ShowMeasurementDisplayHistogram)
+                // {
+                //     Debug.Assert(Channel.CommsRouter != null, "Display dumper requires comms router.");
+                //     Channel.CommsRouter.OpenSession(
+                //         "iqsharp_state_dump",
+                //         new MeasurementHistogramContent()
+                //         {
+                //             State = state
+                //         }
+                //     ).Wait();
+                // }
+
+                // Clean up the state vector buffer.
+                _data = null;
+
+                return result;
             }
+
         }
     }
 }
