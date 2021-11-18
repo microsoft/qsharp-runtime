@@ -327,7 +327,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     bool dumpQubits(std::vector<logical_qubit_id> const& qs, TDumpToLocationCallback callback, TDumpLocation location) override
     {
-        assert(qs.size() <= num_qubits());
+        //assert(qs.size() <= num_qubits());
 
         WavefunctionStorage wfn(1ull << qs.size());
 
@@ -347,7 +347,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(size_t, double, double))
     {
-        assert(qs.size() <= num_qubits());
+        //assert(qs.size() <= num_qubits());
 
         WavefunctionStorage wfn(1ull << qs.size());
 
@@ -379,7 +379,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         auto test = std::vector<bool>(table_size, false);
         for (size_t i = 0; i < table_size; ++i)
             test.at(permutation_table[i]) = true;
-        assert(std::accumulate(test.begin(), test.end(), 0u) == table_size);
+        //assert(std::accumulate(test.begin(), test.end(), 0u) == table_size);
 #endif
 */
 
@@ -410,7 +410,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
 
     void changebasis(std::vector<Gates::Basis> const& bs, std::vector<logical_qubit_id> const& qs, bool back)
     {
-        assert(bs.size() == qs.size());
+        //assert(bs.size() == qs.size());
         for (unsigned i = 0; i < bs.size(); ++i)
             changebasis(bs[i], qs[i], back);
     }

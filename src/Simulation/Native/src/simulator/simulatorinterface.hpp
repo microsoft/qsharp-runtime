@@ -87,32 +87,32 @@ class SimulatorInterface
 
     virtual bool subsytemwavefunction(std::vector<unsigned> const& qs, WavefunctionStorage& qubitswfn, double tolerance)
     {
-        assert(false);
+        //assert(false);
         return false;
     };
 
     virtual void dump(bool (*callback)(size_t, double, double))
     {
-        assert(false);
+        //assert(false);
     }
     virtual void dump(TDumpToLocationCallback, TDumpLocation)
     {
-        assert(false);
+        //assert(false);
     }
     // TODO(rokuzmin): What does it return?
     virtual bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(size_t, double, double))
     {
-        assert(false);
+        //assert(false);
         return false;
     }
     virtual bool dumpQubits(std::vector<logical_qubit_id> const& qs, TDumpToLocationCallback callback, TDumpLocation location)
     {
-        assert(false);
+        //assert(false);
         return false;
     }
     virtual void dumpIds(void (*callback)(unsigned))
     {
-        assert(false);
+        //assert(false);
     }
 
     // apply permutation of basis states to the wave function

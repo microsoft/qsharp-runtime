@@ -82,7 +82,7 @@ class DiagMatrix
     /// \pre i<rows() && j<cols()
     value_type operator()(unsigned i, unsigned j) const
     {
-        assert(i < this->rows() && j < this->cols());
+        //assert(i < this->rows() && j < this->cols());
         return i == j ? diag_[i] : static_cast<value_type>(0.);
     }
 
@@ -90,8 +90,8 @@ class DiagMatrix
     /// \pre i<rows() && j<cols()
     reference operator()(unsigned i, unsigned j)
     {
-        assert(i < this->rows() && j < this->cols());
-        assert(i == j);
+        //assert(i < this->rows() && j < this->cols());
+        //assert(i == j);
         return diag_[i];
     }
 

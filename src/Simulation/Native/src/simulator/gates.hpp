@@ -462,7 +462,8 @@ class R : public RotationGate
             return Rz(angle(), qubit()).matrix();
             break;
         default:
-            assert(false);
+            //assert(false);
+            ;
         }
         // dummy return
         return TinyMatrix<ComplexType, 2>();

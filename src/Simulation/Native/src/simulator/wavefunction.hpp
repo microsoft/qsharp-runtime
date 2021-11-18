@@ -52,8 +52,8 @@ inline size_t set_register(
     size_t basis_vector_in_ps,
     size_t basis_vector_target)
 {
-    assert(qmask == kernels::make_mask(ps));
-    assert(basis_vector_in_ps < (1ull << ps.size()));
+    //assert(qmask == kernels::make_mask(ps));
+    //assert(basis_vector_in_ps < (1ull << ps.size()));
 
     size_t result = basis_vector_target & ~qmask;
     for (unsigned i = 0; i < ps.size(); ++i)
@@ -109,8 +109,8 @@ static bool is_sorted_assending(const std::vector<logical_qubit_id>& x)
 
 static bool is_intersection_empty(const std::vector<logical_qubit_id>& x, const std::vector<logical_qubit_id>& y)
 {
-    assert(is_sorted_assending(x));
-    assert(is_sorted_assending(y));
+    //assert(is_sorted_assending(x));
+    //assert(is_sorted_assending(y));
 
     std::vector<logical_qubit_id> intersection;
     std::set_intersection(x.begin(), x.end(), y.begin(), y.end(), std::back_inserter(intersection));
@@ -119,7 +119,7 @@ static bool is_intersection_empty(const std::vector<logical_qubit_id>& x, const 
 
 static bool is_intersection_empty(const std::vector<logical_qubit_id>& x, const std::set<logical_qubit_id>& y)
 {
-    assert(is_sorted_assending(x));
+    //assert(is_sorted_assending(x));
 
     std::vector<logical_qubit_id> intersection;
     std::set_intersection(x.begin(), x.end(), y.begin(), y.end(), std::back_inserter(intersection));
@@ -144,7 +144,7 @@ class Cluster
         : qids_(qids)
         , gates_(gates)
     {
-        assert(is_sorted_assending(qids));
+        //assert(is_sorted_assending(qids));
     }
     Cluster(Cluster&& other)
         : qids_(std::move(other.qids_))
@@ -292,7 +292,7 @@ class Cluster
         std::list<Cluster> prevClusters;
         for (unsigned cluster_width = 1; cluster_width < fuseSpan + 1; cluster_width++)
         {
-            assert(prevClusters.empty());
+            //assert(prevClusters.empty());
             prevClusters.swap(curClusters);
 
             Cluster prevCluster;
@@ -414,7 +414,7 @@ class Wavefunction
 
     positional_qubit_id get_qubit_position(logical_qubit_id q) const
     {
-        assert(qubitmap_[q] != invalid_qubit_position());
+        //assert(qubitmap_[q] != invalid_qubit_position());
         return qubitmap_[q];
     }
 
@@ -484,7 +484,7 @@ class Wavefunction
     {
 /*
 #ifndef NDEBUG
-        assert(usage_ != QubitAllocationPattern::explicitLogicalId);
+        //assert(usage_ != QubitAllocationPattern::explicitLogicalId);
         usage_ = QubitAllocationPattern::implicitLogicalId;
 #endif
 */
@@ -513,7 +513,7 @@ class Wavefunction
     {
 /*
 #ifndef NDEBUG
-        assert(usage_ != QubitAllocationPattern::implicitLogicalId);
+        //assert(usage_ != QubitAllocationPattern::implicitLogicalId);
         usage_ = QubitAllocationPattern::explicitLogicalId;
 #endif
 */
@@ -523,15 +523,15 @@ class Wavefunction
 
         if (id < qubitmap_.size())
         {
-            assert(qubitmap_[id] == invalid_qubit_position());
+            //assert(qubitmap_[id] == invalid_qubit_position());
             qubitmap_[id] = num_qubits_++;
         }
         else
         {
-            assert(id == qubitmap_.size()); // we want qubitmap_ to be as small as possible
+            //assert(id == qubitmap_.size()); // we want qubitmap_ to be as small as possible
             qubitmap_.push_back(num_qubits_++);
         }
-        assert((wfn_.size() >> num_qubits_) == 1);
+        //assert((wfn_.size() >> num_qubits_) == 1);
     }
 
     /// release the specified qubit
@@ -581,7 +581,7 @@ class Wavefunction
     /// is successfuly injected.
     bool inject_state(const std::vector<logical_qubit_id>& qubits, const std::vector<ComplexType>& amplitudes)
     {
-        assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
+        //assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
 
         flush();
 
@@ -686,11 +686,11 @@ class Wavefunction
     bool getvalue(logical_qubit_id q) const
     {
         flush();
-        assert(isclassical(q));
+        //assert(isclassical(q));
         int res = kernels::getvalue(wfn_, get_qubit_position(q));
         if (res == 2) std::cout << *this;
 
-        assert(res < 2);
+        //assert(res < 2);
         return res == 1;
     }
 
@@ -776,12 +776,12 @@ class Wavefunction
 
 /*
 #ifndef NDEBUG
-        assert(table_size == (1ull << qs.size()));
+        //assert(table_size == (1ull << qs.size()));
         // permutation_table should describe a permutation of {0, 1, 2, ..., table_size - 1}
         std::set<size_t> permutations(permutation_table, permutation_table + table_size);
-        assert(permutations.size() == table_size);         // no duplicates
-        assert(*permutations.begin() == 0);                // min element in ordered set
-        assert(*(--permutations.end()) == table_size - 1); // max element in ordered set
+        //assert(permutations.size() == table_size);         // no duplicates
+        //assert(*permutations.begin() == 0);                // min element in ordered set
+        //assert(*(--permutations.end()) == table_size - 1); // max element in ordered set
 #endif
 */
 
@@ -808,7 +808,7 @@ class Wavefunction
             for (size_t i = 0; i < num_states; ++i)
             {
                 const size_t target = permute(i);
-                //assert(permuted.insert(target).second); // should see no duplicates
+                ////assert(permuted.insert(target).second); // should see no duplicates
                 psi_new[target] = wfn_[i];
             }
         }
@@ -817,15 +817,15 @@ class Wavefunction
             for (size_t i = 0; i < num_states; ++i)
             {
                 const size_t source = permute(i);
-                //assert(permuted.insert(source).second); // should see no duplicates
+                ////assert(permuted.insert(source).second); // should see no duplicates
                 psi_new[i] = wfn_[source];
             }
         }
 
         //// check that this was, indeed, a permutation of the basis
-        //assert(permuted.size() == num_states);         // would follow if no duplicates encountered above
-        //assert(*permuted.begin() == 0);                // min element in ordered set
-        //assert(*(--permuted.end()) == num_states - 1); // max element in ordered set
+        ////assert(permuted.size() == num_states);         // would follow if no duplicates encountered above
+        ////assert(*permuted.begin() == 0);                // min element in ordered set
+        ////assert(*(--permuted.end()) == num_states - 1); // max element in ordered set
 
         std::swap(wfn_, psi_new);
     }

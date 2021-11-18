@@ -101,7 +101,7 @@ class TinyMatrix
     /// \pre i<rows() && j<cols()
     value_type operator()(unsigned i, unsigned j) const
     {
-        assert(i < this->rows() && j < this->cols());
+        //assert(i < this->rows() && j < this->cols());
         return mat_[i][j];
     }
 
@@ -109,7 +109,7 @@ class TinyMatrix
     /// \pre i<rows() && j<cols()
     reference operator()(unsigned i, unsigned j)
     {
-        assert(i < this->rows() && j < this->cols());
+        //assert(i < this->rows() && j < this->cols());
         return mat_[i][j];
     }
 

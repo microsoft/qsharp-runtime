@@ -28,11 +28,11 @@ unsigned ilog2(Int n)
     for (unsigned width = 0; width < 8 * sizeof(Int); ++width)
         if ((static_cast<Int>(1) << width) == n) return width;
     // not a power of 2
-    assert(false);
+    //assert(false);
     return std::numeric_limits<unsigned>::max(); // dummy return
 #else
     unsigned l = _bit_scan_reverse(n);
-    assert(n == (Int(1) << l));
+    //assert(n == (Int(1) << l));
     return l;
 #endif
 }

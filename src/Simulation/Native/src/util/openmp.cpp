@@ -13,6 +13,6 @@ void Microsoft::Quantum::openmp::init(unsigned numthreads)
     kmp_set_defaults("KMP_AFFINITY=compact");
 #endif
 #else
-    assert(numthreads < 2);
+    //assert(numthreads < 2);
 #endif
 }

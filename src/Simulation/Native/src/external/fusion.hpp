@@ -58,7 +58,7 @@ public:
 	
 	template <class T>
 	void global_factor(T const& factor) {
-		assert(items_.size() > 0); // make sure we never drop a global factor
+		//assert(items_.size() > 0); // make sure we never drop a global factor
 		global_factor_ *= factor;
 		IndexVector empty_vec;
 		Matrix empty_matrix;
@@ -119,7 +119,7 @@ public:
 			target_set_.emplace(idx);
 		
 		if (global_factor_ != 1. && ctrl_list.size() > 0){
-			assert(ctrl_set_.size() == 0);
+			//assert(ctrl_set_.size() == 0);
 			add_controls(matrix, index_list, ctrl_list);
 		}
 		else
@@ -134,8 +134,8 @@ public:
 	}
 	
 	void perform_fusion(Matrix& fused_matrix, IndexVector& index_list, IndexVector& ctrl_list){
-		if (global_factor_ != 1.)
-			assert(ctrl_set_.size() == 0);
+		// if (global_factor_ != 1.)
+		// 	//assert(ctrl_set_.size() == 0);
 		
 		for (auto idx : target_set_)
 			index_list.push_back(idx);

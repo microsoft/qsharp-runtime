@@ -34,7 +34,7 @@ TInputIterator argmaxnrm2serial(TInputIterator first, TInputIterator last)
 template <class T, class A>
 std::size_t argmaxnrm2(const std::vector<T, A>& values)
 {
-    assert(values.size() > 0);
+    //assert(values.size() > 0);
 
     std::size_t threads = static_cast<std::size_t>(omp_get_max_threads());
     std::vector<std::size_t> chunks = split_interval_in_chunks(values.size(), threads);

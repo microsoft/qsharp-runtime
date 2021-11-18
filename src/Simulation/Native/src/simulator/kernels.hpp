@@ -205,7 +205,8 @@ inline ComplexType iExp(int power)
     case 3:
         return -1i;
     default:
-        assert(false);
+        //assert(false);
+        ;
     }
     return 0;
 }
@@ -218,7 +219,7 @@ void apply_controlled_exp(
     std::vector<unsigned> const& cs,
     std::vector<unsigned> const& qs)
 {
-    assert(qs.size() > 1);
+    //assert(qs.size() > 1);
     unsigned lowest = *std::min_element(qs.begin(), qs.end());
 
     std::size_t offset = 1ull << lowest;
@@ -257,7 +258,8 @@ void apply_controlled_exp(
             case Gates::PauliI:
                 break;
             default:
-                assert(false);
+                //assert(false);
+                ;
             }
         }
 
@@ -288,7 +290,7 @@ double jointprobability(
     std::vector<unsigned> const& qs,
     bool val = true)
 {
-    assert(qs.size() > 1);
+    //assert(qs.size() > 1);
 
     double prob = 0.;
     unsigned lowest = *std::min_element(qs.begin(), qs.end());
@@ -323,7 +325,8 @@ double jointprobability(
                 yz_bits |= (1ull << qs[i]);
                 break;
             default:
-                assert(false);
+                //assert(false);
+                ;
             }
         }
 
@@ -380,11 +383,11 @@ void subsytemwavefunction_by_pivot(
 {
 
     const unsigned bit_size = sizeof(std::size_t) * 8;
-    assert(qs.size() > 0);
-    for (std::size_t i = 0; i < qs.size() - 1; ++i)
-    {
-        assert(qs[i] < qs[i + 1]);
-    }
+    //assert(qs.size() > 0);
+    // for (std::size_t i = 0; i < qs.size() - 1; ++i)
+    // {
+    //     //assert(qs[i] < qs[i + 1]);
+    // }
 
     std::size_t max = 1ull << qs.size();
 
@@ -418,13 +421,13 @@ bool istensorproduct(
 {
 
     const unsigned bit_size = sizeof(std::size_t) * 8;
-    assert(wfn.size() == wfn1.size() * wfn2.size());
+    //assert(wfn.size() == wfn1.size() * wfn2.size());
 
-    assert(wfn1.size() == 1ull << qs1.size());
-    assert(wfn2.size() == 1ull << qs2.size());
+    //assert(wfn1.size() == 1ull << qs1.size());
+    //assert(wfn2.size() == 1ull << qs2.size());
 
-    assert(qs2 == complement(qs1, static_cast<unsigned>(qs1.size() + qs2.size())));
-    assert(qs1 == complement(qs2, static_cast<unsigned>(qs1.size() + qs2.size())));
+    //assert(qs2 == complement(qs1, static_cast<unsigned>(qs1.size() + qs2.size())));
+    //assert(qs1 == complement(qs2, static_cast<unsigned>(qs1.size() + qs2.size())));
 
     std::vector<size_t> chunks = split_interval_in_chunks(wfn1.size(), 1);
 
@@ -476,8 +479,8 @@ bool subsytemwavefunction(
 {
     const unsigned bit_size = sizeof(std::size_t) * 8;
 
-    assert(qubitswfn.size() == 1ull << qs.size());
-    assert(tolerance > 0.0);
+    //assert(qubitswfn.size() == 1ull << qs.size());
+    //assert(tolerance > 0.0);
 
     // We need a sorted list of qubits:
     std::vector<unsigned> sorted(qs);
@@ -496,7 +499,7 @@ bool subsytemwavefunction(
     {
         std::vector<unsigned> qs_rest = complement(sorted, total_qubits);
         std::vector<T, A1> qubitswfn_rest(1ull << (qs_rest.size()));
-        assert(qubitswfn_rest.size() * qubitswfn.size() == wfn.size());
+        //assert(qubitswfn_rest.size() * qubitswfn.size() == wfn.size());
         subsytemwavefunction_by_pivot(wfn, qs_rest, qubitswfn_rest, pivot_position);
         normalize(qubitswfn_rest);
 

@@ -15,12 +15,12 @@ namespace Quantum
 static std::vector<unsigned> complement(const std::vector<unsigned>& bit_positions, unsigned highest_bit)
 {
     const unsigned max_bit_size = 64;
-    assert(highest_bit <= max_bit_size);
+    //assert(highest_bit <= max_bit_size);
     std::bitset<max_bit_size> mask(0);
     std::vector<unsigned> res;
     for (unsigned i : bit_positions)
     {
-        assert(i < max_bit_size);
+        //assert(i < max_bit_size);
         mask.set(i);
     }
 

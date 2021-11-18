@@ -97,7 +97,7 @@ using rowtype = vector<complex<double>,AlignedAlloc<complex<double>,64>>;
 using matrixtype = vector<rowtype>;
 
 int main(int argc, char *argv[]){
-	assert(argc > 2);
+	////assert(argc > 2);
 	size_t N = 1ULL << atoi(argv[1]);
 	unsigned i0 = atoi(argv[2]);
 	matrixtype m(2, rowtype(2));
