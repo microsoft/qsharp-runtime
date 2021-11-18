@@ -373,6 +373,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         bool adjoint = false)
 
     {
+/*
 #ifndef NDEBUG
         // check the permute function is bijective
         auto test = std::vector<bool>(table_size, false);
@@ -380,6 +381,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
             test.at(permutation_table[i]) = true;
         assert(std::accumulate(test.begin(), test.end(), 0u) == table_size);
 #endif
+*/
 
         recursive_lock_type l(getmutex());
         psi.permute_basis(qs, table_size, permutation_table, adjoint);

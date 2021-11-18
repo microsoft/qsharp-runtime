@@ -334,6 +334,7 @@ class Cluster
 template <class T = ComplexType>
 class Wavefunction
 {
+/*
 #ifndef NDEBUG
     /// There are two distinct usage patterns to how qubits are allocated and they shouldn't be mixed after allocations
     /// have begun. However, we only check the pattern consistency in debug asserts.
@@ -344,6 +345,7 @@ class Wavefunction
         explicitLogicalId, // the caller specifies the logical qubit id
     };
 #endif
+*/
 
     /// Number of currently allocated qubits.
     unsigned num_qubits_;
@@ -371,9 +373,11 @@ class Wavefunction
     using RngEngine = std::mt19937;
     RngEngine rng_;
 
+/*
 #ifndef NDEBUG
     QubitAllocationPattern usage_ = QubitAllocationPattern::any;
 #endif
+*/
 
   public:
     using value_type = T;
@@ -478,10 +482,12 @@ class Wavefunction
     /// Allocate a qubit with implicitly assigned logical qubit id.
     logical_qubit_id allocate_qubit()
     {
+/*
 #ifndef NDEBUG
         assert(usage_ != QubitAllocationPattern::explicitLogicalId);
         usage_ = QubitAllocationPattern::implicitLogicalId;
 #endif
+*/
 
         flush();
         wfn_.resize(2 * wfn_.size());
@@ -505,10 +511,12 @@ class Wavefunction
     /// doesn't collide with other allocated qubits.
     void allocate_qubit(logical_qubit_id id)
     {
+/*
 #ifndef NDEBUG
         assert(usage_ != QubitAllocationPattern::implicitLogicalId);
         usage_ = QubitAllocationPattern::explicitLogicalId;
 #endif
+*/
 
         flush();
         wfn_.resize(2 * wfn_.size());
@@ -766,6 +774,7 @@ class Wavefunction
     {
         if (qs.empty()) return;
 
+/*
 #ifndef NDEBUG
         assert(table_size == (1ull << qs.size()));
         // permutation_table should describe a permutation of {0, 1, 2, ..., table_size - 1}
@@ -774,6 +783,7 @@ class Wavefunction
         assert(*permutations.begin() == 0);                // min element in ordered set
         assert(*(--permutations.end()) == table_size - 1); // max element in ordered set
 #endif
+*/
 
         flush();
 
@@ -788,9 +798,11 @@ class Wavefunction
             return detail::set_register(positions, qmask, permutation_table[qstate], basis_vector);
         };
 
+/*
 #ifndef NDEBUG
         std::set<size_t> permuted;
 #endif
+*/
         if (!adjoint)
         {
             for (size_t i = 0; i < num_states; ++i)

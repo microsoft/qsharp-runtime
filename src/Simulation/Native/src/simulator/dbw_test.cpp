@@ -202,11 +202,11 @@ int main()
     int gateCnt = (int)prb.size();
     double maxGps = 0.0;
 
-#ifdef NDEBUG
+//#ifdef NDEBUG
     double gpsFailureThreshold = 1000.0;
-#else
-    double gpsFailureThreshold = 60.0;
-#endif
+//#else
+//    double gpsFailureThreshold = 60.0;
+//#endif
 
     printf("==== Starting %s (%d gates), Failure threshold %.2e gps\n", fName, gateCnt, gpsFailureThreshold);
 
