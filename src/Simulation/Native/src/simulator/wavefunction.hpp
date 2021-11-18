@@ -808,7 +808,7 @@ class Wavefunction
             for (size_t i = 0; i < num_states; ++i)
             {
                 const size_t target = permute(i);
-                assert(permuted.insert(target).second); // should see no duplicates
+                //assert(permuted.insert(target).second); // should see no duplicates
                 psi_new[target] = wfn_[i];
             }
         }
@@ -817,15 +817,15 @@ class Wavefunction
             for (size_t i = 0; i < num_states; ++i)
             {
                 const size_t source = permute(i);
-                assert(permuted.insert(source).second); // should see no duplicates
+                //assert(permuted.insert(source).second); // should see no duplicates
                 psi_new[i] = wfn_[source];
             }
         }
 
-        // check that this was, indeed, a permutation of the basis
-        assert(permuted.size() == num_states);         // would follow if no duplicates encountered above
-        assert(*permuted.begin() == 0);                // min element in ordered set
-        assert(*(--permuted.end()) == num_states - 1); // max element in ordered set
+        //// check that this was, indeed, a permutation of the basis
+        //assert(permuted.size() == num_states);         // would follow if no duplicates encountered above
+        //assert(*permuted.begin() == 0);                // min element in ordered set
+        //assert(*(--permuted.end()) == num_states - 1); // max element in ordered set
 
         std::swap(wfn_, psi_new);
     }
