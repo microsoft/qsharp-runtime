@@ -93,9 +93,9 @@ namespace Microsoft.Quantum.Simulation.Common
             }
         }
 
-        public I Get<I>(Type t)
+        public I Get<I>(Type T)
         {
-            return (I)this.GetInstance(t);
+            return (I)this.GetInstance(T);
         }
 
         /// <summary>
