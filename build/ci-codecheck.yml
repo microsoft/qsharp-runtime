@@ -27,7 +27,7 @@ jobs:
       linux:
         imageName: 'ubuntu-latest'
       mac:
-        imageName: 'macOS-latest'
+        imageName: 'macOS-10.15'
       #windows:                         # No sanitizers supported on Win at the moment.
       #  imageName: 'windows-latest'
   pool: 
