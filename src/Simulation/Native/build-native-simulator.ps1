@@ -30,7 +30,7 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     # version of gcc we've installed.
     #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=gcc-11 -D CMAKE_CXX_COMPILER=g++-11 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
     #cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
+    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
 }
 else {
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
