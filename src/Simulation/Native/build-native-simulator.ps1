@@ -31,10 +31,15 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     # version of gcc we've installed.
     #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=gcc-11 -D CMAKE_CXX_COMPILER=g++-11 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
     #cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
-    $SANITIZE_FLAGS="-fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability -fsanitize=address -fsanitize-blacklist=/Users/runner/work/1/s/src/Qir/Common/cmake/../../UBSan.ignore -fno-omit-frame-pointer -fno-optimize-sibling-calls"
+
+    #$SANITIZE_FLAGS="-fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability -fsanitize=address -fsanitize-blacklist=/Users/runner/work/1/s/src/Qir/Common/cmake/../../UBSan.ignore -fno-omit-frame-pointer -fno-optimize-sibling-calls"
+    #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" `
+    #  -D CMAKE_C_FLAGS_DEBUG="-ggdb3 $SANITIZE_FLAGS" `
+    #  -D CMAKE_CXX_FLAGS_DEBUG="-ggdb3 $SANITIZE_FLAGS" ..
+
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" `
-      -D CMAKE_C_FLAGS_DEBUG="-ggdb3 $SANITIZE_FLAGS" `
-      -D CMAKE_CXX_FLAGS_DEBUG="-ggdb3 $SANITIZE_FLAGS" ..
+      -D CMAKE_C_FLAGS_DEBUG="-ggdb3" `
+      -D CMAKE_CXX_FLAGS_DEBUG="-ggdb3" ..
 }
 else {
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
