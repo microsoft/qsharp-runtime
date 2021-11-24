@@ -9,6 +9,7 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
     # # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md
     # brew update
     # brew install gcc@7
+    brew install libomp
 } else {
     Write-Host "No pre-reqs for building native simulator on platforms other than MacOS"
 }
