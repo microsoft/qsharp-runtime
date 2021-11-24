@@ -22,7 +22,7 @@ elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
 {
     Write-Host "On Linux build native simulator using gcc (needed for OpenMP)"
     #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=gcc -D CMAKE_CXX_COMPILER=g++ -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-11 -D CMAKE_CXX_COMPILER=clang++-11 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
+    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-11 -D CMAKE_CXX_COMPILER=clang++-11 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
 }
 elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
 {
@@ -32,8 +32,8 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=gcc-11 -D CMAKE_CXX_COMPILER=g++-11 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
     #cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" `
-      -D CMAKE_C_FLAGS_DEBUG="-g3" `
-      -D CMAKE_CXX_FLAGS_DEBUG="-g3" ..
+      -D CMAKE_C_FLAGS_DEBUG="-ggdb3" `
+      -D CMAKE_CXX_FLAGS_DEBUG="-ggdb3" ..
 }
 else {
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..

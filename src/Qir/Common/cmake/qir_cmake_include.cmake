@@ -133,7 +133,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
 # Sanitizers (https://clang.llvm.org/docs/UsersManual.html#controlling-code-generation):
 
 if (NOT WIN32)
-    set(SANITIZE_FLAGS "-g3")
+    set(SANITIZE_FLAGS "-ggdb3")
 
     # Undefined Behavior Sanitizer (https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html)
     # Win:
