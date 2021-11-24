@@ -24,8 +24,8 @@ jobs:
   displayName: Build
   strategy:
     matrix:
-      linux:
-        imageName: 'ubuntu-latest'
+      #linux:
+      #  imageName: 'ubuntu-latest'
       mac:
         imageName: 'macOS-latest'
       #windows:                         # No sanitizers supported on Win at the moment.
