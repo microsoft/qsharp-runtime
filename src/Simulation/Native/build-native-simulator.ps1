@@ -22,11 +22,9 @@ $SANITIZE_FLAGS=`
     + "-fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability " `
     `
     + "-fsanitize=address " `
-    + "-fsanitize=pointer-subtract " `
+    + "-fsanitize=pointer-compare -fsanitize=pointer-subtract " `
     + "-fsanitize-address-use-after-scope " `
     + "-fno-omit-frame-pointer -fno-optimize-sibling-calls"
-
-    # -fsanitize=pointer-compare  Results in this? https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_build/results?buildId=35947&view=logs&j=2f953adc-c56d-55c4-a64a-eab7c4b02235&t=0add2ae9-6315-517a-e27a-74c6ff583129&l=71
 
     #+ "-fsanitize=unsigned-integer-overflow "
     #  -fsanitize=bounds-strict    clang: error: unsupported argument 'bounds-strict' to option 'fsanitize='  (as opposed to gcc)
