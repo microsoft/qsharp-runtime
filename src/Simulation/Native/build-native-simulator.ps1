@@ -33,7 +33,7 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     # # cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
 
     $OPENMP_PATH="/usr/local/opt/libomp"
-    $OPENMP_COMPILER_FLAGS="-Xpreprocessor -fopenmp -I$OPENMP_PATH/include"
+    $OPENMP_COMPILER_FLAGS="-Xpreprocessor -fopenmp -I$OPENMP_PATH/include -lomp -L$OPENMP_PATH/lib"
     $OPENMP_LIB_NAME="omp"
     cmake -D BUILD_SHARED_LIBS:BOOL="1" `
         -D OpenMP_CXX_FLAGS="$OPENMP_COMPILER_FLAGS" -D OpenMP_CXX_LIB_NAMES="$OPENMP_LIB_NAME" `
