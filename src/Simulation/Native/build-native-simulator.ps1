@@ -10,11 +10,11 @@ if (-not (Test-Path $nativeBuild)) {
 }
 Push-Location $nativeBuild
 
-$SANITIZE_FLAGS="-fsanitize=undefined -fsanitize=float-divide-by-zero " `
-    + "-fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability " `
+$SANITIZE_FLAGS="-fsanitize=undefined " `
     + "-fsanitize=address " `
-    + "-fsanitize-blacklist=/Users/runner/work/1/s/src/Qir/Common/cmake/../../UBSan.ignore " `
     + "-fno-omit-frame-pointer -fno-optimize-sibling-calls"
+    #+ "-fsanitize=float-divide-by-zero " 
+    #+ "-fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability " 
 
 # There should be no space after -D CMAKE_BUILD_TYPE= but if we provide the environment variable inline, without
 # the space it doesn't seem to get substituted... With invalid -D CMAKE_BUILD_TYPE argument cmake silently produces
