@@ -8,6 +8,16 @@ steps:
   inputs:
     versionSpec: '5.6.0'
  
+  # Native Simulator (needed to build and run the QIR tests):
+- pwsh: src/Simulation/Native/prerequisites.ps1
+  displayName: "Install Native Simulator Prerequisites"
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- powershell: |
+    .\build-native-simulator.ps1
+  displayName: "Build Native Simulator"
+  workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
+
   # QIR Runtime:
 - pwsh: src/Qir/Runtime/prerequisites.ps1
   displayName: "Install QIR Runtime Prerequisites"
@@ -20,16 +30,6 @@ steps:
 - pwsh: src/Qir/Runtime/test-qir-runtime.ps1
   displayName: "Test QIR Runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)
-
-  # Native Simulator (needed to build and run the QIR tests):
-- pwsh: src/Simulation/Native/prerequisites.ps1
-  displayName: "Install Native Simulator Prerequisites"
-  workingDirectory: $(System.DefaultWorkingDirectory)
-
-- powershell: |
-    .\build-native-simulator.ps1
-  displayName: "Build Native Simulator"
-  workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
 
   # QIR Tests:
 - pwsh: src/Qir/Tests/build-qir-tests.ps1
