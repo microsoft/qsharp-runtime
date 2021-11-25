@@ -33,13 +33,12 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     # # cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
 
     $OPENMP_PATH="/usr/local/opt/libomp"
-    $OPENMP_COMPILER_FLAGS="-Xpreprocessor -fopenmp -I$OPENMP_PATH/include"
+    $OPENMP_COMPILER_FLAGS="-Xpreprocessor -fopenmp -I$OPENMP_PATH/include -lomp -L$OPENMP_PATH/lib"
     $OPENMP_LIB_NAME="omp"
     cmake -D BUILD_SHARED_LIBS:BOOL="1" `
         -D OpenMP_CXX_FLAGS="$OPENMP_COMPILER_FLAGS" -D OpenMP_CXX_LIB_NAMES="$OPENMP_LIB_NAME" `
         -D   OpenMP_C_FLAGS="$OPENMP_COMPILER_FLAGS" -D   OpenMP_C_LIB_NAMES="$OPENMP_LIB_NAME" `
         -D OpenMP_omp_LIBRARY=$OPENMP_PATH/lib/libomp.dylib `
-        -D CMAKE_EXE_LINKER_FLAGS="-lomp -L$OPENMP_PATH/lib" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
     # TODO(rokuzmin): Updte prerequisites.
 }
