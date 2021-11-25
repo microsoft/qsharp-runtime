@@ -10,11 +10,24 @@ if (-not (Test-Path $nativeBuild)) {
 }
 Push-Location $nativeBuild
 
-$SANITIZE_FLAGS="-fsanitize=undefined " `
+$SANITIZE_FLAGS=`
+    "-fsanitize=undefined " `
+    + "-fsanitize=shift -fsanitize=shift-base " `
+    + "-fsanitize=integer-divide-by-zero -fsanitize=float-divide-by-zero " `
+    + "-fsanitize=unreachable " `
+    + "-fsanitize=vla-bound -fsanitize=null -fsanitize=return " `
+    + "-fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=alignment -fsanitize=object-size " `
+    + "-fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool -fsanitize=enum " `
+    + "-fsanitize=vptr -fsanitize=pointer-overflow -fsanitize=builtin " `
+    + "-fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability " `
+    `
     + "-fsanitize=address " `
+    + "-fsanitize=pointer-compare -fsanitize=pointer-subtract " `
+    + "-fsanitize-address-use-after-scope " `
     + "-fno-omit-frame-pointer -fno-optimize-sibling-calls"
-    #+ "-fsanitize=float-divide-by-zero " 
-    #+ "-fsanitize=unsigned-integer-overflow -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability " 
+
+    #+ "-fsanitize=unsigned-integer-overflow "
+    #  -fsanitize=bounds-strict    clang: error: unsupported argument 'bounds-strict' to option 'fsanitize='  (as opposed to gcc)
 
 # There should be no space after -D CMAKE_BUILD_TYPE= but if we provide the environment variable inline, without
 # the space it doesn't seem to get substituted... With invalid -D CMAKE_BUILD_TYPE argument cmake silently produces
