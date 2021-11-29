@@ -34,9 +34,23 @@ $SANITIZE_FLAGS=`
 # a DEBUG build.
 if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
 {
-    Write-Host "On Windows build native simulator using the default C/C++ compiler (should be MSVC)"
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
-    # TODO(rokuzmin): Switch to clang.
+    #Write-Host "On Windows build native simulator using the default C/C++ compiler (should be MSVC)"
+
+    $CMAKE_C_COMPILER = "-DCMAKE_C_COMPILER=clang.exe"
+    $CMAKE_CXX_COMPILER = "-DCMAKE_CXX_COMPILER=clang++.exe"
+
+    if ((!(Get-Command clang -ErrorAction SilentlyContinue) -and (choco find --idonly -l llvm) -contains "llvm") -or `
+        (Test-Path Env:/AGENT_OS)) {
+        # LLVM was installed by Chocolatey, so add the install location to the path.
+        $env:PATH = "$($env:SystemDrive)\Program Files\LLVM\bin;$env:Path"
+    }
+
+    #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" `
+    #    -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
+    #cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ../.. | Write-Host
+    cmake $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
+
+    # TODO(rokuzmin): Switch to clang, install prereqs (choco?).
 }
 elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
 {
