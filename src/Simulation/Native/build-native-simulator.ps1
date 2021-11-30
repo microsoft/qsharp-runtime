@@ -48,7 +48,8 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" `
     #    -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
     #cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ../.. | Write-Host
-    cmake $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
+    cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
+        # Without `-G Ninja` fail to switch from MSVC to Clang.
 
     # TODO(rokuzmin): Switch to clang, install prereqs (choco?).
 }

@@ -1,6 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+###
+set(AVXFLAGS "-mavx")
+set(AVX2FLAGS "-mfma -mavx2")
+set(AVX512FLAGS "-mfma -mavx512f -mavx512cd")
+set(FMAFLAGS )
+
+###
+
 add_executable(factory_test factory_test.cpp)
 target_link_libraries(factory_test Microsoft.Quantum.Simulator.Runtime)
 add_test(NAME factory_test COMMAND ./factory_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -19,6 +27,17 @@ add_executable(quantum_simulator_unittests
   "${PROJECT_SOURCE_DIR}/src/catch2/catch_driver.cpp"
   local_test.cpp
 )
+set_source_files_properties(local_test.cpp PROPERTIES COMPILE_FLAGS ${AVXFLAGS})
+###
+# set(SOURCES simulator/factory.cpp simulator/capi.cpp simulator/simulator.cpp util/openmp.cpp simulator/simulatoravx.cpp simulator/simulatoravx2.cpp simulator/simulatoravx512.cpp )
+# if(BUILD_SHARED_LIBS)
+#   add_library(Microsoft.Quantum.Simulator.Runtime SHARED ${SOURCES})
+#   set_source_files_properties(simulator/capi.cpp PROPERTIES COMPILE_FLAGS ${AVXFLAGS})
+#   set_source_files_properties(simulator/simulator.cpp PROPERTIES COMPILE_FLAGS ${AVXFLAGS})
+###
+
+
+
 
 target_link_libraries(quantum_simulator_unittests PUBLIC
   Microsoft.Quantum.Simulator.Runtime
