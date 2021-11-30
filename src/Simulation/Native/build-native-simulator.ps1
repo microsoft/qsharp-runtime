@@ -18,7 +18,7 @@ $SANITIZE_FLAGS=`
     + "-fsanitize=vla-bound -fsanitize=null -fsanitize=return " `
     + "-fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=alignment -fsanitize=object-size " `
     + "-fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool -fsanitize=enum " `
-    + "-fsanitize=vptr -fsanitize=pointer-overflow -fsanitize=builtin " `
+    + "-fsanitize=pointer-overflow -fsanitize=builtin " `
     + "-fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability " `
     `
     + "-fsanitize=address " `
@@ -28,6 +28,10 @@ $SANITIZE_FLAGS=`
 
     #+ "-fsanitize=unsigned-integer-overflow "
     #  -fsanitize=bounds-strict    clang: error: unsupported argument 'bounds-strict' to option 'fsanitize='  (as opposed to gcc)
+
+$NON_WIN_SANITIZE_FLAGS=`
+    "-fsanitize=vptr "
+
 
 # There should be no space after -D CMAKE_BUILD_TYPE= but if we provide the environment variable inline, without
 # the space it doesn't seem to get substituted... With invalid -D CMAKE_BUILD_TYPE argument cmake silently produces
@@ -48,8 +52,12 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" `
     #    -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
     #cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ../.. | Write-Host
-    cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
+    cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" `
+        -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
         # Without `-G Ninja` fail to switch from MSVC to Clang.
+
+        # -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" 
+        # -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" 
 
     # TODO(rokuzmin): Switch to clang, install prereqs (choco?).
 }
@@ -57,8 +65,8 @@ elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
 {
     Write-Host "On Linux build native simulator using gcc (needed for OpenMP)"
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-11 -D CMAKE_CXX_COMPILER=clang++-11 `
-        -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
-        -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
+        -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
+        -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
     # TODO(rokuzmin): Updte prerequisites.
 }
@@ -76,8 +84,8 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
         -D OpenMP_CXX_FLAGS="$OPENMP_COMPILER_FLAGS" -D OpenMP_CXX_LIB_NAMES="$OPENMP_LIB_NAME" `
         -D   OpenMP_C_FLAGS="$OPENMP_COMPILER_FLAGS" -D   OpenMP_C_LIB_NAMES="$OPENMP_LIB_NAME" `
         -D OpenMP_omp_LIBRARY=$OPENMP_PATH/lib/libomp.dylib `
-        -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
-        -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
+        -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
+        -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
     # TODO(rokuzmin): Updte prerequisites.
 }

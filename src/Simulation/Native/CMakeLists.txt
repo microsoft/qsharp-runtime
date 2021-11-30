@@ -47,6 +47,12 @@ option(USE_GATE_FUSION "Use gate fusion" ON)
 # #   set(CMAKE_CXX_FLAGS "-static-libgcc")
 # endif (MSVC)
 
+# TODO(rokuzmin): Add Spectre mitigations.
+# # Always use available Spectre mitigations where available
+# if (NOT APPLE)
+#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mspeculative-load-hardening -mretpoline")
+#     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mspeculative-load-hardening -mretpoline")
+# endif()
 
 include_directories(${PROJECT_BINARY_DIR}/src)
 include_directories(${PROJECT_SOURCE_DIR}/src)
