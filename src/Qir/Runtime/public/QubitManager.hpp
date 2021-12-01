@@ -40,7 +40,7 @@ namespace Quantum
         // No complex scenarios for now. Don't need to support copying/moving.
         CQubitManager(const CQubitManager&) = delete;
         CQubitManager& operator=(const CQubitManager&) = delete;
-        virtual ~CQubitManager();
+        /* virtual */ ~CQubitManager();
 
         // Restricted reuse area control
         void StartRestrictedReuseArea();
