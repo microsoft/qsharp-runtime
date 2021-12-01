@@ -55,11 +55,6 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" `
         -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
         # Without `-G Ninja` fail to switch from MSVC to Clang.
-
-        # -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" 
-        # -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" 
-
-    # TODO(rokuzmin): Switch to clang, install prereqs (choco?).
 }
 elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
 {
@@ -68,7 +63,6 @@ elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
-    # TODO(rokuzmin): Updte prerequisites.
 }
 elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
 {
@@ -76,6 +70,7 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     # # `gcc`on Darwin seems to be a shim that redirects to AppleClang, to get real gcc, must point to the specific
     # # version of gcc we've installed.
     # # cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
+    Write-Host "On MacOS build using the default C/C++ compiler (should be AppleClang)"
 
     $OPENMP_PATH="/usr/local/opt/libomp"
     $OPENMP_COMPILER_FLAGS="-Xpreprocessor -fopenmp -I$OPENMP_PATH/include -lomp -L$OPENMP_PATH/lib"
@@ -87,7 +82,6 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
-    # TODO(rokuzmin): Updte prerequisites.
 }
 else {
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
