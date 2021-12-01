@@ -58,7 +58,6 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
 }
 elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
 {
-    Write-Host "On Linux build native simulator using gcc (needed for OpenMP)"
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-11 -D CMAKE_CXX_COMPILER=clang++-11 `
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
