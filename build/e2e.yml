@@ -1,33 +1,33 @@
-# name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(BuildId)
+name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(BuildId)
 
-# parameters:
-# - name: validation_level
-#   displayName: Validation Level
-#   type: string
-#   default: normal
-#   values:
-#   - minimal
-#   - normal
-#   - full
+parameters:
+- name: validation_level
+  displayName: Validation Level
+  type: string
+  default: normal
+  values:
+  - minimal
+  - normal
+  - full
 
-# trigger: none
+trigger: none
 
-# pr:
-# - main
-# - feature/*
-# - features/*
-# - release/*
+pr:
+- main
+- feature/*
+- features/*
+- release/*
 
-# resources:
-#   repositories:
-#   - repository: qdk
-#     type: github
-#     endpoint: github
-#     name: microsoft/qdk
-#     ref: refs/heads/main
+resources:
+  repositories:
+  - repository: qdk
+    type: github
+    endpoint: github
+    name: microsoft/qdk
+    ref: refs/heads/main
 
-# extends:
-#   template: build/qdk-module-e2e.yml@qdk
-#   parameters:
-#     module: qsharp-runtime
-#     validation_level: ${{ parameters.validation_level }}
+extends:
+  template: build/qdk-module-e2e.yml@qdk
+  parameters:
+    module: qsharp-runtime
+    validation_level: ${{ parameters.validation_level }}
