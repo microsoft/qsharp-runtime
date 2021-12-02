@@ -74,7 +74,9 @@ template <class T, class A>
 unsigned getvalue(
     std::vector<std::complex<T>, A> const& wfn,
     unsigned q,
-    double eps = 100. * std::numeric_limits<T>::epsilon()) __attribute__((noinline))
+    double eps = 100. * std::numeric_limits<T>::epsilon())
+    __attribute__((noinline)) // TODO(rokuzmin, #885): Try to remove `__attribute__((noinline))` after migrating
+                              // to clang-13 on Win and Linux.
 {
     std::size_t mask = 1ull << q;
     for (std::size_t i = 0; i < wfn.size(); ++i)

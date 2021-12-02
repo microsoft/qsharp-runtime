@@ -37,8 +37,6 @@ $SANITIZE_FLAGS=`
 # a DEBUG build.
 if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
 {
-    #Write-Host "On Windows build native simulator using the default C/C++ compiler (should be MSVC)"
-
     $CMAKE_C_COMPILER = "-DCMAKE_C_COMPILER=clang.exe"
     $CMAKE_CXX_COMPILER = "-DCMAKE_CXX_COMPILER=clang++.exe"
 
@@ -48,11 +46,9 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
         $env:PATH = "$($env:SystemDrive)\Program Files\LLVM\bin;$env:Path"
     }
 
-    #cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" `
-    #    -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
-    #cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ../.. | Write-Host
-    cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" `
-        -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
+    cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER `
+        -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" `
+        -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION"  ..
         # Without `-G Ninja` we fail to switch from MSVC to Clang.
 }
 elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
@@ -64,10 +60,6 @@ elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
 }
 elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
 {
-    # Write-Host "On MacOS build native simulator using gcc (needed for OpenMP)"
-    # # `gcc`on Darwin seems to be a shim that redirects to AppleClang, to get real gcc, must point to the specific
-    # # version of gcc we've installed.
-    # # cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
     Write-Host "On MacOS build using the default C/C++ compiler (should be AppleClang)"
 
     $OPENMP_PATH="/usr/local/opt/libomp"
