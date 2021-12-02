@@ -54,7 +54,6 @@ QUANTUM_SIMULATOR LoadQuantumSimulator()
     QUANTUM_SIMULATOR handle = nullptr;
 #ifdef _WIN32
     handle = ::LoadLibraryA(FULLSTATESIMULATORLIB);
-    // handle = ::dlopen(FULLSTATESIMULATORLIB, RTLD_LAZY);
     if (handle == nullptr)
     {
         throw std::runtime_error(std::string("Failed to load ") + FULLSTATESIMULATORLIB +

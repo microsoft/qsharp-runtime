@@ -10,6 +10,9 @@ if (-not (Test-Path $nativeBuild)) {
 }
 Push-Location $nativeBuild
 
+# Search for "sanitize" in 
+# https://clang.llvm.org/docs/ClangCommandLineReference.html
+# https://man7.org/linux/man-pages/man1/gcc.1.html
 $SANITIZE_FLAGS=`
     "-fsanitize=undefined " `
     + "-fsanitize=shift -fsanitize=shift-base " `
@@ -18,7 +21,7 @@ $SANITIZE_FLAGS=`
     + "-fsanitize=vla-bound -fsanitize=null -fsanitize=return " `
     + "-fsanitize=signed-integer-overflow -fsanitize=bounds -fsanitize=alignment -fsanitize=object-size " `
     + "-fsanitize=float-cast-overflow -fsanitize=nonnull-attribute -fsanitize=returns-nonnull-attribute -fsanitize=bool -fsanitize=enum " `
-    + "-fsanitize=pointer-overflow -fsanitize=builtin " `
+    + "-fsanitize=vptr -fsanitize=pointer-overflow -fsanitize=builtin " `
     + "-fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability " `
     `
     + "-fsanitize=address " `
@@ -26,12 +29,8 @@ $SANITIZE_FLAGS=`
     + "-fsanitize-address-use-after-scope " `
     + "-fno-omit-frame-pointer -fno-optimize-sibling-calls"
 
-    #+ "-fsanitize=unsigned-integer-overflow "
-    #  -fsanitize=bounds-strict    clang: error: unsupported argument 'bounds-strict' to option 'fsanitize='  (as opposed to gcc)
-
-$NON_WIN_SANITIZE_FLAGS=`
-    "-fsanitize=vptr "
-
+    #+ "-fsanitize=unsigned-integer-overflow "      # TODO(rokuzmin, #884): Disable this option for _specific_ lines 
+                                                    # of code, but not for the whole binary.
 
 # There should be no space after -D CMAKE_BUILD_TYPE= but if we provide the environment variable inline, without
 # the space it doesn't seem to get substituted... With invalid -D CMAKE_BUILD_TYPE argument cmake silently produces
@@ -54,13 +53,13 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     #cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ../.. | Write-Host
     cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" `
         -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
-        # Without `-G Ninja` fail to switch from MSVC to Clang.
+        # Without `-G Ninja` we fail to switch from MSVC to Clang.
 }
 elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
 {
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-11 -D CMAKE_CXX_COMPILER=clang++-11 `
-        -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
-        -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
+        -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
+        -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
 }
 elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
@@ -78,8 +77,8 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
         -D OpenMP_CXX_FLAGS="$OPENMP_COMPILER_FLAGS" -D OpenMP_CXX_LIB_NAMES="$OPENMP_LIB_NAME" `
         -D   OpenMP_C_FLAGS="$OPENMP_COMPILER_FLAGS" -D   OpenMP_C_LIB_NAMES="$OPENMP_LIB_NAME" `
         -D OpenMP_omp_LIBRARY=$OPENMP_PATH/lib/libomp.dylib `
-        -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
-        -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS $NON_WIN_SANITIZE_FLAGS" `
+        -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
+        -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
 }
 else {

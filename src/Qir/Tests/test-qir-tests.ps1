@@ -27,7 +27,7 @@ if ($Env:BUILD_CONFIGURATION -eq "Debug")
         $env:ASAN_OPTIONS = "check_initialization_order=true:detect_stack_use_after_return=true:" `
             + "alloc_dealloc_mismatch=true:new_delete_type_mismatch=true:strict_init_order=true:strict_string_checks=true"
 
-            # + "detect_invalid_pointer_pairs=2" TODO(rokuzmin): ==8218==ERROR: AddressSanitizer: invalid-pointer-pair: 0x602000000af4 0x602000000af0
+            # + "detect_invalid_pointer_pairs=2" TODO(rokuzmin, #883): ==8218==ERROR: AddressSanitizer: invalid-pointer-pair: 0x602000000af4 0x602000000af0
     }
 }
 
