@@ -32,21 +32,6 @@ option(USE_SINGLE_PRECISION "Use single-precision floating point operations" OFF
 option(HAVE_INTRINSICS "Have AVX intrinsics" OFF)
 option(USE_GATE_FUSION "Use gate fusion" ON)
 
-# windows specific flags
-# if (MSVC)
-#   # always create debug info
-#   add_definitions("/Zi")
-#   add_definitions("/Z7")
-
-#   # build with no VC runtime depedencies:
-#   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Qspectre /guard:cf /Zi /Z7")
-#   set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   /MTd /Qspectre /guard:cf")
-#   set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
-#   # TODO(rokuzmin): Switch to clang.
-# # else (MSVC)
-# #   set(CMAKE_CXX_FLAGS "-static-libgcc")
-# endif (MSVC)
-
 # Always use Spectre mitigations where available
 if (WIN32)
     # Enforce use of static runtime (avoids target machine needing msvcrt installed).

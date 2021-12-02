@@ -47,7 +47,6 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     }
 
     cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER `
-        -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION"  ..
         # Without `-G Ninja` we fail to switch from MSVC to Clang.
 }
@@ -56,7 +55,7 @@ elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-11 -D CMAKE_CXX_COMPILER=clang++-11 `
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
-        -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
+        -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
 }
 elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
 {
@@ -71,7 +70,7 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
         -D OpenMP_omp_LIBRARY=$OPENMP_PATH/lib/libomp.dylib `
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
-        -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" -D CMAKE_VERBOSE_MAKEFILE:BOOL="1" ..
+        -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
 }
 else {
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
