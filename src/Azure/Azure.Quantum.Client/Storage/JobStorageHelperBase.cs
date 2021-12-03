@@ -7,7 +7,9 @@ namespace Microsoft.Azure.Quantum.Storage
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+
     using global::Azure.Storage.Blobs;
+
     using Microsoft.Azure.Quantum.Utility;
 
     public abstract class JobStorageHelperBase : IJobStorageHelper
@@ -54,17 +56,20 @@ namespace Microsoft.Azure.Quantum.Storage
             return;
         }
 
-        /// <summary>
-        /// Uploads the job input.
-        /// </summary>
-        /// <param name="jobId">The job id.</param>
-        /// <param name="input">The input.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Container uri + Input uri.</returns>
+        /// <inheritdoc/>
         public abstract Task<(string containerUri, string inputUri)> UploadJobInputAsync(
-            string jobId,
-            Stream input,
-            CancellationToken cancellationToken = default);
+                string jobId,
+                Stream input,
+                string contentType,
+                bool compress,
+                CancellationToken cancellationToken = default);
+
+        /// <inheritdoc/>
+        public Task<(string containerUri, string inputUri)> UploadJobInputAsync(
+                string jobId,
+                Stream input,
+                CancellationToken cancellationToken = default) =>
+            this.UploadJobInputAsync(jobId, input, null, false, cancellationToken);
 
         /// <summary>
         /// Uploads the job program output mapping.

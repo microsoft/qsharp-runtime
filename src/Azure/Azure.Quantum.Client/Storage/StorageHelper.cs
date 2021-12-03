@@ -5,6 +5,8 @@ namespace Microsoft.Azure.Quantum.Storage
 {
     using System;
     using System.IO;
+    using System.Net.Mime;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using global::Azure.Storage.Blobs;
@@ -42,18 +44,13 @@ namespace Microsoft.Azure.Quantum.Storage
             return;
         }
 
-        /// <summary>
-        /// Uploads the BLOB.
-        /// </summary>
-        /// <param name="containerClient">Container client.</param>
-        /// <param name="blobName">Name of the BLOB.</param>
-        /// <param name="input">The input.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Async task.</returns>
+        /// <inheritdoc/>
         public async Task UploadBlobAsync(
             BlobContainerClient containerClient,
             string blobName,
             Stream input,
+            string contentType,
+            string contentEncoding,
             CancellationToken cancellationToken = default)
         {
             try
@@ -61,9 +58,20 @@ namespace Microsoft.Azure.Quantum.Storage
                 // Ensure container is created
                 await containerClient.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: cancellationToken);
 
+                var headers = new BlobHttpHeaders
+                {
+                    ContentEncoding = contentEncoding,
+                    ContentType = contentType,
+                };
+
+                var options = new BlobUploadOptions
+                {
+                    HttpHeaders = headers,
+                };
+
                 // Upload blob
                 BlobClient blob = containerClient.GetBlobClient(blobName);
-                await blob.UploadAsync(input, overwrite: true, cancellationToken);
+                await blob.UploadAsync(input, options, cancellationToken);
             }
             catch (Exception ex)
             {
