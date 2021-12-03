@@ -386,6 +386,11 @@ class Wavefunction
         rng_.seed((unsigned)std::chrono::system_clock::now().time_since_epoch().count());
     }
 
+    uint64_t get_kernel_ms() const
+    {
+        return fused_.get_kernel_ms();
+    }
+
     void reset()
     {
         fused_.reset();

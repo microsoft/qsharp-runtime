@@ -11,6 +11,7 @@
 
 #include <map>
 #include <numeric>
+#include <iostream>
 
 namespace Microsoft
 {
@@ -28,6 +29,11 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     Simulator(unsigned maxlocal = 0u)
         : psi()
     {
+    }
+
+    ~Simulator()
+    {
+        std::cout << "Kernel(ms) : " << psi.get_kernel_ms() << std::endl;
     }
 
     std::size_t random(std::vector<double> const& d)

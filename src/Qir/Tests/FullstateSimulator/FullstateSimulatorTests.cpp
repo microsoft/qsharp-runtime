@@ -4,9 +4,23 @@
 #include <complex>
 #include <memory>
 #include <vector>
+#include <chrono>
+#include <iostream>
+#include <sstream>
+#include <utility>
+#include <vector>
+#include <assert.h>
 
-#define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
-#include "catch.hpp"
+#include <time.h>
+#ifdef _WIN32
+#include <Windows.h>
+#include <sysinfoapi.h>
+#else
+#include <sys/sysinfo.h>
+#endif
+
+//#define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
+//#include "catch.hpp"
 
 #include "QirRuntimeApi_I.hpp"
 #include "QSharpSimApi_I.hpp"
@@ -18,7 +32,7 @@ using namespace std;
 
 // The tests rely on the implementation detail of CFullstateSimulator that the qubits are nothing more but contiguously
 // incremented ids.
-static unsigned GetQubitId(QubitIdType q)
+/*static unsigned GetQubitId(QubitIdType q)
 {
     return static_cast<unsigned>(static_cast<size_t>(q));
 }
@@ -28,8 +42,9 @@ static Result MZ(IQuantumGateSet* iqa, QubitIdType q)
     PauliId pauliZ[1] = {PauliId_Z};
     QubitIdType qs[1] = {q};
     return iqa->Measure(1, pauliZ, 1, qs);
-}
+}*/
 
+/*
 TEST_CASE("Fullstate simulator: allocate qubits", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
@@ -397,28 +412,278 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
         sim->ReleaseQubit(qs[i]);
     }
 }
-
+*/
 extern "C" int Microsoft__Quantum__Testing__QIR__InvalidRelease__Interop(); // NOLINT
-TEST_CASE("QIR: Simulator rejects unmeasured, non-zero release", "[fullstate_simulator]")
+/*TEST_CASE("QIR: Simulator rejects unmeasured, non-zero release", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(sim.get(), true);
     REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__InvalidRelease__Interop());
-}
+}*/
 
 extern "C" int Microsoft__Quantum__Testing__QIR__MeasureRelease__Interop(); // NOLINT
-TEST_CASE("QIR: Simulator accepts measured release", "[fullstate_simulator]")
+/*TEST_CASE("QIR: Simulator accepts measured release", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(sim.get(), true);
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__MeasureRelease__Interop());
-}
+}*/
 
 extern "C" int Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop(); // NOLINT
-TEST_CASE("QIR: invoke all standard Q# gates against the fullstate simulator", "[fullstate_simulator]")
+/*TEST_CASE("QIR: invoke all standard Q# gates against the fullstate simulator", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    QirExecutionContext::Scoped qirctx(sim.get(), true);
 
     REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop());
+}*/
+
+class CTiming
+{
+  public:
+    CTiming(std::string nameIn, int32_t timesIn = 1) : name(nameIn), times(timesIn)
+    {
+        start = std::chrono::duration_cast<std::chrono::microseconds>(
+                    std::chrono::high_resolution_clock::now().time_since_epoch())
+                    .count();
+        startCpu = GetCpuTimeMs();
+    }
+
+    ~CTiming()
+    {
+        auto end = std::chrono::duration_cast<std::chrono::microseconds>(
+                       std::chrono::high_resolution_clock::now().time_since_epoch())
+                       .count();
+        double wallTimeMs = ((double)(end - start)) / 1000.0;
+
+#ifdef _WIN32
+        endCpu = GetCpuTimeMs();
+        SYSTEM_INFO info;
+        GetSystemInfo(&info);
+        auto nCores = info.dwNumberOfProcessors;
+#else
+        endCpu      = GetCpuTimeMs();
+        auto nCores = get_nprocs();
+#endif
+        try
+        {
+            std::cout << name << " total: " << wallTimeMs << ", average:" << wallTimeMs / times << " ms,";
+            std::cout << " CPU utilization ratio: " << (endCpu - startCpu) / (wallTimeMs * nCores)
+                      << ", cores: " << nCores << std::endl;
+        }
+        catch (...)
+        {
+        }
+    }
+
+  private:
+    double GetCpuTimeMs()
+    {
+#ifdef _WIN32
+        double cpuMs = ((double)clock()) * 1000. / CLOCKS_PER_SEC;
+#else
+        uint64_t cycles;
+        bool done = QueryProcessCycleTime(GetCurrentProcess(), &cycles);
+        if (!done)
+        {
+            std::cout << "Failed to query process cpu time" << std::endl;
+        }
+
+        double cpuMs = ((double)cycles) / CyclesPerMSec;
+#endif
+        return cpuMs;
+    }
+    int64_t start;
+    std::string name;
+    int32_t times;
+    double startCpu;
+    double endCpu;
+};
+
+extern "C" int Microsoft__Quantum__Testing__QIR__Advantage44__Interop(); // NOLINT
+/*TEST_CASE("QIR: Advantage44", "[fullstate_simulator]")
+{
+    int result = 0;
+    {
+
+        std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+        QirExecutionContext::Scoped qirctx(sim.get(), false);
+        // result = Microsoft__Quantum__Testing__QIR__Advantage44__Interop();
+        {
+            CTiming timer("Advantage44", 3);
+            for (int i = 0; i < 3; i++)
+            {
+                result = Microsoft__Quantum__Testing__QIR__Advantage44__Interop();
+            }
+        }
+    }
+    std::cout << "Gates:" << result << std::endl;
+}*/
+
+extern "C" int Microsoft__Quantum__Testing__QIR__Advantage55__Interop(); // NOLINT
+/*TEST_CASE("QIR: Advantage55", "[fullstate_simulator]")
+{
+    int result = 0;
+    {
+        std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+        QirExecutionContext::Scoped qirctx(sim.get(), false);
+        // result = Microsoft__Quantum__Testing__QIR__Advantage55__Interop();
+        {
+            CTiming timer("Advantage55", 3);
+            for (int i = 0; i < 3; i++)
+            {
+                result = Microsoft__Quantum__Testing__QIR__Advantage55__Interop();
+            }
+        }
+    }
+    std::cout << "Gates:" << result << std::endl;
+}*/
+
+extern "C" int Microsoft__Quantum__Testing__QIR__Advantage56__Interop(); // NOLINT
+/*TEST_CASE("QIR: Advantage56", "[fullstate_simulator]")
+{
+    int result = 0;
+    {
+        std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+        QirExecutionContext::Scoped qirctx(sim.get(), false);
+        // result = Microsoft__Quantum__Testing__QIR__Advantage56__Interop();
+        {
+            CTiming timer("Advantage56", 3);
+            for (int i = 0; i < 3; i++)
+            {
+                result = Microsoft__Quantum__Testing__QIR__Advantage56__Interop();
+            }
+        }
+    }
+    std::cout << "Gates:" << result << std::endl;
+}*/
+
+extern "C" int Microsoft__Quantum__Testing__QIR__HGate__Interop(); // NOLINT
+/*TEST_CASE("QIR: HGate", "[fullstate_simulator]")
+{
+    int result = 0;
+    {
+        std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+        QirExecutionContext::Scoped qirctx(sim.get(), false);
+        // result = Microsoft__Quantum__Testing__QIR__HGate__Interop();
+        {
+            CTiming timer("HGate", 3);
+            for (int i = 0; i < 3; i++)
+            {
+                result = Microsoft__Quantum__Testing__QIR__HGate__Interop();
+            }
+        }
+    }
+    std::cout << "Gates:" << result << std::endl;
+}*/
+
+extern "C" int Microsoft__Quantum__Testing__QIR__CNOTGate__Interop(); // NOLINT
+/*TEST_CASE("QIR: CNOTGate", "[fullstate_simulator]")
+{
+    int result = 0;
+    {
+        std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+        QirExecutionContext::Scoped qirctx(sim.get(), false);
+        // result = Microsoft__Quantum__Testing__QIR__CNOTGate__Interop();
+        {
+            CTiming timer("CNOTGate", 3);
+            for (int i = 0; i < 3; i++)
+            {
+                result = Microsoft__Quantum__Testing__QIR__CNOTGate__Interop();
+            }
+        }
+    }
+    std::cout << "Gates:" << result << std::endl;
+}*/
+
+extern "C" int Microsoft__Quantum__Testing__QIR__CCNOTGate__Interop(); // NOLINT
+/*TEST_CASE("QIR: CCNOTGate", "[fullstate_simulator]")
+{
+    int result = 0;
+    {
+        std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+        QirExecutionContext::Scoped qirctx(sim.get(), false);
+        // result = Microsoft__Quantum__Testing__QIR__CCNOTGate__Interop();
+        {
+            CTiming timer("CCNOTGate", 3);
+            for (int i = 0; i < 3; i++)
+            {
+                result = Microsoft__Quantum__Testing__QIR__CCNOTGate__Interop();
+            }
+        }
+    }
+    std::cout << "Gates:" << result << std::endl;
+}*/
+
+typedef int (*QuantumFunc)();
+static std::vector<std::pair<std::string, QuantumFunc>> qFuncs = {
+    {"Advantage44", Microsoft__Quantum__Testing__QIR__Advantage44__Interop},
+    {"Advantage55", Microsoft__Quantum__Testing__QIR__Advantage55__Interop},
+    {"Advantage56", Microsoft__Quantum__Testing__QIR__Advantage56__Interop},
+    {"HGate", Microsoft__Quantum__Testing__QIR__HGate__Interop},
+    {"CNOTGate", Microsoft__Quantum__Testing__QIR__CNOTGate__Interop},
+    {"CCNOTGate", Microsoft__Quantum__Testing__QIR__CCNOTGate__Interop}};
+
+static void ExecuteTest(int functionId, int loops)
+{
+    int result = 0;
+    {
+        auto func                           = qFuncs[(size_t)functionId];
+        std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+        QirExecutionContext::Scoped qirctx(sim.get(), false);
+        {
+            CTiming timer(func.first, loops);
+            for (int i = 0; i < loops; i++)
+            {
+                result = func.second();
+            }
+        }
+    }
+    std::cout << "Gates:" << result << std::endl;
+}
+
+int main(int argc, char* argv[])
+{
+    int funcId = 3;
+    int loops  = 3;
+    try
+    {
+        if (argc > 1)
+        {
+            stringstream inputFuncId(argv[1]);
+            inputFuncId >> funcId;
+        }
+        if (argc > 2)
+        {
+            stringstream inputLoops(argv[2]);
+            inputLoops >> loops;
+        }
+        std::cout << "Test function " << funcId << ", for " << loops << " loops" << std::endl;
+        {
+            std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+            QirExecutionContext::Scoped qirctx(sim.get(), true);
+
+            if (0 != Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop())
+            {
+                std::cerr << "Failed to initialize the quantum context" << std::endl;
+                return 1;
+            }
+        }
+        if ((size_t)funcId >= qFuncs.size())
+        {
+            for (int i = 0; (size_t)i < qFuncs.size(); i++)
+            {
+                ExecuteTest(i, loops);
+            }
+        }
+        else
+        {
+            ExecuteTest(funcId, loops);
+        }
+        return 0;
+    }
+    catch (...)
+    {
+        return 2;
+    }
 }

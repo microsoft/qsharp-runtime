@@ -32,6 +32,7 @@ namespace quantum
                 double      gps;
                 string      tstName = "";
                 Stopwatch stopWatch = new Stopwatch();
+                double totalSecs = 0;
 
                 for (int tst = tstMin; tst <= tstMax; tst++)
                 {
@@ -56,15 +57,33 @@ namespace quantum
                                 gates = Advantage56.Run(sim).Result; 
                                 tstName = "5x6";
                                 break;
+                            case 4:
+                                gates = HGate.Run(sim).Result;
+                                tstName = "HGate30";
+                                break;
+                            case 5:
+                                gates = CNOTGate.Run(sim).Result;
+                                tstName = "CNOTGate30";
+                                break;
+                            case 6:
+                                gates = CCNOTGate.Run(sim).Result;
+                                tstName = "CCNOTGate30";
+                                break;
                         }
 			            stopWatch.Stop();
                         ts 	    = stopWatch.Elapsed;
                         tSecs 	    = ts.TotalSeconds;
                         gps 	    = gates / tSecs;
-                        
+                        totalSecs += tSecs;
+
                         Console.WriteLine($"CSV,{tstName},{loop:D2},{tSecs:F2},{gates:E2},{envThr},{envFus},{envDep},{gps:E2}");
                     }
                 }
+
+                Process currentProcess = Process.GetCurrentProcess();
+                var cpuTime = currentProcess.TotalProcessorTime;
+                double cpuUsage = cpuTime.TotalSeconds / (totalSecs * Environment.ProcessorCount);
+                Console.WriteLine($"CPU Usage Ratio: {cpuUsage}, Total CPU Time: {cpuTime.TotalSeconds} seconds, Elapsed Time: {totalSecs} seconds, cores: {Environment.ProcessorCount}");
             }
         }
     }
