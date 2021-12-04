@@ -40,8 +40,8 @@ namespace Microsoft.Azure.Quantum.Storage
             BlobContainerClient containerClient,
             string blobName,
             Stream input,
-            string contentType,
-            string contentEncoding,
+            string? contentType,
+            string? contentEncoding,
             CancellationToken cancellationToken = default);
 
         /// <summary>
