@@ -16,14 +16,10 @@ if ($Env:BUILD_CONFIGURATION -eq "Debug")
     if (-not ($IsWindows))
     {
         $env:LSAN_OPTIONS += "suppressions=../../../../LSan.ignore"    # https://clang.llvm.org/docs/AddressSanitizer.html#suppressing-memory-leaks
-        if (-not ($IsMacOS))
-        {
-            $env:ASAN_OPTIONS += "check_initialization_order=1"    # https://clang.llvm.org/docs/AddressSanitizer.html#initialization-order-checking
-        }
-        #else    # AddressSanitizer: detect_leaks is not supported on this platform. Re-enable this once supported.
-        #{
-        #    $env:ASAN_OPTIONS += "detect_leaks=1"      # https://clang.llvm.org/docs/AddressSanitizer.html#memory-leak-detection
-        #}
+        # TODO: macOS: `ASAN_OPTIONS=detect_leaks=1` (https://clang.llvm.org/docs/AddressSanitizer.html#memory-leak-detection).
+        $env:ASAN_OPTIONS = "check_initialization_order=true:detect_stack_use_after_return=true:" `
+            + "alloc_dealloc_mismatch=true:new_delete_type_mismatch=true:strict_init_order=true:strict_string_checks=true"
+            # + ":detect_invalid_pointer_pairs=2" TODO(rokuzmin, #883): ==8218==ERROR: AddressSanitizer: invalid-pointer-pair: 0x602000000af4 0x602000000af0
     }
 }
 

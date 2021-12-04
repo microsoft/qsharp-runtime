@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+set(AVXFLAGS "-mavx")
+
 add_executable(factory_test factory_test.cpp)
 target_link_libraries(factory_test Microsoft.Quantum.Simulator.Runtime)
 add_test(NAME factory_test COMMAND ./factory_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -19,6 +21,7 @@ add_executable(quantum_simulator_unittests
   "${PROJECT_SOURCE_DIR}/src/catch2/catch_driver.cpp"
   local_test.cpp
 )
+set_source_files_properties(local_test.cpp PROPERTIES COMPILE_FLAGS ${AVXFLAGS})
 
 target_link_libraries(quantum_simulator_unittests PUBLIC
   Microsoft.Quantum.Simulator.Runtime
