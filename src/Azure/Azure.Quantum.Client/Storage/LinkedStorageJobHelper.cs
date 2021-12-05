@@ -23,28 +23,34 @@ namespace Microsoft.Azure.Quantum.Storage
             this.workspace = workspace;
         }
 
-        /// <summary>
-        /// Uploads the job input.
-        /// </summary>
-        /// <param name="jobId">The job id.</param>
-        /// <param name="input">The input.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>
-        /// Container uri + Input uri without SAS.
-        /// </returns>
+        /// <inheritdoc/>
         public override async Task<(string containerUri, string inputUri)> UploadJobInputAsync(
             string jobId,
             Stream input,
+            string contentType,
+            bool compress,
             CancellationToken cancellationToken = default)
         {
             string containerName = GetContainerName(jobId);
+            string encoding = null;
+            Stream data = input;
 
             BlobContainerClient containerClient = await this.GetContainerClient(containerName);
 
+            if (compress)
+            {
+                var compressedInput = new MemoryStream();
+                await Compression.Compress(input, compressedInput);
+                data = compressedInput;
+                encoding = "gzip";
+            }
+
             await this.StorageHelper.UploadBlobAsync(
-                containerClient,
-                Constants.Storage.InputBlobName,
-                input,
+                containerClient: containerClient,
+                blobName: Constants.Storage.InputBlobName,
+                input: data,
+                contentType: contentType,
+                contentEncoding: encoding,
                 cancellationToken);
 
             Uri inputUri = containerClient
@@ -54,13 +60,7 @@ namespace Microsoft.Azure.Quantum.Storage
             return (GetUriPath(containerClient.Uri), GetUriPath(inputUri));
         }
 
-        /// <summary>
-        /// Uploads the job program output mapping.
-        /// </summary>
-        /// <param name="jobId">The job id.</param>
-        /// <param name="mapping">The job program output mapping.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>Container uri + Mapping uri without SAS.</returns>
+        /// <inheritdoc/>
         public override async Task<(string containerUri, string mappingUri)> UploadJobMappingAsync(
             string jobId,
             Stream mapping,
