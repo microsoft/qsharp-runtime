@@ -10,7 +10,7 @@ steps:
  
   # QIR Runtime:
 - pwsh: src/Qir/Runtime/prerequisites.ps1
-  displayName: "Install QIR Runtime Prerequisites"
+  displayName: "Install QIR Runtime Prerequisistes"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
 - pwsh: src/Qir/Runtime/build-qir-runtime.ps1

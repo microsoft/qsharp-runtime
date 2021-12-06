@@ -40,9 +40,7 @@ namespace Quantum
         // No complex scenarios for now. Don't need to support copying/moving.
         CQubitManager(const CQubitManager&) = delete;
         CQubitManager& operator=(const CQubitManager&) = delete;
-        ~CQubitManager(); // If this dtor is made _virtual_ then the QIR RT tests crash (at least in Debug config)
-                          // if the native simulator is compiled with Clang (as opposed to GCC). Nothing wrong found in
-                          // the code, probably is the compiler bug.
+        virtual ~CQubitManager();
 
         // Restricted reuse area control
         void StartRestrictedReuseArea();
