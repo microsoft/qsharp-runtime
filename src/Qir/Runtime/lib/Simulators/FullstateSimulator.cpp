@@ -211,7 +211,7 @@ namespace Quantum
         {
             if (this->simulatorId != NULL_SIMULATORID)
             {
-                typedef void (*TDestroy)(unsigned);
+                typedef unsigned (*TDestroy)(unsigned);
                 static TDestroy destroySimulatorInstance =
                     reinterpret_cast<TDestroy>(LoadProc(this->handle, "destroy"));
                 assert(destroySimulatorInstance);
@@ -226,7 +226,7 @@ namespace Quantum
         // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
         void GetState(TGetStateCallback callback) override
         {
-            typedef void (*TDump)(unsigned, TGetStateCallback);
+            typedef bool (*TDump)(unsigned, TGetStateCallback);
             static TDump dump = reinterpret_cast<TDump>(this->GetProc("Dump"));
             dump(this->simulatorId, callback);
         }
@@ -462,7 +462,7 @@ namespace Quantum
 
         void R(PauliId axis, QubitIdType target, double theta) override
         {
-            typedef void (*TR)(unsigned, unsigned, double, unsigned);
+            typedef unsigned (*TR)(unsigned, unsigned, double, unsigned);
             static TR r = reinterpret_cast<TR>(this->GetProc("R"));
 
             r(this->simulatorId, GetBasis(axis), theta, GetQubitId(target));
@@ -472,7 +472,7 @@ namespace Quantum
         void ControlledR(long numControls, QubitIdType controls[], PauliId axis, QubitIdType target,
                          double theta) override
         {
-            typedef void (*TMCR)(unsigned, unsigned, double, unsigned, unsigned*, unsigned);
+            typedef unsigned (*TMCR)(unsigned, unsigned, double, unsigned, unsigned*, unsigned);
             static TMCR cr = reinterpret_cast<TMCR>(this->GetProc("MCR"));
 
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
@@ -483,7 +483,7 @@ namespace Quantum
 
         void Exp(long numTargets, PauliId paulis[], QubitIdType targets[], double theta) override
         {
-            typedef void (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
+            typedef unsigned (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
             static TExp exp                      = reinterpret_cast<TExp>(this->GetProc("Exp"));
             std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);
             std::vector<unsigned> convertedBases = GetBases(numTargets, paulis);
@@ -494,7 +494,7 @@ namespace Quantum
         void ControlledExp(long numControls, QubitIdType controls[], long numTargets, PauliId paulis[],
                            QubitIdType targets[], double theta) override
         {
-            typedef void (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
+            typedef unsigned (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
             static TMCExp cexp                   = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
             std::vector<unsigned> idsTargets     = GetQubitIds(numTargets, targets);
             std::vector<unsigned> idsControls    = GetQubitIds(numControls, controls);
