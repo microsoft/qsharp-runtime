@@ -578,6 +578,12 @@ let ``Submit uses default values`` () =
                Dry Run: False
                Verbose: True
 
+               QIR submission is not present.
+
+               QIR submitter not found.
+
+               Q# submitter not found.
+
                Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
@@ -602,6 +608,12 @@ let ``Submit uses default values with default target`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               QIR submission is not present.
+
+               QIR submitter not found.
+
+               Q# submitter not found.
 
                Submitting Q# entry point using a quantum machine.
 
@@ -642,6 +654,12 @@ let ``Submit allows overriding default values`` () =
                Dry Run: False
                Verbose: True
 
+               QIR submission is not present.
+
+               QIR submitter not found.
+
+               Q# submitter not found.
+
                Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
@@ -681,7 +699,15 @@ let ``Submit allows a long user-agent`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               QIR submission is not present.
+
+               QIR submitter not found.
+
+               Q# submitter not found.
+
                Submitting Q# entry point using a quantum machine.
+
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
 
@@ -724,8 +750,14 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Dry Run: False
                 Verbose: True
 
+                QIR submission is not present.
+
+                QIR submitter not found.
+
+                Q# submitter not found.
+
                 Submitting Q# entry point using a quantum machine.
-               
+
                 https://www.example.com/00000000-0000-0000-0000-0000000000000"
                
 [<Fact>]
@@ -760,6 +792,12 @@ let ``Submit allows overriding default values with default target`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               QIR submission is not present.
+
+               QIR submitter not found.
+
+               Q# submitter not found.
 
                Submitting Q# entry point using a quantum machine.
 
@@ -801,6 +839,12 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Dry Run: False
                Verbose: True
 
+               QIR submission is not present.
+
+               QIR submitter not found.
+
+               Q# submitter not found.
+
                Submitting Q# entry point using a quantum machine.
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
@@ -827,6 +871,12 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               QIR submission is not present.
+
+               QIR submitter not found.
+
+               Q# submitter not found.
 
                Submitting Q# entry point using a quantum machine.
 
@@ -858,6 +908,12 @@ let ``Submit allows spaces for the --location option`` () =
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
+
+               QIR submission is not present.
+
+               QIR submitter not found.
+
+               Q# submitter not found.
 
                Submitting Q# entry point using a quantum machine.
 
@@ -965,6 +1021,10 @@ let ``Submit supports Q# submitters`` () =
          Dry Run: False
          Verbose: True
 
+         QIR submission is not present.
+
+         QIR submitter not found.
+
          Submitting Q# entry point.
 
          https://www.example.com/00000000-0000-0000-0000-0000000000000"
@@ -992,6 +1052,10 @@ let ``Submit supports job parameters`` () =
          Dry Run: False
          Verbose: True
 
+         QIR submission is not present.
+
+         QIR submitter not found.
+
          Submitting Q# entry point.
 
          https://www.example.com/00000000-0000-0000-0000-0000000000000"
@@ -1018,6 +1082,10 @@ let ``Extra equals symbols in a job parameter are parsed as part of the value`` 
          Output: FriendlyUri
          Dry Run: False
          Verbose: True
+
+         QIR submission is not present.
+
+         QIR submitter not found.
 
          Submitting Q# entry point.
 

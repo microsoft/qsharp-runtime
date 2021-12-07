@@ -67,7 +67,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             AzureSettings settings, QSharpSubmission<TIn, TOut> qsSubmission, QirSubmission? qirSubmission)
         {
             LogIfVerbose(settings, settings.ToString());
-
+            LogIfVerbose(settings, $"QIR submission is {((qirSubmission is null) ? "not " : string.Empty)}present.");
             if ((settings.Location is null) && (settings.BaseUri is null))
             {
                 DisplayError($"Either --location or --base-uri must be provided.", null);
@@ -77,16 +77,19 @@ namespace Microsoft.Quantum.EntryPointDriver
             {
                 return SubmitQir(settings, qirSubmitter, qirSubmission);
             }
+            LogIfVerbose(settings, "QIR submitter not found.");
 
             if (QSharpSubmitter(settings) is { } qsSubmitter)
             {
                 return SubmitQSharp(settings, qsSubmitter, qsSubmission);
             }
+            LogIfVerbose(settings, "Q# submitter not found.");
 
             if (QSharpMachine(settings) is { } machine)
             {
                 return SubmitQSharpMachine(settings, machine, qsSubmission);
             }
+            LogIfVerbose(settings, "Q# machine not found.");
 
             if (qirSubmission is null && !(QirSubmitter(settings) is null))
             {

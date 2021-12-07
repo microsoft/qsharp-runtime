@@ -113,6 +113,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "Dry Run: False",
                     "Verbose: True",
                     "",
+                    "QIR submission is present.",
+                    "",
                     "Submitting QIR entry point.",
                     "",
                     "https://www.example.com/00000000-0000-0000-0000-0000000000000",
