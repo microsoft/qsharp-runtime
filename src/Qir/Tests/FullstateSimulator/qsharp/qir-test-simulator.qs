@@ -117,7 +117,7 @@ namespace Microsoft.Quantum.Testing.QIR
 
     @EntryPoint()
     operation Advantage44() : Int {
-        let loops = 3;
+        let loops = 10;
         let gateCnt = (171+27*2) * loops;
         using (q = Qubit[29]) {
             for (loop in 0..(loops-1)) {
@@ -301,7 +301,7 @@ namespace Microsoft.Quantum.Testing.QIR
 
     @EntryPoint()
     operation Advantage55() : Int {
-        let loops = 1;
+        let loops = 10;
         let gateCnt = (269+44*2) * loops;
         using (q = Qubit[25]) {
             for (loop in 0..(loops-1)) {
@@ -583,7 +583,7 @@ namespace Microsoft.Quantum.Testing.QIR
 
     @EntryPoint()
     operation Advantage56() : Int {
-        let loops = 1;
+        let loops = 10;
         let gateCnt = (323+53*2) * loops;
         using (q = Qubit[30]) {
             for (loop in 0..(loops-1)) {
@@ -925,7 +925,7 @@ namespace Microsoft.Quantum.Testing.QIR
             for (loop in 0..(loops-1)) {
                 H(q[0]);
             }
-        ResetAll(q);
+        //ResetAll(q);
         }
     return(gateCnt);
     }
@@ -938,7 +938,7 @@ namespace Microsoft.Quantum.Testing.QIR
             for (loop in 0..(loops-1)) {
                 CNOT(q[0], q[1]);
             }
-        ResetAll(q);
+        //ResetAll(q);
         }
     return(gateCnt);
     }
@@ -951,7 +951,7 @@ namespace Microsoft.Quantum.Testing.QIR
             for (loop in 0..(loops-1)) {
                 CCNOT(q[0], q[1], q[2]);
             }
-        ResetAll(q);
+        //ResetAll(q);
         }
     return(gateCnt);
     }

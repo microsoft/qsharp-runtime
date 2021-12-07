@@ -462,8 +462,8 @@ class CTiming
         GetSystemInfo(&info);
         auto nCores = info.dwNumberOfProcessors;
 #else
-        endCpu      = GetCpuTimeMs();
-        auto nCores = get_nprocs();
+        endCpu       = GetCpuTimeMs();
+        auto nCores  = get_nprocs();
 #endif
         try
         {
@@ -480,8 +480,6 @@ class CTiming
     double GetCpuTimeMs()
     {
 #ifdef _WIN32
-        double cpuMs = ((double)clock()) * 1000. / CLOCKS_PER_SEC;
-#else
         uint64_t cycles;
         bool done = QueryProcessCycleTime(GetCurrentProcess(), &cycles);
         if (!done)
@@ -489,7 +487,9 @@ class CTiming
             std::cout << "Failed to query process cpu time" << std::endl;
         }
 
-        double cpuMs = ((double)cycles) / CyclesPerMSec;
+        double cpuMs = ((double)cycles) / CLOCKS_PER_SEC;
+#else
+        double cpuMs = ((double)clock()) * 1000. / CLOCKS_PER_SEC;
 #endif
         return cpuMs;
     }
