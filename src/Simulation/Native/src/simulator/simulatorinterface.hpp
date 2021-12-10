@@ -37,6 +37,7 @@ class SimulatorInterface
 
     // allocate and release
     virtual void allocateQubit(unsigned q) = 0;
+    virtual unsigned allocate() = 0;
     virtual bool release(unsigned q) = 0;
     virtual unsigned num_qubits() const = 0;
 

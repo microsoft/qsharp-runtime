@@ -69,6 +69,11 @@ extern "C"
         Microsoft::Quantum::Simulator::get(id)->allocateQubit(q);
     }
 
+    MICROSOFT_QUANTUM_DECL unsigned allocate(_In_ unsigned id)
+    {
+        return Microsoft::Quantum::Simulator::get(id)->allocate();
+    }
+
     MICROSOFT_QUANTUM_DECL bool release(_In_ unsigned id, _In_ unsigned q)
     {
         // The underlying simulator function will return True if and only if the qubit being released
