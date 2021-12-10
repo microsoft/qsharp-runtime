@@ -356,9 +356,53 @@ template <class T, class A>
 double nrm2(std::vector<std::complex<T>, A> const& x)
 {
     double sum = 0.;
+    const std::intptr_t wfn_size = (std::intptr_t)x.size();
 #pragma omp parallel for schedule(static) reduction(+ : sum)
-    for (std::intptr_t i = 0; i < (std::intptr_t)x.size(); ++i)
+    for (std::intptr_t i = 0; i < wfn_size; ++i)
         sum += x[i].real() * x[i].real() + x[i].imag() * x[i].imag();
+    return std::sqrt(sum);
+}
+
+template <class T, class A>
+double nrm2_simd(std::vector<std::complex<T>, A> const& x)
+{
+    double sum = 0.;
+    const std::intptr_t wfn_size = (std::intptr_t)x.size() * 2;
+    const T * data = reinterpret_cast<const T*>(x.data());
+#pragma omp parallel for schedule(static) reduction(+ : sum)
+    for (std::intptr_t i = 0; i < wfn_size; i += 8)
+    {
+        #pragma omp simd reduction(+ : sum)
+        for (int j = 0 ; j < 8; j++)
+        {
+            sum += data[i + j] * data[i + j];
+        }
+    }
+    return std::sqrt(sum);
+}
+
+template <class T, class A>
+double nrm2_avx512(std::vector<std::complex<T>, A> const& x)
+{
+    double sum = 0.;
+    const int threads = omp_get_max_threads();
+    std::vector<double> local_sums(threads);
+    const std::intptr_t wfn_size = (std::intptr_t)x.size() * 2;
+    const T * data = reinterpret_cast<const T*>(x.data());
+#pragma omp parallel for schedule(static, 1)
+    for (std::intptr_t i = 0; i < wfn_size; i += 8)
+    {
+        const auto thread_id = omp_get_thread_num();
+        double& sum_local = local_sums[thread_id];
+        __m512d input = _mm512_load_pd((const void *)&data[i]);
+        input = _mm512_mul_pd(input, input);
+        sum_local += _mm512_reduce_add_pd(input);
+    }
+//#pragma omp simd reduction(+ : sum)
+    for (int id = 0; id < threads; id++)
+    {
+        sum += local_sums[id];
+    }
     return std::sqrt(sum);
 }
 
@@ -369,6 +413,34 @@ void normalize(std::vector<T, A>& wfn)
 #pragma omp parallel for schedule(static)
     for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); ++i)
         wfn[i] *= scale;
+}
+
+inline void simd_normalize(double scale, double* pvalue)
+{
+    __m256d input = _mm256_load_pd(pvalue);
+    __m256d scalar = _mm256_set1_pd(scale);
+    __m256d output = _mm256_mul_pd(input, scalar);
+    _mm256_store_pd(pvalue, output);
+}
+
+template <class T, class A>
+void normalize_avx512(std::vector<T, A>& wfn)
+{
+    const double scale = 1. / nrm2_avx512(wfn);
+    
+    const std::intptr_t wfn_size = (std::intptr_t)wfn.size() * 2;
+
+    double * data = reinterpret_cast<double*>(wfn.data());
+
+#pragma omp parallel for schedule(static, 1)
+    for (std::intptr_t i = 0; i < wfn_size; i += 8)
+    {
+        double* pvalue = &(data[i]);
+        __m512d input = _mm512_load_pd(pvalue);
+        __m512d scalar = _mm512_set1_pd(scale);
+        __m512d output = _mm512_mul_pd(input, scalar);
+        _mm512_store_pd(pvalue, output);
+    }
 }
 
 template <class T, class A1, class A2>

@@ -1,5 +1,21 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+# AVX
+if (MSVC)
+set(AVXFLAGS "/arch:AVX" )
+set(AVX2FLAGS "/arch:AVX2" )
+set(AVX512FLAGS "/arch:AVX512" )
+set(FMAFLAGS "")
+else(MSVC)
+SET(AVXFLAGS "-mavx")
+set(AVX2FLAGS "-mfma -mavx2")
+set(AVX512FLAGS "-mfma -mavx512f -mavx512cd")
+set(FMAFLAGS )
+endif(MSVC)
+
+set_source_files_properties(kernels_test.cpp PROPERTIES COMPILE_FLAGS ${AVX512FLAGS})
+add_executable(kernels_test kernels_test.cpp)
+add_test(NAME kernels_test COMMAND ./kernels_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_executable(factory_test factory_test.cpp)
 target_link_libraries(factory_test Microsoft.Quantum.Simulator.Runtime)
@@ -12,8 +28,6 @@ add_test(NAME capi_test COMMAND ./capi_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR
 add_executable(dbw_test dbw_test.cpp)
 target_link_libraries(dbw_test Microsoft.Quantum.Simulator.Runtime)
 add_test(NAME dbw_test COMMAND ./dbw_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
-
 
 add_executable(quantum_simulator_unittests
   "${PROJECT_SOURCE_DIR}/src/catch2/catch_driver.cpp"
