@@ -6,6 +6,7 @@ message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
 project(qirruntime)
 
 # specify the C++ standard, compiler and other tools
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 

@@ -8,6 +8,10 @@
 #include <string>
 #include <thread>
 
+#include <time.h>
+
+#include <chrono>
+
 #ifndef HAVE_INTRINSICS
 #include "external/nointrin/kernels.hpp"
 #else
@@ -37,7 +41,11 @@ class Fused
         wfnCapacity     = 0u;   // used to optimize runtime parameters
         maxFusedSpan    = 4;    // determine span to use at runtime
         maxFusedDepth   = 999;  // determine max depth to use at runtime
+        kernelMs = 0;
     }
+      uint64_t get_kernel_ms() const {
+          return kernelMs;
+      }
 
     inline void reset()
     {
@@ -74,7 +82,9 @@ class Fused
       std::size_t cmask = 0;
       for (auto c : cs)
         cmask |= (1ull << c);
-      
+      auto start = std::chrono::duration_cast<std::chrono::milliseconds>(
+                   std::chrono::high_resolution_clock::now().time_since_epoch())
+                   .count();
       switch (qs.size())
       {
         case 1:
@@ -99,7 +109,10 @@ class Fused
             ::kernel(wfn, qs[6], qs[5], qs[4], qs[3], qs[2], qs[1], qs[0], m, cmask);
             break;
       }
-
+      auto end = std::chrono::duration_cast<std::chrono::milliseconds>(
+                         std::chrono::high_resolution_clock::now().time_since_epoch())
+                         .count();
+      kernelMs += (end - start);
       fusedgates = Fusion();
     }
     
@@ -199,6 +212,8 @@ class Fused
     mutable size_t wfnCapacity;
     mutable int    maxFusedSpan;
     mutable int    maxFusedDepth;
+
+    mutable uint64_t kernelMs;
   };
   
   

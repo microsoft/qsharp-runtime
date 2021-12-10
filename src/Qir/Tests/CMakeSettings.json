@@ -1,0 +1,27 @@
+﻿{
+    "configurations": [
+        {
+            "name": "x64-Debug",
+            "generator": "Ninja",
+            "configurationType": "Debug",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "buildRoot": "${projectDir}\\out\\build\\${name}",
+            "installRoot": "${projectDir}\\out\\install\\${name}",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "",
+            "ctestCommandArgs": "",
+            "variables": [
+                {
+                    "name": "CMAKE_BUILD_TYPE",
+                    "value": "Release",
+                    "type": "STRING"
+                },
+                {
+                    "name": "CMAKE_INSTALL_PREFIX",
+                    "value": "D:/git/qsharp-runtime/src/Qir/Tests/out/install/Release",
+                    "type": "PATH"
+                }
+            ]
+        }
+    ]
+}
