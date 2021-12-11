@@ -161,7 +161,7 @@ class Fused
             char* envFD = NULL;
             maxFusedDepth = 999;
 #ifdef _MSC_VER
-            err = _dupenv_s(&envFD, &len, "QDK_SIM_FUSEDEPTH");
+            errno_t err2 = _dupenv_s(&envFD, &len, "QDK_SIM_FUSEDEPTH");
             if (envFD != NULL && len > 0) {
                 maxFusedDepth = atoi(envFD);
         }
@@ -176,7 +176,7 @@ class Fused
             maxFusedSpan = 4;                               // General sweet spot
             if (wfnCapacity < 1u << 20) maxFusedSpan = 2;   // Don't pre-fuse small problems
 #ifdef _MSC_VER
-            err = _dupenv_s(&envFS, &len, "QDK_SIM_FUSESPAN");
+            errno_t err3 = _dupenv_s(&envFS, &len, "QDK_SIM_FUSESPAN");
             if (envFS != NULL && len > 0) {
                 maxFusedSpan = atoi(envFS);
                 if (maxFusedSpan > 7) maxFusedSpan = 7;     // Highest we can handle
