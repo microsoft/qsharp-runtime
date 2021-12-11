@@ -2,9 +2,11 @@
 # Licensed under the MIT License.
 
 if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
+    brew update
     brew install libomp
+    brew install ninja
 } elseif (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
-    if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
+    if (!(Get-Command clang -ErrorAction SilentlyContinue) -or `
         (Test-Path Env:/AGENT_OS)) {
         choco install llvm --version=11.1.0 --allow-downgrade
         Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
@@ -20,10 +22,10 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
 else {
     if (Get-Command sudo -ErrorAction SilentlyContinue) {
         sudo apt update
-        sudo apt-get install -y clang-11
+        sudo apt-get install -y ninja-build clang-11 clang-tidy-11 clang-format-11
     } else {
         apt update
-        apt-get install -y clang-11
+        apt-get install -y ninja-build clang-11 clang-tidy-11 clang-format-11
     }
 }
 
