@@ -10,8 +10,10 @@ set(FMAFLAGS )
 configure_file(config.hpp.in ${PROJECT_BINARY_DIR}/src/config.hpp)
 configure_file(version.hpp.in ${PROJECT_BINARY_DIR}/src/version.hpp)
 
+if(BUILD_TESTS)
 add_subdirectory(util)
 add_subdirectory(simulator)
+endif(BUILD_TESTS)
 
 set(SOURCES simulator/factory.cpp simulator/capi.cpp simulator/simulator.cpp util/openmp.cpp simulator/simulatoravx.cpp simulator/simulatoravx2.cpp simulator/simulatoravx512.cpp )
 if(BUILD_SHARED_LIBS)

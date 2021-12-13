@@ -31,6 +31,7 @@ option(ENABLE_OPENMP  "Enable OpenMP Parallelization" ON)
 option(USE_SINGLE_PRECISION "Use single-precision floating point operations" OFF)
 option(HAVE_INTRINSICS "Have AVX intrinsics" OFF)
 option(USE_GATE_FUSION "Use gate fusion" ON)
+option(BUILD_TESTS "Build simulator test applications" ON)
 
 # Always use Spectre mitigations where available
 if (WIN32)
@@ -109,7 +110,9 @@ endif(OPENMP_FOUND)
 endif(ENABLE_OPENMP)
 
 # tests
+if(BUILD_TESTS)
 ENABLE_TESTING()
+endif(BUILD_TESTS)
 
 # include directories
 add_subdirectory("src")
