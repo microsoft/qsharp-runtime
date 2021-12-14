@@ -10,6 +10,7 @@ crate-type = ["staticlib","rlib"]
 [features]
 fullstatesim = []
 staticsim = []
+install-prereqs = []
 default = ["fullstatesim"]
 
 [build-dependencies]

@@ -1,9 +1,14 @@
 use cmake::Config;
 use std::boxed::Box;
 use std::error::Error;
+use std::process::Command;
 
 fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rerun-if-env-changed=TARGET");
+
+    if cfg!(feature = "install-prereqs") {
+        install_prereqs()?;
+    }
 
     let mut config = Config::new("..");
     if cfg!(target_os = "windows") {
@@ -83,5 +88,39 @@ fn set_compiler(config: &mut Config) -> Result<(), Box<dyn Error>> {
     } else {
         panic!("Unsupported platform")
     }
+    Ok(())
+}
+
+fn install_prereqs() -> Result<(), Box<dyn Error>> {
+    if cfg!(target_os = "windows") {
+        if let Err(_) = which::which("clang.exe") {
+            Command::new("choco")
+                .args(&["install", "llvm", "--version=11.1.0", "--allow-downgrade"])
+                .status()?;
+        }
+        if let Err(_) = which::which("ninja") {
+            Command::new("choco").args(&["install", "ninja"]).status()?;
+        }
+        if let Err(_) = which::which("cmake") {
+            Command::new("choco").args(&["install", "cmake"]).status()?;
+        }
+    } else if cfg!(target_os = "linux") {
+        if let Ok(_) = which::which("sudo") {
+            Command::new("sudo").args(&["apt", "update"]).status()?;
+            Command::new("sudo")
+                .args(&["apt-get", "install", "-y", "ninja-build", "clang-11"])
+                .status()?;
+        } else {
+            Command::new("apt").args(&["update"]).status()?;
+            Command::new("apt-get")
+                .args(&["install", "-y", "ninja-build", "clang-11"])
+                .status()?;
+        }
+    } else if cfg!(target_os = "macos") {
+        Command::new("brew").args(&["update"]).status()?;
+        Command::new("brew").args(&["install", "libomp"]).status()?;
+        Command::new("brew").args(&["install", "ninja"]).status()?;
+    }
+
     Ok(())
 }
