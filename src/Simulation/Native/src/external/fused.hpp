@@ -11,6 +11,7 @@
 #include <time.h>
 
 #include <chrono>
+#include "cudaquantuminterfaces.h"
 
 #ifndef HAVE_INTRINSICS
 #include "external/nointrin/kernels.hpp"
@@ -66,6 +67,46 @@ class Fused
 
     const int maxDepth() const {
         return maxFusedDepth;
+    }
+
+    void flush_gpu(void* gpuContext) const
+    {
+      if (fusedgates.size() == 0)
+        return;
+      Fusion::Matrix m;
+      Fusion::IndexVector qs, cs;
+
+      fusedgates.perform_fusion(m, qs, cs);
+      std::vector<int> controls(cs.size());
+      for(size_t i = 0; i  < cs.size(); i++)
+      {
+        controls[i] = (int) cs[i];
+      }
+      std::vector<int> targets(qs.size());
+      for(size_t i = 0; i  < qs.size(); i++)
+      {
+        targets[i] = (int) qs[i];
+      }
+      const size_t qbits = m.size();
+      std::vector<std::complex<double>> mm(qbits* qbits);
+      size_t m_index = 0;
+      for (size_t i = 0; i < qbits; i++)
+      {
+        for (size_t j = 0; j < qbits; j++)
+        {
+          mm[i * qbits + j] = m[i][j];
+        }
+      }
+      auto start = std::chrono::duration_cast<std::chrono::milliseconds>(
+                   std::chrono::high_resolution_clock::now().time_since_epoch())
+                   .count();
+
+      apply_cuquantum_gate(gpuContext, reinterpret_cast<double*>(mm.data()), (int)controls.size(), (int)targets.size(), targets.data(), controls.data());
+      auto end = std::chrono::duration_cast<std::chrono::milliseconds>(
+                         std::chrono::high_resolution_clock::now().time_since_epoch())
+                         .count();
+      kernelMs += (end - start);
+      fusedgates = Fusion();
     }
 
     template <class T, class A>
@@ -126,28 +167,28 @@ class Fused
       return mat;
     }
     
-    template <class T, class A, class M>
-    void apply_controlled(std::vector<T, A>& wfn, M const& mat, std::vector<unsigned> const& cs, unsigned q) const
+    template <class M>
+    void apply_controlled(M const& mat, std::vector<unsigned> const& cs, unsigned q) const
     {
         Fusion::IndexVector qs = std::vector<unsigned>(1, q);
         fusedgates.insert(convertMatrix(mat), qs, cs);
     }
 
-    template <class T, class A, class M>
-    void apply(std::vector<T, A>& wfn, M const& mat, unsigned q) const
+    template <class M>
+    void apply(M const& mat, unsigned q) const
     {
       std::vector<unsigned> cs;
-      apply_controlled(wfn, mat, cs, q);
+      apply_controlled(mat, cs, q);
     }
 
-    template <class T, class A>
-    bool shouldFlush(std::vector<T, A>& wfn, std::vector<unsigned> const& cs, unsigned q)
+
+    bool shouldFlush(size_t wfn_capacity, std::vector<unsigned> const& cs, unsigned q)
     {
         // Major runtime logic change here
 
           // Have to update capacity as the WFN grows
-        if (wfnCapacity != wfn.capacity()) {
-            wfnCapacity = wfn.capacity();
+        if (wfnCapacity != wfn_capacity) {
+            wfnCapacity = wfn_capacity;
             char* envNT = NULL;
             size_t len;
 #ifdef _OPENMP

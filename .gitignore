@@ -355,3 +355,5 @@ out/
 # Ignore drops from building native simulators.
 xplat
 /AdvantageBenchmark/privateBuild/GPUCache
+/src/cuda/*.so*
+/src/cuda/*.a

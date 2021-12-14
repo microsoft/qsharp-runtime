@@ -14,11 +14,13 @@
 #include <string.h>
 #include <vector>
 #include <chrono>
+#include <stdexcept>
 
 #include "gates.hpp"
 #include "types.hpp"
 
 #include "external/fused.hpp"
+#include "cudaquantuminterfaces.h"
 
 namespace Microsoft
 {
@@ -351,7 +353,8 @@ class Wavefunction
     /// Represents the state of the system with num_qubits_ qubits in little-endian notation (that is, the qubit
     /// with positional id = 0 corresponds to the least significant bit in the index of the standard computational
     /// basic vector of this wave function). Might not reflect the current state if there are pending fused gates.
-    mutable WavefunctionStorage wfn_;
+    //mutable WavefunctionStorage wfn_;
+    mutable void* gpu_wfn_;
 
     /// Each qubit has a client-facing id, which we call "logical qubit id" or just "logical qubit". However, the order
     /// of qubits in the internal representation of the state, that is, the positions of the qubits in the standard
@@ -381,9 +384,11 @@ class Wavefunction
     /// allocate a wave function for zero qubits
     Wavefunction()
         : num_qubits_(0)
-        , wfn_(1, 1.)
+        //, wfn_(1, 1.)
+        ,gpu_wfn_(nullptr)
     {
         rng_.seed((unsigned)std::chrono::system_clock::now().time_since_epoch().count());
+        gpu_wfn_ = create_cuquantum_context();
     }
 
     uint64_t get_kernel_ms() const
@@ -396,8 +401,9 @@ class Wavefunction
         fused_.reset();
         rng_.seed((unsigned)std::chrono::system_clock::now().time_since_epoch().count());
         num_qubits_ = 0;
-        wfn_.resize(1);
-        wfn_[0] = 1.;
+        //wfn_.resize(1);
+        //wfn_[0] = 1.;
+        create_cuquantum_bits(gpu_wfn_, 0);
         qubitmap_.resize(0);
 
         // what about pending_gates_?
@@ -406,6 +412,8 @@ class Wavefunction
     ~Wavefunction()
     {
         flush();
+        free_cuquantum_context(gpu_wfn_);
+        gpu_wfn_ = nullptr;
     }
 
     constexpr positional_qubit_id invalid_qubit_position() const
@@ -453,7 +461,8 @@ class Wavefunction
 
         if (clusters.empty())
         {
-            fused_.flush(wfn_);
+            //fused_.flush(wfn_);
+            fused_.flush_gpu(gpu_wfn_);
         }
         else
         {
@@ -465,16 +474,17 @@ class Wavefunction
                     const std::vector<logical_qubit_id>& cs = gate.get_controls();
                     if (cs.size() == 0)
                     {
-                        fused_.apply(wfn_, gate.get_mat(), get_qubit_position(gate.get_target()));
+                        fused_.apply(gate.get_mat(), get_qubit_position(gate.get_target()));
                     }
                     else
                     {
                         fused_.apply_controlled(
-                            wfn_, gate.get_mat(), get_qubit_positions(cs), get_qubit_position(gate.get_target()));
+                            gate.get_mat(), get_qubit_positions(cs), get_qubit_position(gate.get_target()));
                     }
                 }
 
-                fused_.flush(wfn_);
+                //fused_.flush(wfn_);
+                fused_.flush_gpu(gpu_wfn_);
             }
         }
         pending_gates_.clear();
@@ -489,7 +499,8 @@ class Wavefunction
 #endif
 
         flush();
-        wfn_.resize(2 * wfn_.size());
+        //wfn_.resize(2 * wfn_.size());
+        increase_cuquantum_bit(gpu_wfn_);
 
         // Reuse a logical qubit id, if any is available.
         auto it = std::find(qubitmap_.begin(), qubitmap_.end(), invalid_qubit_position());
@@ -516,7 +527,8 @@ class Wavefunction
 #endif
 
         flush();
-        wfn_.resize(2 * wfn_.size());
+        //wfn_.resize(2 * wfn_.size());
+        increase_cuquantum_bit(gpu_wfn_);
 
         if (id < qubitmap_.size())
         {
@@ -528,7 +540,7 @@ class Wavefunction
             assert(id == qubitmap_.size()); // we want qubitmap_ to be as small as possible
             qubitmap_.push_back(num_qubits_++);
         }
-        assert((wfn_.size() >> num_qubits_) == 1);
+        //assert((wfn_.size() >> num_qubits_) == 1);
     }
 
     /// release the specified qubit
@@ -537,7 +549,8 @@ class Wavefunction
     {
         positional_qubit_id p = get_qubit_position(q);
         flush();
-        kernels::collapse(wfn_, p, getvalue(q), true);
+        //kernels::collapse(wfn_, p, getvalue(q), true);
+        kernels::collapse_gpu(gpu_wfn_, p, getvalue(q));
         for (int i = 0; i < qubitmap_.size(); ++i)
             if (qubitmap_[i] > p && qubitmap_[i] != invalid_qubit_position()) qubitmap_[i]--;
         qubitmap_[q] = invalid_qubit_position();
@@ -554,21 +567,27 @@ class Wavefunction
     double probability(logical_qubit_id q) const
     {
         flush();
-        return kernels::probability(wfn_, get_qubit_position(q));
+        throw std::runtime_error("probability, not implemented");
+        //return kernels::probability(wfn_, get_qubit_position(q));
+        return 0;
     }
 
     /// probability of jointly measuring a 1
     double jointprobability(std::vector<logical_qubit_id> const& qs) const
     {
         flush();
-        return kernels::jointprobability(wfn_, get_qubit_positions(qs));
+        throw std::runtime_error("jointprobability 1, not implemented");
+        //return kernels::jointprobability(wfn_, get_qubit_positions(qs));
+        return 0;
     }
 
     /// probability of jointly measuring a 1
     double jointprobability(std::vector<Gates::Basis> const& bs, std::vector<logical_qubit_id> const& qs) const
     {
         flush();
-        return kernels::jointprobability(wfn_, bs, get_qubit_positions(qs));
+        throw std::runtime_error("jointprobability 2, not implemented");
+        //return kernels::jointprobability(wfn_, bs, get_qubit_positions(qs));
+        return 0;
     }
 
     /// \pre: Each qubit, listed in `q`, must be unentangled and in state |0>. If the prerequisite isn't satisfied,
@@ -581,13 +600,14 @@ class Wavefunction
         assert((static_cast<size_t>(1) << qubits.size()) == amplitudes.size());
 
         flush();
+        throw std::runtime_error("inject_state, not implemented");
 
         if (qubits.size() == num_qubits_)
         {
             // Check prerequisites. In the case of total state injection the wave function must consist of a single
             // term |0...0> (so we can avoid checking each qubit individually).
             double eps = 100. * std::numeric_limits<double>::epsilon();
-            if (std::norm(wfn_[0]) < 1.0 - eps)
+            //if (std::norm(wfn_[0]) < 1.0 - eps)
             {
                 return false;
             }
@@ -598,7 +618,7 @@ class Wavefunction
             {
                 qubitmap_[qubits[i]] = i;
             }
-            wfn_.assign(amplitudes.begin(), amplitudes.end());
+            //wfn_.assign(amplitudes.begin(), amplitudes.end());
         }
         else
         {
@@ -606,7 +626,7 @@ class Wavefunction
             std::vector<positional_qubit_id> positions = get_qubit_positions(qubits);
             for (positional_qubit_id p : positions)
             {
-                if (!kernels::isclassical(wfn_, p) || kernels::getvalue(wfn_, p) != 0)
+                //if (!kernels::isclassical(wfn_, p) || kernels::getvalue(wfn_, p) != 0)
                 {
                     return false;
                 }
@@ -617,7 +637,8 @@ class Wavefunction
             // injection we need to find the corresponding |i> vector from the original wave function and |j> vector
             // from the state being injected, and multiply their amplitudes. The things are complicated by the fact that
             // the state might not be injected on adjacently positioned qubits, but get/set_register takes care of that.
-            const int64_t num_states = static_cast<int64_t>(wfn_.size());
+            //const int64_t num_states = static_cast<int64_t>(wfn_.size());
+            const int64_t num_states = 1ULL << num_qubits_;
             const size_t mask = kernels::make_mask(positions);
             WavefunctionStorage wfn_new(num_states);
 
@@ -631,9 +652,9 @@ class Wavefunction
             {
                 const size_t injected_index = detail::get_register(positions, basis_index);
                 const size_t original_term = detail::set_register(positions, mask, 0, basis_index);
-                wfn_new[basis_index] = wfn_[original_term] * amplitudes[injected_index];
+                //wfn_new[basis_index] = wfn_[original_term] * amplitudes[injected_index];
             }
-            std::swap(wfn_, wfn_new);
+            //std::swap(wfn_, wfn_new);
         }
 
         return true;
@@ -644,10 +665,15 @@ class Wavefunction
     {
         flush();
         std::uniform_real_distribution<double> uniform(0., 1.);
-        bool result = (uniform(rng_) < probability(q));
-        kernels::collapse(wfn_, get_qubit_position(q), result);
-        kernels::normalize(wfn_);
-        return result;
+        //bool result = (uniform(rng_) < probability(q));
+        //kernels::collapse(wfn_, get_qubit_position(q), result);
+        //kernels::normalize(wfn_);
+        //return result;
+        int parity[1] = {0};
+        int basis_bits[1] = {(int)get_qubit_position(q)};
+        double random_value = uniform(rng_);
+        meansure_cuquantum_zbasis(gpu_wfn_, parity, basis_bits, 1, random_value, true);
+        return parity[0] != 0 ;
     }
 
     bool jointmeasure(std::vector<logical_qubit_id> const& qs)
@@ -655,10 +681,19 @@ class Wavefunction
         flush();
         std::vector<positional_qubit_id> ps = get_qubit_positions(qs);
         std::uniform_real_distribution<double> uniform(0., 1.);
-        bool result = (uniform(rng_) < jointprobability(qs));
-        kernels::jointcollapse(wfn_, ps, result);
-        kernels::normalize(wfn_);
-        return result;
+        //bool result = (uniform(rng_) < jointprobability(qs));
+        //kernels::jointcollapse(wfn_, ps, result);
+        //kernels::normalize(wfn_);
+        //return result;
+        std::vector<int> ps_int(ps.size());
+        for(size_t i = 0; i < ps.size(); i++)
+        {
+            ps_int[i] = (int)ps[i];
+        }
+        int parity[1] = {0};
+        double random_value = uniform(rng_);
+        meansure_cuquantum_zbasis(gpu_wfn_, parity, ps_int.data(), (int)ps_int.size(), random_value, true);
+        return parity[0] != 0 ;
     }
 
     void apply_controlled_exp(
@@ -668,14 +703,30 @@ class Wavefunction
         std::vector<logical_qubit_id> const& qs)
     {
         flush();
-        kernels::apply_controlled_exp(wfn_, bs, phi, get_qubit_positions(cs), get_qubit_positions(qs));
+        //kernels::apply_controlled_exp(wfn_, bs, phi, get_qubit_positions(cs), get_qubit_positions(qs));
+        std::vector<int> cs_ints(cs.size());
+        std::vector<int> qs_ints(qs.size());
+        std::vector<int> bs_ints(qs.size());
+        for (size_t i = 0; i < qs.size(); i++)
+        {
+            qs_ints[i] = (int)get_qubit_position(qs[i]);
+            bs_ints[i] = (int)bs[i];
+        }
+        for (size_t i = 0; i < qs.size(); i++)
+        {
+            cs_ints[i] = (int)get_qubit_position(cs[i]);
+        }
+        apply_cuquantum_controlled_exp(gpu_wfn_, phi, bs_ints.data(), qs_ints.data(), (uint32_t) qs_ints.size(), cs_ints.data(), nullptr, (uint32_t)cs_ints.size());
     }
 
     /// checks if the qubit is in classical state
     bool isclassical(logical_qubit_id q) const
     {
         flush();
-        return kernels::isclassical(wfn_, get_qubit_position(q));
+
+        //return kernels::isclassical(wfn_, get_qubit_position(q));
+        throw std::runtime_error("isclassical is not impelemented yet!");
+        return false;
     }
 
     /// returns the classical value of a qubit (if classical)
@@ -683,8 +734,10 @@ class Wavefunction
     bool getvalue(logical_qubit_id q) const
     {
         flush();
+        throw std::runtime_error("getvalue is not impelemented yet!");
         assert(isclassical(q));
-        int res = kernels::getvalue(wfn_, get_qubit_position(q));
+        //int res = kernels::getvalue(wfn_, get_qubit_position(q));
+        int res = 1;
         if (res == 2) std::cout << *this;
 
         assert(res < 2);
@@ -695,7 +748,9 @@ class Wavefunction
     WavefunctionStorage const& data() const
     {
         flush();
-        return wfn_;
+        throw std::runtime_error("data is not impelemented yet!");
+        //return wfn_;
+        return WavefunctionStorage();
     }
 
     /// seed the random number engine for measurements
@@ -715,7 +770,7 @@ class Wavefunction
             flush();
         }
 
-        fused_.shouldFlush(wfn_, cs, g.qubit());
+        fused_.shouldFlush(1ULL << num_qubits_, cs, g.qubit());
     }
 
     /// generic application of a multiply controlled gate
@@ -728,7 +783,7 @@ class Wavefunction
             flush();
         }
 
-        fused_.shouldFlush(wfn_, cs, g.qubit());
+        fused_.shouldFlush(1ULL << num_qubits_, cs, g.qubit());
     }
 
     /// generic application of a controlled gate
@@ -749,7 +804,9 @@ class Wavefunction
     bool subsytemwavefunction(std::vector<logical_qubit_id> const& qs, std::vector<T, A>& qubitswfn, double tolerance)
     {
         flush(); // we have to flush before we can extract the state
-        return kernels::subsytemwavefunction(wfn_, get_qubit_positions(qs), qubitswfn, tolerance);
+        throw std::runtime_error("subsytemwavefunction, not implemented");
+        //return kernels::subsytemwavefunction(wfn_, get_qubit_positions(qs), qubitswfn, tolerance);
+        return false;
     }
 
     /// Apply the unitary operator that permutes the standard computational basis of the subsystem, defined by the
@@ -781,10 +838,12 @@ class Wavefunction
 #endif
 
         flush();
+        throw std::runtime_error("permute_basis not implemented yet");
 
         std::vector<positional_qubit_id> positions = get_qubit_positions(qs);
 
-        const size_t num_states = wfn_.size();
+        //const size_t num_states = wfn_.size();
+        const size_t num_states = 1ULL << num_qubits_;
         WavefunctionStorage psi_new(num_states);
         const size_t qmask = kernels::make_mask(positions);
 
@@ -802,7 +861,7 @@ class Wavefunction
             {
                 const size_t target = permute(i);
                 assert(permuted.insert(target).second); // should see no duplicates
-                psi_new[target] = wfn_[i];
+                //psi_new[target] = wfn_[i];
             }
         }
         else
@@ -811,7 +870,7 @@ class Wavefunction
             {
                 const size_t source = permute(i);
                 assert(permuted.insert(source).second); // should see no duplicates
-                psi_new[i] = wfn_[source];
+                //psi_new[i] = wfn_[source];
             }
         }
 
@@ -820,7 +879,7 @@ class Wavefunction
         assert(*permuted.begin() == 0);                // min element in ordered set
         assert(*(--permuted.end()) == num_states - 1); // max element in ordered set
 
-        std::swap(wfn_, psi_new);
+        //std::swap(wfn_, psi_new);
     }
 
     RngEngine& rng()

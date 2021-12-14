@@ -9,6 +9,7 @@
 #include "util/bitops.hpp"
 #include "util/diagmatrix.hpp"
 #include "util/tinymatrix.hpp"
+#include "cudaquantuminterfaces.h"
 
 #include <atomic>
 #include <complex>
@@ -108,6 +109,13 @@ void collapse(std::vector<T, A>& wfn, unsigned q, bool val, bool compact = false
         for (std::intptr_t i = 0; i < static_cast<std::intptr_t>(wfn.size()); ++i)
             if ((i & mask) != state) wfn[i] = 0.;
     }
+}
+template <class T>
+void collapse_gpu(T* wfn, unsigned q, bool val)
+{
+    std::size_t mask = (1ull << q);
+    std::size_t state = (val ? mask : 0ul);
+    collapse_cuquantum(wfn, mask, state);
 }
 
 template <class T, class A>

@@ -9,7 +9,7 @@ add_executable(argmaxnrm2_test argmaxnrm2_test.cpp)
 add_executable(bititerator_test bititerator_test.cpp)
 add_executable(cpuid_test cpuid_test.cpp)
 
-target_link_libraries(openmp_test Microsoft.Quantum.Simulator.Runtime)
+target_link_libraries(openmp_test Microsoft.Quantum.Simulator.Runtime cudaquantumgates)
 
 add_test(NAME tinymatrix COMMAND  ./tinymatrix_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME diagmatrix COMMAND  ./diagmatrix_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
