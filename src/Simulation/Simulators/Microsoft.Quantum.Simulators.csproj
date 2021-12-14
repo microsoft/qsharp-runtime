@@ -39,11 +39,26 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
+    <!--
+    <None Include="/usr/local/Cellar/libomp/13.0.0/lib/libomp.dylib">
+      <Link>runtimes\osx-x64\native\libomp.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    -->
     <None Include="..\Native\linux\**\*">
       <Link>runtimes\linux-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
+    <!-- 
+    <None Include="/lib/llvm-11/lib/libomp.so.5">
+      <Link>runtimes\linux-x64\native\libomp.so.5</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    -->
+
   </ItemGroup>
 
 </Project>
