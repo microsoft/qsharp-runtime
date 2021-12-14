@@ -3,4 +3,5 @@
 members = [
     "src/Simulation/qdk_sim_rs",
     "src/Qir/microsoft-quantum-qir-runtime-sys",
+    "src/Simulation/Native/microsoft-quantum-simulator-sys",
 ]

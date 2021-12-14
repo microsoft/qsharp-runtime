@@ -1,0 +1,18 @@
+[package]
+name = "microsoft-quantum-simulator-sys"
+version = "0.1.0"
+edition = "2021"
+links = "Microsoft.Quantum.Simulator.Runtime"
+
+[lib]
+crate-type = ["staticlib","rlib"]
+
+[features]
+fullstatesim = []
+staticsim = []
+default = ["fullstatesim"]
+
+[build-dependencies]
+cmake = "0.1.46"
+cc = "1.0.71"
+which = "4.2.2"
