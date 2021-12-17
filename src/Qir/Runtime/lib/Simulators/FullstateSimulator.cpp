@@ -266,7 +266,7 @@ namespace Quantum
                 // We reject the release of a qubit that is not in the ground state (releaseQubit returns false),
                 // and was not recently measured (ie: the last operation was not measurement). This means the
                 // state is not well known, and therefore the safety of release is not guaranteed.
-                //__quantum__rt__fail_cstr("Released qubit neither measured nor in ground state.");
+                __quantum__rt__fail_cstr("Released qubit neither measured nor in ground state.");
             }
             qubitManager->Release(q); // Release it in the qubit manager.
         }

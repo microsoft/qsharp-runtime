@@ -75,7 +75,7 @@ namespace Quantum
         {
             if (tracked.second > 0)
             {
-                //__quantum__rt__fail_cstr("Found a potentially leaked object!");
+                __quantum__rt__fail_cstr("Found a potentially leaked object!");
             }
         }
     }
