@@ -8,6 +8,8 @@ target_link_libraries(fullstate-simulator-tests PUBLIC
   -lMicrosoft.Quantum.Qir.Runtime
   -lMicrosoft.Quantum.Qir.QSharp.Foundation
   -lMicrosoft.Quantum.Qir.QSharp.Core
+  -lcudaquantumgates
+  -lcustatevec
 )
 
 target_include_directories(fullstate-simulator-tests PUBLIC

@@ -11,6 +11,7 @@ CXX_FLAGS= -std=c++11 $(INC) $(LIBS)
 
 all:
 	nvcc --shared --compiler-options '-fPIC'  -o libcudaquantumgates.so cudaquantumgates.cu  ${CXX_FLAGS}
+	cp libcudaquantumgates.so ../Qir/Runtime/bin/Release/bin/
 
 clean:
-	rm -f cudaquantumgates.so 
+	rm -f cudaquantumgates.so

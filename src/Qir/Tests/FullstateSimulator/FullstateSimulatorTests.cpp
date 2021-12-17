@@ -659,16 +659,7 @@ int main(int argc, char* argv[])
             inputLoops >> loops;
         }
         std::cout << "Test function " << funcId << ", for " << loops << " loops" << std::endl;
-        {
-            std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-            QirExecutionContext::Scoped qirctx(sim.get(), true);
 
-            if (0 != Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop())
-            {
-                std::cerr << "Failed to initialize the quantum context" << std::endl;
-                return 1;
-            }
-        }
         if ((size_t)funcId >= qFuncs.size())
         {
             for (int i = 0; (size_t)i < qFuncs.size(); i++)
@@ -680,10 +671,18 @@ int main(int argc, char* argv[])
         {
             ExecuteTest(funcId, loops);
         }
+        std::cerr << "succeeded !" << std::endl;
         return 0;
+    }
+    catch (const std::exception& exc)
+    {
+        // catch anything thrown within try block that derives from std::exception
+        std::cerr << exc.what() << std::endl;
+        return 1;
     }
     catch (...)
     {
+        std::cerr << "unknown exception!" << std::endl;
         return 2;
     }
 }

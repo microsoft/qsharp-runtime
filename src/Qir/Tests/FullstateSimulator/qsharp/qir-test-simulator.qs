@@ -292,9 +292,9 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[13]);
                 H(q[14]);
                 H(q[15]);
-                //for (q1 in q) { let _ = M(q1); }
             }
-        //ResetAll(q);
+            for (q1 in q) { let _ = M(q1); }
+        ResetAll(q);
         }
     return(gateCnt);
     }
@@ -574,9 +574,9 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[22]);
                 H(q[23]);
                 H(q[24]);
-                //for (q1 in q) { let _ = M(q1); }
             }
-        //ResetAll(q);
+        for (q1 in q) { let _ = M(q1); }
+        ResetAll(q);
         }
     return(gateCnt);
     }
@@ -585,7 +585,7 @@ namespace Microsoft.Quantum.Testing.QIR
     operation Advantage56() : Int {
         let loops = 10;
         let gateCnt = (323+53*2) * loops;
-        using (q = Qubit[30]) {
+        using (q = Qubit[29]) {
             for (loop in 0..(loops-1)) {
                 H(q[0]);
                 H(q[1]);
@@ -616,7 +616,7 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
+                //H(q[29]);
                 CZ(q[2],q[3]);
                 CZ(q[14],q[15]);
                 CZ(q[26],q[27]);
@@ -653,13 +653,13 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
+                //H(q[29]);
                 CZ(q[0],q[1]);
                 CZ(q[4],q[5]);
                 CZ(q[12],q[13]);
                 CZ(q[16],q[17]);
                 CZ(q[24],q[25]);
-                CZ(q[28],q[29]);
+                //CZ(q[28],q[29]);
                 CZ(q[8],q[9]);
                 CZ(q[20],q[21]);
                 H(q[0]);
@@ -691,7 +691,7 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
+                //H(q[29]);
                 CZ(q[18],q[24]);
                 CZ(q[20],q[26]);
                 CZ(q[22],q[28]);
@@ -727,13 +727,13 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
+                //H(q[29]);
                 CZ(q[6],q[12]);
                 CZ(q[8],q[14]);
                 CZ(q[10],q[16]);
                 CZ(q[19],q[25]);
                 CZ(q[21],q[27]);
-                CZ(q[23],q[29]);
+                //CZ(q[23],q[29]);
                 H(q[0]);
                 H(q[1]);
                 H(q[2]);
@@ -763,7 +763,7 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
+                //H(q[29]);
                 CZ(q[3],q[4]);
                 CZ(q[15],q[16]);
                 CZ(q[27],q[28]);
@@ -800,7 +800,7 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
+                //H(q[29]);
                 CZ(q[1],q[2]);
                 CZ(q[5],q[6]);
                 CZ(q[13],q[14]);
@@ -837,7 +837,7 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
+                //H(q[29]);
                 CZ(q[0],q[6]);
                 CZ(q[2],q[8]);
                 CZ(q[4],q[10]);
@@ -873,7 +873,7 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
+                //H(q[29]);
                 CZ(q[12],q[18]);
                 CZ(q[14],q[20]);
                 CZ(q[16],q[22]);
@@ -909,10 +909,10 @@ namespace Microsoft.Quantum.Testing.QIR
                 H(q[26]);
                 H(q[27]);
                 H(q[28]);
-                H(q[29]);
-                //for (q1 in q) { let _ = M(q1); }
+                //H(q[29]);
             }
-        //ResetAll(q);
+        for (q1 in q) { let _ = M(q1); }
+        ResetAll(q);
         }
     return(gateCnt);
     }
@@ -925,7 +925,7 @@ namespace Microsoft.Quantum.Testing.QIR
             for (loop in 0..(loops-1)) {
                 H(q[0]);
             }
-        //ResetAll(q);
+        ResetAll(q);
         }
     return(gateCnt);
     }
@@ -938,7 +938,7 @@ namespace Microsoft.Quantum.Testing.QIR
             for (loop in 0..(loops-1)) {
                 CNOT(q[0], q[1]);
             }
-        //ResetAll(q);
+        ResetAll(q);
         }
     return(gateCnt);
     }
@@ -951,7 +951,7 @@ namespace Microsoft.Quantum.Testing.QIR
             for (loop in 0..(loops-1)) {
                 CCNOT(q[0], q[1], q[2]);
             }
-        //ResetAll(q);
+        ResetAll(q);
         }
     return(gateCnt);
     }

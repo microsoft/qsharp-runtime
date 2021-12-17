@@ -555,6 +555,10 @@ class Wavefunction
             if (qubitmap_[i] > p && qubitmap_[i] != invalid_qubit_position()) qubitmap_[i]--;
         qubitmap_[q] = invalid_qubit_position();
         --num_qubits_;
+        if (num_qubits_ == 0)
+        {
+            release_cuquantum_bits(gpu_wfn_);
+        }
     }
 
     /// the number of used qubits
@@ -724,9 +728,9 @@ class Wavefunction
     {
         flush();
 
-        //return kernels::isclassical(wfn_, get_qubit_position(q));
-        throw std::runtime_error("isclassical is not impelemented yet!");
-        return false;
+        return kernels::isclassical_gpu(gpu_wfn_, get_qubit_position(q));
+        //throw std::runtime_error("isclassical is not impelemented yet!");
+        //return true;
     }
 
     /// returns the classical value of a qubit (if classical)
@@ -734,10 +738,10 @@ class Wavefunction
     bool getvalue(logical_qubit_id q) const
     {
         flush();
-        throw std::runtime_error("getvalue is not impelemented yet!");
-        assert(isclassical(q));
+        //throw std::runtime_error("getvalue is not impelemented yet!");
+        //assert(isclassical(q));
         //int res = kernels::getvalue(wfn_, get_qubit_position(q));
-        int res = 1;
+        int res = kernels::getvalue_gpu(gpu_wfn_, get_qubit_position(q));
         if (res == 2) std::cout << *this;
 
         assert(res < 2);

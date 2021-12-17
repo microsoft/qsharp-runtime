@@ -84,6 +84,16 @@ unsigned getvalue(
     return 2;
 }
 
+
+template <class T>
+unsigned getvalue_gpu(
+    T* wfn,
+    unsigned q,
+    double eps = 100. * std::numeric_limits<double>::epsilon())
+{
+    std::size_t mask = 1ull << q;
+    return get_cuquantum_value(wfn, (int64_t)mask, eps);
+}
 template <class T, class A>
 void collapse(std::vector<T, A>& wfn, unsigned q, bool val, bool compact = false)
 {
@@ -116,6 +126,28 @@ void collapse_gpu(T* wfn, unsigned q, bool val)
     std::size_t mask = (1ull << q);
     std::size_t state = (val ? mask : 0ul);
     collapse_cuquantum(wfn, mask, state);
+}
+
+template <class T>
+bool isclassical_gpu(T* wfn, std::size_t q,
+    double eps = 100. * std::numeric_limits<double>::epsilon())
+{
+    std::size_t offset = 1ull << q;
+    bool have0 = false;
+    bool have1 = false;
+
+    std::size_t maski = ~(offset - 1);
+    const int64_t num_blocks = 1024;
+    std::unique_ptr<bool[]> output_haves(new bool[num_blocks * 2]);
+    is_cuquantum_classical(wfn, eps, output_haves.get(), (int64_t) offset, (int64_t) maski, (int64_t) num_blocks); 
+    #pragma omp parallel for schedule(static) reduction(|| : have0, have1)
+    for(int64_t i = 0; i < num_blocks; i++)
+    {
+        have0 |= output_haves[i*2];
+        have1 |= output_haves[i*2 + 1];
+    }
+    if (have0 && have1) return false;
+    return true;
 }
 
 template <class T, class A>
