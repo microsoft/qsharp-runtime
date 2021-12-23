@@ -24,7 +24,7 @@ pub fn x() -> Array2<C64> {
 
 /// Returns a unitary matrix representing the `Y` operation.
 pub fn y() -> Array2<C64> {
-    array![[ZERO_C, I_C], [-I_C, ZERO_C]]
+    array![[ZERO_C, -I_C], [I_C, ZERO_C]]
 }
 
 /// Returns a unitary matrix representing the `Z` operation.
