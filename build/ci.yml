@@ -31,7 +31,7 @@ jobs:
       linux:
         imageName: 'ubuntu-latest'
       mac:
-        imageName: 'macOS-10.15'
+        imageName: 'macOS-latest'
       windows:
         imageName: 'windows-latest'
   pool: 
