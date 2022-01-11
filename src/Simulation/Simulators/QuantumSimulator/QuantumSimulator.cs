@@ -30,6 +30,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "seed")]
         private static extern void SetSeed(uint id, UInt32 seedValue);
 
+        [DllImport("libomp", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "omp_get_num_threads")]
+        private static extern int OmpGetNumberOfThreads();
+
         /// <summary>
         /// Creates a an instance of a quantum simulator.
         /// </summary>
@@ -45,6 +48,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
             (int?)randomNumberGeneratorSeed
         )
         {
+            // We don't need this value, but explicitly calling an OMP function should trigger the load of libomp
+            // by .NET from the runtimes folder for the current platform, such that the later library load by the
+            // simulator does not need to know where to search for it.
+            var threadCount = OmpGetNumberOfThreads();
+
             Id = Init();
             // Make sure that the same seed used by the built-in System.Random
             // instance is also used by the native simulator itself.
