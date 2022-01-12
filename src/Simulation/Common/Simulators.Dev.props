@@ -16,6 +16,9 @@
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(QsimDllMac)</QSimDll>
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(QsimDllLinux)</QSimDll>
     <QSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(QsimDllWindows)</QSimDll>
+    <QSimDependencies Condition="$([MSBuild]::IsOsPlatform('OSX'))">$([MSBuild]::NormalizePath($(NativeBuildPath)/../../osx))</QSimDependencies>
+    <QSimDependencies Condition="$([MSBuild]::IsOsPlatform('Linux'))">$([MSBuild]::NormalizePath($(NativeBuildPath)/../../linux))</QSimDependencies>
+    <QSimDependencies Condition="$([MSBuild]::IsOsPlatform('Windows'))">$([MSBuild]::NormalizePath($(NativeBuildPath)/../../win10))</QSimDependencies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +28,11 @@
 
   <ItemGroup>
     <None Include="$(QSimDll)" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="$(QSimDependencies)/**/*" >
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>

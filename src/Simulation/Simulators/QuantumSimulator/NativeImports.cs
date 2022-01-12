@@ -14,6 +14,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // Preparation\Arbitrary.cs(23,41): error CS0117: 'QuantumSimulator' does not contain a definition for
             // 'QSIM_DLL_NAME' [D:\a\1\s\submodules\QuantumLibraries\Standard\src\Standard.csproj]
 
+        [DllImport("libomp", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "omp_get_num_threads")]
+        private static extern int OmpGetNumberOfThreadsNative();
+
         private delegate void IdsCallback(uint id);
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DumpIds")]
         private static extern void sim_QubitsIdsNative(uint id, IdsCallback callback);
