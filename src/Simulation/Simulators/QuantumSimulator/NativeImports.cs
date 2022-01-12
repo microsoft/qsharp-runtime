@@ -9,90 +9,109 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class QuantumSimulator
     {
+        public const string QSIM_DLL_NAME = "Microsoft.Quantum.Simulator.Runtime"; // If this is not public then
+            // we get a CI build error:
+            // Preparation\Arbitrary.cs(23,41): error CS0117: 'QuantumSimulator' does not contain a definition for
+            // 'QSIM_DLL_NAME' [D:\a\1\s\submodules\QuantumLibraries\Standard\src\Standard.csproj]
+
+        [DllImport("libomp", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "omp_get_num_threads")]
+        private static extern int OmpGetNumberOfThreadsNative();
+
+        private delegate void IdsCallback(uint id);
+        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DumpIds")]
+        private static extern void sim_QubitsIdsNative(uint id, IdsCallback callback);
+
+        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "init")]
+        private static extern uint InitNative();
+
+        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "destroy")]
+        private static extern uint DestroyNative(uint id);
+
+        [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "seed")]
+        private static extern void SetSeedNative(uint id, UInt32 seedValue);
+
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "allocateQubit")]
-        private static extern void AllocateOne(uint id, uint qubit_id);
+        private static extern void AllocateOneNative(uint id, uint qubit_id);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "release")]
-        private static extern bool ReleaseOne(uint id, uint qubit_id);
+        private static extern bool ReleaseOneNative(uint id, uint qubit_id);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Exp")]
-        private static extern void Exp(uint id, uint n, Pauli[] paulis, double angle, uint[] ids);
+        private static extern void ExpNative(uint id, uint n, Pauli[] paulis, double angle, uint[] ids);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCExp")]
-        private static extern void MCExp(uint id, uint n, Pauli[] paulis, double angle, uint nc, uint[] ctrls, uint[] ids);
+        private static extern void MCExpNative(uint id, uint n, Pauli[] paulis, double angle, uint nc, uint[] ctrls, uint[] ids);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "H")]
-        private static extern void H(uint id, uint qubit);
+        private static extern void HNative(uint id, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCH")]
-        private static extern void MCH(uint id, uint count, uint[] ctrls, uint qubit);
+        private static extern void MCHNative(uint id, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "M")]
-        private static extern uint M(uint id, uint q);
+        private static extern uint MNative(uint id, uint q);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Measure")]
-        private static extern uint Measure(uint id, uint n, Pauli[] b, uint[] ids);
+        private static extern uint MeasureNative(uint id, uint n, Pauli[] b, uint[] ids);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "R")]
-        private static extern void R(uint id, Pauli basis, double angle, uint qubit);
+        private static extern void RNative(uint id, Pauli basis, double angle, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCR")]
-        private static extern void MCR(uint id, Pauli basis, double angle, uint count, uint[] ctrls, uint qubit);
+        private static extern void MCRNative(uint id, Pauli basis, double angle, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "S")]
-        private static extern void S(uint id, uint qubit);
+        private static extern void SNative(uint id, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "AdjS")]
-        private static extern void AdjS(uint id, uint qubit);
+        private static extern void AdjSNative(uint id, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCS")]
-        private static extern void MCS(uint id, uint count, uint[] ctrls, uint qubit);
+        private static extern void MCSNative(uint id, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCAdjS")]
-        private static extern void MCAdjS(uint id, uint count, uint[] ctrls, uint qubit);
+        private static extern void MCAdjSNative(uint id, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "T")]
-        private static extern void T(uint id, uint qubit);
+        private static extern void TNative(uint id, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "AdjT")]
-        private static extern void AdjT(uint id, uint qubit);
+        private static extern void AdjTNative(uint id, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCT")]
-        private static extern void MCT(uint id, uint count, uint[] ctrls, uint qubit);
+        private static extern void MCTNative(uint id, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCAdjT")]
-        private static extern void MCAdjT(uint id, uint count, uint[] ctrls, uint qubit);
+        private static extern void MCAdjTNative(uint id, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "X")]
-        private static extern void X(uint id, uint qubit);
+        private static extern void XNative(uint id, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCX")]
-        private static extern void MCX(uint id, uint count, uint[] ctrls, uint qubit);
+        private static extern void MCXNative(uint id, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Y")]
-        private static extern void Y(uint id, uint qubit);
+        private static extern void YNative(uint id, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCY")]
-        private static extern void MCY(uint id, uint count, uint[] ctrls, uint qubit);
+        private static extern void MCYNative(uint id, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Z")]
-        private static extern void Z(uint id, uint qubit);
+        private static extern void ZNative(uint id, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "MCZ")]
-        private static extern void MCZ(uint id, uint count, uint[] ctrls, uint qubit);
-
-        private delegate bool DumpCallback(uint idx, double real, double img);
+        private static extern void MCZNative(uint id, uint count, uint[] ctrls, uint qubit);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Dump")]
-        private static extern void sim_Dump(uint id, DumpCallback callback);
+        private static extern void sim_DumpNative(uint id, DumpCallback callback);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DumpQubits")]
-        private static extern bool sim_DumpQubits(uint id, uint cout, uint[] ids, DumpCallback callback);
+        private static extern bool sim_DumpQubitsNative(uint id, uint cout, uint[] ids, DumpCallback callback);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "JointEnsembleProbability")]
-        private static extern double JointEnsembleProbability(uint id, uint n, Pauli[] b, uint[] q);
+        private static extern double JointEnsembleProbabilityNative(uint id, uint n, Pauli[] b, uint[] q);
 
         [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "random_choice")]
-        private static extern Int64 random_choice(uint id, Int64 size, double[] p);
+        private static extern Int64 random_choiceNative(uint id, Int64 size, double[] p);
     }
 }
