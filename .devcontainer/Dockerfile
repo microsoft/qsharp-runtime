@@ -7,8 +7,8 @@ USER root
 RUN apt update \
     && apt-get install -y --no-install-recommends \
     ninja-build \
-    clang-11 \
-    clang-tidy-11 \
+    clang-13 \
+    clang-tidy-13 \
     build-essential \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/

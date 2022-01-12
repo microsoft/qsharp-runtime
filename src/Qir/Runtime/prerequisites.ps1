@@ -8,7 +8,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
             !(Get-Command clang-format -ErrorAction SilentlyContinue) -or `
             (Test-Path Env:/AGENT_OS)) {
-            choco install llvm --version=11.1.0 --allow-downgrade
+            choco install llvm --version=13.0.0 --allow-downgrade
             Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
@@ -30,10 +30,10 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     } else {
         if (Get-Command sudo -ErrorAction SilentlyContinue) {
             sudo apt update
-            sudo apt-get install -y ninja-build clang-11 clang-tidy-11 clang-format-11
+            sudo apt-get install -y ninja-build clang-13 clang-tidy-13 clang-format-13
         } else {
             apt update
-            apt-get install -y ninja-build clang-11 clang-tidy-11 clang-format-11
+            apt-get install -y ninja-build clang-13 clang-tidy-13 clang-format-13
         }
     }
 }

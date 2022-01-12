@@ -42,11 +42,11 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
 1. In the Ubuntu's terminal:
     1. `$ sudo apt install cmake` (`$ cmake --version` should return 3.16.3)
     1. `$ sudo apt-get install ninja-build` (`$ ninja --version` should return 1.10.0)
-    1. `$ sudo apt install clang-11` (`$ clang++-11 --version` should return 11.0.0)
+    1. `$ sudo apt install clang-13` (`$ clang++-13 --version` should return 13.0.0)
     1. Set Clang as the preferred C/C++ compiler:
-        - $ export CC=/usr/bin/clang-11
-        - $ export CXX=/usr/bin/clang++-11
-    1. `$ sudo apt install clang-tidy-11` (`$ clang-tidy-11 --version` should return 'LLVM version 11.0.0')
+        - $ export CC=/usr/bin/clang-13
+        - $ export CXX=/usr/bin/clang++-13
+    1. `$ sudo apt install clang-tidy-13` (`$ clang-tidy-13 --version` should return 'LLVM version 13.0.0')
     1. Install the same version of dotnet as specified by qsharp-runtime [README](../../../README.md)
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.

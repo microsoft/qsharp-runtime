@@ -45,12 +45,12 @@ fn compile_runtime_libraries(path_to_runtime_src: &str) -> Result<(), Box<dyn Er
 fn set_compiler(config: &mut Config) -> Result<(), Box<dyn Error>>{
     if cfg!(target_os = "linux") {
         let mut c_cfg = cc::Build::new();
-        let clang_11 = which::which("clang-11")?;
+        let clang_11 = which::which("clang-13")?;
         c_cfg.compiler(clang_11);
         config.init_c_cfg(c_cfg);
 
         let mut cxx_cfg = cc::Build::new();
-        let clangpp_11 = which::which("clang++-11")?;
+        let clangpp_11 = which::which("clang++-13")?;
         cxx_cfg.compiler(clangpp_11);
         config.init_cxx_cfg(cxx_cfg);
     } else if cfg!(target_os = "windows") {

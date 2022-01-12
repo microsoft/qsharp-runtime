@@ -53,7 +53,7 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
 }
 elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
 {
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-11 -D CMAKE_CXX_COMPILER=clang++-11 `
+    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ `
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
