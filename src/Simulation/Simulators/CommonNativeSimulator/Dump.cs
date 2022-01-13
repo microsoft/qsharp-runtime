@@ -14,11 +14,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-        // protected virtual QVoid process(Action<string> channel, IQArray<Qubit>? qubits)
-        // {
-        //     return QVoid.Instance;
-        // }
-
         /// <summary>
         /// Dumps the wave function for the given qubits into the given target. 
         /// If the target is QVoid or an empty string, it dumps it to the console
@@ -51,30 +46,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 }
             }
             return QVoid.Instance;
-            // var filename = (target is QVoid) ? "" : target.ToString();
-            // var logMessage = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
-
-            // // If no file provided, use `Message` to generate the message into the console;
-            // if (string.IsNullOrWhiteSpace(filename))
-            // {
-            //     var op = this.Get<ICallable<string, QVoid>, Microsoft.Quantum.Intrinsic.Message>();
-            //     return process((msg) => op.Apply(msg), qubits);
-            // }
-            // else
-            // {
-            //     try
-            //     {
-            //         using (var file = new StreamWriter(filename))
-            //         {
-            //             return process(file.WriteLine, qubits);
-            //         }
-            //     }
-            //     catch (Exception e)
-            //     {
-            //         logMessage.Apply($"[warning] Unable to write state to '{filename}' ({e.Message})");
-            //         return QVoid.Instance;
-            //     }
-            // }
         }
 
         // `QsimDumpMachine` makes an impression that it is never used,
@@ -180,14 +151,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             [JsonProperty("diagnostic_kind")]
             private string DiagnosticKind => "state-vector";
 
-            // TODO(rokuzmin): Get back to this after the IQ#-side PR:
-            // /// <summary>
-            // ///     ID for an HTML element where the vertical measurement probability histogram
-            // ///     will be displayed.
-            // /// </summary>
-            // [JsonProperty("div_id")]
-            // public string DivId { get; set; } = string.Empty;
-
             /// <summary>
             ///     The indexes of each qubit on which this state is defined, or
             ///     <c>null</c> if these indexes are not known.
@@ -208,21 +171,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// </remarks>
             [JsonProperty("amplitudes")]
             public Complex[]? Amplitudes { get; set; }
-
-
-            // TODO(rokuzmin): Make this an extension method for `DisplayableState` in IQSharp repo:
-            // /// <summary>
-            // ///     An enumerable source of the significant amplitudes of this state
-            // ///     vector and their labels, where significance and labels are
-            // ///     defined by the values loaded from <paramref name="configurationSource" />.
-            // /// </summary>
-            // public IEnumerable<(Complex, string)> SignificantAmplitudes(
-            //     IConfigurationSource configurationSource
-            // ) => SignificantAmplitudes(
-            //     configurationSource.BasisStateLabelingConvention,
-            //     configurationSource.TruncateSmallAmplitudes,
-            //     configurationSource.TruncationThreshold
-            // );
 
             /// <summary>
             ///     An enumerable source of the significant amplitudes of this state
@@ -399,7 +347,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public override string ToString() => // An override of the `object.ToString()`.
                 ToString(BasisStateLabelingConvention.LittleEndian, false, 0.0);
 
-        } // public class DisplayableState
+        }
 
         /// <summary>
         /// This class allows you to dump the state (wave function)
@@ -407,7 +355,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// The callback function is triggered for every state basis
         /// vector in the wavefunction.
         /// </summary>
-        public abstract class StateDumper // Is used by "iqsharp\src\Jupyter\Visualization\StateDisplayOperations.cs".
+        public abstract class StateDumper
         {
             /// <summary>
             /// Basic constructor. Takes the simulator to probe.
@@ -432,7 +380,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             /// The Simulator being reported.
             /// </summary>
-            public /*QuantumSimulator*/ CommonNativeSimulator Simulator { get; }
+            public CommonNativeSimulator Simulator { get; }
 
             /// <summary>
             /// Entry method to get the dump of the wave function.
@@ -450,7 +398,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     return this.Simulator.sim_DumpQubits((uint)ids.Length, ids, Callback);
                 }
             }
-        } // public abstract class StateDumper
+        }
 
         /// <summary>
         ///     A state dumper that encodes dumped states into displayable
@@ -460,51 +408,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             private long _count = -1;
             private Complex[]? _data = null;
-
-            // TODO(rokuzmin): Remove the commented-out code below once everything works on IQSharp side.
-            // /// <summary>
-            // ///     Whether small amplitudes should be truncated when dumping
-            // ///     states.
-            // /// </summary>
-            // public bool TruncateSmallAmplitudes { get; set; } = false;
-
-            // /// <summary>
-            // ///     The threshold for truncating measurement probabilities when
-            // ///     dumping states. Computational basis states whose measurement
-            // ///     probabilities (i.e: squared magnitudes) are below this threshold
-            // ///     are subject to truncation when
-            // ///     <see cref="IConfigurationSource.TruncateSmallAmplitudes" />
-            // ///     is <c>true</c>.
-            // /// </summary>
-            // public double TruncationThreshold { get; set; } = 1e-10;
-
-            // /// <summary>
-            // ///     The labeling convention to be used when labeling computational
-            // ///     basis states.
-            // /// </summary>
-            // public BasisStateLabelingConvention BasisStateLabelingConvention { get; set; } = BasisStateLabelingConvention.Bitstring;
-
-            // /// <summary>
-            // ///     Whether the measurement probabilities will be displayed as an
-            // ///     interactive histogram.
-            // /// </summary>
-            // private bool ShowMeasurementDisplayHistogram { get; set; } = false;
-
-            // /// <summary>
-            // ///     Sets the properties of this display dumper from a given
-            // ///     configuration source.
-            // /// </summary>
-            // public JupyterDisplayDumper Configure(IConfigurationSource configurationSource)
-            // {
-            //     configurationSource
-            //         .ApplyConfiguration<bool>("dump.measurementDisplayHistogram", value => ShowMeasurementDisplayHistogram = value)
-            //         .ApplyConfiguration<bool>("dump.truncateSmallAmplitudes", value => TruncateSmallAmplitudes = value)
-            //         .ApplyConfiguration<double>("dump.truncationThreshold", value => TruncationThreshold = value)
-            //         .ApplyConfiguration<BasisStateLabelingConvention>(
-            //             "dump.basisStateLabelingConvention", value => BasisStateLabelingConvention = value
-            //         );
-            //     return this;
-            // }
 
             /// <summary>
             /// A method to call to output a string representation.
@@ -559,7 +462,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     QubitIds = qubits?.Select(q => q.Id) ?? Simulator.GetQubitIds().Select(q => (int)q) ?? Enumerable.Empty<int>(),
                     NQubits = (int)_count,
                     Amplitudes = _data,
-                    // DivId = $"dump-machine-div-{id}" 
                 };
 
                 if (this.FileWriter != null)
@@ -571,25 +473,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     Simulator.MaybeDisplayDiagnostic(state);
                 }
 
-                // TODO(rokuzmin): Work on this thoroughly on the IQSharp side:
-                // if (ShowMeasurementDisplayHistogram)
-                // {
-                //     Debug.Assert(Channel.CommsRouter != null, "Display dumper requires comms router.");
-                //     Channel.CommsRouter.OpenSession(
-                //         "iqsharp_state_dump",
-                //         new MeasurementHistogramContent()
-                //         {
-                //             State = state
-                //         }
-                //     ).Wait();
-                // }
-
                 // Clean up the state vector buffer.
                 _data = null;
 
                 return result;
             }
 
-        } // public class DisplayableStateDumper : StateDumper
+        }
     }
 }
