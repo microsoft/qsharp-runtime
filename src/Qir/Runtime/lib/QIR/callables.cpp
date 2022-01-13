@@ -371,7 +371,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
     // Copy the controls into the new array. This array doesn't own the qubits so must use the generic constructor.
     QirArray* combinedControls          = new QirArray(cControls, qubitSize);
     char* dst                           = combinedControls->buffer;
-    [[maybe_unused]] const char* dstEnd = dst + qubitSize * cControls;
+    [[maybe_unused]] const char* dstEnd = dst + static_cast<size_t>(qubitSize * cControls);
     current                             = outer;
     QirTupleHeader* last                = nullptr;
     for (int i = 0; i < depth; i++)
@@ -383,7 +383,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 
         QirArray* controls = current->controls;
 
-        const QirArray::TBufSize blockSize = qubitSize * controls->count;
+        const QirArray::TBufSize blockSize = static_cast<QirArray::TBufSize>(qubitSize * controls->count);
         // Make sure we don't overflow `TBufSize` on 32-bit arch:
         assert((blockSize >= qubitSize) && (blockSize >= controls->count));
 

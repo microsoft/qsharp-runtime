@@ -118,7 +118,7 @@ QirArray::QirArray(TItemCount countItems, TItemSize itemSizeBytes, TDimCount dim
 
     assert(this->count * (TBufSize)itemSizeInBytes < std::numeric_limits<TBufSize>::max());
     // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-    const TBufSize bufferSize = this->count * itemSizeInBytes;
+    const TBufSize bufferSize = static_cast<TBufSize>(this->count * itemSizeInBytes);
     if (bufferSize > 0)
     {
         this->buffer = new char[bufferSize];
@@ -146,7 +146,7 @@ QirArray::QirArray(const QirArray& other)
 
     assert((TBufSize)(this->count) * this->itemSizeInBytes < std::numeric_limits<TBufSize>::max());
     // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-    const TBufSize size = this->count * this->itemSizeInBytes;
+    const TBufSize size = static_cast<TBufSize>(this->count * this->itemSizeInBytes);
     if (this->count > 0)
     {
         this->buffer = new char[size];
@@ -167,7 +167,7 @@ QirArray::~QirArray()
 char* QirArray::GetItemPointer(TItemCount index) const
 {
     assert(index < this->count);
-    return &this->buffer[index * this->itemSizeInBytes];
+    return &this->buffer[static_cast<TBufSize>(index * this->itemSizeInBytes)];
 }
 
 void QirArray::Append(const QirArray* other)
@@ -178,7 +178,7 @@ void QirArray::Append(const QirArray* other)
 
     assert((TBufSize)(other->count) * other->itemSizeInBytes < std::numeric_limits<TBufSize>::max());
     // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-    const TBufSize otherSize = other->count * other->itemSizeInBytes;
+    const TBufSize otherSize = static_cast<TBufSize>(other->count * other->itemSizeInBytes);
 
     if (otherSize == 0)
     {
@@ -187,7 +187,7 @@ void QirArray::Append(const QirArray* other)
 
     assert((TBufSize)(this->count) * this->itemSizeInBytes < std::numeric_limits<TBufSize>::max());
     // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-    const TBufSize thisSize = this->count * this->itemSizeInBytes;
+    const TBufSize thisSize = static_cast<TBufSize>(this->count * this->itemSizeInBytes);
 
     char* newBuffer = new char[thisSize + otherSize];
     if (thisSize)
@@ -585,14 +585,15 @@ extern "C"
             assert((QirArray::TBufSize)rangeRunCount * itemSizeInBytes <
                    std::numeric_limits<QirArray::TBufSize>::max());
             // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-            const QirArray::TBufSize rangeChunkSize = rangeRunCount * itemSizeInBytes;
+            const QirArray::TBufSize rangeChunkSize = static_cast<QirArray::TBufSize>(rangeRunCount * itemSizeInBytes);
 
             QirArray::TItemCount dst = 0;
             QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * range.start);
             while (src < array->count)
             {
                 assert(dst < slice->count);
-                memcpy(&slice->buffer[dst * itemSizeInBytes], &array->buffer[src * itemSizeInBytes], rangeChunkSize);
+                memcpy(&slice->buffer[static_cast<QirArray::TBufSize>(dst * itemSizeInBytes)],
+                       &array->buffer[static_cast<QirArray::TBufSize>(src * itemSizeInBytes)], rangeChunkSize);
                 src += rowCount;
                 dst += rangeRunCount;
             }
@@ -603,7 +604,7 @@ extern "C"
         assert((QirArray::TBufSize)singleIndexRunCount * itemSizeInBytes <
                std::numeric_limits<QirArray::TBufSize>::max());
         // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
-        const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
+        const QirArray::TBufSize chunkSize = static_cast<QirArray::TBufSize>(singleIndexRunCount * itemSizeInBytes);
         QirArray::TItemCount dst           = 0;
         QirArray::TItemCount src           = (QirArray::TItemCount)(singleIndexRunCount * range.start);
         while (src < array->count)
@@ -618,7 +619,8 @@ extern "C"
                        (array->count * array->itemSizeInBytes));
                 assert(srcInner >= 0);
 
-                memcpy(&slice->buffer[dst * itemSizeInBytes], &array->buffer[srcInner * itemSizeInBytes], chunkSize);
+                memcpy(&slice->buffer[static_cast<QirArray::TBufSize>(dst * itemSizeInBytes)],
+                       &array->buffer[static_cast<QirArray::TBufSize>(srcInner * itemSizeInBytes)], chunkSize);
                 srcInner += (singleIndexRunCount * range.step);
                 dst += singleIndexRunCount;
             }
@@ -660,14 +662,15 @@ extern "C"
                std::numeric_limits<QirArray::TBufSize>::max());
         // Using `<` rather than `<=` to calm down the compiler on 32-bit arch.
 
-        const QirArray::TBufSize chunkSize = singleIndexRunCount * itemSizeInBytes;
+        const QirArray::TBufSize chunkSize = static_cast<QirArray::TBufSize>(singleIndexRunCount * itemSizeInBytes);
 
         QirArray::TItemCount dst = 0;
         QirArray::TItemCount src = (QirArray::TItemCount)(singleIndexRunCount * index);
         while (src < array->count)
         {
             assert(dst < project->count);
-            memcpy(&project->buffer[dst * itemSizeInBytes], &array->buffer[src * itemSizeInBytes], chunkSize);
+            memcpy(&project->buffer[static_cast<QirArray::TBufSize>(dst * itemSizeInBytes)],
+                   &array->buffer[static_cast<QirArray::TBufSize>(src * itemSizeInBytes)], chunkSize);
             src += rowCount;
             dst += singleIndexRunCount;
         }

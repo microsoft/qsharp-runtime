@@ -158,13 +158,15 @@ namespace Quantum
         void DumpState()
         {
             std::cout << "*********************" << std::endl;
-            this->GetState([](size_t idx, double re, double im) {
-                if (!Close(re, 0.0) || !Close(im, 0.0))
+            this->GetState(
+                [](size_t idx, double re, double im)
                 {
-                    std::cout << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
-                }
-                return true;
-            });
+                    if (!Close(re, 0.0) || !Close(im, 0.0))
+                    {
+                        std::cout << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
+                    }
+                    return true;
+                });
             std::cout << "*********************" << std::endl;
         }
 
@@ -541,7 +543,8 @@ namespace Quantum
 
       private:
         TDumpToLocationCallback const dumpToLocationCallback = [](size_t idx, double re, double im,
-                                                                  TDumpLocation location) -> bool {
+                                                                  TDumpLocation location) -> bool
+        {
             std::ostream& outStream = *reinterpret_cast<std::ostream*>(location);
 
             if (!Close(re, 0.0) || !Close(im, 0.0))
