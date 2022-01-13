@@ -160,18 +160,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")
                 };
 
-
-            /// <summary>
-            /// Returns a string that represents the label for the given base state.
-            /// </summary>
-            public virtual string FormatBaseState(uint idx) 
-            {
-                int qubitCount = Amplitudes?.Length ?? 0;
-                int maxCharsStateId = ((1 << qubitCount) - 1).ToString().Length;
-
-                return $"∣{idx.ToString().PadLeft(maxCharsStateId, ' ')}❭";
-            }
-
             /// <summary>
             /// Returns a string that represents the magnitude of the  amplitude.
             /// </summary>
@@ -228,20 +216,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// </summary>
             public virtual string FormatCartesian(double real, double img) =>
                 $"{real,9:F6} + {img,9:F6} i";
-
-            /// <summary>
-            /// The method to use to format the amplitude into a string.
-            /// </summary>
-            public virtual string Format(uint idx, double real, double img)
-            {
-                var amplitude = (real * real) + (img * img);
-                var angle = System.Math.Atan2(img, real);
-
-                return $"{FormatBaseState(idx)}:\t" +
-                       $"{FormatCartesian(real, img)}\t == \t" +
-                       $"{FormatPolar(amplitude, angle)}";
-
-            }
 
             public string ToString(BasisStateLabelingConvention convention,   // Non-override. Parameterized.
                                    bool truncateSmallAmplitudes, 
