@@ -383,7 +383,7 @@ QirTupleHeader* FlattenControlArrays(QirTupleHeader* tuple, int depth)
 
         QirArray* controls = current->controls;
 
-        const QirArray::TBufSize blockSize = static_cast<QirArray::TBufSize>(qubitSize * controls->count);
+        const QirArray::TBufSize blockSize = (QirArray::TBufSize)qubitSize * (QirArray::TBufSize)controls->count;
         // Make sure we don't overflow `TBufSize` on 32-bit arch:
         assert((blockSize >= qubitSize) && (blockSize >= controls->count));
 
