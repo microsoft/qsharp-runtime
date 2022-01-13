@@ -86,7 +86,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     <see cref="Microsoft.Quantum.Simulation.Simulators.CommonNativeSimulator.StateDumper.Dump" />.
             /// </remarks>
             [JsonProperty("amplitudes")]
-            public Complex[]? Amplitudes { get; set; }
+            public IDictionary<int, Complex>? Amplitudes { get; set; }
 
             /// <summary>
             ///     An enumerable source of the significant amplitudes of this state
@@ -110,14 +110,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 (
                     truncateSmallAmplitudes
                     ? Amplitudes
-                        .Select((amplitude, idx) => (amplitude, idx))
+                        .Select(idx_amplitude => idx_amplitude)
                         .Where(item =>
-                            System.Math.Pow(item.amplitude.Magnitude, 2.0) >= truncationThreshold
+                            System.Math.Pow(item.Value.Magnitude, 2.0) >= truncationThreshold
                         )
-                    : Amplitudes.Select((amplitude, idx) => (amplitude, idx))
+                    : Amplitudes.Select(idx_amplitude => idx_amplitude)
                 )
                 .Select(
-                    item => (item.amplitude, BasisStateLabel(convention, item.idx))
+                    item => (item.Value, BasisStateLabel(convention, item.Key))
                 )
                 .OrderBy(
                     item => item.Item2,
