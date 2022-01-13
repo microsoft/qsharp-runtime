@@ -436,7 +436,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <summary>
             ///     Dumps the state of a register of qubits as a displayable object.
             /// </summary>
-            // TODO(rokuzmin): What does it return?
             public override bool Dump(IQArray<Qubit>? qubits = null)
             {
                 System.Diagnostics.Debug.Assert(this.Simulator.QubitManager != null, 
@@ -454,7 +453,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 // vector, so let's display it, counting on the right display
                 // encoder to be there to pack it into a table.
 
-                // var id = System.Guid.NewGuid();
                 var state = new DisplayableState
                 {
                     // We cast here as we don't support a large enough number
