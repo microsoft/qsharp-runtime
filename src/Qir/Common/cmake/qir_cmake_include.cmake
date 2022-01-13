@@ -81,6 +81,9 @@ set(WARNING_FLAGS "${WARNING_FLAGS} -Weverything")
 #       -Wpre-c++20-compat.
 #   -Wpre-c++2b-compat-pedantic (= -Wpre-c++2b-compat).
 
+# We need to be able to use `__` prefix for QIR names like `__quantum__rt__*` and `__quantum__qis__*`.
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-reserved-identifier")
+
 # https://clang.llvm.org/docs/DiagnosticsReference.html#wc-98-compat-pedantic
 set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-c++98-compat-pedantic")
 

@@ -26,7 +26,7 @@ while on macOS, `prerequisites.ps1` relies on the [`brew` package manager](https
 
 #### Windows pre-reqs
 
-1. Install Clang 11, Ninja and CMake from the public distros.
+1. Install Clang 13, Ninja and CMake from the public distros.
 1. Add all three to your/system `%PATH%`.
 1. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
 1. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
