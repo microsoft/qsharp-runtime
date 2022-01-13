@@ -201,7 +201,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 {
                     // We cast here as we don't support a large enough number
                     // of qubits to saturate an int.
-                    QubitIds = qubits?.Select(q => q.Id) ?? Simulator.GetQubitIds().Select(q => (int)q) ?? Enumerable.Empty<int>(),
+                    QubitIds = qubits?.Select(q => q.Id) ?? Simulator.QubitIds.Select(q => (int)q) ?? Enumerable.Empty<int>(),
                     NQubits = (int)_count,
                     Amplitudes = _data,
                 };

@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <summary>
         ///     Returns the list of the qubits' ids currently allocated in the simulator.
         /// </summary>
-        public uint[] QubitIds
+        public override uint[] QubitIds
         {
             get
             {
@@ -26,9 +26,5 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        public override uint[] GetQubitIds()
-        {
-            return QubitIds;
-        }
     }
 }
