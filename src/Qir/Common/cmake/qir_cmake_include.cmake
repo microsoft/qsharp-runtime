@@ -81,6 +81,7 @@ set(WARNING_FLAGS "${WARNING_FLAGS} -Weverything")
 #       -Wpre-c++20-compat.
 #   -Wpre-c++2b-compat-pedantic (= -Wpre-c++2b-compat).
 
+include(CheckCCompilerFlag)
 check_c_compiler_flag(-Wreserved-identifier HAVE_RESERVED_IDENTIFIER_WARNING)
 if(HAVE_RESERVED_IDENTIFIER_WARNING)
     # We need to be able to use `__` prefix for QIR names like `__quantum__rt__*` and `__quantum__qis__*`.
