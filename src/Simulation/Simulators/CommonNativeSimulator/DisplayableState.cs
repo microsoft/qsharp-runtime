@@ -110,11 +110,10 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 (
                     truncateSmallAmplitudes
                     ? Amplitudes
-                        .Select(idx_amplitude => idx_amplitude)
                         .Where(item =>
                             System.Math.Pow(item.Value.Magnitude, 2.0) >= truncationThreshold
                         )
-                    : Amplitudes.Select(idx_amplitude => idx_amplitude)
+                    : Amplitudes
                 )
                 .Select(
                     item => (item.Value, BasisStateLabel(convention, item.Key))
