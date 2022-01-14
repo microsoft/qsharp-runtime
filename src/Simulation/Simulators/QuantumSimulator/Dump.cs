@@ -14,7 +14,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <summary>
         ///     Returns the list of the qubits' ids currently allocated in the simulator.
         /// </summary>
-        public uint[] QubitIds
+        public override uint[] QubitIds
         {
             get
             {
@@ -26,19 +26,5 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        protected override QVoid process(Action<string> channel, IQArray<Qubit>? qubits)
-        {
-            var ids = qubits?.Select(q => (uint)q.Id).ToArray() ?? QubitIds;
-
-            var dumper = new SimpleDumper(this, channel);
-            channel($"# wave function for qubits with ids (least to most significant): {string.Join(";", ids)}");
-
-            if (!dumper.Dump(qubits))
-            {
-                channel("## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##");
-            }
-
-            return QVoid.Instance;
-        }
     }
 }

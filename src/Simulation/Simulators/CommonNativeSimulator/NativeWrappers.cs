@@ -29,5 +29,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         protected abstract void MCY(uint count, uint[] ctrls, uint qubit);
         protected abstract void Z(uint qubit);
         protected abstract void MCZ(uint count, uint[] ctrls, uint qubit);
+
+        protected delegate bool DumpCallback(uint idx, double real, double img);
+        protected abstract void sim_Dump(DumpCallback callback);
+        protected abstract bool sim_DumpQubits(uint count, uint[] ids, DumpCallback callback);
     }
 }
