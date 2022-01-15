@@ -6,12 +6,20 @@
 Write-Host "##[info]Build SparseSimulator"
 
 & (Join-Path $PSScriptRoot .. .. .. .. build set-env.ps1)
-$FailureCommands = 'Write-Host "##vso[task.logissue type=error;] Failed to build SparseSimulator. See errors below or above." ;  Pop-Location ; Exit 1'
+$FaiureLogging = 'Write-Host "##vso[task.logissue type=error;] Failed to build SparseSimulator. See errors below or above."'
+$FailureExitCommand = 'Exit 1'
+$FailureCommands = "$FaiureLogging ;  Pop-Location ; $FailureExitCommand"
 
 # BULD NATIVE PART
 
 # mkdir Native\build\(Debug|Release)
 $BuildDir = (Join-Path $PSScriptRoot "Native" "build" $Env:BUILD_CONFIGURATION)
+# if (Test-Path $BuildDir -PathType Leaf) {   # if file rather than dir
+#     Remove-Item -Path $BuildDir -Force -ErrorVariable $Errors
+#     if ($Errors.Count -gt 0) {    # if failed to remove the file
+#         Invoke-Expression "$FaiureLogging ; $FailureExitCommand"
+#     }
+# }
 if (-not (Test-Path $BuildDir)) {
     New-Item -Path $BuildDir -ItemType "directory" | Out-Null
 }
