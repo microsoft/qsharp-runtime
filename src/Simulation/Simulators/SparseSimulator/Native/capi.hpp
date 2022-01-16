@@ -17,6 +17,7 @@
 #ifdef BUILD_DLL
 #define MICROSOFT_QUANTUM_DECL __declspec(dllexport)
 #else
+// See "// yes really" in `CSharpIntegrationTests.cpp` if you are thinking about adding "__declspec(dllimport)".
 #define MICROSOFT_QUANTUM_DECL
 #endif
 #define MICROSOFT_QUANTUM_DECL_IMPORT __declspec(dllimport)
