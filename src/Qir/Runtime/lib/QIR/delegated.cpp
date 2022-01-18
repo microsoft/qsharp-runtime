@@ -48,9 +48,30 @@ extern "C"
         return reinterpret_cast<QUBIT*>(Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit());
     }
 
+    QirArray* __quantum__rt__qubit_allocate_array(int64_t count)
+    {
+        QirArray* array = __quantum__rt__array_create_1d(sizeof(intptr_t), count);
+        for (QirArray::TItemCount i = 0; i < count; i++)
+        {
+            *reinterpret_cast<QUBIT**>(__quantum__rt__array_get_element_ptr_1d(array, i)) =
+                __quantum__rt__qubit_allocate();
+        }
+        return array;
+    }
+
     void __quantum__rt__qubit_release(QUBIT* qubit)
     {
         Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(reinterpret_cast<QubitIdType>(qubit));
+    }
+
+    void __quantum__rt__qubit_release_array(QirArray* array)
+    {
+        QirArray::TItemCount count = (QirArray::TItemCount)__quantum__rt__array_get_size_1d(array);
+        for (QirArray::TItemCount i = 0; i < count; i++)
+        {
+            __quantum__rt__qubit_release(*reinterpret_cast<QUBIT**>(__quantum__rt__array_get_element_ptr_1d(array, i)));
+        }
+        __quantum__rt__array_update_reference_count(array, -1);
     }
 
     QUBIT* __quantum__rt__qubit_borrow()
@@ -59,10 +80,20 @@ extern "C"
         return __quantum__rt__qubit_allocate();
     }
 
+    QirArray* __quantum__rt__qubit_borrow_array(int64_t count)
+    {
+        return __quantum__rt__qubit_allocate_array(count);
+    }
+
     void __quantum__rt__qubit_return(QUBIT* qubit)
     {
         // Currently we implement borrowing as allocation.
         __quantum__rt__qubit_release(qubit);
+    }
+
+    void __quantum__rt__qubit_return_array(QirArray* array)
+    {
+        __quantum__rt__qubit_release_array(array);
     }
 
     void __quantum__rt__qubit_restricted_reuse_area_start()

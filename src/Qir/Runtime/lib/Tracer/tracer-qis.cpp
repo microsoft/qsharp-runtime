@@ -5,6 +5,7 @@
 
 #include "CoreTypes.hpp"
 #include "QirTypes.hpp"
+#include "QirRuntime.hpp"
 #include "tracer.hpp"
 #include "tracer-qis.hpp"
 #include "TracerInternal.hpp"
@@ -30,18 +31,24 @@ extern "C"
     }
     void __quantum__qis__single_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QUBIT* target) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
-                                        1, reinterpret_cast<QubitIdType*>(&target));
+        (void)tracer->TraceMultiQubitOp(
+            id, duration, (long)(__quantum__rt__array_get_size_1d(ctls)),
+            reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)), 1,
+            reinterpret_cast<QubitIdType*>(&target));
     }
     void __quantum__qis__multi_qubit_op(int32_t id, int32_t duration, QirArray* targets) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, 0, nullptr, (long)(targets->count),
-                                        reinterpret_cast<QubitIdType*>(targets->buffer));
+        (void)tracer->TraceMultiQubitOp(
+            id, duration, 0, nullptr, (long)(__quantum__rt__array_get_size_1d(targets)),
+            reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(targets, 0)));
     }
     void __quantum__qis__multi_qubit_op_ctl(int32_t id, int32_t duration, QirArray* ctls, QirArray* targets) // NOLINT
     {
-        (void)tracer->TraceMultiQubitOp(id, duration, (long)(ctls->count), reinterpret_cast<QubitIdType*>(ctls->buffer),
-                                        (long)(targets->count), reinterpret_cast<QubitIdType*>(targets->buffer));
+        (void)tracer->TraceMultiQubitOp(
+            id, duration, (long)(__quantum__rt__array_get_size_1d(ctls)),
+            reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)),
+            (long)(__quantum__rt__array_get_size_1d(targets)),
+            reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(targets, 0)));
     }
 
     void __quantum__qis__inject_barrier(int32_t id, int32_t duration) // NOLINT
@@ -56,17 +63,20 @@ extern "C"
 
     RESULT* __quantum__qis__joint_measure(int32_t id, int32_t duration, QirArray* qs) // NOLINT
     {
-        return tracer->TraceMultiQubitMeasurement(id, duration, (long)(qs->count),
-                                                  reinterpret_cast<QubitIdType*>(qs->buffer));
+        return tracer->TraceMultiQubitMeasurement(
+            id, duration, (long)(__quantum__rt__array_get_size_1d(qs)),
+            reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(qs, 0)));
     }
 
     void __quantum__qis__apply_conditionally( // NOLINT
         QirArray* rs1, QirArray* rs2, QirCallable* clbOnAllEqual, QirCallable* clbOnSomeDifferent)
     {
-        CTracer::FenceScope sf(tracer.get(), (long)(rs1->count), reinterpret_cast<Result*>(rs1->buffer),
-                               (long)(rs2->count), reinterpret_cast<Result*>(rs2->buffer));
+        CTracer::FenceScope sf(tracer.get(), (long)(__quantum__rt__array_get_size_1d(rs1)),
+                               reinterpret_cast<Result*>(__quantum__rt__array_get_element_ptr_1d(rs1, 0)),
+                               (long)(__quantum__rt__array_get_size_1d(rs2)),
+                               reinterpret_cast<Result*>(__quantum__rt__array_get_element_ptr_1d(rs2, 0)));
 
-        clbOnAllEqual->Invoke();
-        clbOnSomeDifferent->Invoke();
+        __quantum__rt__callable_invoke(clbOnAllEqual, nullptr, nullptr);
+        __quantum__rt__callable_invoke(clbOnSomeDifferent, nullptr, nullptr);
     }
 }

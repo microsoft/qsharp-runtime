@@ -1,0 +1,15 @@
+[package]
+name = "rust-qir-runtime"
+version = "0.1.0"
+authors = ["Microsoft"]
+edition = "2021"
+
+[dependencies]
+num-bigint = { version = "0.4.3", default-features = false }
+
+[build-dependencies]
+cc = "1"
+which = "4.2.2"
+
+[lib]
+crate-type = ["staticlib","rlib"]

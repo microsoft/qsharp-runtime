@@ -16,17 +16,6 @@
 
 extern "C"
 {
-    char* __quantum__rt__memory_allocate(uint64_t size)
-    {
-        return (char*)malloc((size_t)size);
-    }
-
-    // Fail the computation with the given error message.
-    void __quantum__rt__fail(QirString* msg) // NOLINT
-    {
-        __quantum__rt__fail_cstr(msg->str.c_str());
-    }
-
     void __quantum__rt__fail_cstr(const char* cstr)
     {
         Microsoft::Quantum::OutputStream::Get() << cstr << std::endl;

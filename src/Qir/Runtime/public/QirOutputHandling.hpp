@@ -50,14 +50,14 @@ extern "C"
     // Primitive Result Records
 
     /// Produces output records of exactly "RESULT\\t0" or "RESULT\\t1"
-    QIR_SHARED_API void __quantum__rt__result_record_output(Result); // NOLINT
+    // QIR_SHARED_API void __quantum__rt__result_record_output(Result); // NOLINT
 
     /// Produces output records of exactly "RESULT\\tfalse" or "RESULT\\ttrue"
     QIR_SHARED_API void __quantum__rt__bool_record_output(bool); // NOLINT
 
     /// Produces output records of the format "RESULT\\tn" where n is the string representation of the integer value,
     /// such as "RESULT\\t42"
-    QIR_SHARED_API void __quantum__rt__integer_record_output(int64_t); // NOLINT
+    QIR_SHARED_API void __quantum__rt__int_record_output(int64_t); // NOLINT
 
     /// Produces output records of the format "RESULT\\td" where d is the string representation of the double value,
     /// such as "RESULT\\t3.14"

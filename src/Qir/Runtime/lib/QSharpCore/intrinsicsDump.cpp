@@ -16,7 +16,7 @@ extern "C"
         GetDiagnostics()->DumpMachine(location);
     }
 
-    void __quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits)
+    void __quantum__qis__dumpregister__body(uint8_t* location, QirArray* qubits)
     {
         GetDiagnostics()->DumpRegister(location, qubits);
     }

@@ -152,10 +152,9 @@ extern "C"
     QIR_SHARED_API char* __quantum__rt__array_get_element_ptr(QirArray*, ...);                      // NOLINT
     QIR_SHARED_API char* __quantum__rt__array_get_element_ptr_nonvariadic(QirArray*, va_list dims); // NOLINT
 
-    // Creates and returns an array that is a slice of an existing array. The int indicates which dimension
-    // the slice is on. The %Range specifies the slice.
-    QIR_SHARED_API QirArray* quantum__rt__array_slice(QirArray*, int32_t, const QirRange&, // NOLINT
-                                                      bool /*ignored: forceNewInstance*/);
+    // Creates and returns an array that is a slice of an existing array. The %Range specifies the slice.
+    QIR_SHARED_API QirArray* quantum__rt__array_slice_1d(QirArray*, QirRange, // NOLINT
+                                                         bool /*ignored: forceNewInstance*/);
 
     // Creates and returns an array that is a projection of an existing array. The int indicates which dimension the
     // projection is on, and the int64_t specifies the specific index value to project. The returned Array* will have
@@ -234,7 +233,7 @@ extern "C"
     QIR_SHARED_API QirString* __quantum__rt__qubit_to_string(QUBIT*); // NOLINT
 
     // Returns a string representation of the range.
-    QIR_SHARED_API QirString* quantum__rt__range_to_string(const QirRange&); // NOLINT
+    QIR_SHARED_API QirString* quantum__rt__range_to_string(QirRange); // NOLINT
 
     // Returns a pointer to an array that contains a null-terminated sequence of characters
     // (i.e., a C-string) representing the current value of the string object.

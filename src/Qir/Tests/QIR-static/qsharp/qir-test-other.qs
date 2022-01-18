@@ -25,11 +25,6 @@ namespace Microsoft.Quantum.Testing.QIR.Other {
     }
 
     @EntryPoint()
-    function PauliArrayAsIntFailTest() : Int {
-        return PauliArrayAsInt(new Pauli[32]);   // Must fail/throw.
-    }
-
-    @EntryPoint()
     function ParityTest() : Int {
         //function Parity (a : Int) : Int
         if 0 != Parity(0)                       { return  1; }  // The return value indicates which test case has failed.
