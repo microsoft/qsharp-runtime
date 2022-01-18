@@ -21,7 +21,7 @@ extern "C"
     void __quantum__qis__assertmeasurementprobability__body(QirArray* bases, QirArray* qubits, RESULT* result,
                                                             double prob, QirString* msg, double tol)
     {
-        if (bases->count != qubits->count)
+        if (__quantum__rt__array_get_size_1d(bases) != __quantum__rt__array_get_size_1d(qubits))
         {
             __quantum__rt__fail_cstr("Both input arrays - bases, qubits - for AssertMeasurementProbability(), "
                                      "must be of same size.");
@@ -34,17 +34,17 @@ extern "C"
         }
 
         // Convert paulis from sequence of bytes to sequence of PauliId:
-        std::vector<PauliId> paulis(bases->count);
-        for (QirArray::TItemCount i = 0; i < bases->count; ++i)
+        std::vector<PauliId> paulis((uint64_t)__quantum__rt__array_get_size_1d(bases));
+        for (QirArray::TItemCount i = 0; i < __quantum__rt__array_get_size_1d(bases); ++i)
         {
-            paulis[i] = (PauliId) * (bases->GetItemPointer(i));
+            paulis[i] = (PauliId)*__quantum__rt__array_get_element_ptr_1d(bases, i);
         }
 
-        if (!GetDiagnostics()->AssertProbability((long)qubits->count, paulis.data(),
-                                                 reinterpret_cast<QubitIdType*>(qubits->GetItemPointer(0)), prob, tol,
-                                                 nullptr))
+        if (!GetDiagnostics()->AssertProbability(
+                (long)__quantum__rt__array_get_size_1d(qubits), paulis.data(),
+                reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(qubits, 0)), prob, tol, nullptr))
         {
-            __quantum__rt__fail(msg);
+            __quantum__rt__fail_cstr(__quantum__rt__string_get_data(msg));
         }
     }
 

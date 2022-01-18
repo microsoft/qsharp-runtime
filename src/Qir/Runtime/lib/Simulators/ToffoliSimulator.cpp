@@ -113,12 +113,12 @@ namespace Quantum
             throw std::logic_error("operation_not_supported");
         }
 
-        void DumpMachine(const void* /* location */) override
+        void DumpMachine(void* /* location */) override
         {
             std::cerr << __func__ << " is not yet implemented" << std::endl; // #645
         }
 
-        void DumpRegister(const void* /* location */, const QirArray* /* qubits */) override
+        void DumpRegister(void* /* location */, QirArray* /* qubits */) override
         {
             std::cerr << __func__ << " is not yet implemented" << std::endl; // #645
         }

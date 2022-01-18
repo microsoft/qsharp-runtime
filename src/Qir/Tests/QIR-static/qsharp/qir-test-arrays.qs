@@ -5,7 +5,6 @@ namespace Microsoft.Quantum.Testing.QIR {
     open Microsoft.Quantum.Testing.QIR.Other;
     open Microsoft.Quantum.Testing.QIR.Math;
     open Microsoft.Quantum.Testing.QIR.Str;
-    open Microsoft.Quantum.Testing.QIR.Out;
 
     @EntryPoint()
     operation Test_Arrays(array : Int[], index : Int, val : Int) : Int {

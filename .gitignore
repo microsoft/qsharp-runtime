@@ -360,3 +360,7 @@ src/Simulation/Native/osx/libMicrosoft.Quantum.Simulator.Runtime.dylib
 src/Simulation/Native/win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll
 src/Simulation/Native/linux/Microsoft.Quantum.Experimental.Simulators.Runtime.dll
 src/Simulation/Native/osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll
+
+# Rust Files
+/Cargo.lock
+/target

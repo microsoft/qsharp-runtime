@@ -69,8 +69,8 @@ namespace Quantum
         // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
         virtual void GetState(TGetStateCallback callback) = 0;
 
-        virtual void DumpMachine(const void* location)                          = 0;
-        virtual void DumpRegister(const void* location, const QirArray* qubits) = 0;
+        virtual void DumpMachine(void* location)                    = 0;
+        virtual void DumpRegister(void* location, QirArray* qubits) = 0;
 
         // Both Assert methods return `true`, if the assert holds, `false` otherwise.
         virtual bool Assert(long numTargets, PauliId bases[], QubitIdType targets[], Result result,

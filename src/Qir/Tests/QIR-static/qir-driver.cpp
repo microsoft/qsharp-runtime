@@ -12,6 +12,7 @@
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
+#include "QirRuntime.hpp"
 #include "QirRuntimeApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
@@ -170,23 +171,6 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][
     // }
 }
 
-#ifdef _WIN32
-// A non-sensical function that creates a 3D array with given dimensions, then projects on the index = 1 of the
-// second dimension and returns a function of the sizes of the dimensions of the projection and a the provided value,
-// that is written to the original array at [1,1,1] and then retrieved from [1,1].
-// Thus, all three dimensions must be at least 2.
-extern "C" int64_t TestMultidimArrays(char value, int64_t dim0, int64_t dim1, int64_t dim2);
-TEST_CASE("QIR: multidimensional arrays", "[qir][qir.arrMultid]")
-{
-    QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
-
-    REQUIRE(42 + (2 + 8) / 2 == TestMultidimArrays(42, 2, 4, 8));
-    REQUIRE(17 + (3 + 7) / 2 == TestMultidimArrays(17, 3, 5, 7));
-}
-#else // not _WIN32
-// TODO: The bridge for variadic functions is broken on Linux!
-#endif
-
 // Manually authored QIR to test dumping range [0..2..6] into string and then raising a failure with it
 extern "C" void TestFailWithRangeString(int64_t start, int64_t step, int64_t end);
 TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
@@ -307,9 +291,14 @@ extern "C" void __quantum__qis__k__body(QUBIT* q)                               
 }
 extern "C" void __quantum__qis__k__ctl(QirArray* controls, QUBIT* q) // NOLINT
 {
+    auto len = __quantum__rt__array_get_size_1d(controls);
+    vector<QubitIdType> ids;
+    for (int64_t i = 0; i < len; i++)
+    {
+        ids.push_back(*reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(controls, i)));
+    }
     g_cKCallsControlled++;
-    g_ctrqapi->ControlledX((long)(controls->count), reinterpret_cast<QubitIdType*>(controls->buffer),
-                           reinterpret_cast<QubitIdType>(q));
+    g_ctrqapi->ControlledX((long)len, ids.data(), reinterpret_cast<QubitIdType>(q));
 }
 TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
 {

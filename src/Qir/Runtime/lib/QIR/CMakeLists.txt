@@ -10,13 +10,9 @@
 #
 set(rt_sup_source_files
   OutputStream.cpp
-  Output.cpp
   allocationsTracker.cpp
-  arrays.cpp
-  callables.cpp
   context.cpp
   delegated.cpp
-  strings.cpp
   utils.cpp
   QubitManager.cpp
   BasicRuntimeDriver.cpp
@@ -24,7 +20,7 @@ set(rt_sup_source_files
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
 add_library(qir-rt-support-obj OBJECT ${rt_sup_source_files})
-target_source_from_qir(qir-rt-support-obj bridge-rt.ll)
+target_source_from_qir(qir-rt-support-obj ../riQIR/src/bridge-rt.ll)
 target_include_directories(qir-rt-support-obj PUBLIC 
     ${public_includes}   
     ${common_includes}
@@ -45,7 +41,22 @@ target_link_libraries(Microsoft.Quantum.Qir.Runtime
   ${CMAKE_DL_LIBS}
   qir-rt-support-obj
   ${SPECTRE_LIBS}
+  "-L${CMAKE_BINARY_DIR}/bin"
+  -lrust_qir_runtime
 )
+
+if (WIN32)
+  target_link_libraries(Microsoft.Quantum.Qir.Runtime
+    Ws2_32
+    Bcrypt
+    Userenv
+  )
+  target_link_options(Microsoft.Quantum.Qir.Runtime PUBLIC "LINKER:/def:${PROJECT_SOURCE_DIR}/lib/QIR/exports.def")
+else()
+  target_link_libraries(Microsoft.Quantum.Qir.Runtime
+    pthread
+  )
+endif()
 
 target_include_directories(Microsoft.Quantum.Qir.Runtime PUBLIC ${public_includes})
 target_compile_definitions(Microsoft.Quantum.Qir.Runtime PRIVATE EXPORT_QIR_API)

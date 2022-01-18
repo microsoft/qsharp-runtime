@@ -58,6 +58,6 @@ extern "C"
     // Q# Dump:
     // Note: The param `location` must be `const void*`,
     // but it is called from .ll, where `const void*` is not supported.
-    QIR_SHARED_API void __quantum__qis__dumpmachine__body(uint8_t* location);                          // NOLINT
-    QIR_SHARED_API void __quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits); // NOLINT
+    QIR_SHARED_API void __quantum__qis__dumpmachine__body(uint8_t* location);                    // NOLINT
+    QIR_SHARED_API void __quantum__qis__dumpregister__body(uint8_t* location, QirArray* qubits); // NOLINT
 }

@@ -236,8 +236,8 @@ namespace Quantum
             return std::to_string(q);
         }
 
-        void DumpMachine(const void* location) override;
-        void DumpRegister(const void* location, const QirArray* qubits) override;
+        void DumpMachine(void* location) override;
+        void DumpRegister(void* location, QirArray* qubits) override;
 
         QubitIdType AllocateQubit() override
         {
@@ -528,11 +528,11 @@ namespace Quantum
         }
 
       private:
-        std::ostream& GetOutStream(const void* location, std::ofstream& outFileStream);
+        std::ostream& GetOutStream(void* location, std::ofstream& outFileStream);
         void DumpMachineImpl(std::ostream& outStream);
-        void DumpRegisterImpl(std::ostream& outStream, const QirArray* qubits);
+        void DumpRegisterImpl(std::ostream& outStream, QirArray* qubits);
         void GetStateTo(TDumpLocation location, TDumpToLocationCallback callback);
-        bool GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, const QirArray* qubits);
+        bool GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, QirArray* qubits);
 
         // This bit std::vector tracks whether the last operation on a given qubit was Measure.
         // Note that `std::vector<bool>` is already specialized to use an underlying bitfied to save space.
@@ -559,16 +559,17 @@ namespace Quantum
         outStream.flush();
     }
 
-    void CFullstateSimulator::DumpRegisterImpl(std::ostream& outStream, const QirArray* qubits)
+    void CFullstateSimulator::DumpRegisterImpl(std::ostream& outStream, QirArray* qubits)
     {
         outStream << "# wave function for qubits with ids (least to most significant): ";
-        for (QirArray::TItemCount idx = 0; idx < qubits->count; ++idx)
+        for (QirArray::TItemCount idx = 0; idx < __quantum__rt__array_get_size_1d(qubits); ++idx)
         {
             if (idx != 0)
             {
                 outStream << "; ";
             }
-            outStream << (uintptr_t)((reinterpret_cast<QubitIdType*>(qubits->GetItemPointer(0)))[idx]);
+            outStream << (uintptr_t)(
+                (reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(qubits, 0)))[idx]);
         }
         outStream << ':' << std::endl;
 
@@ -580,14 +581,15 @@ namespace Quantum
         outStream.flush();
     }
 
-    bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback,
-                                            const QirArray* qubits)
+    bool CFullstateSimulator::GetRegisterTo(TDumpLocation location, TDumpToLocationCallback callback, QirArray* qubits)
     {
         std::vector<unsigned> ids =
-            GetQubitIds((long)(qubits->count), reinterpret_cast<QubitIdType*>(qubits->GetItemPointer(0)));
+            GetQubitIds((long)(__quantum__rt__array_get_size_1d(qubits)),
+                        reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(qubits, 0)));
         static TDumpQubitsToLocationAPI dumpQubitsToLocation =
             reinterpret_cast<TDumpQubitsToLocationAPI>(this->GetProc("DumpQubitsToLocation"));
-        return dumpQubitsToLocation(this->simulatorId, (unsigned)(qubits->count), ids.data(), callback, location);
+        return dumpQubitsToLocation(this->simulatorId, (unsigned)(__quantum__rt__array_get_size_1d(qubits)), ids.data(),
+                                    callback, location);
     }
 
     void CFullstateSimulator::GetStateTo(TDumpLocation location, TDumpToLocationCallback callback)
@@ -597,13 +599,13 @@ namespace Quantum
         dumpTo(this->simulatorId, callback, location);
     }
 
-    std::ostream& CFullstateSimulator::GetOutStream(const void* location, std::ofstream& outFileStream)
+    std::ostream& CFullstateSimulator::GetOutStream(void* location, std::ofstream& outFileStream)
     {
         // If the location is not nullptr and not empty string then dump to a file:
-        if ((location != nullptr) && (((static_cast<const QirString*>(location))->str) != ""))
+        if ((location != nullptr) && (__quantum__rt__string_get_length(static_cast<QirString*>(location)) > 0))
         {
             // Open the file for appending:
-            const std::string& filePath = (static_cast<const QirString*>(location))->str;
+            const std::string& filePath = __quantum__rt__string_get_data(static_cast<QirString*>(location));
 
             bool openException = false;
             try
@@ -629,14 +631,14 @@ namespace Quantum
         return OutputStream::Get();
     }
 
-    void CFullstateSimulator::DumpMachine(const void* location)
+    void CFullstateSimulator::DumpMachine(void* location)
     {
         std::ofstream outFileStream;
         std::ostream& outStream = GetOutStream(location, outFileStream);
         DumpMachineImpl(outStream);
     }
 
-    void CFullstateSimulator::DumpRegister(const void* location, const QirArray* qubits)
+    void CFullstateSimulator::DumpRegister(void* location, QirArray* qubits)
     {
         std::ofstream outFileStream;
         std::ostream& outStream = GetOutStream(location, outFileStream);
