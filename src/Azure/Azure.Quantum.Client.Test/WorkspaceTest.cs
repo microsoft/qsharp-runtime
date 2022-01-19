@@ -7,10 +7,12 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Azure.Identity;
 using Azure.Quantum;
+using Azure.Quantum.Jobs;
 using Azure.Quantum.Jobs.Models;
 
 using Microsoft.Azure.Quantum.Exceptions;
@@ -174,6 +176,100 @@ Tests will be marked as Inconclusive if the pre-reqs are not correctly setup.";
 
             // Make sure we iterated through all the expected jobs:
             Assert.AreEqual(0, max);
+        }
+
+        [TestMethod]
+        [TestCategory("Local")]
+        public async Task ApplicationIdTest()
+        {
+            const string ENV_VAR_APPID = "EnvVarAppId";
+            const string OPTIONS_APPID = "OptionAppId";
+            const string LONG_ENV_VAR_APPID = "LongEnvVarAppId";
+            const string LONG_OPTIONS_APPID = "LongOptionAppId";
+            const string VERY_LONG_ENV_VAR_APPID = "VeryVeryVeryVeryVeryVeryLongEnvVarAppId";
+            const string VERY_LONG_OPTIONS_APPID = "VeryVeryVeryVeryVeryVeryLongOptionAppId";
+            const string APPID_ENV_VAR_NAME = "AZURE_QUANTUM_NET_APPID";
+
+            Func<QuantumJobClientOptions, Workspace> createWorkspace = (QuantumJobClientOptions options) =>
+            {
+                var credential = new ClientSecretCredential(tenantId: "72f988bf-86f1-41af-91ab-2d7cd011db47", 
+                                                            clientId: "00000000-0000-0000-0000-000000000000",
+                                                            clientSecret: "PLACEHOLDER");                                                        
+                return new Workspace(subscriptionId: "SubscriptionId",
+                                     resourceGroupName: "ResourceGroupName",
+                                     workspaceName: "WorkspaceName",
+                                     location: "WestUs",
+                                     options: options,
+                                     credential: credential);
+            };
+
+            var originalEnvironmentAppId = Environment.GetEnvironmentVariable(APPID_ENV_VAR_NAME);
+            try
+            {
+
+                // Test with no Environment AppId and no Options AppId
+                Environment.SetEnvironmentVariable(APPID_ENV_VAR_NAME, null);
+                var workspace = createWorkspace(null);
+                Assert.IsNotNull(workspace.ClientOptions);
+                Assert.IsNotNull(workspace.ClientOptions.Diagnostics);
+                Assert.AreEqual("", workspace.ClientOptions.Diagnostics.ApplicationId);
+
+                // Test with Environment AppId and no Options AppId
+                Environment.SetEnvironmentVariable(APPID_ENV_VAR_NAME, ENV_VAR_APPID);
+                workspace = createWorkspace(null);
+                Assert.IsNotNull(workspace.ClientOptions);
+                Assert.IsNotNull(workspace.ClientOptions.Diagnostics);
+                Assert.AreEqual(ENV_VAR_APPID, workspace.ClientOptions.Diagnostics.ApplicationId);
+
+                // Test with no Environment AppId and with Options AppId 
+                Environment.SetEnvironmentVariable(APPID_ENV_VAR_NAME, null);
+                var options = new QuantumJobClientOptions();
+                options.Diagnostics.ApplicationId = OPTIONS_APPID;
+                workspace = createWorkspace(options);
+                Assert.IsNotNull(workspace.ClientOptions);
+                Assert.IsNotNull(workspace.ClientOptions.Diagnostics);
+                Assert.AreEqual(OPTIONS_APPID, workspace.ClientOptions.Diagnostics.ApplicationId);
+
+                // Test with Environment AppId and with Options AppId
+                Environment.SetEnvironmentVariable(APPID_ENV_VAR_NAME, ENV_VAR_APPID);
+                options = new QuantumJobClientOptions();
+                options.Diagnostics.ApplicationId = OPTIONS_APPID;
+                workspace = createWorkspace(options);
+                Assert.IsNotNull(workspace.ClientOptions);
+                Assert.IsNotNull(workspace.ClientOptions.Diagnostics);
+                Assert.AreEqual($"{OPTIONS_APPID}-{ENV_VAR_APPID}", workspace.ClientOptions.Diagnostics.ApplicationId);
+
+                // Test with long (>24 chars) combination of Environment AppId and Options AppId
+                Environment.SetEnvironmentVariable(APPID_ENV_VAR_NAME, LONG_ENV_VAR_APPID);
+                options = new QuantumJobClientOptions();
+                options.Diagnostics.ApplicationId = LONG_OPTIONS_APPID;
+                workspace = createWorkspace(options);
+                Assert.IsNotNull(workspace.ClientOptions);
+                Assert.IsNotNull(workspace.ClientOptions.Diagnostics);
+                var truncatedAppId = $"{LONG_OPTIONS_APPID}-{LONG_ENV_VAR_APPID}".Substring(0, 24);
+                Assert.AreEqual(truncatedAppId, workspace.ClientOptions.Diagnostics.ApplicationId);
+
+                // Test with long (>24 chars) Environment AppId and no Options AppId
+                Environment.SetEnvironmentVariable(APPID_ENV_VAR_NAME, VERY_LONG_ENV_VAR_APPID);
+                workspace = createWorkspace(null);
+                Assert.IsNotNull(workspace.ClientOptions);
+                Assert.IsNotNull(workspace.ClientOptions.Diagnostics);
+                Assert.AreEqual(VERY_LONG_ENV_VAR_APPID.Substring(0, 24), workspace.ClientOptions.Diagnostics.ApplicationId);
+
+                // Test with long (>24 chars) Options AppId and no Environment AppId
+                Environment.SetEnvironmentVariable(APPID_ENV_VAR_NAME, null);
+                options = new QuantumJobClientOptions();
+                Assert.ThrowsException<System.ArgumentOutOfRangeException>(() => 
+                    options.Diagnostics.ApplicationId = VERY_LONG_OPTIONS_APPID);
+            }
+            finally
+            {
+                // restore original env var AZURE_QUANTUM_NET_APPID
+                if (originalEnvironmentAppId != null)
+                {
+                    Environment.SetEnvironmentVariable(APPID_ENV_VAR_NAME, originalEnvironmentAppId);
+                }
+            }
         }
 
         private static void AssertJob(CloudJob job)

@@ -27,6 +27,9 @@
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CCNOTFromCCZ.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\CNOTFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CX.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CYFromCNOT.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\CZFromSinglyControlled.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFracFromExpUtil.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromExpUtil.qs" />
     <QsharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtil.qs" />

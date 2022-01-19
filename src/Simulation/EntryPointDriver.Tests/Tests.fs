@@ -646,7 +646,7 @@ let ``Submit allows overriding default values`` () =
 
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
 
-               
+
 [<Fact>]
 let ``Submit allows a long user-agent`` () =
     let given = test "Returns Unit"
@@ -661,7 +661,7 @@ let ``Submit allows a long user-agent`` () =
         "--shots"
         "750"
         "--user-agent"
-        "a-very-long-user-agent-(it-will-be-truncated)"
+        "a-very-long-user-agent-(it-will-be-not-be-truncated-here)"
         "--credential"
         "cli"
     ])
@@ -674,18 +674,17 @@ let ``Submit allows a long user-agent`` () =
                Location: myLocation
                Credential: CLI
                AadToken: myTok
-               UserAgent: a-very-long-user-agent-(
+               UserAgent: a-very-long-user-agent-(it-will-be-not-be-truncated-here)
                Job Name: myJobName
                Job Parameters:
                Shots: 750
                Output: FriendlyUri
                Dry Run: False
                Verbose: True
-
                Submitting Q# entry point using a quantum machine.
-
                https://www.example.com/00000000-0000-0000-0000-0000000000000"
-               
+
+
 [<Fact>]
 let ``Submit extracts the location from a quantum endpoint`` () =
     let given = test "Returns Unit"

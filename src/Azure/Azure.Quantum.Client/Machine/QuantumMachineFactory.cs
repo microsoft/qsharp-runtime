@@ -23,14 +23,17 @@ namespace Microsoft.Azure.Quantum
         public static IQuantumMachine? CreateMachine(
             IWorkspace workspace, string targetName, string? storageConnectionString = null)
         {
+            // We normalize the case of the provided target name to lower.
+            var targetNameNormalized = targetName?.ToLowerInvariant();
+
             var machineName =
-                targetName is null
+                targetNameNormalized is null
                 ? null
-                : targetName.StartsWith("qci.")
+                : targetNameNormalized.StartsWith("qci.")
                 ? "Microsoft.Quantum.Providers.QCI.Targets.QCIQuantumMachine, Microsoft.Quantum.Providers.QCI"
-                : targetName.StartsWith("ionq.")
+                : targetNameNormalized.StartsWith("ionq.")
                 ? "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ"
-                : targetName.StartsWith("honeywell.")
+                : targetNameNormalized.StartsWith("honeywell.")
                 ? "Microsoft.Quantum.Providers.Honeywell.Targets.HoneywellQuantumMachine, Microsoft.Quantum.Providers.Honeywell"
                 : null;
 
@@ -54,7 +57,7 @@ namespace Microsoft.Azure.Quantum
                 ? null
                 : (IQuantumMachine)Activator.CreateInstance(
                     machineType,
-                    targetName,
+                    targetNameNormalized,
                     workspace,
                     storageConnectionString);
         }
