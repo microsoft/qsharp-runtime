@@ -3,8 +3,6 @@
 
 Write-Host "##[info]Build Native simulator for $Env:BUILD_CONFIGURATION"
 
-Write-Host "##[info]Found native OS X components: $(Get-ChildItem (Join-Path $PSScriptRoot osx) | Select-Object -ExpandProperty FullName)"
-
 $nativeBuild = (Join-Path $PSScriptRoot "build")
 if (-not (Test-Path $nativeBuild)) {
     New-Item -Path $nativeBuild -ItemType "directory"
