@@ -150,7 +150,7 @@ namespace Microsoft.Quantum.SparseSimulation
         }
 
         [DllImport(simulator_dll)]
-        private static extern int H_cpp(SimulatorIdType sim, QubitIdType qubit_id);
+        private static extern void H_cpp(SimulatorIdType sim, QubitIdType qubit_id);
         public override void H(Qubit qubit)
         {
             H_cpp(Id, (QubitIdType)qubit.Id);
