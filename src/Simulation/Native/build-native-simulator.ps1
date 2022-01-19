@@ -3,6 +3,12 @@
 
 Write-Host "##[info]Build Native simulator for $Env:BUILD_CONFIGURATION"
 
+if ($IsMacOS) {
+    Write-Host "##vso[info]Fixing binary dependencies with install_name_tool..."
+    install_name_tool -id "@rpath/libomp.dylib" (Join-Path $PSScriptRoot osx libomp.dylib)
+}
+
+
 $nativeBuild = (Join-Path $PSScriptRoot "build")
 if (-not (Test-Path $nativeBuild)) {
     New-Item -Path $nativeBuild -ItemType "directory"
