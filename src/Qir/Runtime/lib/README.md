@@ -16,7 +16,7 @@ Is a project defined [here](../../../Simulation/QSharpFoundation).
 Is a project defined [here](../../../Simulation/QSharpCore).
 
 ## QIR
-Anything that is required by the [QIR specs](https://github.com/microsoft/qsharp-language/tree/main/Specifications/),
+Anything that is required by the [QIR specs](https://github.com/qir-alliance/qir-spec),
 which in particular includes the ["methods that delegate to the simulators"](QIR/bridge-rt.ll#46), should live in the QIR folder.
 They require support from the backend, but are not language-specific.  
 Both the Q# Core and the Q# Foundation are Q#-specific in that these are the target instructions that the Q# libraries are built on.

@@ -6,7 +6,7 @@ The purpose of the Resource Tracer is to provide efficient and flexible way to e
  for more background on resource estimation for quantum programs.
 
 To run against the tracer, the quantum program should comply with the
- [QIR specifications](https://github.com/microsoft/qsharp-language/tree/main/Specifications/) as well as:
+ [QIR specifications](https://github.com/qir-alliance/qir-spec) as well as:
 
 1. convert _each_ used intrinsic operation into one of the Quantum Instruction Set (_qis_) operations supported by the
  tracer (see the last section of this readme);
