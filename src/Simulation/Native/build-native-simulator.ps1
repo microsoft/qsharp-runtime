@@ -79,6 +79,7 @@ cmake --build . --config "$Env:BUILD_CONFIGURATION" --target install
 
 if ($IsMacOS) {
     Write-Host "##[info]Copying libomp..."
+    Copy-Item -Verbose (Join-Path $PSScriptRoot osx libomp.dylib) (Join-Path $PSScriptRoot build)
     Copy-Item -Verbose (Join-Path $PSScriptRoot osx libomp.dylib) (Join-Path $PSScriptRoot build drop)
 }
 
