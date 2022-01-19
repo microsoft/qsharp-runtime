@@ -71,6 +71,11 @@ else {
 }
 cmake --build . --config "$Env:BUILD_CONFIGURATION" --target install
 
+if ($IsMacOS) {
+    Write-Host "##vso[info]Checking binary dependencies with otool..."
+    otool -l ./drop/libMicrosoft.Quantum.Simulator.Runtime.dylib
+}
+
 Pop-Location
 
 
