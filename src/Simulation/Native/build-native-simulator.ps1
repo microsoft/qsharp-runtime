@@ -4,7 +4,7 @@
 Write-Host "##[info]Build Native simulator for $Env:BUILD_CONFIGURATION"
 
 if ($IsMacOS) {
-    Write-Host "##vso[info]Fixing binary dependencies with install_name_tool..."
+    Write-Host "##[info]Fixing binary dependencies with install_name_tool..."
     install_name_tool -id "@rpath/libomp.dylib" (Join-Path $PSScriptRoot osx libomp.dylib)
 }
 
@@ -78,8 +78,8 @@ else {
 cmake --build . --config "$Env:BUILD_CONFIGURATION" --target install
 
 if ($IsMacOS) {
-    Write-Host "##vso[info]Checking binary dependencies with otool..."
-    otool -l ./drop/libMicrosoft.Quantum.Simulator.Runtime.dylib
+    Write-Host "##[info]Copying libomp..."
+    Copy-Item -Verbose (Join-Path $PSScriptRoot osx libomp.dylib) (Join-Path $PSScriptRoot build drop)
 }
 
 Pop-Location
