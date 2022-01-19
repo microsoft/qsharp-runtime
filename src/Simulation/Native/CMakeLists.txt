@@ -92,7 +92,7 @@ if(ENABLE_OPENMP)
 if (APPLE)
     set(OPENMP_PATH             "/usr/local/opt/libomp")
     set(OPENMP_LOCAL_PATH       "${PROJECT_SOURCE_DIR}/osx")
-    set(OPENMP_COMPILER_FLAGS   "-Xpreprocessor -fopenmp -I${OPENMP_PATH}/include -lomp -L${OPENMP_LOCAL_PATH}")
+    set(OPENMP_COMPILER_FLAGS   "-Xpreprocessor -fopenmp -I${OPENMP_PATH}/include -l${OPENMP_LOCAL_PATH}/libomp.dylib")
     set(OPENMP_LIB_NAME         "omp")
 
     set(OpenMP_CXX_FLAGS        "${OPENMP_COMPILER_FLAGS}")
