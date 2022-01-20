@@ -86,6 +86,28 @@ public:
 		_execute_queued_ops();
 	}
 
+	// void dumpIds(void (*callback)(logical_qubit_id))
+	// {
+	//     recursive_lock_type l(getmutex());
+	//     flush();
+
+	//     std::vector<logical_qubit_id> qubits = psi.get_qubit_ids();
+	//     for (logical_qubit_id q : qubits)
+	//     {
+	//         callback(q);
+	//     }
+	// }
+	void dump_ids(void (*callback)(logical_qubit_id))
+	{
+		for(size_t qid = 0; qid < _occupied_qubits.size(); ++qid)
+		{
+			if(_occupied_qubits[qid])
+			{
+				callback((logical_qubit_id)qid);
+			}
+		}
+	}
+
 	// Outputs the wavefunction to the console, after
 	// executing any queued operations
 	void DumpWavefunction(size_t indent = 0){

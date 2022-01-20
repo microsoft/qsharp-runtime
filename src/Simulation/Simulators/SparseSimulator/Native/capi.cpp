@@ -268,6 +268,15 @@ extern "C"
         return getSimulator(sim_id)->dump_qubits(qs, callback);
     }
 
+    // // dump the list of logical qubit ids to given callback
+    // MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned id, _In_ void (*callback)(unsigned))
+    // {
+    //     Microsoft::Quantum::Simulator::get(id)->dumpIds(callback);
+    // }
+    MICROSOFT_QUANTUM_DECL void QubitIds_cpp(simulator_id_type sim_id, void (*callback)(logical_qubit_id))
+    {
+        getSimulator(sim_id)->dump_ids(callback);
+    }
 
     // Asserts that the gates in `b`, measured on the qubits in `q`, return `result`
     MICROSOFT_QUANTUM_DECL bool Assert_cpp(simulator_id_type sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result){
