@@ -135,6 +135,7 @@ extern "C"
         _In_ logical_qubit_id n,
         _In_reads_(n) logical_qubit_id* q,
         _In_ void (*callback)(char* , double, double));
+    MICROSOFT_QUANTUM_DECL void QubitIds_cpp(simulator_id_type sim_id, void (*callback)(logical_qubit_id));
 
     MICROSOFT_QUANTUM_DECL bool Assert_cpp(simulator_id_type sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result);
 }
