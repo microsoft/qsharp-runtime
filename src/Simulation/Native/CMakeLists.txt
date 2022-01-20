@@ -90,15 +90,21 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 if(ENABLE_OPENMP)
 
 if (APPLE)
-    set(OPENMP_PATH             "/usr/local/opt/libomp")
-    set(OPENMP_COMPILER_FLAGS   "-Xpreprocessor -fopenmp -I${OPENMP_PATH}/include -lomp -L${OPENMP_PATH}/lib")
+    set(OPENMP_LOCAL_PATH       "${PROJECT_SOURCE_DIR}/osx")
+    # Note we use `-rpath @loader_path` to ensure the produced binary includes the folder of the binary
+    # itself in the runtime search path for dynamic library load, regardless of environment settings.
+    # We don't use `@executable_path` because that takes into account recursive dependencies and will be
+    # the folder of the originally launched binary (root of the dependency tree) instead of loading binary
+    # (the immediate parent in the dependency tree), which will be the simulatory library itself.
+    # See https://www.man7.org/linux/man-pages/man1/ld.1.html and https://stackoverflow.com/questions/52981210/linking-with-dylib-library-from-the-command-line-using-clang
+    set(OPENMP_COMPILER_FLAGS   "-Xpreprocessor -fopenmp -I${OPENMP_LOCAL_PATH}/include -L${OPENMP_LOCAL_PATH} -lomp -rpath @loader_path")
     set(OPENMP_LIB_NAME         "omp")
 
     set(OpenMP_CXX_FLAGS        "${OPENMP_COMPILER_FLAGS}")
     set(OpenMP_C_FLAGS          "${OPENMP_COMPILER_FLAGS}")
     set(OpenMP_CXX_LIB_NAMES    "${OPENMP_LIB_NAME}")
     set(OpenMP_C_LIB_NAMES      "${OPENMP_LIB_NAME}")
-    set(OpenMP_omp_LIBRARY      "${OPENMP_PATH}/lib/libomp.dylib")
+    set(OpenMP_omp_LIBRARY      "${OPENMP_LOCAL_PATH}/libomp.dylib")
 endif()
 
 find_package(OpenMP)
