@@ -90,8 +90,10 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 if(ENABLE_OPENMP)
 
 if (APPLE)
-    # set(OPENMP_PATH             "/usr/local/opt/libomp")
     set(OPENMP_LOCAL_PATH       "${PROJECT_SOURCE_DIR}/osx")
+    # Note we use `-rpath @executable_path` to ensure the produced binary includes the folder of the binary
+    # itself in the runtime search path for dynamic library load, regardless of environment settings.
+    # See https://www.man7.org/linux/man-pages/man1/ld.1.html and https://wincent.com/wiki/@executable_path,_@load_path_and_@rpath
     set(OPENMP_COMPILER_FLAGS   "-Xpreprocessor -fopenmp -I${OPENMP_LOCAL_PATH}/include -L${OPENMP_LOCAL_PATH} -lomp -rpath @executable_path")
     set(OPENMP_LIB_NAME         "omp")
 
