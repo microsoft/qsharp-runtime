@@ -34,7 +34,7 @@ add_test(
 if(DEFINED ENV{NATIVE_SIMULATOR})
     set(TEST_DEPS1 $ENV{NATIVE_SIMULATOR})
 else()
-    set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../../Simulation/native/build/$ENV{BUILD_CONFIGURATION}")
+    set(TEST_DEPS1 "${PROJECT_SOURCE_DIR}/../../Simulation/native/build/drop")
 endif()
 
 set(TEST_DEPS2 "${PROJECT_SOURCE_DIR}/../Runtime/bin/$ENV{BUILD_CONFIGURATION}/bin")

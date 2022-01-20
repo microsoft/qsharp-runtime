@@ -23,6 +23,7 @@ extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__SinhTest__Interop();
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__CoshTest__Interop();          // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__TanhTest__Interop();          // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__Interop(); // NOLINT
+extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Math__ExponentTest__Interop();      // NOLINT
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(    // NOLINT
     int64_t min, int64_t max);
 extern "C" double Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop( // NOLINT
@@ -96,6 +97,11 @@ TEST_CASE("QIR: Math.Tanh", "[qir.math][qir.Math.Tanh]")
 TEST_CASE("QIR: Math.IeeeRemainder", "[qir.math][qir.Math.IeeeRemainder]")
 {
     REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__IeeeRemainderTest__Interop());
+}
+
+TEST_CASE("QIR: Math.Exponent.builtin", "[qir.math][qir.Math.Exponent.builtin]")
+{
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Math__ExponentTest__Interop());
 }
 
 TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")

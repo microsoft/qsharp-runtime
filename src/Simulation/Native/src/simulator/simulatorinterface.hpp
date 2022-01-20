@@ -99,7 +99,6 @@ class SimulatorInterface
     {
         assert(false);
     }
-    // TODO(rokuzmin): What does it return?
     virtual bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(size_t, double, double))
     {
         assert(false);

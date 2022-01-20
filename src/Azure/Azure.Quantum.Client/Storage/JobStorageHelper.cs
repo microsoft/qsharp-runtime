@@ -37,28 +37,34 @@ namespace Microsoft.Azure.Quantum.Storage
             }
         }
 
-        /// <summary>
-        /// Uploads the job input.
-        /// </summary>
-        /// <param name="jobId">The job id.</param>
-        /// <param name="input">The input.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>
-        /// Container uri + Input uri.
-        /// </returns>
+        /// <inheritdoc/>
         public override async Task<(string containerUri, string inputUri)> UploadJobInputAsync(
             string jobId,
             Stream input,
+            string contentType,
+            bool compress,
             CancellationToken cancellationToken = default)
         {
             string containerName = GetContainerName(jobId);
+            string encoding = null;
+            Stream data = input;
+
+            if (compress)
+            {
+                var compressedInput = new MemoryStream();
+                await Compression.Compress(input, compressedInput);
+                data = compressedInput;
+                encoding = "gzip";
+            }
 
             BlobContainerClient containerClient = await this.GetContainerClient(containerName);
 
             await this.StorageHelper.UploadBlobAsync(
                 containerClient,
                 Constants.Storage.InputBlobName,
-                input,
+                input: data,
+                contentType: contentType,
+                contentEncoding: encoding,
                 cancellationToken);
 
             string containerUri = this.StorageHelper.GetBlobContainerSasUri(

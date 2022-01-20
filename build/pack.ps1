@@ -132,7 +132,7 @@ function Pack-Crate() {
         cargo package --allow-dirty;
         # Copy only the .crate file, since we don't need all the intermediate
         # artifacts brought in by the full folder under target/package.
-        Copy-Item -Force (Join-Path . "target" "package" "*.crate") $OutPath;
+        Copy-Item -Force (Join-Path $PSScriptRoot .. "target" "package" "*.crate") $OutPath;
     Pop-Location
 }
 

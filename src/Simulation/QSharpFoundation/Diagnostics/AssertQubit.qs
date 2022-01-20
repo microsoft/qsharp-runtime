@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// - AssertQubitIsInStateWithinTolerance
     ///
     /// # Remarks
-    /// <xref:microsoft.quantum.diagnostics.assertqubitisinstatewithintolerance> allows for asserting
+    /// <xref:Microsoft.Quantum.Diagnostics.AssertQubitIsInStateWithinTolerance> allows for asserting
     /// arbitrary qubit states rather than only $Z$ eigenstates.
     ///
     /// Note that the Adjoint and Controlled versions of this operation will not
@@ -47,7 +47,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// - AssertQubitIsInStateWithinTolerance
     ///
     /// # Remarks
-    /// <xref:microsoft.quantum.diagnostics.assertqubitisinstatewithintolerance> allows for asserting
+    /// <xref:Microsoft.Quantum.Diagnostics.AssertQubitIsInStateWithinTolerance> allows for asserting
     /// arbitrary qubit states rather than only $Z$ eigenstates.
     ///
     /// Note that the Adjoint and Controlled versions of this operation will not

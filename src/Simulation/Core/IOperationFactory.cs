@@ -24,7 +24,7 @@ namespace Microsoft.Quantum.Simulation.Core
         /// <summary>
         /// Returns an instance of the requested operation.
         /// </summary>
-        I Get<I>(Type t);
+        I Get<I>(Type T);
 
         /// <summary>
         /// Returns an instance of the requested operation.
