@@ -354,7 +354,3 @@ out/
 
 # Ignore drops from building native simulators.
 xplat
-
-# Rust
-target/
-Cargo.lock
