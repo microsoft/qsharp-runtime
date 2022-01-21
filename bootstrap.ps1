@@ -7,16 +7,9 @@ Push-Location (Join-Path $PSScriptRoot "build")
     .\prerequisites.ps1
 Pop-Location
 
+cargo install cargo-edit
 Push-Location (Join-Path $PSScriptRoot "./src/Simulation/qdk_sim_rs")
-    # We use dotnet-script to inject the version number into Cargo.toml,
-    # so we go on ahead here and restore any missing tools.
-    # Since that Cargo.toml is referenced by CMake lists in the QIR
-    # runtime, this injection has to be the first thing we do.
-    dotnet tool restore
-    dotnet script inject-version.csx -- `
-        --template Cargo.toml.template `
-        --out-path Cargo.toml `
-        --version $Env:NUGET_VERSION;
+    cargo set-version $Env:NUGET_VERSION;
 Pop-Location
 
 if (-not (Test-Path Env:/AGENT_OS)) {                                    # If not CI build, i.e. local build (if AGENT_OS envvar is not defined)
