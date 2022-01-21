@@ -28,23 +28,4 @@
     <PackageReference Include="NumSharp" Version="0.20.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\Native\win10\**\*">
-      <Link>runtimes\win-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\Native\osx\**\*">
-      <Link>runtimes\osx-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\Native\linux\**\*">
-      <Link>runtimes\linux-x64\native\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-
-  </ItemGroup>
-
 </Project>
