@@ -20,10 +20,10 @@
   </PropertyGroup>  
 
   <ItemGroup>
-    <PackageReference Include="Azure.Core" Version="1.14.0" />
+    <PackageReference Include="Azure.Core" Version="1.19.0" />
     <PackageReference Include="Azure.Identity" Version="1.4.0" />
     <PackageReference Include="Azure.Quantum.Jobs" Version="1.0.0-beta.2" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.2.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>

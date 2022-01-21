@@ -10,14 +10,3 @@ foo*
 CMakeFiles/
 CMakeCache.txt
 *.so
-
-# Ignore build artifacts...
-win10
-# ...except for vcomp140, which isn't actually a build
-# artifact, but provides the Visual C/C++ OpenMP runtime
-# needed by the full-state simulator.
-#
-# Making sure that this file is in the repo will make
-# sure it ends up in our final NuGet packages, as needed
-# for the full-state simulator to work correctly.
-!win10/vcomp140.dll

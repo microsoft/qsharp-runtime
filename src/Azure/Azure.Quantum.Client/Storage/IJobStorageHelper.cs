@@ -30,6 +30,22 @@ namespace Microsoft.Azure.Quantum.Storage
             CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Uploads the job input.
+        /// </summary>
+        /// <param name="jobId">The job id.</param>
+        /// <param name="input">The input.</param>
+        /// <param name="contentType">The MIME type indicating the content of the payload.</param>
+        /// <param name="compress">A flag to indicate if the payload should be uploaded compressed to storage.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Container uri + Input uri.</returns>
+        Task<(string containerUri, string inputUri)> UploadJobInputAsync(
+            string jobId,
+            Stream input,
+            string contentType,
+            bool compress,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Uploads the job program output mapping.
         /// </summary>
         /// <param name="jobId">The job id.</param>

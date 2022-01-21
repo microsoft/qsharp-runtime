@@ -346,4 +346,9 @@ namespace Microsoft.Quantum.Testing.QIR.Math {
         return 0;
     }
 
+    @EntryPoint()
+    function ExponentTest() : Int {
+        return (2 ^ 2) - 4;
+    }
+
 }

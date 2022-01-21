@@ -35,6 +35,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         public uint Id { get; protected set; }
 
+        public abstract uint[] QubitIds { get; }
+
         public override string Name
         {
             get

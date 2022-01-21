@@ -28,6 +28,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
                randomNumberGeneratorSeed,
                disableBorrowing)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                // We don't need this value, but explicitly calling an OMP function should trigger the load of libomp
+                // by .NET from the runtimes folder for the current platform, such that the later library load by the
+                // simulator does not need to know where to search for it.
+                var threadCount = OmpGetNumberOfThreadsNative();
+            }
+
             Id = InitNative();
             // Make sure that the same seed used by the built-in System.Random
             // instance is also used by the native simulator itself.

@@ -1,5 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
+#nullable enable
 
 namespace Microsoft.Azure.Quantum.Storage
 {
@@ -32,13 +34,31 @@ namespace Microsoft.Azure.Quantum.Storage
         /// <param name="containerClient">Container client.</param>
         /// <param name="blobName">Name of the BLOB.</param>
         /// <param name="input">The input.</param>
+        /// <param name="contentType">The MIME type indicating the content of the payload.</param>
+        /// <param name="contentEncoding">The blob encoding.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>async task.</returns>
         Task UploadBlobAsync(
             BlobContainerClient containerClient,
             string blobName,
             Stream input,
+            string? contentType,
+            string? contentEncoding,
             CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Uploads the BLOB.
+        /// </summary>
+        /// <param name="containerClient">Container client.</param>
+        /// <param name="blobName">Name of the BLOB.</param>
+        /// <param name="input">The input.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>async task.</returns>
+        Task UploadBlobAsync(
+            BlobContainerClient containerClient,
+            string blobName,
+            Stream input,
+            CancellationToken cancellationToken = default) => this.UploadBlobAsync(containerClient, blobName, input, null, null, cancellationToken);
 
         /// <summary>
         /// Gets the BLOB sas URI.
