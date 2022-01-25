@@ -20,13 +20,23 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 Assert.Equal("Quantum Simulator", subject.Name);
             }
+            using (var subject = new SparseSimulator2())
+            {
+                Assert.Equal("Sparse Simulator", subject.Name);
+            }
         }
 
         [Fact]
         public void QSimVerifyPrimitivesCompleteness()
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator2()
+            };
+
+            foreach (var sim in simulators)
             {
+                // using (var sim = new QuantumSimulator())
                 var ops =
                     from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
                     where op.IsSubclassOf(typeof(AbstractCallable))
@@ -55,7 +65,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimX()
         {
-            using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: false)
+            };
+
+            //using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            foreach (var sim in simulators)
             {
                 var x = sim.Get<Intrinsic.X>();
                 var measure = sim.Get<Intrinsic.M>();
@@ -101,7 +117,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimRandom()
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator2()
+            };
+
+            //using (var sim = new QuantumSimulator())
+            foreach (var sim in simulators)
             {
                 var r = sim.Get<Intrinsic.Random>();
                 var probs = new QArray<double> (0.0, 0.0, 0.0, 0.7, 0.0, 0.0);
@@ -113,7 +135,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimAssert()
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator2()
+            };
+
+            foreach (var sim in simulators)
+            //using (var sim = new QuantumSimulator())
             {
                 var assert = sim.Get<Intrinsic.Assert>();
                 var h = sim.Get<Intrinsic.H>();
@@ -144,7 +172,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimAssertProb()
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator2()
+            };
+
+            foreach (var sim in simulators)
+            //using (var sim = new QuantumSimulator())
             {
                 var tolerance = 0.02;
                 var assertProb = sim.Get<Intrinsic.AssertProb>();
@@ -264,7 +298,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             TestMultiControllable(gate.Adjoint, ctrls, targets);
         }
 
-        private void TestOne<T>(QuantumSimulator qsim, T gate, Action<T, IQArray<Qubit>, IQArray<Qubit>> action)
+        //private void TestOne<T>(QuantumSimulator qsim, T gate, Action<T, IQArray<Qubit>, IQArray<Qubit>> action)
+        private void TestOne<T>(CommonNativeSimulator qsim, T gate, Action<T, IQArray<Qubit>, IQArray<Qubit>> action)
         {
             var allocate = qsim.Get<Intrinsic.Allocate>();
             var release = qsim.Get<Intrinsic.Release>();
@@ -300,7 +335,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 foreach (var t in gateTypes)
                 {
-                    using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+                    var simulators = new CommonNativeSimulator[] { 
+                        new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                        new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: false)
+                    };
+
+                    foreach (var qsim in simulators)
+                    // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
                     {
                         var gate = qsim.Get<IUnitary<Qubit>>(t);
                         TestOne(qsim, gate, TestUnitary);
@@ -312,7 +353,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestRCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: false)
+            };
+
+            foreach (var qsim in simulators)
+            // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             {
                 // R
                 var mapper = new Func<Qubit, (Pauli, Double, Qubit)>(qubit => (Pauli.PauliZ, 1.0, qubit));
@@ -325,7 +372,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestExpCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: false)
+            };
+
+            foreach (var qsim in simulators)
+            // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             {
                 // Exp
                 {
@@ -349,7 +402,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestMeasureCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: false)
+            };
+
+            foreach (var qsim in simulators)
+            // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             {
                 // M
                 {
@@ -373,7 +432,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestAssertCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: false)
+            };
+
+            foreach (var qsim in simulators)
+            // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             {
                 // Assert
                 {

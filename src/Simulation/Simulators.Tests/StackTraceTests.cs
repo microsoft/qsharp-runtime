@@ -31,40 +31,54 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void AllocateQubit2Test()
         {
-            using var sim = new QuantumSimulator();
-            try
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator2()
+            };
+
+            foreach (var sim in simulators)
             {
-                IgnorableAssert.Disable();
-                QVoid res = sim.Execute<AllocateQubit2, QVoid, QVoid>(QVoid.Instance);
-            }
-            catch (ExecutionFailException)
-            {
-                var stackFrames = sim.CallStack;
+                // using var sim = new QuantumSimulator();
+                try
+                {
+                    IgnorableAssert.Disable();
+                    QVoid res = sim.Execute<AllocateQubit2, QVoid, QVoid>(QVoid.Instance);
+                }
+                catch (ExecutionFailException)
+                {
+                    var stackFrames = sim.CallStack;
 
-                // Make sure that the call stack isn't null before proceeding.
-                Assert.NotNull(stackFrames);
+                    // Make sure that the call stack isn't null before proceeding.
+                    Assert.NotNull(stackFrames);
 
-                // The following assumes that Assert is on Q# stack.
-                Assert.Equal(2, stackFrames!.Length);
+                    // The following assumes that Assert is on Q# stack.
+                    Assert.Equal(2, stackFrames!.Length);
 
-                Assert.Equal("Microsoft.Quantum.Diagnostics.AssertMeasurementProbability", stackFrames[0].Callable.FullName);
-                Assert.Equal(namespacePrefix + "AllocateQubit2", stackFrames[1].Callable.FullName);
+                    Assert.Equal("Microsoft.Quantum.Diagnostics.AssertMeasurementProbability", stackFrames[0].Callable.FullName);
+                    Assert.Equal(namespacePrefix + "AllocateQubit2", stackFrames[1].Callable.FullName);
 
-                Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
-                Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
+                    Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
 
-                Assert.Equal(94, stackFrames[1].FailedLineNumber);
-            }
-            finally
-            {
-                IgnorableAssert.Enable();
+                    Assert.Equal(94, stackFrames[1].FailedLineNumber);
+                }
+                finally
+                {
+                    IgnorableAssert.Enable();
+                }
             }
         }
 
         [Fact]
         public void AlwaysFail4Test()
         {
-            using (var sim = new QuantumSimulator())
+            //using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator2()
+            };
+
+            foreach (var sim in simulators)
             {
                 try
                 {

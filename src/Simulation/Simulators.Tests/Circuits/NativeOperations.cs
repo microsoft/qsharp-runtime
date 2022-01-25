@@ -44,6 +44,10 @@ namespace NativeOperations
                 {
                     return "Toffoli";
                 }
+                else if (this.__Factory__ is SparseSimulator2)
+                {
+                    return "SparseSimulator2";
+                }
 
                 return base.__Body__(arg);
             };
