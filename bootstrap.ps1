@@ -28,9 +28,11 @@ if (-not (Test-Path Env:/AGENT_OS)) {                                    # If no
         Pop-Location
 
         Write-Host "Build release flavor of the Sparse Simulator"
-        Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators/SparseSimulator")
-            .\build.ps1
-        Pop-Location
+        #Push-Location (Join-Path $PSScriptRoot "src/Simulation/Simulators/SparseSimulator")
+        #Push-Location (Join-Path $PSScriptRoot "src" "Simulation" "NativeSparseSimulator")
+        #    .\build.ps1
+        #Pop-Location
+        Invoke-Expression (Join-Path $PSScriptRoot "src" "Simulation" "NativeSparseSimulator" "build.ps1")
 
         Push-Location (Join-Path $PSScriptRoot "src/Simulation/qdk_sim_rs")
             # Don't run the experimental simulator build if we're local
