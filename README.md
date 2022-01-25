@@ -58,7 +58,7 @@ To build on other platforms:
     * Install [CMake](https://cmake.org/install/)
     * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
     * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
-      * Install `g++` (e.g. in Ubuntu 20.04 `sudo apt-get install g++`).
+      * Install [`libomp`](https://openmp.llvm.org) needed for the native (C++) full-state simulator.
       * The build does not accept `dotnet-*-5.0` packages, install `dotnet-*-3.1`
         (`sudo apt-get install dotnet-sdk-3.1`). The possible result can be:
 
