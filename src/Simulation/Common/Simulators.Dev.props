@@ -1,24 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project InitialTargets="CopyNativeDlls" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   
   <PropertyGroup>
     <DocumentationFile>bin\$(BuildConfiguration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <EnlistmentRoot>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\..\))</EnlistmentRoot>
-    <NativeBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native/build/drop))</NativeBuildPath>
+    <NativeRootPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native))</NativeRootPath>
+    <NativeBuildPath>$([MSBuild]::NormalizePath($(NativeRootPath)/build/drop))</NativeBuildPath>
     <ExperimentalSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/qdk_sim_rs/drop))</ExperimentalSimBuildPath>
-  </PropertyGroup>
-
-  <!-- Copy Microsoft.Quantum.Simulator.Runtime.dll from src/Simulation/Native build to where we can see and use it. -->
-  <PropertyGroup Condition="'$(QsimDll)' == ''">
-    <QsimDllMac>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))</QsimDllMac>
-    <QsimDllLinux>$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))</QsimDllLinux>
-    <QsimDllWindows>$([MSBuild]::NormalizePath($(NativeBuildPath)/Microsoft.Quantum.Simulator.Runtime.dll))</QsimDllWindows>
-    <QSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(QsimDllMac)</QSimDll>
-    <QSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(QsimDllLinux)</QSimDll>
-    <QSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(QsimDllWindows)</QSimDll>
-    <QSimDependencies Condition="$([MSBuild]::IsOsPlatform('OSX'))">$([MSBuild]::NormalizePath($(NativeBuildPath)/../../osx))</QSimDependencies>
-    <QSimDependencies Condition="$([MSBuild]::IsOsPlatform('Linux'))">$([MSBuild]::NormalizePath($(NativeBuildPath)/../../linux))</QSimDependencies>
-    <QSimDependencies Condition="$([MSBuild]::IsOsPlatform('Windows'))">$([MSBuild]::NormalizePath($(NativeBuildPath)/../../win10))</QSimDependencies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,42 +14,42 @@
     <ProjectReference Include="$(EnlistmentRoot)src\Simulation\Common\Microsoft.Quantum.Simulation.Common.csproj" IncludeInSimulatorPackage="true" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="$(QSimDll)" >
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="$(QSimDependencies)/**/*" >
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-  </ItemGroup>
+  <!-- Copy Native dlls from their build output to where we can see and use them -->
+  <Target Name="CopyNativeDlls">
+    <ItemGroup>
+      <!-- Native simulator: -->
+      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))" Dest="osx/libMicrosoft.Quantum.Simulator.Runtime.dylib" />
+      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))" Dest="linux/libMicrosoft.Quantum.Simulator.Runtime.so" />
+      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeBuildPath)/Microsoft.Quantum.Simulator.Runtime.dll))" Dest="win10/Microsoft.Quantum.Simulator.Runtime.dll" />
+      
+      <!-- Native Experimental simulator simulator: -->
+      <NativeDll Include="$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.dylib))" Dest="osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll" />
+      <NativeDll Include="$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.so))" Dest="linux/Microsoft.Quantum.Experimental.Simulators.Runtime.dll" />
+      <NativeDll Include="$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/qdk_sim.dll))" Dest="win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll" />
+    </ItemGroup>
 
-  <!-- Copy the experimental simulators from xplat/qdk_sim_rs build to where we can see and use it. -->
-  <PropertyGroup Condition="'$(ExperimentalSimDll)' == ''">
-    <ExperimentalSimDllMac>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.dylib))</ExperimentalSimDllMac>
-    <ExperimentalSimDllLinux>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.so))</ExperimentalSimDllLinux>
-    <ExperimentalSimDllWindows>$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/qdk_sim.dll))</ExperimentalSimDllWindows>
-    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('OSX'))">$(ExperimentalSimDllMac)</ExperimentalSimDll>
-    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('Linux'))">$(ExperimentalSimDllLinux)</ExperimentalSimDll>
-    <ExperimentalSimDll Condition="$([MSBuild]::IsOsPlatform('Windows'))">$(ExperimentalSimDllWindows)</ExperimentalSimDll>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="$(ExperimentalSimDll)" Condition="Exists('$(ExperimentalSimDll)')">
-      <Link>Microsoft.Quantum.Experimental.Simulators.Runtime.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-  </ItemGroup>
-
-  <Target Name="ValidateExperimentalSimDll" BeforeTargets="GetCopyToOutputDirectoryItems">
-    <Warning
-      Text="The experimental simulator DLL was not found at '$(ExperimentalSimDll)'; not including in simulators package."
-      Condition="!Exists('$(ExperimentalSimDll)')"
-    />
+    <Copy
+        SourceFiles="@(NativeDll)"
+        DestinationFiles="@(NativeDll->'$([MSBuild]::NormalizePath($(NativeRootPath)/))%(Dest)')"
+        ContinueOnError="WarnAndContinue"
+        SkipUnchangedFiles="true" />
   </Target>
 
+  <ItemGroup>
+    <None Include="$(NativeRootPath)/win10/*" Condition="$([MSBuild]::IsOsPlatform('Windows'))">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="$(NativeRootPath)/osx/*" Condition="$([MSBuild]::IsOsPlatform('OSX'))">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+    <None Include="$(NativeRootPath)/linux/*" Condition="$([MSBuild]::IsOsPlatform('Linux'))">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
 </Project>
