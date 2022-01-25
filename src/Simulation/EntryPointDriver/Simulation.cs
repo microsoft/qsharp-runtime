@@ -53,8 +53,8 @@ namespace Microsoft.Quantum.EntryPointDriver
                         ? (false, () => new QuantumSimulator())
                         : simulator == settings.ToffoliSimulatorName
                         ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
-                        : simulator == settings.SparseSimulatorName
-                        ? (false, new Func<IOperationFactory>(() => new SparseSimulator2()))
+                        // : simulator == settings.SparseSimulatorName
+                        // ? (false, new Func<IOperationFactory>(() => new SparseSimulator2()))
                         : (true, settings.CreateDefaultCustomSimulator);
                 if (isCustom && simulator != settings.DefaultSimulatorName)
                 {
