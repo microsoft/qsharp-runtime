@@ -32,7 +32,7 @@ extern "C"
     MICROSOFT_QUANTUM_DECL void seed_cpp(simulator_id_type sim_id, _In_ unsigned int s);
     // allocate and release
     MICROSOFT_QUANTUM_DECL void allocateQubit_cpp(simulator_id_type sim_id, logical_qubit_id q);
-    MICROSOFT_QUANTUM_DECL void releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q);
+    MICROSOFT_QUANTUM_DECL bool releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q);
     MICROSOFT_QUANTUM_DECL logical_qubit_id num_qubits_cpp(simulator_id_type sim_id);
 
     // single-qubit gates

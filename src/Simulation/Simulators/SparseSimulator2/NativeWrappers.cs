@@ -270,10 +270,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         protected override bool ReleaseOne(uint qubit_id)
         {
             // return ReleaseOneNative(this.Id, qubit_id);
-            // private static extern void releaseQubit_cpp(SimulatorIdType sim, QubitIdType qubit_id);
+            // private static extern bool releaseQubit_cpp(SimulatorIdType sim, QubitIdType qubit_id);
+            return releaseQubit_cpp(this.Id, (QubitIdType)qubit_id);
 
-            // TODO(rokuzmin)
-            throw new UnsupportedOperationException();
         }
 
     }

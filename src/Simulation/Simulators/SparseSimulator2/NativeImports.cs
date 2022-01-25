@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "release")]
         // private static extern bool ReleaseOneNative(uint id, uint qubit_id);
         [DllImport(simulator_dll)]
-        private static extern void releaseQubit_cpp(SimulatorIdType sim, QubitIdType qubit_id);
+        private static extern bool releaseQubit_cpp(SimulatorIdType sim, QubitIdType qubit_id);
 
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Exp")]
         // private static extern void ExpNative(uint id, uint n, Pauli[] paulis, double angle, uint[] ids);

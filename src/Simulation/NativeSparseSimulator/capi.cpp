@@ -42,9 +42,9 @@ extern "C"
         getSimulator(sim_id)->allocate_specific_qubit(q);
     }
 
-    MICROSOFT_QUANTUM_DECL void releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL bool releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q)
     {
-        getSimulator(sim_id)->release(q);
+        return (getSimulator(sim_id)->release(q));
     }
 
     MICROSOFT_QUANTUM_DECL logical_qubit_id num_qubits_cpp(simulator_id_type sim_id)
