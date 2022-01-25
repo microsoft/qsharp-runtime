@@ -8,7 +8,12 @@ Write-Host "##[info]Build NativeSparseSimulator for $Env:BUILD_CONFIGURATION"
 & (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
 $FailureCommands = 'Write-Host "##vso[task.logissue type=error;] Failed to build NativeSparseSimulator. See errors below or above." ;  Pop-Location ; Exit 1'
 
-# mkdir build\(Debug|Release)
+$buildType = $Env:BUILD_CONFIGURATION
+if ($buildType -eq "Release") {
+    $buildType = "RelWithDebInfo"
+}
+
+# mkdir build
 $BuildDir = (Join-Path $PSScriptRoot "build")
 if (-not (Test-Path $BuildDir)) {
     New-Item -Path $BuildDir -ItemType "directory" | Out-Null
@@ -17,7 +22,7 @@ if (-not (Test-Path $BuildDir)) {
 # pushd build\(Debug|Release)
 Push-Location $BuildDir
 
-    $CmakeConfigCommand = "cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$Env:BUILD_CONFIGURATION -S .. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
+    $CmakeConfigCommand = "cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$buildType -S .. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
     
     if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
     {
