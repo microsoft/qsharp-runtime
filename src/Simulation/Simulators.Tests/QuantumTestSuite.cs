@@ -27,7 +27,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            {
             //using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true ))
             {
                 sim.OnLog += (msg) => { output.WriteLine(msg); };
@@ -44,7 +43,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            {
             //using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true ))
             {
                 sim.OnLog += (msg) => { output.WriteLine(msg); };
@@ -62,7 +60,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            {
             //using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true ))
             {
                 sim.OnLog += (msg) => { output.WriteLine(msg); };
