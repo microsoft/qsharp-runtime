@@ -58,6 +58,7 @@ Push-Location $BuildDir
 
     # Invoke the build scripts:
     ( cmake --build . ) || ( Invoke-Expression $FailureCommands )
+    # cmake --build . --config "$Env:BUILD_CONFIGURATION" --target install
 
 # popd
 Pop-Location
