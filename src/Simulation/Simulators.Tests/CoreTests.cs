@@ -43,6 +43,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Null(ex);
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
+
+            ProcessRunner.Run("dotnet", $"{exe} --simulator SparseSimulator2", out var _, out error, out exitCode, out ex);
+            Assert.Null(ex);
+            Assert.Equal(0, exitCode);
+            Assert.Empty(error.ToString().Trim());
         }
 
         [Fact]
@@ -279,6 +284,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             RunOne(new QCTraceSimulator());
             RunOne(new ResourcesEstimator());
             RunOne(new QuantumSimulator());
+            RunOne(new SparseSimulator2());
         }
 
 
