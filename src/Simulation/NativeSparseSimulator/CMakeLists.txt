@@ -30,19 +30,3 @@ foreach(TEST SparseSimulatorTests CSharpIntegrationTests)
     target_include_directories(${TEST} PRIVATE ../../Qir/Common/Externals/catch2)
     add_test(${TEST} ${TEST})
 endforeach()
-
-
-#add_executable(dbw_test dbw_test.cpp)
-#target_link_libraries(dbw_test Microsoft.Quantum.Simulator.Runtime)
-#add_test(NAME dbw_test COMMAND ./dbw_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
-
-#add_test(
-#    NAME quantum_simulator_unittests
-#    COMMAND quantum_simulator_unittests ~[skip] -o "quantum_simulator_unittests_results.xml" -r junit
-#)
-
-#install(TARGETS SparseQuantumSimulator
-#        RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop"
-#        LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/drop"
-#       )

@@ -19,7 +19,7 @@ if (-not (Test-Path $BuildDir)) {
     New-Item -Path $BuildDir -ItemType "directory" | Out-Null
 }
 
-# pushd build\(Debug|Release)
+# pushd build
 Push-Location $BuildDir
 
     $CmakeConfigCommand = "cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$buildType -S .. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.

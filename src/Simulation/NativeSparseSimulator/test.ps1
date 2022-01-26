@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 Write-Host "##[info]Test Native Sparse Simulator"
-#Push-Location (Join-Path $PSScriptRoot "build")
 Push-Location (Join-Path $PSScriptRoot "build")
 
 ctest -C "$Env:BUILD_CONFIGURATION" --verbose

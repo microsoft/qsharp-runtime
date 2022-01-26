@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             }
             using (var subject = new SparseSimulator2())
             {
-                Assert.Equal("Sparse Simulator", subject.Name);
+                Assert.Equal("SparseSimulator2", subject.Name);
             }
         }
 
@@ -35,8 +35,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
+            // using (var sim = new QuantumSimulator())
             {
-                // using (var sim = new QuantumSimulator())
                 var ops =
                     from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
                     where op.IsSubclassOf(typeof(AbstractCallable))
