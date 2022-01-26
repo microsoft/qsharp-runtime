@@ -633,18 +633,13 @@ TEST_CASE("AssertTest") {
             sim.Assert(basis, qubits, val);
             sim.update_state();
         };
-    REQUIRE_THROWS_AS(sim_assert(basis, true), std::exception);
-    
     basis = { Basis::PauliZ, Basis::PauliZ, Basis::PauliI };
-    REQUIRE_THROWS_AS(sim_assert(basis, true), std::exception);
-    
+    sim_assert(basis, false);
+    sim.X(0);
+    sim_assert(basis, true);
+
     basis = { Basis::PauliX, Basis::PauliI, Basis::PauliI };
     REQUIRE_THROWS_AS(sim_assert(basis, false), std::exception);
-    REQUIRE_THROWS_AS(sim_assert(basis, true), std::exception);
-    
-    basis = { Basis::PauliY, Basis::PauliI, Basis::PauliI };
-    REQUIRE_THROWS_AS(sim_assert(basis, false), std::exception);
-    REQUIRE_THROWS_AS(sim_assert(basis, true), std::exception);
 }
 
 // Tests an assortment of assertions on GHZ states
@@ -672,6 +667,7 @@ TEST_CASE("AssertGHZTest") {
     sim.Assert(basis, qubits, true);
     REQUIRE_THROWS_AS(sim.Assert(basis, qubits, false), std::exception);
     sim.probe("0");
+    sim.update_state();
 }
 
 // Basic test of quantum teleportation

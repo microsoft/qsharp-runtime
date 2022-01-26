@@ -88,14 +88,14 @@ public:
 
 	// void dumpIds(void (*callback)(logical_qubit_id))
 	// {
-	//     recursive_lock_type l(getmutex());
-	//     flush();
+	//	 recursive_lock_type l(getmutex());
+	//	 flush();
 
-	//     std::vector<logical_qubit_id> qubits = psi.get_qubit_ids();
-	//     for (logical_qubit_id q : qubits)
-	//     {
-	//         callback(q);
-	//     }
+	//	 std::vector<logical_qubit_id> qubits = psi.get_qubit_ids();
+	//	 for (logical_qubit_id q : qubits)
+	//	 {
+	//		 callback(q);
+	//	 }
 	// }
 	void dump_ids(void (*callback)(logical_qubit_id))
 	{
@@ -196,7 +196,7 @@ public:
 
 	// For both CNOT and all types of C*NOT
 	// If a control index is repeated, it just treats it as one control
-	//     (Q# will throw an error in that condition)
+	//	 (Q# will throw an error in that condition)
 	void MCX(std::vector<logical_qubit_id> const& controls, logical_qubit_id  target) {
 		// Check for anything on the controls
 		if (controls.size() > 1){
@@ -617,7 +617,14 @@ public:
 		// at some future point, not at the point of failure
 		#if defined(NDEBUG)
 			if (isAllZ) {
-				_queued_operations.push_back(operation(OP::Assert, qubits, result));
+				// there may still be PauliIs in axes
+				std::vector<logical_qubit_id> zqubits;
+				zqubits.reserve(qubits.size());
+				for (int i = 0; i < qubits.size(); ++i) {
+					if (axes[i] == Gates::Basis::PauliZ)
+						zqubits.push_back(qubits[i]);
+				}
+				_queued_operations.push_back(operation(OP::Assert, zqubits, result));
 				// In release mode we queue Z assertion and return.
 				return;
 			}
