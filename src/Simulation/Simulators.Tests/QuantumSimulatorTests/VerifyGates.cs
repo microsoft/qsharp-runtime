@@ -206,7 +206,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var simulators = new CommonNativeSimulator[] { 
                 new QuantumSimulator(),
-                new SparseSimulator2()
+                //new SparseSimulator2()    // TODO(rokuzmin): Uncomment once the MCT is implemented.
             };
 
             foreach (var sim in simulators)
