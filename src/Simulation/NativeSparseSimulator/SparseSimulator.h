@@ -170,7 +170,9 @@ public:
 			_execute_queued_ops(qubit_id);
 			
 			if (!_quantum_state->is_qubit_zero(qubit_id)){
-				throw std::runtime_error("Released qubit not in zero state");
+				_quantum_state->Reset(qubit_id);
+				_set_qubit_to_zero(qubit_id);
+				return false;
 			}
 
 		}
