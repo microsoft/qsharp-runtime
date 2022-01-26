@@ -730,9 +730,6 @@ public:
                 case OP::MCSWAP:
                     operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls), op.target_2));
                     break;
-                case OP::Assert:
-                    operation_vector.push_back(internal_operation(op.gate_type, _get_mask(op.controls), op.result));
-                    break;
                 default:
                     throw std::runtime_error("Unsupported operation");
                     break;
@@ -790,14 +787,6 @@ public:
                             label.flip(op.target);
                             label.flip(op.target_2);
                         } 
-                        break;
-                    case OP::Assert:
-                        if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
-                            std::cout << "Problematic state: " << label << "\n";
-                            std::cout << "Amplitude: " << val << "\n";
-                            std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
-                            throw std::runtime_error("Assert failed");
-                        }
                         break;
                     default:
                         throw std::runtime_error("Unsupported operation");
