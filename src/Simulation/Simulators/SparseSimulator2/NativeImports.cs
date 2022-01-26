@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
     public partial class SparseSimulator2
     {
         //public const string QSIM_DLL_NAME = "SparseQuantumSimulator.dll"; 
-        private const string simulator_dll = "SparseQuantumSimulator.dll";
+        private const string simulator_dll = "SparseQuantumSimulator";
 
         // [DllImport("libomp", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "omp_get_num_threads")]
         // private static extern int OmpGetNumberOfThreadsNative();
