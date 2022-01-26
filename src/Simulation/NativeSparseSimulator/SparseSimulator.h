@@ -571,38 +571,29 @@ public:
 	void Assert(std::vector<Gates::Basis> axes, std::vector<logical_qubit_id> const& qubits, bool result) {
 		// Assertions will not commute well with Rx or Ry
 		for (auto qubit : qubits) {
-			if (_queue_Rx[qubit] || _queue_Ry[qubit]){
+			if (_queue_Rx[qubit] || _queue_Ry[qubit])
 				_execute_queued_ops(qubits, OP::Ry);
-			}
 		}
-		bool isAllZ = true;
 		bool isEmpty = true;
 		// Process each assertion by H commutation
 		for (int i = 0; i < qubits.size(); i++) { 		
 			switch (axes[i]){
 				case Gates::Basis::PauliY:
-					// HY=YH, so we switch the eigenvalue
-					if (_queue_H[qubits[i]]){
-						result ^= _queue_H[qubits[i]];
-					}
-					isAllZ = false;
+					// HY=-YH, so we switch the eigenvalue
+					if (_queue_H[qubits[i]])
+						result ^= 1;
 					isEmpty = false;
 					break; 
 				case Gates::Basis::PauliX:
 					// HX = ZH
-					if (_queue_H[qubits[i]]){
+					if (_queue_H[qubits[i]])
 						axes[i] = Gates::Basis::PauliZ;
-					} else {
-						isAllZ = false;
-					}
 					isEmpty = false;
 					break;
 				case Gates::Basis::PauliZ:
 					// HZ = XH
-					if (_queue_H[qubits[i]]){
+					if (_queue_H[qubits[i]])
 						axes[i] = Gates::Basis::PauliX;
-						isAllZ = false;
-					}
 					isEmpty = false;
 					break;
 				default:

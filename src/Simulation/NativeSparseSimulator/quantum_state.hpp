@@ -561,11 +561,11 @@ public:
             // is *not* a match, so the assertion should fail. 
             auto flipped_state = _qubit_data.find(current_state->first ^ XYs);
             if (flipped_state == _qubit_data.end() ||
-                std::norm(flipped_state->second -  current_state->second * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision_squared) {
+                std::norm(flipped_state->second   -  current_state->second * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision_squared) {
                 qubit_label label = current_state->first;
                 amplitude val = current_state->second;
                 std::cout << "Problematic state: " << label << "\n";
-                std::cout << "Expected " << val * (get_parity(label & YZs) ? -phaseShift : phaseShift);
+                std::cout << "Expected " << val * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift);
                 std::cout << ", got " << (flipped_state == _qubit_data.end() ? 0.0 : flipped_state->second) << "\n";
                 std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
                 throw std::runtime_error("Not an eigenstate");

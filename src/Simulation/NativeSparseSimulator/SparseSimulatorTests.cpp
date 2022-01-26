@@ -642,6 +642,57 @@ TEST_CASE("AssertTest") {
     REQUIRE_THROWS_AS(sim_assert(basis, false), std::exception);
 }
 
+// Tests an assortment of assertions to both pass and to throw exceptions
+TEST_CASE("AssertTest2") {
+    const logical_qubit_id num_qubits = 32;
+    const qubit_label_type<num_qubits> zero(0);
+    SparseSimulator sim = SparseSimulator(num_qubits);
+    using namespace Gates;
+    std::vector<Basis> basis{ Basis::PauliZ, Basis::PauliZ };
+    std::vector<logical_qubit_id> qubits{ 0,1 };
+    sim.Assert(basis, qubits, false);
+    sim.update_state();
+    // These require forcing the simulator to update the state for it to actually throw the exception
+    
+    auto sim_assert = [&](std::vector<Basis> const& basis, bool val) {
+            sim.Assert(basis, qubits, val);
+            sim.update_state();
+        };
+    sim.X(0);
+    sim.X(1);
+    sim_assert(basis, false);
+    
+    sim.H(0);
+    sim.H(1);
+    basis = {Basis::PauliX, Basis::PauliX};
+    sim_assert(basis, false);
+    
+    sim.S(0);
+    sim.S(1);
+    basis = {Basis::PauliY, Basis::PauliY};
+    sim_assert(basis, false);
+    
+    
+    sim.X(0);
+    sim_assert(basis, true);
+    sim.AdjS(0);
+    sim.AdjS(1);
+    
+    basis = {Basis::PauliX, Basis::PauliX};
+    sim_assert(basis, true);
+    sim.H(0);
+    sim.H(1);
+
+    basis = {Basis::PauliZ, Basis::PauliZ};
+    sim_assert(basis, true);
+    sim.X(1);
+    sim.X(0);
+    
+    sim_assert(basis, true);
+    sim.X(0);
+    sim_assert(basis, false);
+}
+
 // Tests an assortment of assertions on GHZ states
 TEST_CASE("AssertGHZTest") {
     const logical_qubit_id num_qubits = 32;
