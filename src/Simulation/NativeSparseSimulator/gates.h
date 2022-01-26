@@ -37,7 +37,6 @@ enum class OP {
     MCRy,
     SWAP,
     MCSWAP,
-    Assert,
     PermuteSmall,
     PermuteLarge,
     Proj,
@@ -106,8 +105,6 @@ const static std::string op_name(OP gate_type) {
             return "SWAP";
         case OP::MCSWAP:
             return "MCSWAP";
-        case OP::Assert:
-            return "Assert";
         case OP::PermuteSmall:
             return "Perm_S";
         case OP::PermuteLarge:
@@ -185,16 +182,6 @@ struct operation {
             controls(controls_arg),
             phase(phase_arg)
         {}
-    bool result;
-    // Assert
-    operation(OP gate_type_arg, 
-            std::vector<logical_qubit_id> Zs_arg, 
-            bool result_arg
-            ) : target(0),
-                gate_type(gate_type_arg),
-                controls(Zs_arg),
-                result(result_arg)
-                {}
 };
 
 // Also represents operations, but uses
@@ -253,15 +240,6 @@ struct condensed_operation {
             controls(controls_arg),
             phase(phase_arg)
         {}
-    bool result;
-    // Assert
-    condensed_operation(OP gate_type_arg, 
-            std::bitset<num_qubits> const& Zs_arg, 
-            bool result_arg
-            ) : target(0),
-                gate_type(gate_type_arg),
-                controls(Zs_arg),
-                result(result_arg){}
 };
 
 namespace Gates

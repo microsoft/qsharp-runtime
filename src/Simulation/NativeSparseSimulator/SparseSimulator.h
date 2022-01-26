@@ -612,28 +612,6 @@ public:
 		if (isEmpty) {
 			return;
 		}
-		// Z assertions are like phase gates
-		// If it's in release mode, it will queue them
-		// as a phase/permutation gate
-		// This means if an assert fails, it will fail
-		// at some future point, not at the point of failure
-		#if defined(NDEBUG)
-			if (isAllZ) {
-				// there may still be PauliIs in axes
-				std::vector<logical_qubit_id> zqubits;
-				zqubits.reserve(qubits.size());
-				for (int i = 0; i < qubits.size(); ++i) {
-					if (axes[i] == Gates::Basis::PauliZ)
-						zqubits.push_back(qubits[i]);
-				}
-				_queued_operations.push_back(operation(OP::Assert, zqubits, result));
-				// In release mode we queue Z assertion and return.
-				return;
-			}
-		#endif
-		// X or Y assertions require immediate execution.
-		// We also execute Z assertion immediately in debug mode
-		// to provide feedback at the point of failure.
 		_execute_queued_ops(qubits, OP::PermuteLarge);
 		_quantum_state->Assert(axes, qubits, result);
 	}
