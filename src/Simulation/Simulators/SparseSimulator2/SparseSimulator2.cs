@@ -61,7 +61,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             get
             {
-                return "Sparse Simulator";
+                return "SparseSimulator2";
             }
         }
     }
