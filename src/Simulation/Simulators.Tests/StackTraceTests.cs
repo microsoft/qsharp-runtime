@@ -65,6 +65,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 finally
                 {
                     IgnorableAssert.Enable();
+                    sim.Dispose();
                 }
             }
         }
@@ -132,6 +133,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                         output.WriteLine($"operation:{stackFrames[i].Callable.FullName}");
                         output.WriteLine(stackFrames[i].GetOperationSourceFromPDB());
                     }
+                }
+                finally
+                {
+                    sim.Dispose();
                 }
             }
         }

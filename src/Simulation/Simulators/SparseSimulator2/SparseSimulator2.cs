@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
@@ -9,6 +9,8 @@ using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics;
+
+#nullable enable
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
@@ -22,12 +24,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <param name="throwOnReleasingQubitsNotInZeroState"> If set to true, the exception is thrown when trying to release qubits not in zero state. </param>
         /// <param name="randomNumberGeneratorSeed"> Seed for the random number generator used by a simulator for measurement outcomes and the Random operation. </param>
         /// <param name="disableBorrowing"> If true, Borrowing qubits will be disabled, and a new qubit will be allocated instead every time borrowing is requested. Performance may improve. </param>
-        /// <param name="num_qubits"> Qubit capacity. </param>
+        /// <param name="numQubits"> Qubit capacity. </param>
         public SparseSimulator2(
             bool throwOnReleasingQubitsNotInZeroState = true,
             UInt32? randomNumberGeneratorSeed = null,
             bool disableBorrowing = false,
-            uint num_qubits = 64)
+            uint numQubits = 64)
         : base(throwOnReleasingQubitsNotInZeroState,
                randomNumberGeneratorSeed,
                disableBorrowing)
@@ -41,7 +43,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // }
 
             //Id = InitNative();
-            Id = init_cpp((QubitIdType)num_qubits);
+            Id = init_cpp((QubitIdType)numQubits);
 
             // Make sure that the same seed used by the built-in System.Random
             // instance is also used by the native simulator itself.

@@ -193,25 +193,32 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var control = new FreeQubit(1);
-                var target = new FreeQubit(0);
-                //var op = new QuantumSimulator().Get<Intrinsic.CNOT>();
-                var op = sim.Get<Intrinsic.CNOT>();
-                var args = op.__DataIn__((control, target));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "X",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = true,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { control },
-                    Targets = new List<Qubit>() { target },
-                };
+                    var control = new FreeQubit(1);
+                    var target = new FreeQubit(0);
+                    //var op = new QuantumSimulator().Get<Intrinsic.CNOT>();
+                    var op = sim.Get<Intrinsic.CNOT>();
+                    var args = op.__DataIn__((control, target));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "X",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = true,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { control },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -225,26 +232,33 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var control1 = new FreeQubit(0);
-                var control2 = new FreeQubit(2);
-                var target = new FreeQubit(1);
-                //var op = new QuantumSimulator().Get<Intrinsic.CCNOT>();
-                var op = sim.Get<Intrinsic.CCNOT>();
-                var args = op.__DataIn__((control1, control2, target));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "X",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = true,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { control1, control2 },
-                    Targets = new List<Qubit>() { target },
-                };
+                    var control1 = new FreeQubit(0);
+                    var control2 = new FreeQubit(2);
+                    var target = new FreeQubit(1);
+                    //var op = new QuantumSimulator().Get<Intrinsic.CCNOT>();
+                    var op = sim.Get<Intrinsic.CCNOT>();
+                    var args = op.__DataIn__((control1, control2, target));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "X",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = true,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { control1, control2 },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -258,25 +272,32 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var q1 = new FreeQubit(0);
-                var q2 = new FreeQubit(1);
-                // var op = new QuantumSimulator().Get<Intrinsic.SWAP>();
-                var op = sim.Get<Intrinsic.SWAP>();
-                var args = op.__DataIn__((q1, q2));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "SWAP",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { q1, q2 },
-                };
+                    var q1 = new FreeQubit(0);
+                    var q2 = new FreeQubit(1);
+                    // var op = new QuantumSimulator().Get<Intrinsic.SWAP>();
+                    var op = sim.Get<Intrinsic.SWAP>();
+                    var args = op.__DataIn__((q1, q2));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "SWAP",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { q1, q2 },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -290,24 +311,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var target = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Intrinsic.Ry>();
-                var op = sim.Get<Intrinsic.Ry>();
-                var args = op.__DataIn__((2.1, target));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "Ry",
-                    FormattedNonQubitArgs = "(" + 2.1 + ")",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { target },
-                };
+                    var target = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Intrinsic.Ry>();
+                    var op = sim.Get<Intrinsic.Ry>();
+                    var args = op.__DataIn__((2.1, target));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "Ry",
+                        FormattedNonQubitArgs = "(" + 2.1 + ")",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -321,24 +349,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var measureQubit = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Intrinsic.M>();
-                var op = sim.Get<Intrinsic.M>();
-                var args = op.__DataIn__(measureQubit);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "M",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = true,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { measureQubit },
-                };
+                    var measureQubit = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Intrinsic.M>();
+                    var op = sim.Get<Intrinsic.M>();
+                    var args = op.__DataIn__(measureQubit);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "M",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = true,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { measureQubit },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -352,24 +387,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var target = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Intrinsic.Reset>();
-                var op = sim.Get<Intrinsic.Reset>();
-                var args = op.__DataIn__(target);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "Reset",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { target },
-                };
+                    var target = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Intrinsic.Reset>();
+                    var op = sim.Get<Intrinsic.Reset>();
+                    var args = op.__DataIn__(target);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "Reset",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -383,24 +425,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                IQArray<Qubit> targets = new QArray<Qubit>(new[] { new FreeQubit(0) });
-                // var op = new QuantumSimulator().Get<Intrinsic.ResetAll>();
-                var op = sim.Get<Intrinsic.ResetAll>();
-                var args = op.__DataIn__(targets);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "ResetAll",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = true,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = targets,
-                };
+                    IQArray<Qubit> targets = new QArray<Qubit>(new[] { new FreeQubit(0) });
+                    // var op = new QuantumSimulator().Get<Intrinsic.ResetAll>();
+                    var op = sim.Get<Intrinsic.ResetAll>();
+                    var args = op.__DataIn__(targets);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "ResetAll",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = true,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = targets,
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
     }
@@ -417,24 +466,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var measureQubit = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Measurement.MResetX>();
-                var op = sim.Get<Measurement.MResetX>();
-                var args = op.__DataIn__(measureQubit);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "MResetX",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = true,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { measureQubit },
-                };
+                    var measureQubit = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Measurement.MResetX>();
+                    var op = sim.Get<Measurement.MResetX>();
+                    var args = op.__DataIn__(measureQubit);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "MResetX",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = true,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { measureQubit },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -448,24 +504,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var measureQubit = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Measurement.MResetY>();
-                var op = sim.Get<Measurement.MResetY>();
-                var args = op.__DataIn__(measureQubit);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "MResetY",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = true,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { measureQubit },
-                };
+                    var measureQubit = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Measurement.MResetY>();
+                    var op = sim.Get<Measurement.MResetY>();
+                    var args = op.__DataIn__(measureQubit);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "MResetY",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = true,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { measureQubit },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -479,24 +542,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var measureQubit = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Measurement.MResetZ>();
-                var op = sim.Get<Measurement.MResetZ>();
-                var args = op.__DataIn__(measureQubit);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "MResetZ",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = true,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { measureQubit },
-                };
+                    var measureQubit = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Measurement.MResetZ>();
+                    var op = sim.Get<Measurement.MResetZ>();
+                    var args = op.__DataIn__(measureQubit);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "MResetZ",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = true,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { measureQubit },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
     }
@@ -513,24 +583,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var measureQubit = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Circuits.Empty>();
-                var op = sim.Get<Circuits.Empty>();
-                var args = op.__DataIn__(QVoid.Instance);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "Empty",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { },
-                };
+                    var measureQubit = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Circuits.Empty>();
+                    var op = sim.Get<Circuits.Empty>();
+                    var args = op.__DataIn__(QVoid.Instance);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "Empty",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -580,23 +657,30 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                // var op = new QuantumSimulator().Get<Circuits.NestedOp>();
-                var op = sim.Get<Circuits.NestedOp>();
-                var args = op.__DataIn__(QVoid.Instance);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "NestedOp",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { },
-                };
+                    // var op = new QuantumSimulator().Get<Circuits.NestedOp>();
+                    var op = sim.Get<Circuits.NestedOp>();
+                    var args = op.__DataIn__(QVoid.Instance);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "NestedOp",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -610,24 +694,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var q = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Circuits.TwoQubitOp>();
-                var op = sim.Get<Circuits.TwoQubitOp>();
-                var args = op.__DataIn__((q, q));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "TwoQubitOp",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { q },
-                };
+                    var q = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Circuits.TwoQubitOp>();
+                    var op = sim.Get<Circuits.TwoQubitOp>();
+                    var args = op.__DataIn__((q, q));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "TwoQubitOp",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { q },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -641,24 +732,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                // var op = new QuantumSimulator().Get<Circuits.BoolArrayOp>();
-                var op = sim.Get<Circuits.BoolArrayOp>();
-                IQArray<Boolean> bits = new QArray<Boolean>(new bool[] { false, true });
-                var args = op.__DataIn__(bits);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "BoolArrayOp",
-                    FormattedNonQubitArgs = "[False, True]",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { },
-                };
+                    // var op = new QuantumSimulator().Get<Circuits.BoolArrayOp>();
+                    var op = sim.Get<Circuits.BoolArrayOp>();
+                    IQArray<Boolean> bits = new QArray<Boolean>(new bool[] { false, true });
+                    var args = op.__DataIn__(bits);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "BoolArrayOp",
+                        FormattedNonQubitArgs = "[False, True]",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
     }
@@ -675,24 +773,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                Qubit target = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Tests.Circuits.FooUDTOp>();
-                var op = sim.Get<Tests.Circuits.FooUDTOp>();
-                var args = op.__DataIn__(new Circuits.FooUDT(("bar", (target, 2.1))));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "FooUDTOp",
-                    FormattedNonQubitArgs = "(\"bar\", (" + 2.1 + "))",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { target },
-                };
+                    Qubit target = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Tests.Circuits.FooUDTOp>();
+                    var op = sim.Get<Tests.Circuits.FooUDTOp>();
+                    var args = op.__DataIn__(new Circuits.FooUDT(("bar", (target, 2.1))));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "FooUDTOp",
+                        FormattedNonQubitArgs = "(\"bar\", (" + 2.1 + "))",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
     }
@@ -709,25 +814,32 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
-                Qubit target = new FreeQubit(1);
-                // var op = new QuantumSimulator().Get<Intrinsic.H>().Controlled;
-                var op = sim.Get<Intrinsic.H>().Controlled;
-                var args = op.__DataIn__((controls, target));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "H",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = true,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = controls,
-                    Targets = new List<Qubit>() { target },
-                };
+                    IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
+                    Qubit target = new FreeQubit(1);
+                    // var op = new QuantumSimulator().Get<Intrinsic.H>().Controlled;
+                    var op = sim.Get<Intrinsic.H>().Controlled;
+                    var args = op.__DataIn__((controls, target));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "H",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = true,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = controls,
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -741,25 +853,32 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
-                Qubit target = new FreeQubit(1);
-                // var op = new QuantumSimulator().Get<Intrinsic.X>().Controlled;
-                var op = sim.Get<Intrinsic.X>().Controlled;
-                var args = op.__DataIn__((controls, target));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "X",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = true,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = controls,
-                    Targets = new List<Qubit>() { target },
-                };
+                    IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
+                    Qubit target = new FreeQubit(1);
+                    // var op = new QuantumSimulator().Get<Intrinsic.X>().Controlled;
+                    var op = sim.Get<Intrinsic.X>().Controlled;
+                    var args = op.__DataIn__((controls, target));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "X",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = true,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = controls,
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -773,26 +892,33 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
-                Qubit control = new FreeQubit(1);
-                Qubit target = new FreeQubit(2);
-                // var op = new QuantumSimulator().Get<Intrinsic.CNOT>().Controlled;
-                var op = sim.Get<Intrinsic.CNOT>().Controlled;
-                var args = op.__DataIn__((controls, (control, target)));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "X",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = true,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = controls.Append(control),
-                    Targets = new List<Qubit>() { target },
-                };
+                    IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
+                    Qubit control = new FreeQubit(1);
+                    Qubit target = new FreeQubit(2);
+                    // var op = new QuantumSimulator().Get<Intrinsic.CNOT>().Controlled;
+                    var op = sim.Get<Intrinsic.CNOT>().Controlled;
+                    var args = op.__DataIn__((controls, (control, target)));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "X",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = true,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = controls.Append(control),
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -806,28 +932,35 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                Qubit control1 = new FreeQubit(0);
-                Qubit control2 = new FreeQubit(1);
-                Qubit control3 = new FreeQubit(2);
-                Qubit target = new FreeQubit(3);
-                IQArray<Qubit> controls = new QArray<Qubit>(new[] { control1 });
-                // var op = new QuantumSimulator().Get<Intrinsic.CCNOT>().Controlled;
-                var op = sim.Get<Intrinsic.CCNOT>().Controlled;
-                var args = op.__DataIn__((controls, (control2, control3, target)));
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "X",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = true,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { control1, control2, control3 },
-                    Targets = new List<Qubit>() { target },
-                };
+                    Qubit control1 = new FreeQubit(0);
+                    Qubit control2 = new FreeQubit(1);
+                    Qubit control3 = new FreeQubit(2);
+                    Qubit target = new FreeQubit(3);
+                    IQArray<Qubit> controls = new QArray<Qubit>(new[] { control1 });
+                    // var op = new QuantumSimulator().Get<Intrinsic.CCNOT>().Controlled;
+                    var op = sim.Get<Intrinsic.CCNOT>().Controlled;
+                    var args = op.__DataIn__((controls, (control2, control3, target)));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "X",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = true,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { control1, control2, control3 },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
     }
@@ -844,24 +977,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                Qubit target = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Intrinsic.H>().Adjoint;
-                var op = sim.Get<Intrinsic.H>().Adjoint;
-                var args = op.__DataIn__(target);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "H",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = true,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { target },
-                };
+                    Qubit target = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Intrinsic.H>().Adjoint;
+                    var op = sim.Get<Intrinsic.H>().Adjoint;
+                    var args = op.__DataIn__(target);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "H",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = true,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -875,24 +1015,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                Qubit target = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Intrinsic.X>().Adjoint;
-                var op = sim.Get<Intrinsic.X>().Adjoint;
-                var args = op.__DataIn__(target);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "X",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = true,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { target },
-                };
+                    Qubit target = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Intrinsic.X>().Adjoint;
+                    var op = sim.Get<Intrinsic.X>().Adjoint;
+                    var args = op.__DataIn__(target);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "X",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = true,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -906,24 +1053,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                Qubit target = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Adjoint;
-                var op = sim.Get<Intrinsic.H>().Adjoint.Adjoint;
-                var args = op.__DataIn__(target);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "H",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { target },
-                };
+                    Qubit target = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Adjoint;
+                    var op = sim.Get<Intrinsic.H>().Adjoint.Adjoint;
+                    var args = op.__DataIn__(target);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "H",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -1021,25 +1175,32 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var target = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<Intrinsic.Ry>().Partial((double d) =>
-                var op = sim.Get<Intrinsic.Ry>().Partial((double d) =>
-                    new ValueTuple<double, Qubit>(d, target));
-                var args = op.__DataIn__(2.1);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "Ry",
-                    FormattedNonQubitArgs = "(" + 2.1 + ")",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { target },
-                };
+                    var target = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<Intrinsic.Ry>().Partial((double d) =>
+                    var op = sim.Get<Intrinsic.Ry>().Partial((double d) =>
+                        new ValueTuple<double, Qubit>(d, target));
+                    var args = op.__DataIn__(2.1);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "Ry",
+                        FormattedNonQubitArgs = "(" + 2.1 + ")",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { target },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -1053,25 +1214,32 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                var target = new FreeQubit(0);
-                // var op = new QuantumSimulator().Get<ICallable<(String, (Qubit, Double)), Circuits.FooUDT>>(typeof(Circuits.FooUDT))
-                var op = sim.Get<ICallable<(String, (Qubit, Double)), Circuits.FooUDT>>(typeof(Circuits.FooUDT))
-                    .Partial<double>((double d) => (("bar", (target, d))));
-                var args = new QTuple<double>(2.1);
-                var expected = new RuntimeMetadata()
+                try
                 {
-                    Label = "FooUDT",
-                    FormattedNonQubitArgs = "(\"bar\", (" + 2.1 + "))",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { },
-                };
+                    var target = new FreeQubit(0);
+                    // var op = new QuantumSimulator().Get<ICallable<(String, (Qubit, Double)), Circuits.FooUDT>>(typeof(Circuits.FooUDT))
+                    var op = sim.Get<ICallable<(String, (Qubit, Double)), Circuits.FooUDT>>(typeof(Circuits.FooUDT))
+                        .Partial<double>((double d) => (("bar", (target, d))));
+                    var args = new QTuple<double>(2.1);
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "FooUDT",
+                        FormattedNonQubitArgs = "(\"bar\", (" + 2.1 + "))",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { },
+                    };
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
     }

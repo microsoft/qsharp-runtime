@@ -88,10 +88,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                // var op = new QuantumSimulator().Get<Intrinsic.H>();
-                var op = sim.Get<Intrinsic.H>();
-                var opTuple = new QTuple<(ICallable, string)>((op, "foo"));
-                Assert.Equal("(H, \"foo\")", opTuple.GetNonQubitArgumentsAsString());
+                try
+                {
+                    // var op = new QuantumSimulator().Get<Intrinsic.H>();
+                    var op = sim.Get<Intrinsic.H>();
+                    var opTuple = new QTuple<(ICallable, string)>((op, "foo"));
+                    Assert.Equal("(H, \"foo\")", opTuple.GetNonQubitArgumentsAsString());
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
 
             var qtuple = new QTuple<(Qubit, string)>((new FreeQubit(0), "foo"));
@@ -156,10 +163,17 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                // var op = new QuantumSimulator().Get<Intrinsic.H>();
-                var op = sim.Get<Intrinsic.H>();
-                data = new ApplyData<ICallable>(op);
-                Assert.Equal("H", data.GetNonQubitArgumentsAsString());
+                try
+                {
+                    // var op = new QuantumSimulator().Get<Intrinsic.H>();
+                    var op = sim.Get<Intrinsic.H>();
+                    data = new ApplyData<ICallable>(op);
+                    Assert.Equal("H", data.GetNonQubitArgumentsAsString());
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
 
             data = new ApplyData<ValueTuple<int, string>>((1, "foo"));

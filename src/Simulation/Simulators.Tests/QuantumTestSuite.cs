@@ -29,8 +29,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             foreach (var sim in simulators)
             //using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true ))
             {
-                sim.OnLog += (msg) => { output.WriteLine(msg); };
-                op.TestOperationRunner(sim);
+                try
+                {
+                    sim.OnLog += (msg) => { output.WriteLine(msg); };
+                    op.TestOperationRunner(sim);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -45,8 +52,15 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             foreach (var sim in simulators)
             //using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true ))
             {
-                sim.OnLog += (msg) => { output.WriteLine(msg); };
-                op.TestOperationRunner(sim);
+                try
+                {
+                    sim.OnLog += (msg) => { output.WriteLine(msg); };
+                    op.TestOperationRunner(sim);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -62,18 +76,25 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             foreach (var sim in simulators)
             //using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true ))
             {
-                sim.OnLog += (msg) => { output.WriteLine(msg); };
-                Action action = () => op.TestOperationRunner(sim);
-                bool hasThrown = false;
                 try
                 {
-                    action.IgnoreDebugAssert();
+                    sim.OnLog += (msg) => { output.WriteLine(msg); };
+                    Action action = () => op.TestOperationRunner(sim);
+                    bool hasThrown = false;
+                    try
+                    {
+                        action.IgnoreDebugAssert();
+                    }
+                    catch (ExecutionFailException)
+                    {
+                        hasThrown = true;
+                    }
+                    Assert.True(hasThrown, "The operation was known to throw. It does not throw anymore. Congratulations ! You fixed the bug.");
                 }
-                catch (ExecutionFailException)
+                finally
                 {
-                    hasThrown = true;
+                    sim.Dispose();
                 }
-                Assert.True(hasThrown, "The operation was known to throw. It does not throw anymore. Congratulations ! You fixed the bug.");
             }
         }
     }
