@@ -642,6 +642,8 @@ public:
         // Find a probability to get a specific result
         double probability = MeasurementProbability(axes, qubits);
         bool result = _rng() <= probability;
+        if (!result)
+            probability = 1-probability;
         probability = std::sqrt(probability);
         // This step executes immediately so that we reduce the number of states in superposition
         PauliCombination(axes, qubits, 0.5/probability, (result ? -0.5 : 0.5)/probability);
