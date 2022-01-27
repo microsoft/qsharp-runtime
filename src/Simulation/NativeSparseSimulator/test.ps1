@@ -6,9 +6,12 @@ Push-Location (Join-Path $PSScriptRoot "build")
 
 ctest -C "$Env:BUILD_CONFIGURATION" --verbose
 
-if ($LastExitCode -ne 0) {
+$RetVal = $LastExitCode
+
+if ($RetVal -ne 0) {
     Write-Host "##vso[task.logissue type=error;]Failed to test Native Sparse Simulator"
-    $script:all_ok = $False
 }
 
 Pop-Location
+
+Exit $RetVal
