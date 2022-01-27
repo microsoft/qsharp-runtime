@@ -661,30 +661,36 @@ TEST_CASE("AssertTest2") {
     sim.X(0);
     sim.X(1);
     sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
     
     sim.H(0);
     sim.H(1);
     basis = {Basis::PauliX, Basis::PauliX};
     sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
     
     sim.S(0);
     sim.S(1);
     basis = {Basis::PauliY, Basis::PauliY};
     sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
     
     
     sim.X(0);
     sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
     sim.AdjS(0);
     sim.AdjS(1);
     
     basis = {Basis::PauliX, Basis::PauliX};
     sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
     sim.H(0);
     sim.H(1);
 
     basis = {Basis::PauliZ, Basis::PauliZ};
     sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
     sim.X(1);
     sim.X(0);
     
