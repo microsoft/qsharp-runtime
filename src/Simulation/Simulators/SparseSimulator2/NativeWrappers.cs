@@ -199,16 +199,22 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         protected override void MCS(uint count, uint[] ctrls, uint qubit)
         {
-            // TODO(rokuzmin)
-            //MCSNative(this.Id, count, ctrls, qubit);
-            throw new UnsupportedOperationException();
+            QubitIdType[] controls = new QubitIdType[ctrls.Length];
+            for(int i = 0; i < ctrls.Length; ++i)
+            {
+                controls[i] = (QubitIdType)(ctrls[i]);
+            }
+            MCR_cpp(this.Id, 2, 0.5*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCAdjS(uint count, uint[] ctrls, uint qubit)
         {
-            // TODO(rokuzmin)
-            //MCAdjSNative(this.Id, count, ctrls, qubit);
-            throw new UnsupportedOperationException();
+            QubitIdType[] controls = new QubitIdType[ctrls.Length];
+            for(int i = 0; i < ctrls.Length; ++i)
+            {
+                controls[i] = (QubitIdType)(ctrls[i]);
+            }
+            MCR_cpp(this.Id, 2, -0.5*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void sim_Dump(DumpCallback callback)
@@ -234,18 +240,22 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         protected override void MCT(uint count, uint[] ctrls, uint qubit)
         {
-            //MCTNative(this.Id, count, ctrls, qubit);
-
-            // TODO(rokuzmin)
-            throw new UnsupportedOperationException();
+            QubitIdType[] controls = new QubitIdType[ctrls.Length];
+            for(int i = 0; i < ctrls.Length; ++i)
+            {
+                controls[i] = (QubitIdType)(ctrls[i]);
+            }
+            MCR_cpp(this.Id, 2, 0.25*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCAdjT(uint count, uint[] ctrls, uint qubit)
         {
-            // MCAdjTNative(this.Id, count, ctrls, qubit);
-            
-            // TODO(rokuzmin)
-            throw new UnsupportedOperationException();
+            QubitIdType[] controls = new QubitIdType[ctrls.Length];
+            for(int i = 0; i < ctrls.Length; ++i)
+            {
+                controls[i] = (QubitIdType)(ctrls[i]);
+            }
+            MCR_cpp(this.Id, 2, -0.25*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCY(uint count, uint[] ctrls, uint qubit)
