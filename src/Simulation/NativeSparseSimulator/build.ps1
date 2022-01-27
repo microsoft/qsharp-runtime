@@ -1,12 +1,16 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-#Requires -Version 7.1
+#Requires -Version 6.0
 
 Write-Host "##[info]Build NativeSparseSimulator for $Env:BUILD_CONFIGURATION"
 
 & (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
-$FailureCommands = 'Write-Host "##vso[task.logissue type=error;] Failed to build NativeSparseSimulator. See errors below or above." ;  Pop-Location ; Exit 1'
+$FailureCommands = {
+    Write-Host "##vso[task.logissue type=error;] Failed to build NativeSparseSimulator. See errors above or below."
+    Pop-Location
+    Exit 1
+}
 
 $buildType = $Env:BUILD_CONFIGURATION
 if ($buildType -eq "Release") {
@@ -24,20 +28,17 @@ Push-Location $BuildDir
 
     $CmakeConfigCommand = "cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$buildType -S .. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
     
-    if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
-    {
+    if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
         Write-Host "On MacOS build using the default C/C++ compiler (should be AppleClang)"
     }
     else {
-        if (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
-        {
+        if (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin")))) {
             Write-Host "On Linux build using Clang"
             $CC = "clang-11"
             $CXX = "clang++-11"
             #$clangTidy = "-DCMAKE_CXX_CLANG_TIDY=clang-tidy-11"
         }
-        elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
-        {
+        elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
             Write-Host "On Windows build using Clang"
             $CC = "clang.exe"
             $CXX = "clang++.exe"
@@ -53,16 +54,20 @@ Push-Location $BuildDir
             #    # the Linux build catch tidy issues.
             #    $clangTidy = "-DCMAKE_CXX_CLANG_TIDY=clang-tidy"
             #}
-        } 
+        }
+        else {
+            Write-Host "##vso[task.logissue type=error;] Failed to determine the platform."
+            $FailureCommands.Invoke()
+        }
 
         $CmakeConfigCommand += " -D CMAKE_C_COMPILER=$CC -D CMAKE_CXX_COMPILER=$CXX "
     }
 
     # Generate the build scripts:
-    ( Invoke-Expression $CmakeConfigCommand ) || ( Invoke-Expression $FailureCommands )
+    ( Invoke-Expression $CmakeConfigCommand ) || ( $FailureCommands.Invoke() )
 
     # Invoke the build scripts:
-    ( cmake --build . ) || ( Invoke-Expression $FailureCommands )
+    ( cmake --build . ) || ( $FailureCommands.Invoke() )
     # cmake --build . --config "$Env:BUILD_CONFIGURATION" --target install
 
 # popd

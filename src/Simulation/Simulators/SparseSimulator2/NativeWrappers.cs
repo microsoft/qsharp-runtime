@@ -1,9 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
 
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Common;
+using System.Linq;
+
+#nullable enable
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
@@ -18,11 +20,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             // private static extern void MCXNative(uint id, uint count, uint[] ctrls, uint qubit);
             // private static extern void MCX_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCX_cpp(this.Id, (int)count, controls, (QubitIdType)qubit);
         }
 
@@ -31,11 +29,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             //MCZNative(this.Id, count, ctrls, qubit);
             // private static extern void MCZNative(uint id, uint count, uint[] ctrls, uint qubit);
             //private static extern void MCZ_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCZ_cpp(this.Id, (int)count, controls, (QubitIdType)qubit);
 
         }
@@ -50,11 +44,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             //MCHNative(this.Id, count, ctrls, qubit);
             //MCH_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCH_cpp(this.Id, (int)count, controls, (QubitIdType)qubit);
         }
 
@@ -119,13 +109,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // return JointEnsembleProbabilityNative(this.Id, n, b, q);
             // private static extern double JointEnsembleProbabilityNative(uint id, uint n, Pauli[] b, uint[] q);
             // private static extern double JointEnsembleProbability_cpp(SimulatorIdType sim, int length, int[] basis, QubitIdType[] qubits);
-            int[] bases = new int[n];
-            QubitIdType[] qids = new QubitIdType[n];
-            for(int i = 0; i < n; ++i)
-            {
-                bases[i] = (int)(b[i]);
-                qids[i]  = (QubitIdType)(q[i]);
-            }
+            QubitIdType[] qids = q.Cast<QubitIdType>().ToArray();
+            int[] bases = b.Cast<int>().ToArray();
             return JointEnsembleProbability_cpp(this.Id, (int)n, bases, qids);
         }
 
@@ -133,13 +118,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             // ExpNative(this.Id, n, paulis, angle, ids);
             // private static extern void Exp_cpp(SimulatorIdType sim, int length, int[] b, double phi, QubitIdType[] q);
-            int[] bases = new int[n];
-            QubitIdType[] qids = new QubitIdType[n];
-            for(int i = 0; i < n; ++i)
-            {
-                bases[i] = (int)(paulis[i]);
-                qids[i]  = (QubitIdType)(ids[i]);
-            }
+            int[] bases = paulis.Cast<int>().ToArray();
+            QubitIdType[] qids = ids.Cast<QubitIdType>().ToArray();
             Exp_cpp(this.Id, (int)n, bases, angle, qids);
         }
 
@@ -147,19 +127,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             // MCExpNative(this.Id, n, paulis, angle, nc, ctrls, ids);
             // private static extern void MCExp_cpp(SimulatorIdType sim, int controls_length, int length, QubitIdType[] c, int[] b, double phi, QubitIdType[] q);
-            QubitIdType[] controls = new QubitIdType[nc];
-            for(int i = 0; i < nc; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
-
-            int[] bases = new int[n];
-            QubitIdType[] qids = new QubitIdType[n];
-            for(int i = 0; i < n; ++i)
-            {
-                bases[i] = (int)(paulis[i]);
-                qids[i]  = (QubitIdType)(ids[i]);
-            }
+            int[] bases = paulis.Cast<int>().ToArray();
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
+            QubitIdType[] qids = ids.Cast<QubitIdType>().ToArray();
             MCExp_cpp(this.Id, (int)nc, (int)n, controls, bases, angle, qids);
         }
 
@@ -174,14 +144,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             // return MeasureNative(this.Id, n, b, ids);
             // private static extern bool Measure_cpp(SimulatorIdType sim, int length, int[] basis, QubitIdType[] qubits);
-            //b.Select(item => (int)item).ToArray()
-            int[] bases = new int[n];
-            QubitIdType[] qids = new QubitIdType[n];
-            for(int i = 0; i < n; ++i)
-            {
-                bases[i] = (int)(b[i]);
-                qids[i]  = (QubitIdType)(ids[i]);
-            }
+            int[] bases = b.Cast<int>().ToArray();
+            QubitIdType[] qids = ids.Cast<QubitIdType>().ToArray();
             return (uint)(Measure_cpp(this.Id, (int)n, bases, qids) ? 1 : 0);
         }
 
@@ -189,31 +153,19 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             // MCRNative(this.Id, basis, angle, count, ctrls, qubit);
             // private static extern void MCR_cpp(SimulatorIdType sim, int basis, double angle, int length, QubitIdType[] controls, QubitIdType target);
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCR_cpp(this.Id, (int)basis, angle, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCS(uint count, uint[] ctrls, uint qubit)
         {
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCR_cpp(this.Id, 2, 0.5*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCAdjS(uint count, uint[] ctrls, uint qubit)
         {
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCR_cpp(this.Id, 2, -0.5*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
@@ -240,21 +192,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
         protected override void MCT(uint count, uint[] ctrls, uint qubit)
         {
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCR_cpp(this.Id, 2, 0.25*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCAdjT(uint count, uint[] ctrls, uint qubit)
         {
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCR_cpp(this.Id, 2, -0.25*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
@@ -262,11 +206,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             // MCYNative(this.Id, count, ctrls, qubit);
             // private static extern void MCY_cpp(SimulatorIdType sim, int length, QubitIdType[] controls, QubitIdType target);
-            QubitIdType[] controls = new QubitIdType[ctrls.Length];
-            for(int i = 0; i < ctrls.Length; ++i)
-            {
-                controls[i] = (QubitIdType)(ctrls[i]);
-            }
+            QubitIdType[] controls = ctrls.Cast<QubitIdType>().ToArray();
             MCY_cpp(this.Id, (int)count, controls, (QubitIdType)qubit);
         }
 
@@ -275,14 +215,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // AllocateOneNative(this.Id, qubit_id);
             // private static extern void allocateQubit_cpp(SimulatorIdType sim, QubitIdType qubit_id);
             allocateQubit_cpp(this.Id, (QubitIdType)qubit_id);
-
         }
         protected override bool ReleaseOne(uint qubit_id)
         {
             // return ReleaseOneNative(this.Id, qubit_id);
             // private static extern bool releaseQubit_cpp(SimulatorIdType sim, QubitIdType qubit_id);
             return releaseQubit_cpp(this.Id, (QubitIdType)qubit_id);
-
         }
 
     }

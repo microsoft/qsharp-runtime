@@ -34,23 +34,14 @@ namespace NativeOperations
         {
             public Native(IOperationFactory m) : base(m) { }
 
-            public override Func<QVoid, String> __Body__ => (arg) =>
-            {
-                if (this.__Factory__ is QuantumSimulator)
+            public override Func<QVoid, String> __Body__ => (arg) => 
+                this.__Factory__ switch
                 {
-                    return "Simulator";
-                }
-                else if (this.__Factory__ is ToffoliSimulator)
-                {
-                    return "Toffoli";
-                }
-                else if (this.__Factory__ is SparseSimulator2)
-                {
-                    return "SparseSimulator2";
-                }
-
-                return base.__Body__(arg);
-            };
+                    QuantumSimulator _ => "Simulator",
+                    ToffoliSimulator _ => "Toffoli",
+                    SparseSimulator2 _ => "SparseSimulator2",
+                    _                  => base.__Body__(arg)
+                };
         }
     }
 
