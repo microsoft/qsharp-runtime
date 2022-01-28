@@ -638,7 +638,7 @@ public:
         return 0.5 - 0.5 * projection.real();
     }
 
-    bool Measure(std::vector<Gates::Basis> const& axes, std::vector<logical_qubit_id> const& qubits){
+    unsigned Measure(std::vector<Gates::Basis> const& axes, std::vector<logical_qubit_id> const& qubits){
         // Find a probability to get a specific result
         double probability = MeasurementProbability(axes, qubits);
         bool result = _rng() <= probability;
@@ -880,24 +880,21 @@ public:
                 // This is just an MCY or MCX gate, but with a phase
                 // So we need to preprocess with a multi-controlled phase
                 if (b==Gates::Basis::PauliY){
-                    amplitude phase = -1i/M01;
+                    amplitude phase = -1i*std::sin(phi / 2.0);
                     phase_and_permute(std::list<operation>{
                         operation(OP::MCPhase, controls[0], controls, phase),
                         operation(OP::MCY, target, controls)
                     });
                 } else {
-                    amplitude phase = 1.0/M01;
+                    amplitude phase = -1i*std::sin(phi / 2.0);
                     phase_and_permute(std::list<operation>{
                         operation(OP::MCPhase, controls[0], controls, phase),
-                        operation(OP::MCY, target, controls)
+                        operation(OP::MCX, target, controls)
                     });
                 }
                 return;
             } else if (std::norm(M01) < _rotation_precision_squared){
-                // This is equivalent to a multi-controlled Z if the rotation is -1
-                if (std::norm(M01 + 1.0) < _rotation_precision_squared){
-                    phase_and_permute(std::list<operation>{operation(OP::MCZ, controls[0], controls)});
-                }
+                phase_and_permute(std::list<operation>{operation(OP::MCPhase, controls[0], controls, M00)});
                 return;
             }
 
@@ -926,7 +923,7 @@ public:
                         }
                         new_state = current_state->second * M10 + flipped_state->second * M00; // one state
                         if (std::norm(new_state) > _rotation_precision_squared) {
-                            new_qubit_data.emplace(current_state->first | flip, new_state);
+                            new_qubit_data.emplace(flipped_state->first, new_state);
                         }
                     }
                 } else {

@@ -543,7 +543,7 @@ public:
 		}
 	}
 
-	bool M(logical_qubit_id target) {
+	unsigned M(logical_qubit_id target) {
 		// Do nothing if the qubit is known to be 0
 		if (!_occupied_qubits[target]){ 
 			return false;
@@ -617,9 +617,9 @@ public:
 
 
 
-	bool Measure(std::vector<Gates::Basis> const& axes, std::vector<logical_qubit_id> const& qubits){
+	unsigned Measure(std::vector<Gates::Basis> const& axes, std::vector<logical_qubit_id> const& qubits){
 		_execute_queued_ops(qubits, OP::Ry);
-		bool result = _quantum_state->Measure(axes, qubits);
+		unsigned result = _quantum_state->Measure(axes, qubits);
 		// Switch basis to save space
 		// Idea being that, e.g., HH = I, but if we know 
 		// that the qubit is in the X-basis, we can apply H

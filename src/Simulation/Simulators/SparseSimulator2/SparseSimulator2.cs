@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    using QubitIdType = System.IntPtr;
+    using QubitIdType = System.UInt32;
 
     public partial class SparseSimulator2 : CommonNativeSimulator
     {
