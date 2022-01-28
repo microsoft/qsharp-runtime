@@ -1,5 +1,5 @@
 # Microsoft Quantum Development Kit: Q# runtime #
-
+<!-- change from feature A -->
 Welcome to the Microsoft Quantum Development Kit!
 
 This repository contains the runtime components for the [Quantum Development Kit](https://docs.microsoft.com/azure/quantum/).
