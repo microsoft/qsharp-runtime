@@ -34,7 +34,7 @@ public:
     virtual void PauliCombination(std::vector<Gates::Basis> const&, std::vector<logical_qubit_id> const&, amplitude, amplitude) = 0;
     virtual void MCPauliCombination(std::vector<logical_qubit_id> const&, std::vector<Gates::Basis> const&, std::vector<logical_qubit_id> const&, amplitude, amplitude) = 0;
 
-    virtual bool M(logical_qubit_id) = 0;
+    virtual unsigned M(logical_qubit_id) = 0;
 
     virtual void Reset(logical_qubit_id) = 0;
 
