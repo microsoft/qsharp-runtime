@@ -8,7 +8,7 @@ using Microsoft.Quantum.Simulation.Core;
 #nullable enable
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    using QubitIdType = System.IntPtr;
+    using QubitIdType = System.UInt32;
     using SimulatorIdType = System.UInt32;
 
     public partial class SparseSimulator2
@@ -70,14 +70,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "M")]
         // private static extern uint MNative(uint id, uint q);
         [DllImport(simulatorDll)]
-        [return: MarshalAs(UnmanagedType.I1)] // necessary because C++ and C# represent bools differently
-        private static extern bool M_cpp(SimulatorIdType sim, QubitIdType qubitId);
+        private static extern uint M_cpp(SimulatorIdType sim, QubitIdType qubitId);
 
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Measure")]
         // private static extern uint MeasureNative(uint id, uint n, Pauli[] b, uint[] ids);
         [DllImport(simulatorDll)]
-        [return: MarshalAs(UnmanagedType.I1)] // necessary because C++ and C# represent bools differently
-        private static extern bool Measure_cpp(SimulatorIdType sim, int length, int[] basis, QubitIdType[] qubits);
+        private static extern uint Measure_cpp(SimulatorIdType sim, int length, int[] basis, QubitIdType[] qubits);
 
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "R")]
         // private static extern void RNative(uint id, Pauli basis, double angle, uint qubit);
@@ -88,6 +86,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // private static extern void MCRNative(uint id, Pauli basis, double angle, uint count, uint[] ctrls, uint qubit);
         [DllImport(simulatorDll)]
         private static extern void MCR_cpp(SimulatorIdType sim, int basis, double angle, int length, QubitIdType[] controls, QubitIdType target);
+
+        [DllImport(simulatorDll)]
+        private static extern void MCR1_cpp(SimulatorIdType sim, int basis, double angle, int length, QubitIdType[] controls, QubitIdType target);
 
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "S")]
         // private static extern void SNative(uint id, uint qubit);

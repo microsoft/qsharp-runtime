@@ -43,7 +43,7 @@ public:
     virtual void Assert(std::vector<Gates::Basis> const&, std::vector<logical_qubit_id> const&, bool) = 0;
 
     virtual double MeasurementProbability(std::vector<Gates::Basis> const&, std::vector<logical_qubit_id> const&) = 0;
-    virtual bool Measure(std::vector<Gates::Basis> const&, std::vector<logical_qubit_id> const&) = 0;
+    virtual unsigned Measure(std::vector<Gates::Basis> const&, std::vector<logical_qubit_id> const&) = 0;
 
 
     virtual amplitude probe(std::string const& label) = 0;

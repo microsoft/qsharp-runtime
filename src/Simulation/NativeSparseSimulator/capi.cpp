@@ -211,7 +211,7 @@ extern "C"
     }
 
     // measurements
-    MICROSOFT_QUANTUM_DECL bool M_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL unsigned M_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q)
     {
         return getSimulator(sim_id)->M(q);
     }
@@ -220,7 +220,7 @@ extern "C"
         getSimulator(sim_id)->Reset(q);
     }
 
-    MICROSOFT_QUANTUM_DECL bool Measure_cpp(
+    MICROSOFT_QUANTUM_DECL unsigned Measure_cpp(
         simulator_id_type sim_id,
         _In_ int n,
         _In_reads_(n) int* b,

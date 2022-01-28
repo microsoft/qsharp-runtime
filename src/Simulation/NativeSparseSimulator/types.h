@@ -12,10 +12,10 @@ namespace Microsoft::Quantum::SPARSESIMULATOR
 {
 
 // Runtime may use multiple simulators so a simulator id is used to identify the simulator needed.
-using simulator_id_type = unsigned;
+using simulator_id_type = std::uint32_t;
 
 // Logical qubit id is visible to the clients and is immutable during the lifetime of the qubit.
-using logical_qubit_id = intptr_t;
+using logical_qubit_id = std::uint32_t;
 
 using real_type = double;
 
