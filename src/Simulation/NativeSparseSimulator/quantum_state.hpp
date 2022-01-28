@@ -440,7 +440,6 @@ public:
         }
         // Randomly select
         unsigned result = (_rng() <= one_probability) ? 1 : 0;
-        std::cout << "***Measuring qubit. P(1)=" << one_probability << "; " << result << std::endl;
 
         wavefunction &new_qubit_data = (result == 1) ? ones : zeros;
         // Create a new, normalized state
