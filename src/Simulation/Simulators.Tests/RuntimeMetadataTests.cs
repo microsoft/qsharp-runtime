@@ -11,6 +11,18 @@ using Xunit;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
+    /// <summary>
+    /// Base test class for those test classes that need the simulator factories.
+    /// </summary>
+    public class SimulatorFactoryProvider 
+    {
+        protected Func<CommonNativeSimulator>[] simulatorFactories = new Func<CommonNativeSimulator>[]
+        {
+            () => new QuantumSimulator(),
+            () => new SparseSimulator2()
+        };
+    }
+
     public class RuntimeMetadataEqualityTests
     {
         [Fact]
@@ -571,7 +583,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
     }
 
-    public class CustomCircuitTests
+    public class CustomCircuitTests : SimulatorFactoryProvider
     {
         [Fact]
         public void EmptyOperation()
@@ -614,36 +626,39 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void OperationAsArgument()
         {
-            var simulators = new CommonNativeSimulator[] { 
-                new QuantumSimulator(),
-                new SparseSimulator2(),
-                new QuantumSimulator(),
-                new SparseSimulator2()
-            };
-
-            //foreach (var sim in simulators)
-            for(uint i = 0; i < 2; ++i)
+            foreach(var factory in simulatorFactories)
             {
-                var q = new FreeQubit(0);
-                // var opArg = new QuantumSimulator().Get<Circuits.HOp>();
-                // var op = new QuantumSimulator().Get<Circuits.WrapperOp>();
-                var opArg = simulators[i].Get<Circuits.HOp>();
-                var op = simulators[i+2].Get<Circuits.WrapperOp>();
-                var args = op.__DataIn__((opArg, q));
-                var expected = new RuntimeMetadata()
-                {
-                    Label = "WrapperOp",
-                    FormattedNonQubitArgs = "(HOp)",
-                    IsAdjoint = false,
-                    IsControlled = false,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = new List<Qubit>() { },
-                    Targets = new List<Qubit>() { q },
-                };
+                var sim1 = factory();
+                var sim2 = factory();
 
-                Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                try
+                {
+                    var q = new FreeQubit(0);
+                    // var opArg = new QuantumSimulator().Get<Circuits.HOp>();
+                    // var op = new QuantumSimulator().Get<Circuits.WrapperOp>();
+                    var opArg = sim1.Get<Circuits.HOp>();
+                    var op = sim2.Get<Circuits.WrapperOp>();
+                    var args = op.__DataIn__((opArg, q));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "WrapperOp",
+                        FormattedNonQubitArgs = "(HOp)",
+                        IsAdjoint = false,
+                        IsControlled = false,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = new List<Qubit>() { },
+                        Targets = new List<Qubit>() { q },
+                    };
+
+                    Assert.Equal(op.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim2.Dispose();
+                    sim1.Dispose();
+                }
             }
         }
 
@@ -965,7 +980,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
     }
 
-    public class AdjointTests
+    public class AdjointTests : SimulatorFactoryProvider
     {
         [Fact]
         public void AdjointH()
@@ -1084,80 +1099,87 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void ControlledAdjointH()
         {
-            var simulators = new CommonNativeSimulator[] { 
-                new QuantumSimulator(),
-                new SparseSimulator2(),
-                new QuantumSimulator(),
-                new SparseSimulator2()
-            };
-
-            //foreach (var sim in simulators)
-            for(uint i = 0; i < 2; ++i)
+            foreach(var factory in simulatorFactories)
             {
-                IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
-                Qubit target = new FreeQubit(1);
-                // var op1 = new QuantumSimulator().Get<Intrinsic.H>().Controlled.Adjoint;
-                // var op2 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Controlled;
-                var op1 = simulators[i  ].Get<Intrinsic.H>().Controlled.Adjoint;
-                var op2 = simulators[i+2].Get<Intrinsic.H>().Adjoint.Controlled;
-                var args = op1.__DataIn__((controls, target));
-                var expected = new RuntimeMetadata()
-                {
-                    Label = "H",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = true,
-                    IsControlled = true,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = controls,
-                    Targets = new List<Qubit>() { target },
-                };
+                var sim1 = factory();
+                var sim2 = factory();
 
-                Assert.Equal(op1.GetRuntimeMetadata(args), expected);
-                Assert.Equal(op2.GetRuntimeMetadata(args), expected);
+                try
+                {
+                    IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
+                    Qubit target = new FreeQubit(1);
+                    // var op1 = new QuantumSimulator().Get<Intrinsic.H>().Controlled.Adjoint;
+                    // var op2 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Controlled;
+                    var op1 = sim1.Get<Intrinsic.H>().Controlled.Adjoint;
+                    var op2 = sim2.Get<Intrinsic.H>().Adjoint.Controlled;
+                    var args = op1.__DataIn__((controls, target));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "H",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = true,
+                        IsControlled = true,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = controls,
+                        Targets = new List<Qubit>() { target },
+                    };
+
+                    Assert.Equal(op1.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op2.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim2.Dispose();
+                    sim1.Dispose();
+                }
             }
         }
 
         [Fact]
         public void ControlledAdjointAdjointH()
         {
-            var simulators = new CommonNativeSimulator[] { 
-                new QuantumSimulator(),
-                new SparseSimulator2(),
-                new QuantumSimulator(),
-                new SparseSimulator2(),
-                new QuantumSimulator(),
-                new SparseSimulator2()
-            };
-
-            for(uint i = 0; i < 2; ++i)
+            foreach(var factory in simulatorFactories)
             {
-                IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
-                Qubit target = new FreeQubit(1);
-                // var op1 = new QuantumSimulator().Get<Intrinsic.H>().Controlled.Adjoint.Adjoint;
-                // var op2 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Controlled.Adjoint;
-                // var op3 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Adjoint.Controlled;
-                var op1 = simulators[i  ].Get<Intrinsic.H>().Controlled.Adjoint.Adjoint;
-                var op2 = simulators[i+2].Get<Intrinsic.H>().Adjoint.Controlled.Adjoint;
-                var op3 = simulators[i+4].Get<Intrinsic.H>().Adjoint.Adjoint.Controlled;
-                var args = op1.__DataIn__((controls, target));
-                var expected = new RuntimeMetadata()
-                {
-                    Label = "H",
-                    FormattedNonQubitArgs = "",
-                    IsAdjoint = false,
-                    IsControlled = true,
-                    IsMeasurement = false,
-                    IsComposite = false,
-                    Children = null,
-                    Controls = controls,
-                    Targets = new List<Qubit>() { target },
-                };
+                var sim1 = factory();
+                var sim2 = factory();
+                var sim3 = factory();
 
-                Assert.Equal(op1.GetRuntimeMetadata(args), expected);
-                Assert.Equal(op2.GetRuntimeMetadata(args), expected);
-                Assert.Equal(op3.GetRuntimeMetadata(args), expected);
+                try
+                {
+                    IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
+                    Qubit target = new FreeQubit(1);
+                    // var op1 = new QuantumSimulator().Get<Intrinsic.H>().Controlled.Adjoint.Adjoint;
+                    // var op2 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Controlled.Adjoint;
+                    // var op3 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Adjoint.Controlled;
+                    var op1 = sim1.Get<Intrinsic.H>().Controlled.Adjoint.Adjoint;
+                    var op2 = sim2.Get<Intrinsic.H>().Adjoint.Controlled.Adjoint;
+                    var op3 = sim3.Get<Intrinsic.H>().Adjoint.Adjoint.Controlled;
+                    var args = op1.__DataIn__((controls, target));
+                    var expected = new RuntimeMetadata()
+                    {
+                        Label = "H",
+                        FormattedNonQubitArgs = "",
+                        IsAdjoint = false,
+                        IsControlled = true,
+                        IsMeasurement = false,
+                        IsComposite = false,
+                        Children = null,
+                        Controls = controls,
+                        Targets = new List<Qubit>() { target },
+                    };
+
+                    Assert.Equal(op1.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op2.GetRuntimeMetadata(args), expected);
+                    Assert.Equal(op3.GetRuntimeMetadata(args), expected);
+                }
+                finally
+                {
+                    sim3.Dispose();
+                    sim2.Dispose();
+                    sim1.Dispose();
+                }
             }
         }
     }
