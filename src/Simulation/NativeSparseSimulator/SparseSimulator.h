@@ -546,24 +546,20 @@ public:
 	unsigned M(logical_qubit_id target) {
 		// Do nothing if the qubit is known to be 0
 		if (!_occupied_qubits[target]){ 
-			return false;
+			return 0;
 		}
 		// If we get a measurement, we take it as soon as we can
 		_execute_queued_ops(target, OP::Ry);
 		// If we measure 0, then this resets the occupied qubit register
-		if (_quantum_state->M(target)){
-			_set_qubit_to_nonzero(target);
-		} else {
+		unsigned res = _quantum_state->M(target);
+		if (res == 0)
 			_set_qubit_to_zero(target);
-		}
-		return _occupied_qubits[target];
-
+		return res;
 	}
 
 	void Reset(logical_qubit_id target) {
 		if (!_occupied_qubits[target]){ return; }
-		// If we get a measurement, we take it as soon as we can
-			_execute_queued_ops(target, OP::Ry);
+		_execute_queued_ops(target, OP::Ry);
 		_quantum_state->Reset(target);
 		_set_qubit_to_zero(target);
 	}

@@ -417,12 +417,7 @@ public:
     }
 
 
-    bool M(logical_qubit_id target) {
-        qubit_label flip = qubit_label();
-        flip.set(target);
-
-        bool result = _qubit_data.begin()->first[target];
-        
+    unsigned M(logical_qubit_id target) {
         double zero_probability = 0.0;
         double one_probability = 0.0;
 
@@ -444,11 +439,12 @@ public:
             }
         }
         // Randomly select
-        result = (_rng() <= one_probability);
+        unsigned result = (_rng() <= one_probability) ? 1 : 0;
+        std::cout << "***Measuring qubit. P(1)=" << one_probability << "; " << result << std::endl;
 
-        wavefunction &new_qubit_data = result ? ones : zeros;
+        wavefunction &new_qubit_data = (result == 1) ? ones : zeros;
         // Create a new, normalized state
-        double normalizer = 1.0/std::sqrt((result) ? one_probability : zero_probability);
+        double normalizer = 1.0/std::sqrt((result == 1) ? one_probability : zero_probability);
         for (auto current_state = (new_qubit_data).begin(); current_state != (new_qubit_data).end(); ++current_state) {
             current_state->second *= normalizer;
         }
@@ -458,9 +454,6 @@ public:
     }
 
     void Reset(logical_qubit_id target) {
-        qubit_label flip = qubit_label(0);
-        flip.set(target);
-
         double zero_probability = 0.0;
         double one_probability = 0.0;
 
