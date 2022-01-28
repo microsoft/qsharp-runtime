@@ -263,7 +263,12 @@ public:
 		if (_queue_H[target]){
 			// The phase added does not depend on the target
 			// Thus we use one of the controls as a target
-			_queued_operations.push_back(operation(OP::MCZ, controls[0], controls));
+			if (controls.size() == 1)
+				_queued_operations.push_back(operation(OP::Z, controls[0]));
+			else if (controls.size() > 1)
+				_queued_operations.push_back(operation(OP::MCZ, controls[0], controls));
+			else
+				throw std::runtime_error("Called MCY without control qubits.");
 		}
 		_queued_operations.push_back(operation(OP::MCY, target, controls));
 		_set_qubit_to_nonzero(target);
@@ -310,13 +315,14 @@ public:
 		if (count > 1) {
 			_execute_queued_ops(controls, OP::Ry);
 			_execute_queued_ops(target, OP::Ry);
-		} else if (count == 1){
+		} else if (count == 1) {
 			// Transform to an MCX, but we need to swap one of the controls
-			// with the target
+			// with the target if the Hadamard is on one of the control qubits
 			std::vector<logical_qubit_id> new_controls(controls);
-			for (logical_qubit_id control : controls){
-				if (_queue_H[control]){
-					std::swap(new_controls[control], target);
+			for (std::size_t i = 0; i < new_controls.size(); ++i){
+				if (_queue_H[new_controls[i]]){
+					std::swap(new_controls[i], target);
+					break;
 				}
 			}
 			_queued_operations.push_back(operation(OP::MCX, target, new_controls));
