@@ -88,7 +88,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         private static extern void MCR_cpp(SimulatorIdType sim, int basis, double angle, int length, QubitIdType[] controls, QubitIdType target);
 
         [DllImport(simulatorDll)]
-        private static extern void MCR1_cpp(SimulatorIdType sim, int basis, double angle, int length, QubitIdType[] controls, QubitIdType target);
+        private static extern void MCR1_cpp(SimulatorIdType sim, double angle, int length, QubitIdType[] controls, QubitIdType target);
 
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "S")]
         // private static extern void SNative(uint id, uint qubit);
