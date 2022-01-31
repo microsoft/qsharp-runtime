@@ -667,8 +667,13 @@ public:
 	}
 
 	// Dumps all the states in superposition via a callback function
-	void dump_all(logical_qubit_id max_qubit_id, void (*callback)(char*, double, double)) {
+	void dump_all(void (*callback)(char*, double, double)) {
 		_execute_queued_ops();
+		logical_qubit_id max_qubit_id = 0;
+		for (std::size_t i = 0; i < _occupied_qubits.size(); ++i) {
+			if (_occupied_qubits[i])
+				max_qubit_id = i;
+		}
 		_quantum_state->dump_all(max_qubit_id, callback);
 	}
 

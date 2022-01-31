@@ -172,9 +172,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
         protected override void sim_Dump(DumpCallback callback)
         {
             // sim_DumpNative(this.Id, callback);
-            // private static extern void Dump_cpp(SimulatorIdType sim, QubitIdType max_qubits, DumpCallback callback);
-            // TODO(rokuzmin)
-            throw new UnsupportedOperationException();
+            // void Dump_cpp(simulator_id_type sim_id, _In_ logical_qubit_id max_qubit_id, _In_ void (*callback)(char* , double, double))
+            Dump_cpp(this.Id, callback);
         }
 
         protected override bool sim_DumpQubits(uint count, uint[] ids, DumpCallback callback)
@@ -184,10 +183,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // private delegate void DumpCallback(StringBuilder label, double real, double img);
             // private static extern bool DumpQubits_cpp(SimulatorIdType sim, int length, QubitIdType[] qubit_ids, DumpCallback callback);
             
-            // return DumpQubits_cpp(this.Id, (int)count, ids, callback);
-
-            // TODO(rokuzmin)
-            throw new UnsupportedOperationException();
+            // bool DumpQubits_cpp(
+            //    simulator_id_type sim_id,
+            //    _In_ logical_qubit_id n,
+            //    _In_reads_(n) logical_qubit_id* q,
+            //    _In_ void (*callback)(char* , double, double))
+            QubitIdType[] qs = ids.Select(q => (QubitIdType)q).ToArray();
+            return DumpQubits_cpp(this.Id, (int)count, qs, callback);
         }
 
         protected override void MCT(uint count, uint[] ctrls, uint qubit)
