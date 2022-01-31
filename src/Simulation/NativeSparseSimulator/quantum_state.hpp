@@ -797,15 +797,15 @@ public:
     void R(Gates::Basis b, double phi, logical_qubit_id index){
         // Z rotation can be done in-place
         if (b == Gates::Basis::PauliZ) {
-            amplitude exp_0 = amplitude(std::cos(phi / 2.0), -std::sin(phi / 2.0));
-            amplitude exp_1 = amplitude(std::cos(phi / 2.0), std::sin(phi / 2.0));
+            amplitude exp_0 = std::polar(1.0, -0.5*phi);
+            amplitude exp_1 = std::polar(1.0, 0.5*phi);
             for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
                 current_state->second *= current_state->first[index] ? exp_1 : exp_0;
             }
         }
         else if (b == Gates::Basis::PauliX || b == Gates::Basis::PauliY) {
             amplitude M00 = std::cos(phi / 2.0);
-            amplitude M01 = -std::sin(phi / 2.0) * (b == Gates::Basis::PauliY ? 1 : 1i);
+            amplitude M01 = -1i*std::sin(0.5 * phi) * (b == Gates::Basis::PauliY ? -1i : 1);
             if (std::norm(M00) < _rotation_precision_squared){
                 // This is just a Y or X gate
                 phase_and_permute(std::list<operation>{operation(b==Gates::Basis::PauliY ? OP::Y : OP::X, index)});
@@ -815,7 +815,7 @@ public:
                 return;
             }
 
-            amplitude M10 = M01 * amplitude(b == Gates::Basis::PauliY ? -1 : 1);
+            amplitude M10 = M01 * (b == Gates::Basis::PauliY ? -1. : 1.);
             // Holds the amplitude of the new state to make it easier to check if it's non-zero
             amplitude new_state;
             qubit_label flip(0);
@@ -854,8 +854,8 @@ public:
         qubit_label checks = _get_mask(controls);
         // A Z-rotation can be done without recreating the wavefunction
         if (b == Gates::Basis::PauliZ) {
-            amplitude exp_0 = amplitude(std::cos(phi / 2.0), -std::sin(phi / 2.0));
-            amplitude exp_1 = amplitude(std::cos(phi / 2.0), std::sin(phi / 2.0));
+            amplitude exp_0 = std::polar(1.0, -0.5*phi);
+            amplitude exp_1 = std::polar(1.0, 0.5*phi);
             for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
                 if ((current_state->first & checks)==checks){
                     current_state->second *= current_state->first[target] ? exp_1 : exp_0;
@@ -864,21 +864,21 @@ public:
         }
         // X or Y requires a new wavefunction
         else if (b == Gates::Basis::PauliX || b == Gates::Basis::PauliY) {
-            amplitude M00 = std::cos(phi / 2.0);
-            amplitude M01 = -std::sin(phi / 2.0) * (b == Gates::Basis::PauliY ? 1 : 1i);
+            amplitude M00 = std::cos(0.5 * phi);
+            amplitude M01 = -1i*std::sin(0.5 * phi) * (b == Gates::Basis::PauliY ? -1i : 1);
             amplitude M10 = (b == Gates::Basis::PauliY ? -1.0 : 1.0) * M01;
 
             if (std::norm(M00) < _rotation_precision_squared){
                 // This is just an MCY or MCX gate, but with a phase
                 // So we need to preprocess with a multi-controlled phase
                 if (b==Gates::Basis::PauliY){
-                    amplitude phase = -1i*std::sin(phi / 2.0);
+                    amplitude phase = -1i*std::sin(0.5 * phi);
                     phase_and_permute(std::list<operation>{
                         operation(OP::MCPhase, controls[0], controls, phase),
                         operation(OP::MCY, target, controls)
                     });
                 } else {
-                    amplitude phase = -1i*std::sin(phi / 2.0);
+                    amplitude phase = -1i*std::sin(0.5 * phi);
                     phase_and_permute(std::list<operation>{
                         operation(OP::MCPhase, controls[0], controls, phase),
                         operation(OP::MCX, target, controls)

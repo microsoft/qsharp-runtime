@@ -358,11 +358,11 @@ public:
 	
 
 	void R1(double const& angle, logical_qubit_id index) {
-		Phase(amplitude(std::cos(angle), std::sin(angle)), index);
+		Phase(std::polar(1.0, angle), index);
 	}
 
 	void MCR1(std::vector<logical_qubit_id> const& controls, double const& angle, logical_qubit_id target){
-		MCPhase(controls, amplitude(std::cos(angle), std::sin(angle)), target);
+		MCPhase(controls, std::polar(1.0, angle), target);
 	}
 
 	void R1Frac(std::int64_t numerator, std::int64_t power, logical_qubit_id index) {
@@ -426,9 +426,9 @@ public:
 		if (b == Gates::Basis::PauliI){
 			// Controlled I rotations are equivalent to controlled phase gates
 			if (controls.size() > 1){
-				MCPhase(controls, amplitude(std::cos(phi),std::sin(phi)), controls[0]);
+				MCPhase(controls, std::polar(1.0, phi), controls[0]);
 			} else {
-				Phase(amplitude(std::cos(phi),std::sin(phi)), controls[0]);
+				Phase(std::polar(1.0, phi), controls[0]);
 			}
 			return;
 		}
