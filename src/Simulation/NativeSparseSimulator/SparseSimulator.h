@@ -426,9 +426,9 @@ public:
 		if (b == Gates::Basis::PauliI){
 			// Controlled I rotations are equivalent to controlled phase gates
 			if (controls.size() > 1){
-				MCPhase(controls, std::polar(1.0, phi), controls[0]);
+				MCPhase(controls, std::polar(1.0, -phi), controls[0]);
 			} else {
-				Phase(std::polar(1.0, phi), controls[0]);
+				Phase(std::polar(1.0, -phi), controls[0]);
 			}
 			return;
 		}
