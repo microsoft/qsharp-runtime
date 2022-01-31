@@ -146,8 +146,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             // private static extern bool Measure_cpp(SimulatorIdType sim, int length, int[] basis, QubitIdType[] qubits);
             int[] bases = b.Cast<int>().ToArray();
             QubitIdType[] qids = ids.Select(c => (QubitIdType)c).ToArray();
-            System.Console.WriteLine("CS-Sparse->Measure() called.");
-            System.Console.Out.Flush();
             return Measure_cpp(this.Id, (int)n, bases, qids);
         }
 
@@ -162,13 +160,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
         protected override void MCS(uint count, uint[] ctrls, uint qubit)
         {
             QubitIdType[] controls = ctrls.Select(c => (QubitIdType)c).ToArray();
-            MCR1_cpp(this.Id, 2, 0.5*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
+            MCR1_cpp(this.Id, 0.5*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCAdjS(uint count, uint[] ctrls, uint qubit)
         {
             QubitIdType[] controls = ctrls.Select(c => (QubitIdType)c).ToArray();
-            MCR1_cpp(this.Id, 2, -0.5*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
+            MCR1_cpp(this.Id, -0.5*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void sim_Dump(DumpCallback callback)
@@ -195,13 +193,13 @@ namespace Microsoft.Quantum.Simulation.Simulators
         protected override void MCT(uint count, uint[] ctrls, uint qubit)
         {
             QubitIdType[] controls = ctrls.Select(c => (QubitIdType)c).ToArray();
-            MCR1_cpp(this.Id, 2, 0.25*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
+            MCR1_cpp(this.Id, 0.25*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCAdjT(uint count, uint[] ctrls, uint qubit)
         {
             QubitIdType[] controls = ctrls.Select(c => (QubitIdType)c).ToArray();
-            MCR1_cpp(this.Id, 2, -0.25*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
+            MCR1_cpp(this.Id, -0.25*System.Math.PI, (int)count, controls, (QubitIdType)qubit);
         }
 
         protected override void MCY(uint count, uint[] ctrls, uint qubit)
