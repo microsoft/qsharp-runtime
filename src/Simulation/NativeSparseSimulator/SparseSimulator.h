@@ -336,7 +336,7 @@ public:
 	// Any phase gate
 	void Phase(amplitude const& phase, logical_qubit_id index) {
 		// Rx, Ry, and H do not commute well with arbitrary phase gates
-		if (_queue_Ry[index] || _queue_Ry[index] || _queue_H[index]){
+		if (_queue_Ry[index] || _queue_Rx[index] || _queue_H[index]){
 			_execute_queued_ops(index, OP::Ry);
 		}
 		_queued_operations.push_back(operation(OP::Phase, index, phase));
