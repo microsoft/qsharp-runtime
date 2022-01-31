@@ -129,7 +129,7 @@ extern "C"
         _In_reads_(n) int* b,
         _In_reads_(n) logical_qubit_id* q);
 
-    MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ logical_qubit_id max_qubit_id, _In_ void (*callback)(char*, double, double));
+    MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ void (*callback)(char*, double, double));
     MICROSOFT_QUANTUM_DECL bool DumpQubits_cpp(
         simulator_id_type sim_id,
         _In_ logical_qubit_id n,

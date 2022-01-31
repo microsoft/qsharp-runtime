@@ -159,7 +159,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "Dump")]
         // private static extern void sim_DumpNative(uint id, DumpCallback callback);
         [DllImport(simulatorDll)]
-        private static extern void Dump_cpp(SimulatorIdType sim, QubitIdType max_qubits, DumpCallback callback);
+        private static extern void Dump_cpp(SimulatorIdType sim, DumpCallback callback);
 
         // [DllImport(QSIM_DLL_NAME, ExactSpelling = true, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DumpQubits")]
         // private static extern bool sim_DumpQubitsNative(uint id, uint cout, uint[] ids, DumpCallback callback);

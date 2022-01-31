@@ -253,8 +253,8 @@ extern "C"
     // Iterates through the entire wavefunction and calls `callback` on every state in the superposition
     // It will write the label of the state, in binary, from qubit 0 to `max_qubit_id`, into the char* pointer, then call `callback`
     //  with the real and complex values as the double arguments
-     MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ logical_qubit_id max_qubit_id, _In_ void (*callback)(char* , double, double)){
-        return getSimulator(sim_id)->dump_all(max_qubit_id, callback);
+     MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ void (*callback)(char* , double, double)){
+        return getSimulator(sim_id)->dump_all(callback);
      }
 
      // Same as Dump_cpp, but only dumps the wavefunction on the qubits in `q`, ensuring they are separable from the rest of the state first
