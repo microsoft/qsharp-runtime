@@ -1007,6 +1007,25 @@ public:
         return true;
     }
 
+    // Checks whether a qubit is classical
+    // result.first is true iff it is classical
+    // result.second holds its classical value if result.first == true
+    std::pair<bool,bool> is_qubit_classical(logical_qubit_id target){
+        bool value_found = false;
+        bool value = false;
+        for (auto current_state = _qubit_data.begin(); current_state != _qubit_data.end(); ++current_state){
+            if (std::norm(current_state->second) > _precision) {
+                if (!value_found) {
+                    value_found = true;
+                    value = current_state->first[target];
+                }
+                else if (value != current_state->first[target])
+                    return std::make_pair(false, false);
+            }
+        }
+        return std::make_pair(true, value);
+    }
+
     // Creates a new wavefunction hash map indexed by strings
     // Not intended for computations but as a way to transfer between
     // simulators templated with different numbers of qubits

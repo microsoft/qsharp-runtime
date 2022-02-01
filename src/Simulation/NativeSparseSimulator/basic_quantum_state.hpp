@@ -61,6 +61,7 @@ public:
     virtual void MCH(std::vector<logical_qubit_id> const& controls, logical_qubit_id index) = 0;
 
     virtual bool is_qubit_zero(logical_qubit_id)  = 0;
+    virtual std::pair<bool,bool> is_qubit_classical(logical_qubit_id) = 0;
 
     virtual universal_wavefunction get_universal_wavefunction() = 0;
 
