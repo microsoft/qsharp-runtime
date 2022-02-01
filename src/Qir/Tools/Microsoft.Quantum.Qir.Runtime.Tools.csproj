@@ -36,7 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.22.185305-beta" />
+    <PackageReference Include="Microsoft.Quantum.QirGeneration" Version="0.22.189218-beta" />
   </ItemGroup>
 
   <ItemGroup>
