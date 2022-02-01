@@ -168,13 +168,16 @@ public:
 			// If not zero here, we must execute any remaining operations
 			// Then check if the result is all zero
 			_execute_queued_ops(qubit_id);
-			
-			if (!_quantum_state->is_qubit_zero(qubit_id)){
+			auto is_classical = _quantum_state->is_qubit_classical(qubit_id);
+			if (!is_classical.first){ // qubit isn't classical
 				_quantum_state->Reset(qubit_id);
 				_set_qubit_to_zero(qubit_id);
 				return false;
 			}
-
+			else if (is_classical.second) {// qubit is in |1>
+				X(qubit_id); // reset to |0> and release
+				_execute_queued_ops(qubit_id);
+			}
 		}
 		_set_qubit_to_zero(qubit_id);
 		return true;	
