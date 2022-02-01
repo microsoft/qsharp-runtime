@@ -663,7 +663,7 @@ public:
     // Dumps the state of a subspace of particular qubits, if they are not entangled
     // This requires it to detect if the subspace is entangled, construct a new 
     // projected wavefunction, then call the `callback` function on each state.
-    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(char*, double, double)) {
+    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(unsigned, double, double)) {
         // Create two wavefunctions
         // check if they are tensor products
         wavefunction dump_wfn;
@@ -671,21 +671,22 @@ public:
         if (!_split_wavefunction(_get_mask(qubits), dump_wfn, leftover_wfn)){
             return false;
         } else {
-            _DumpWavefunction_base(dump_wfn, [qubits, callback](qubit_label label, amplitude val){ 
-                std::string label_string(qubits.size(), '0');
-                for (size_t i=0; i < qubits.size(); i++){
-                    label_string[i] = label[qubits[i]] ? '1' : '0';
-                }
-                callback(const_cast<char *>(label_string.c_str()), val.real(), val.imag());
+            _DumpWavefunction_base(dump_wfn, [qubits, callback](qubit_label label, amplitude val){
+                callback(label.to_ulong(), val.real(), val.imag());
             });
             return true;
         }
     }
 
     // Dumps all the states in superposition via a callback function
-    void dump_all(logical_qubit_id max_qubit_id, void (*callback)(char*, double, double)) {
-        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback](qubit_label label, amplitude val){
-            callback(const_cast<char *>(label.to_string().substr(num_qubits - 1 - max_qubit_id, max_qubit_id + 1).c_str()), val.real(), val.imag());
+    void dump_all(logical_qubit_id max_qubit_id, void (*callback)(unsigned, double, double)) {
+        qubit_label mask;
+        for (std::size_t i = 0; i < mask.size() && i <= max_qubit_id; ++i)
+            mask[i] = 1;
+        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback, mask](qubit_label label, amplitude val){
+            qubit_label masked = mask & label;
+            auto ilabel = masked.to_ulong();
+            callback(ilabel, val.real(), val.imag());
         });
     }
 
@@ -1134,19 +1135,19 @@ private:
     // It first sorts the labels before outputting
     void _DumpWavefunction_base(wavefunction &wfn, std::function<void(qubit_label,amplitude)> output){
         if (wfn.size() == 0){ return; }
-        std::vector<qubit_label> sortedLabels;
-        sortedLabels.reserve(wfn.size());
+        using pair_t = std::pair<qubit_label, amplitude>;
+        std::vector<pair_t> sortedByLabels;
+        sortedByLabels.reserve(wfn.size());
         for (auto current_state = (wfn).begin(); current_state != (wfn).end(); ++current_state) {
-            sortedLabels.push_back(current_state->first);
+            sortedByLabels.push_back(*current_state);
         }
         std::sort(
-            sortedLabels.begin(), 
-            sortedLabels.end(),
-            [](const qubit_label& lhs, const qubit_label& rhs){return lhs < rhs;});
+            sortedByLabels.begin(), 
+            sortedByLabels.end(),
+            [](const pair_t& lhs, const pair_t& rhs){return lhs.first < rhs.first;});
         amplitude val;
-        for (qubit_label label : sortedLabels){
-            output(label, _qubit_data.find(label)->second);
-            
+        for (pair_t entry : sortedByLabels){
+            output(entry.first, entry.second);
         }
     }
 

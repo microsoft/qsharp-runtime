@@ -661,13 +661,13 @@ public:
 	// Dumps the state of a subspace of particular qubits, if they are not entangled
 	// This requires it to detect if the subspace is entangled, construct a new 
 	// projected wavefunction, then call the `callback` function on each state.
-	bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(char*, double, double)) {
+	bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(unsigned, double, double)) {
 		_execute_queued_ops(qubits, OP::Ry);
 		return _quantum_state->dump_qubits(qubits, callback);
 	}
 
 	// Dumps all the states in superposition via a callback function
-	void dump_all(void (*callback)(char*, double, double)) {
+	void dump_all(void (*callback)(unsigned, double, double)) {
 		_execute_queued_ops();
 		logical_qubit_id max_qubit_id = 0;
 		for (std::size_t i = 0; i < _occupied_qubits.size(); ++i) {
