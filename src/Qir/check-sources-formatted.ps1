@@ -14,7 +14,7 @@ if (-not $IsMacOS) {   # We do not control the clang-format version on MacOS, an
 
     $clangFormatCommand = "clang-format"
     if(($IsLinux) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin")))) {
-        $script:clangFormatCommand = "clang-format-11"
+        $script:clangFormatCommand = "clang-format-13"
     }
 
     $OldErrorActionPreference = $ErrorActionPreference
