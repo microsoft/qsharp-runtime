@@ -158,10 +158,10 @@ namespace Quantum
         void DumpState()
         {
             std::cout << "*********************" << std::endl;
-            this->GetState([](size_t idx, double re, double im) {
+            this->GetState([](const char* idx, double re, double im) {
                 if (!Close(re, 0.0) || !Close(im, 0.0))
                 {
-                    std::cout << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
+                    std::cout << "|" << idx << ">: " << re << "+" << im << "i" << std::endl;
                 }
                 return true;
             });
@@ -224,9 +224,9 @@ namespace Quantum
         }
 
         // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
-        void GetState(TGetStateCallback callback) override
+        void GetState(bool (*callback)(const char*, double, double)) override
         {
-            typedef void (*TDump)(unsigned, TGetStateCallback);
+            typedef void (*TDump)(unsigned, bool (*)(const char*, double, double));
             static TDump dump = reinterpret_cast<TDump>(this->GetProc("Dump"));
             dump(this->simulatorId, callback);
         }
