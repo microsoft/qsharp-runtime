@@ -349,7 +349,9 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
 
     dynamic_cast<IDiagnostics*>(sim.get())->GetState([](const char* idxStr, double re, double im) {
         norm += re * re + im * im;
-        size_t idx = std::stoull(idxStr);
+        size_t idx = 0;
+        for (size_t i = 0; idxStr[i] != '\0'; ++i)
+            idx |= (idxStr[i] == '1' ? 1 : 0) << i;
         REQUIRE(idx < 4);
         switch (idx)
         {
@@ -373,7 +375,9 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
 
     dynamic_cast<IDiagnostics*>(sim.get())->GetState([](const char* idxStr, double re, double im) {
         norm += re * re + im * im;
-        size_t idx = std::stoull(idxStr);
+        size_t idx = 0;
+        for (size_t i = 0; idxStr[i] != '\0'; ++i)
+            idx |= (idxStr[i] == '1' ? 1 : 0) << i;
         switch (idx)
         {
         case 4:
