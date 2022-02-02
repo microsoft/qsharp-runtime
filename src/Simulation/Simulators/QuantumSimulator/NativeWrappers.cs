@@ -107,12 +107,12 @@ namespace Microsoft.Quantum.Simulation.Simulators
             MCAdjSNative(this.Id, count, ctrls, qubit);
         }
 
-        protected virtual void sim_Dump(DumpCallback callback)
+        protected override void sim_Dump(DumpCallback callback)
         {
             sim_DumpNative(this.Id, callback);
         }
 
-        protected virtual bool sim_DumpQubits(uint count, uint[] ids, DumpCallback callback)
+        protected override bool sim_DumpQubits(uint count, uint[] ids, DumpCallback callback)
         {
             return sim_DumpQubitsNative(this.Id, count, ids, callback);
         }

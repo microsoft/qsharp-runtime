@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
-    brew install libomp
+    # Skip explicit install for testing purposes
+    # brew install libomp
 } elseif (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
     if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
         (Test-Path Env:/AGENT_OS)) {
