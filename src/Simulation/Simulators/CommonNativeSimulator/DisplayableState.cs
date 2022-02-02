@@ -54,8 +54,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             private static readonly IComparer<string> ToIntComparer =
                 Comparer<string>.Create((label1, label2) =>
-                    Comparer<int>.Default.Compare(
-                        Int32.Parse(label1), Int32.Parse(label2)
+                    Comparer<BigInteger>.Default.Compare(
+                        BigInteger.Parse(label1), BigInteger.Parse(label2)
                     )
                 );
 
@@ -137,9 +137,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public string BasisStateLabel(
                 BasisStateLabelingConvention convention, string index // index is a string of bits
             ) => convention switch
-                { // TODO: Support the different encodings and convert the binary string `index`
-                  //       to a decimal string according to BasisStateLabelingConvention.
-                  //       Possible way: bit-string -> hex-string -> BitInteger.Parse
+                {
                     BasisStateLabelingConvention.Bitstring =>
                         index,
                     BasisStateLabelingConvention.BigEndian =>
