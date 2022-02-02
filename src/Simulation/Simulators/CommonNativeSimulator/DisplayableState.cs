@@ -143,11 +143,31 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     BasisStateLabelingConvention.Bitstring =>
                         index,
                     BasisStateLabelingConvention.BigEndian =>
-                        index,
+                        DecimalFromBitString(index),
                     BasisStateLabelingConvention.LittleEndian =>
-                        index,
+                        DecimalFromBitString(index, false),
                     _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")
                 };
+
+            /// <summary>
+            ///     Convert a bitstring string to a string containing the decimal number
+            ///     that corresponds to the bitstring.
+            /// </summary>
+            private string DecimalFromBitString(string bitString, bool bigEndian=true)
+            {
+                var integer = BigInteger.Zero;
+
+                foreach (var c in (bigEndian ? bitString : bitString.Reverse()))
+                {
+                    integer <<= 1;
+                    if (c == '1')
+                    {
+                        integer |= 1;
+                    }
+                }
+
+                return integer.ToString();
+            }
 
             /// <summary>
             /// Returns a string that represents the magnitude of the  amplitude.
