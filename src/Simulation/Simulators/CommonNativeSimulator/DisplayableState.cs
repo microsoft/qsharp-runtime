@@ -86,7 +86,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     <see cref="Microsoft.Quantum.Simulation.Simulators.CommonNativeSimulator.StateDumper.Dump" />.
             /// </remarks>
             [JsonProperty("amplitudes")]
-            public IDictionary<int, Complex>? Amplitudes { get; set; }
+            public IDictionary<string, Complex>? Amplitudes { get; set; }
 
             /// <summary>
             ///     An enumerable source of the significant amplitudes of this state
@@ -135,27 +135,17 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     into an integer index in the little-endian encoding.
             /// </summary>
             public string BasisStateLabel(
-                BasisStateLabelingConvention convention, int index
+                BasisStateLabelingConvention convention, string index // index is a string of bits
             ) => convention switch
-                {
+                { // TODO: Support the different encodings and convert the binary string `index`
+                  //       to a decimal string according to BasisStateLabelingConvention.
+                  //       Possible way: bit-string -> hex-string -> BitInteger.Parse
                     BasisStateLabelingConvention.Bitstring =>
-                        String.Concat(
-                            System
-                                .Convert
-                                .ToString(index, 2)
-                                .PadLeft(NQubits, '0')
-                                .Reverse()
-                        ),
+                        index,
                     BasisStateLabelingConvention.BigEndian =>
-                        System.Convert.ToInt64(
-                            String.Concat(
-                                System.Convert.ToString(index, 2).PadLeft(NQubits, '0').Reverse()
-                            ),
-                            fromBase: 2
-                        )
-                        .ToString(),
+                        index,
                     BasisStateLabelingConvention.LittleEndian =>
-                        index.ToString(),
+                        index,
                     _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")
                 };
 
