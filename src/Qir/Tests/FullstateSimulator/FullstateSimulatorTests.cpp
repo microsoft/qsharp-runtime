@@ -351,7 +351,9 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
         norm += re * re + im * im;
         size_t idx = 0;
         for (size_t i = 0; idxStr[i] != '\0'; ++i)
-            idx |= (idxStr[i] == '1' ? 1 : 0) << i;
+        {
+            idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
+        }
         REQUIRE(idx < 4);
         switch (idx)
         {
@@ -377,7 +379,9 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
         norm += re * re + im * im;
         size_t idx = 0;
         for (size_t i = 0; idxStr[i] != '\0'; ++i)
-            idx |= (idxStr[i] == '1' ? 1 : 0) << i;
+        {
+            idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
+        }
         switch (idx)
         {
         case 4:
