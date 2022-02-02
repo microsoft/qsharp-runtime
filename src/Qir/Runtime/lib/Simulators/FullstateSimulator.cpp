@@ -224,9 +224,9 @@ namespace Quantum
         }
 
         // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
-        void GetState(bool (*callback)(const char*, double, double)) override
+        void GetState(TGetStateCallback callback) override
         {
-            typedef void (*TDump)(unsigned, bool (*)(const char*, double, double));
+            typedef void (*TDump)(unsigned, TGetStateCallback);
             static TDump dump = reinterpret_cast<TDump>(this->GetProc("Dump"));
             dump(this->simulatorId, callback);
         }
