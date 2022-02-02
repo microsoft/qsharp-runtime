@@ -290,7 +290,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return psi.data().data();
     }
 
-    void dump(bool (*callback)(size_t, double, double))
+    void dump(bool (*callback)(const char*, double, double))
     {
         recursive_lock_type l(getmutex());
         flush();
@@ -298,7 +298,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         auto wfn = psi.data();
         for (std::size_t i = 0; i < wfn.size(); i++)
         {
-            if (!callback(i, wfn[i].real(), wfn[i].imag())) return;
+            if (!callback(std::to_string(i).c_str(), wfn[i].real(), wfn[i].imag())) return;
         }
     }
 
@@ -345,7 +345,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         }
     }
 
-    bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(size_t, double, double))
+    bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(const char*, double, double))
     {
         assert(qs.size() <= num_qubits());
 
@@ -355,7 +355,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         {
             for (std::size_t i = 0; i < wfn.size(); i++)
             {
-                if (!callback(i, wfn[i].real(), wfn[i].imag())) break;
+                if (!callback(std::to_string(i).c_str(), wfn[i].real(), wfn[i].imag())) break;
             }
             return true;
         }

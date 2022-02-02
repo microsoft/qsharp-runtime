@@ -663,7 +663,7 @@ public:
     // Dumps the state of a subspace of particular qubits, if they are not entangled
     // This requires it to detect if the subspace is entangled, construct a new 
     // projected wavefunction, then call the `callback` function on each state.
-    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(unsigned, double, double)) {
+    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(const char*, double, double)) {
         // Create two wavefunctions
         // check if they are tensor products
         wavefunction dump_wfn;
@@ -672,21 +672,19 @@ public:
             return false;
         } else {
             _DumpWavefunction_base(dump_wfn, [qubits, callback](qubit_label label, amplitude val){
-                callback(label.to_ulong(), val.real(), val.imag());
+                std::string masked(qubits.size(),'0');
+                for (std::size_t i = 0; i < qubits.size(); ++i)
+                    masked[i] = label[qubits[i]] ? '1' : '0';
+                callback(masked.c_str(), val.real(), val.imag());
             });
             return true;
         }
     }
 
     // Dumps all the states in superposition via a callback function
-    void dump_all(logical_qubit_id max_qubit_id, void (*callback)(unsigned, double, double)) {
-        qubit_label mask;
-        for (std::size_t i = 0; i < mask.size() && i <= max_qubit_id; ++i)
-            mask[i] = 1;
-        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback, mask](qubit_label label, amplitude val){
-            qubit_label masked = mask & label;
-            auto ilabel = masked.to_ulong();
-            callback(ilabel, val.real(), val.imag());
+    void dump_all(logical_qubit_id max_qubit_id, void (*callback)(const char*, double, double)) {
+        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback](qubit_label label, amplitude val){
+            callback(label.to_string().substr(num_qubits-1-max_qubit_id).c_str(), val.real(), val.imag());
         });
     }
 
