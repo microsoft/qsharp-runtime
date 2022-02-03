@@ -126,7 +126,7 @@ TEST_CASE("Arrays: one dimensional", "[qir_support]")
 
 TEST_CASE("Arrays: multiple dimensions", "[qir_support]")
 {
-    const size_t count = 5 * 3 * 4; // 60
+    const size_t count = (size_t)(5 * 3 * 4); // 60
     QirArray* a        = __quantum__rt__array_create(sizeof(int), 3, (int64_t)5, (int64_t)3, (int64_t)4);
     REQUIRE(__quantum__rt__array_get_dim(a) == 3);
     REQUIRE(__quantum__rt__array_get_size(a, 0) == 5);
