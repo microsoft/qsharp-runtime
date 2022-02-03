@@ -805,11 +805,11 @@ public:
         else if (b == Gates::Basis::PauliX || b == Gates::Basis::PauliY) {
             amplitude M00 = std::cos(phi / 2.0);
             amplitude M01 = -1i*std::sin(0.5 * phi) * (b == Gates::Basis::PauliY ? -1i : 1);
-            if (std::norm(M00) < _rotation_precision){
+            if (std::norm(M00) <= _rotation_precision){
                 // This is just a Y or X gate
                 phase_and_permute(std::list<operation>{operation(b==Gates::Basis::PauliY ? OP::Y : OP::X, index)});
                 return;
-            } else if (std::norm(M01) < _rotation_precision){
+            } else if (std::norm(M01) <= _rotation_precision){
                 // just an identity
                 return;
             }
@@ -867,7 +867,7 @@ public:
             amplitude M01 = -1i*std::sin(0.5 * phi) * (b == Gates::Basis::PauliY ? -1i : 1);
             amplitude M10 = (b == Gates::Basis::PauliY ? -1.0 : 1.0) * M01;
 
-            if (std::norm(M00) < _rotation_precision){
+            if (std::norm(M00) <= _rotation_precision){
                 // This is just an MCY or MCX gate, but with a phase
                 // So we need to preprocess with a multi-controlled phase
                 if (b==Gates::Basis::PauliY){
@@ -884,7 +884,7 @@ public:
                     });
                 }
                 return;
-            } else if (std::norm(M01) < _rotation_precision){
+            } else if (std::norm(M01) <= _rotation_precision){
                 phase_and_permute(std::list<operation>{operation(OP::MCPhase, controls[0], controls, M00)});
                 return;
             }
@@ -1050,10 +1050,10 @@ private:
     std::function<double()> _rng;
 
     // Threshold to assert that something is zero when asserting it is 0
-    double _precision = 1e-10;
+    double _precision = 1e-11;
     // Threshold at which something is zero when
     // deciding whether to add it into the superposition
-    double _rotation_precision = 1e-10;
+    double _rotation_precision = 1e-11;
 
     // Normalizer for H and T gates (1/sqrt(2) as an amplitude)
     const amplitude _normalizer = amplitude(1.0, 0.0) / std::sqrt(2.0);
@@ -1095,6 +1095,9 @@ private:
         wfn2 = wavefunction((int)std::sqrt(_qubit_data.size()));
         // base_label_1 = b1 and base_label_2 = b2 in the notation above
         auto base_state = _qubit_data.begin();
+        for (; base_state != _qubit_data.end() && std::norm(base_state->second) <= _precision; ++base_state);
+        if (base_state == _qubit_data.end())
+            throw std::runtime_error("Invalid state: All amplitudes are ~ zero.");
         qubit_label base_label_1 = base_state->first & first_mask;
         qubit_label base_label_2 = base_state->first & second_mask;
         // base_val = a_bb
@@ -1102,6 +1105,7 @@ private:
         double norm1 = 1., norm2 = 1.;
         wfn1[base_label_1] = 1.;
         wfn2[base_label_2] = 1.;
+        std::size_t num_nonzero_states = 1;
         // From here on, base_state is |x1>|x2>
         ++base_state;
         for (; base_state != _qubit_data.end(); ++base_state){
@@ -1120,20 +1124,29 @@ private:
                 if (std::norm(first_state->second * second_state->second - base_val * base_state->second) > _precision){
                     return false;
                 } else {
+                    if (std::norm(base_state->second) <= _precision)
+                        continue;
+                    num_nonzero_states++;
                     // Not entangled so far, save the two states, with amplitudes a_xx/a_bx and a_xx/a_xb, respectively
                     if (wfn1.find(label_1) == wfn1.end()) {
                         auto amp1 = base_state->second / second_state->second;
-                        wfn1[label_1] = amp1;
-                        norm1 += std::norm(amp1);
+                        auto nrm = std::norm(amp1);
+                        if (nrm > _precision)
+                            wfn1[label_1] = amp1;
+                        norm1 += nrm;
                     }
                     if (wfn2.find(label_2) == wfn2.end()) {
                         auto amp2 = base_state->second / first_state->second;
-                        wfn2[label_2] = amp2;
-                        norm2 += std::norm(amp2);
+                        auto nrm = std::norm(amp2);
+                        if (nrm > _precision)
+                            wfn2[label_2] = amp2;
+                        norm2 += nrm;
                     }
                 }
             }
         }
+        if (num_nonzero_states != wfn1.size()*wfn2.size())
+            return false;
         // Normalize
         for (auto current_state = wfn1.begin(); current_state != wfn1.end(); ++current_state){
             current_state->second *= 1./std::sqrt(norm1);
