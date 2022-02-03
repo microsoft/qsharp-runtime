@@ -1089,10 +1089,6 @@ private:
     // a_bb*a_xx = a_bx * a_xb. 
     // If this holds: we write (a_xx/a_bx)|x1> into the first wavefunction and (a_xx/a_xb)|x2>
     // into the second. 
-    // This means the coefficients of wfn1 are all of the form (c_x/c_b); 
-    // Thus, the norm of wfn1 will be 1/|c_b|^2; thus the norm of wfn2 is 1/|d_b|^2 = |c_b|^2/|a_bb|^2
-    // So we iterate through the smaller wavefunction, to get the normalizing constant, 
-    // then normalize both
     bool _split_wavefunction(qubit_label const& first_mask, wavefunction &wfn1, wavefunction &wfn2){
         qubit_label second_mask = ~first_mask;
         // Guesses size
