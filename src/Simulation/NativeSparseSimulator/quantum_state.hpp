@@ -1104,8 +1104,9 @@ private:
         qubit_label base_label_2 = base_state->first & second_mask;
         // base_val = a_bb
         amplitude base_val = base_state->second;
-        double normalizer_1 = 0.0;
-        double normalizer_2 = 0.0;
+        double norm1 = 1., norm2 = 1.;
+        wfn1[base_label_1] = 1.;
+        wfn2[base_label_2] = 1.;
         // From here on, base_state is |x1>|x2>
         ++base_state;
         for (; base_state != _qubit_data.end(); ++base_state){
@@ -1125,25 +1126,25 @@ private:
                     return false;
                 } else {
                     // Not entangled so far, save the two states, with amplitudes a_xx/a_bx and a_xx/a_xb, respectively
-                    wfn1[label_1] =  base_state->second / second_state->second;
-                    wfn2[label_2] =  base_state->second / first_state->second;
+                    if (wfn1.find(label_1) == wfn1.end()) {
+                        auto amp1 = base_state->second / second_state->second;
+                        wfn1[label_1] = amp1;
+                        norm1 += std::norm(amp1);
+                    }
+                    if (wfn2.find(label_2) == wfn2.end()) {
+                        auto amp2 = base_state->second / first_state->second;
+                        wfn2[label_2] = amp2;
+                        norm2 += std::norm(amp2);
+                    }
                 }
             }
         }
         // Normalize
-        // This cannot be done in the previous loop, as that loop will encounter the same data several times
-        wavefunction &smaller_wfn = (wfn1.size() < wfn2.size()) ? wfn1 : wfn2;
-        wavefunction &larger_wfn  = (wfn1.size() < wfn2.size()) ? wfn2 : wfn1;
-        for (auto current_state = smaller_wfn.begin(); current_state != smaller_wfn.end(); ++current_state){
-            normalizer_1 += std::norm(current_state->second);
+        for (auto current_state = wfn1.begin(); current_state != wfn1.end(); ++current_state){
+            current_state->second *= 1./std::sqrt(norm1);
         }
-        normalizer_2 = normalizer_1/std::norm(base_val);
-        normalizer_1 = 1.0/normalizer_1;
-        for (auto current_state = smaller_wfn.begin(); current_state != smaller_wfn.end(); ++current_state){
-            current_state->second *= normalizer_1;
-        }
-        for (auto current_state = larger_wfn.begin(); current_state != larger_wfn.end(); ++current_state){
-            current_state->second *= normalizer_2;
+        for (auto current_state = wfn2.begin(); current_state != wfn2.end(); ++current_state){
+            current_state->second *= 1./std::sqrt(norm2);
         }
         return true;
     }
