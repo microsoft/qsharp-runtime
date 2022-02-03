@@ -38,7 +38,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -80,7 +79,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: false)
             };
 
-            //using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             foreach (var sim in simulators)
             {
                 try
@@ -139,7 +137,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 new SparseSimulator2()
             };
 
-            //using (var sim = new QuantumSimulator())
             foreach (var sim in simulators)
             {
                 try
@@ -165,7 +162,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            //using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -209,7 +205,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            //using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -336,7 +331,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             TestMultiControllable(gate.Adjoint, ctrls, targets);
         }
 
-        //private void TestOne<T>(QuantumSimulator qsim, T gate, Action<T, IQArray<Qubit>, IQArray<Qubit>> action)
         private void TestOne<T>(CommonNativeSimulator qsim, T gate, Action<T, IQArray<Qubit>, IQArray<Qubit>> action)
         {
             var allocate = qsim.Get<Intrinsic.Allocate>();
@@ -379,7 +373,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     };
 
                     foreach (var qsim in simulators)
-                    // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
                     {
                         var gate = qsim.Get<IUnitary<Qubit>>(t);
                         TestOne(qsim, gate, TestUnitary);
@@ -397,7 +390,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var qsim in simulators)
-            // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             {
                 try
                 {
@@ -423,7 +415,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var qsim in simulators)
-            // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             {
                 try
                 {
@@ -460,7 +451,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var qsim in simulators)
-            // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             {
                 try
                 {
@@ -497,7 +487,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var qsim in simulators)
-            // using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
             {
                 try
                 {
