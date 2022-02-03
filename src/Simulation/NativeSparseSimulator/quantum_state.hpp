@@ -1058,7 +1058,6 @@ private:
     // Normalizer for H and T gates (1/sqrt(2) as an amplitude)
     const amplitude _normalizer = amplitude(1.0, 0.0) / std::sqrt(2.0);
 
-    // The default for bytell_hash_map
     // Used when allocating new wavefunctions
     float _load_factor = 0.9375;
 
