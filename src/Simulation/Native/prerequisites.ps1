@@ -19,12 +19,19 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
     refreshenv
 }
 else {
+    $needClang = (Get-Command clang-13 -ErrorAction SilentlyContinue)
     if (Get-Command sudo -ErrorAction SilentlyContinue) {
-        sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
+        if ($needClang) {
+            wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+            sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
+        }
         sudo apt update
         sudo apt-get install -y clang-13
     } else {
-        add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
+        if ($needClang) {
+            wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
+            add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
+        }
         apt update
         apt-get install -y clang-13
     }

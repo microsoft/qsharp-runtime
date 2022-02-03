@@ -4,15 +4,6 @@ FROM mcr.microsoft.com/vscode/devcontainers/universal:1-linux
 
 USER root
 
-RUN apt update \
-    && apt-get install -y --no-install-recommends \
-    ninja-build \
-    clang-13 \
-    clang-tidy-13 \
-    build-essential \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/
-
 # Install CMake 3.20 (required since apt-get uses 3.16 and repo requires 3.20)
 RUN curl -SsL https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5-linux-x86_64.sh -o cmakeinstall.sh \
     && echo "f582e02696ceee81818dc3378531804b2213ed41c2a8bc566253d16d894cefab cmakeinstall.sh" | sha256sum -c --strict - \
@@ -20,5 +11,4 @@ RUN curl -SsL https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3
     && ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir \
     && rm cmakeinstall.sh
 
-   
 USER codespace
