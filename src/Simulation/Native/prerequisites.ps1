@@ -19,7 +19,7 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
     refreshenv
 }
 else {
-    $needClang = (Get-Command clang-13 -ErrorAction SilentlyContinue)
+    $needClang = !(Get-Command clang-13 -ErrorAction SilentlyContinue)
     if (Get-Command sudo -ErrorAction SilentlyContinue) {
         if ($needClang) {
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
