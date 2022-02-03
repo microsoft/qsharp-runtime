@@ -39,7 +39,6 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests
             };
 
             foreach (var sim in simulators)
-            //using (var sim = new QuantumSimulator())
             {
                 try
                 {
