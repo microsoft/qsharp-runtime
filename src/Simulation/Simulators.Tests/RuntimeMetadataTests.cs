@@ -209,7 +209,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 {
                     var control = new FreeQubit(1);
                     var target = new FreeQubit(0);
-                    //var op = new QuantumSimulator().Get<Intrinsic.CNOT>();
                     var op = sim.Get<Intrinsic.CNOT>();
                     var args = op.__DataIn__((control, target));
                     var expected = new RuntimeMetadata()
@@ -249,7 +248,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     var control1 = new FreeQubit(0);
                     var control2 = new FreeQubit(2);
                     var target = new FreeQubit(1);
-                    //var op = new QuantumSimulator().Get<Intrinsic.CCNOT>();
                     var op = sim.Get<Intrinsic.CCNOT>();
                     var args = op.__DataIn__((control1, control2, target));
                     var expected = new RuntimeMetadata()
@@ -288,7 +286,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 {
                     var q1 = new FreeQubit(0);
                     var q2 = new FreeQubit(1);
-                    // var op = new QuantumSimulator().Get<Intrinsic.SWAP>();
                     var op = sim.Get<Intrinsic.SWAP>();
                     var args = op.__DataIn__((q1, q2));
                     var expected = new RuntimeMetadata()
@@ -326,7 +323,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var target = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Intrinsic.Ry>();
                     var op = sim.Get<Intrinsic.Ry>();
                     var args = op.__DataIn__((2.1, target));
                     var expected = new RuntimeMetadata()
@@ -364,7 +360,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var measureQubit = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Intrinsic.M>();
                     var op = sim.Get<Intrinsic.M>();
                     var args = op.__DataIn__(measureQubit);
                     var expected = new RuntimeMetadata()
@@ -402,7 +397,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var target = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Intrinsic.Reset>();
                     var op = sim.Get<Intrinsic.Reset>();
                     var args = op.__DataIn__(target);
                     var expected = new RuntimeMetadata()
@@ -440,7 +434,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     IQArray<Qubit> targets = new QArray<Qubit>(new[] { new FreeQubit(0) });
-                    // var op = new QuantumSimulator().Get<Intrinsic.ResetAll>();
                     var op = sim.Get<Intrinsic.ResetAll>();
                     var args = op.__DataIn__(targets);
                     var expected = new RuntimeMetadata()
@@ -481,7 +474,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var measureQubit = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Measurement.MResetX>();
                     var op = sim.Get<Measurement.MResetX>();
                     var args = op.__DataIn__(measureQubit);
                     var expected = new RuntimeMetadata()
@@ -519,7 +511,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var measureQubit = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Measurement.MResetY>();
                     var op = sim.Get<Measurement.MResetY>();
                     var args = op.__DataIn__(measureQubit);
                     var expected = new RuntimeMetadata()
@@ -557,7 +548,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var measureQubit = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Measurement.MResetZ>();
                     var op = sim.Get<Measurement.MResetZ>();
                     var args = op.__DataIn__(measureQubit);
                     var expected = new RuntimeMetadata()
@@ -598,7 +588,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var measureQubit = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Circuits.Empty>();
                     var op = sim.Get<Circuits.Empty>();
                     var args = op.__DataIn__(QVoid.Instance);
                     var expected = new RuntimeMetadata()
@@ -634,8 +623,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var q = new FreeQubit(0);
-                    // var opArg = new QuantumSimulator().Get<Circuits.HOp>();
-                    // var op = new QuantumSimulator().Get<Circuits.WrapperOp>();
                     var opArg = sim1.Get<Circuits.HOp>();
                     var op = sim2.Get<Circuits.WrapperOp>();
                     var args = op.__DataIn__((opArg, q));
@@ -674,7 +661,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 try
                 {
-                    // var op = new QuantumSimulator().Get<Circuits.NestedOp>();
                     var op = sim.Get<Circuits.NestedOp>();
                     var args = op.__DataIn__(QVoid.Instance);
                     var expected = new RuntimeMetadata()
@@ -712,7 +698,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var q = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Circuits.TwoQubitOp>();
                     var op = sim.Get<Circuits.TwoQubitOp>();
                     var args = op.__DataIn__((q, q));
                     var expected = new RuntimeMetadata()
@@ -749,7 +734,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 try
                 {
-                    // var op = new QuantumSimulator().Get<Circuits.BoolArrayOp>();
                     var op = sim.Get<Circuits.BoolArrayOp>();
                     IQArray<Boolean> bits = new QArray<Boolean>(new bool[] { false, true });
                     var args = op.__DataIn__(bits);
@@ -791,7 +775,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     Qubit target = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Tests.Circuits.FooUDTOp>();
                     var op = sim.Get<Tests.Circuits.FooUDTOp>();
                     var args = op.__DataIn__(new Circuits.FooUDT(("bar", (target, 2.1))));
                     var expected = new RuntimeMetadata()
@@ -833,7 +816,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 {
                     IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
                     Qubit target = new FreeQubit(1);
-                    // var op = new QuantumSimulator().Get<Intrinsic.H>().Controlled;
                     var op = sim.Get<Intrinsic.H>().Controlled;
                     var args = op.__DataIn__((controls, target));
                     var expected = new RuntimeMetadata()
@@ -872,7 +854,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 {
                     IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
                     Qubit target = new FreeQubit(1);
-                    // var op = new QuantumSimulator().Get<Intrinsic.X>().Controlled;
                     var op = sim.Get<Intrinsic.X>().Controlled;
                     var args = op.__DataIn__((controls, target));
                     var expected = new RuntimeMetadata()
@@ -912,7 +893,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
                     Qubit control = new FreeQubit(1);
                     Qubit target = new FreeQubit(2);
-                    // var op = new QuantumSimulator().Get<Intrinsic.CNOT>().Controlled;
                     var op = sim.Get<Intrinsic.CNOT>().Controlled;
                     var args = op.__DataIn__((controls, (control, target)));
                     var expected = new RuntimeMetadata()
@@ -954,7 +934,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Qubit control3 = new FreeQubit(2);
                     Qubit target = new FreeQubit(3);
                     IQArray<Qubit> controls = new QArray<Qubit>(new[] { control1 });
-                    // var op = new QuantumSimulator().Get<Intrinsic.CCNOT>().Controlled;
                     var op = sim.Get<Intrinsic.CCNOT>().Controlled;
                     var args = op.__DataIn__((controls, (control2, control3, target)));
                     var expected = new RuntimeMetadata()
@@ -995,7 +974,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     Qubit target = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Intrinsic.H>().Adjoint;
                     var op = sim.Get<Intrinsic.H>().Adjoint;
                     var args = op.__DataIn__(target);
                     var expected = new RuntimeMetadata()
@@ -1033,7 +1011,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     Qubit target = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Intrinsic.X>().Adjoint;
                     var op = sim.Get<Intrinsic.X>().Adjoint;
                     var args = op.__DataIn__(target);
                     var expected = new RuntimeMetadata()
@@ -1071,7 +1048,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     Qubit target = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Adjoint;
                     var op = sim.Get<Intrinsic.H>().Adjoint.Adjoint;
                     var args = op.__DataIn__(target);
                     var expected = new RuntimeMetadata()
@@ -1108,8 +1084,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 {
                     IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
                     Qubit target = new FreeQubit(1);
-                    // var op1 = new QuantumSimulator().Get<Intrinsic.H>().Controlled.Adjoint;
-                    // var op2 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Controlled;
                     var op1 = sim1.Get<Intrinsic.H>().Controlled.Adjoint;
                     var op2 = sim2.Get<Intrinsic.H>().Adjoint.Controlled;
                     var args = op1.__DataIn__((controls, target));
@@ -1150,9 +1124,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 {
                     IQArray<Qubit> controls = new QArray<Qubit>(new[] { new FreeQubit(0) });
                     Qubit target = new FreeQubit(1);
-                    // var op1 = new QuantumSimulator().Get<Intrinsic.H>().Controlled.Adjoint.Adjoint;
-                    // var op2 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Controlled.Adjoint;
-                    // var op3 = new QuantumSimulator().Get<Intrinsic.H>().Adjoint.Adjoint.Controlled;
                     var op1 = sim1.Get<Intrinsic.H>().Controlled.Adjoint.Adjoint;
                     var op2 = sim2.Get<Intrinsic.H>().Adjoint.Controlled.Adjoint;
                     var op3 = sim3.Get<Intrinsic.H>().Adjoint.Adjoint.Controlled;
@@ -1200,7 +1171,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var target = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<Intrinsic.Ry>().Partial((double d) =>
                     var op = sim.Get<Intrinsic.Ry>().Partial((double d) =>
                         new ValueTuple<double, Qubit>(d, target));
                     var args = op.__DataIn__(2.1);
@@ -1239,7 +1209,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 try
                 {
                     var target = new FreeQubit(0);
-                    // var op = new QuantumSimulator().Get<ICallable<(String, (Qubit, Double)), Circuits.FooUDT>>(typeof(Circuits.FooUDT))
                     var op = sim.Get<ICallable<(String, (Qubit, Double)), Circuits.FooUDT>>(typeof(Circuits.FooUDT))
                         .Partial<double>((double d) => (("bar", (target, d))));
                     var args = new QTuple<double>(2.1);

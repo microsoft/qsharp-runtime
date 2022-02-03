@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
 
-            // TODO(rokuzmin): Uncomment the block below once the following issue is resolved:
+            // TODO(kuzminrobin): Uncomment the block below once the following issue is resolved:
             // https://github.com/microsoft/qsharp-compiler/issues/1326
             // ProcessRunner.Run("dotnet", $"{exe} --simulator SparseSimulator2", out var _, out error, out exitCode, out ex);
             // Assert.Null(ex);

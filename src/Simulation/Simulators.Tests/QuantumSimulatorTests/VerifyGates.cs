@@ -96,7 +96,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -125,7 +124,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -155,7 +153,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -185,7 +182,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -215,7 +211,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -245,7 +240,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -275,7 +269,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -372,7 +365,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -401,7 +393,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -430,7 +421,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -461,7 +451,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -487,7 +476,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -522,7 +510,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -582,7 +569,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -619,7 +605,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {
@@ -642,7 +627,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             };
 
             foreach (var sim in simulators)
-            // using (var sim = new QuantumSimulator())
             {
                 try
                 {

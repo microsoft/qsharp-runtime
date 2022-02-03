@@ -91,7 +91,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 try
                 {
-                    // var op = new QuantumSimulator().Get<Intrinsic.H>();
                     var op = sim.Get<Intrinsic.H>();
                     var opTuple = new QTuple<(ICallable, string)>((op, "foo"));
                     Assert.Equal("(H, \"foo\")", opTuple.GetNonQubitArgumentsAsString());
@@ -167,7 +166,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             {
                 try
                 {
-                    // var op = new QuantumSimulator().Get<Intrinsic.H>();
                     var op = sim.Get<Intrinsic.H>();
                     data = new ApplyData<ICallable>(op);
                     Assert.Equal("H", data.GetNonQubitArgumentsAsString());

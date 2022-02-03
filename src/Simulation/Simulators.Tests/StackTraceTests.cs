@@ -38,7 +38,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             foreach (var sim in simulators)
             {
-                // using var sim = new QuantumSimulator();
                 try
                 {
                     IgnorableAssert.Disable();
@@ -73,7 +72,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void AlwaysFail4Test()
         {
-            //using (var sim = new QuantumSimulator())
             var simulators = new CommonNativeSimulator[] { 
                 new QuantumSimulator(),
                 new SparseSimulator2()
