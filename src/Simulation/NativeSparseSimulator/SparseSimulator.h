@@ -203,6 +203,10 @@ public:
 	// If a control index is repeated, it just treats it as one control
 	//	 (Q# will throw an error in that condition)
 	void MCX(std::vector<logical_qubit_id> const& controls, logical_qubit_id  target) {
+		if (controls.size() == 0) {
+			X(target);
+			return;
+		}
 		// Check for anything on the controls
 		if (controls.size() > 1){
 			_execute_if(controls);
@@ -257,6 +261,10 @@ public:
 	}
 
 	void MCY(std::vector<logical_qubit_id> const& controls, logical_qubit_id target) {
+		if (controls.size() == 0) {
+			Y(target);
+			return;
+		}
 		_execute_if(controls);
 		// Commutes with Ry on the target, not Rx
 		if (_queue_Rx[target]){
@@ -270,8 +278,6 @@ public:
 				_queued_operations.push_back(operation(OP::Z, controls[0]));
 			else if (controls.size() > 1)
 				_queued_operations.push_back(operation(OP::MCZ, controls[0], controls));
-			else
-				throw std::runtime_error("Called MCY without control qubits.");
 		}
 		_queued_operations.push_back(operation(OP::MCY, target, controls));
 		_set_qubit_to_nonzero(target);
@@ -299,6 +305,10 @@ public:
 	}
 
 	void MCZ(std::vector<logical_qubit_id> const& controls, logical_qubit_id target) {
+		if (controls.size() == 0) {
+			Z(target);
+			return;
+		}
 		// If the only thing on the controls is one H, we can switch
 		// this to an MCX. Any Rx or Ry, or more than 1 H, means we 
 		// must execute. 
@@ -346,6 +356,10 @@ public:
 	}
 
 	void MCPhase(std::vector<logical_qubit_id> const& controls, amplitude const& phase, logical_qubit_id target){
+		if (controls.size() == 0) {
+			Phase(phase, target);
+			return;
+		}
 		_execute_if(controls);
 		_execute_if(target);
 		_queued_operations.push_back(operation(OP::MCPhase, target, controls, phase));
@@ -365,7 +379,10 @@ public:
 	}
 
 	void MCR1(std::vector<logical_qubit_id> const& controls, double const& angle, logical_qubit_id target){
-		MCPhase(controls, std::polar(1.0, angle), target);
+		if (controls.size() > 0)
+			MCPhase(controls, std::polar(1.0, angle), target);
+		else
+			R1(angle, target);
 	}
 
 	void R1Frac(std::int64_t numerator, std::int64_t power, logical_qubit_id index) {
@@ -373,7 +390,10 @@ public:
 	}
 
 	void MCR1Frac(std::vector<logical_qubit_id> const& controls, std::int64_t numerator, std::int64_t power, logical_qubit_id target){
-		MCR1(controls, (double)numerator * pow(0.5, power) * M_PI, target);
+		if (controls.size() > 0)
+			MCR1(controls, (double)numerator * pow(0.5, power) * M_PI, target);
+		else
+			R1Frac(numerator, power, target);
 	}
 
 	void S(logical_qubit_id index) {
@@ -426,6 +446,10 @@ public:
 	}
 
 	void MCR (std::vector<logical_qubit_id> const& controls, Gates::Basis b, double phi, logical_qubit_id target) {
+		if (controls.size() == 0) {
+			R(b, phi, target);
+			return;
+		}
 		if (b == Gates::Basis::PauliI){
 			// Controlled I rotations are equivalent to controlled phase gates
 			if (controls.size() > 1){
@@ -477,6 +501,10 @@ public:
 	}
 
 	void MCExp(std::vector<logical_qubit_id> const& controls, std::vector<Gates::Basis> const& axes, double angle, std::vector<logical_qubit_id> const& qubits){
+		if (controls.size() == 0) {
+			Exp(axes, angle, qubits);
+			return;
+		}
 		amplitude cosAngle = std::cos(angle);
 		amplitude sinAngle = 1i*std::sin(angle);
 		// This does not commute nicely with anything, so we execute everything
@@ -503,6 +531,10 @@ public:
 	}
 
 	void MCH(std::vector<logical_qubit_id> const& controls, logical_qubit_id target) {
+		if (controls.size() == 0) {
+			H(target);
+			return;
+		}
 		// No commutation on controls
 		_execute_if(controls);
 		// No Ry or Rx commutation on target
@@ -535,6 +567,10 @@ public:
 	}
 
 	void CSWAP(std::vector<logical_qubit_id> const& controls, logical_qubit_id index_1, logical_qubit_id index_2){
+		if (controls.size() == 0) {
+			SWAP(index_1, index_2);
+			return;
+		}
 		if (index_1 > index_2){
 			std::swap(index_2, index_1);
 		}
