@@ -56,7 +56,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
                 .ToList();
         }
 
-        private static Parameter MakeParameter(LocalVariableDeclaration<QsLocalSymbol> parameter)
+        private static Parameter MakeParameter(LocalVariableDeclaration<QsLocalSymbol, ResolvedType> parameter)
         {
             var type = MapResolvedTypeToDataType(parameter.Type);
             var arrayType = parameter.Type.Resolution is QsTypeKind.ArrayType innerType
