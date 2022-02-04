@@ -347,55 +347,59 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     iqa->ControlledX(1, &qs[0], qs[1]);
     // 1/sqrt(2)(|00> + |11>)x|0>
 
-    dynamic_cast<IDiagnostics*>(sim.get())->GetState([](const char* idxStr, double re, double im) {
-        norm += re * re + im * im;
-        size_t idx = 0;
-        for (size_t i = 0; idxStr[i] != '\0'; ++i)
+    dynamic_cast<IDiagnostics*>(sim.get())->GetState(
+        [](const char* idxStr, double re, double im)
         {
-            idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
-        }
-        REQUIRE(idx < 4);
-        switch (idx)
-        {
-        case 0:
-        case 3:
-            REQUIRE((1 / sqrt(2.0) == Approx(re).epsilon(0.0001)));
-            REQUIRE(im == 0.0);
-            break;
-        default:
-            REQUIRE(re == 0.0);
-            REQUIRE(im == 0.0);
-            break;
-        }
-        return idx < 3; // the last qubit is in separable |0> state
-    });
+            norm += re * re + im * im;
+            size_t idx = 0;
+            for (size_t i = 0; idxStr[i] != '\0'; ++i)
+            {
+                idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
+            }
+            REQUIRE(idx < 4);
+            switch (idx)
+            {
+            case 0:
+            case 3:
+                REQUIRE((1 / sqrt(2.0) == Approx(re).epsilon(0.0001)));
+                REQUIRE(im == 0.0);
+                break;
+            default:
+                REQUIRE(re == 0.0);
+                REQUIRE(im == 0.0);
+                break;
+            }
+            return idx < 3; // the last qubit is in separable |0> state
+        });
     REQUIRE(1.0 == Approx(norm).epsilon(0.0001));
     norm = 0.0;
 
     iqa->Y(qs[2]);
     // 1/sqrt(2)(|00> + |11>)xi|1>
 
-    dynamic_cast<IDiagnostics*>(sim.get())->GetState([](const char* idxStr, double re, double im) {
-        norm += re * re + im * im;
-        size_t idx = 0;
-        for (size_t i = 0; idxStr[i] != '\0'; ++i)
+    dynamic_cast<IDiagnostics*>(sim.get())->GetState(
+        [](const char* idxStr, double re, double im)
         {
-            idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
-        }
-        switch (idx)
-        {
-        case 4:
-        case 7:
-            REQUIRE(re == 0.0);
-            REQUIRE(1 / sqrt(2.0) == Approx(im).epsilon(0.0001));
-            break;
-        default:
-            REQUIRE(re == 0.0);
-            REQUIRE(im == 0.0);
-            break;
-        }
-        return true; // get full state
-    });
+            norm += re * re + im * im;
+            size_t idx = 0;
+            for (size_t i = 0; idxStr[i] != '\0'; ++i)
+            {
+                idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
+            }
+            switch (idx)
+            {
+            case 4:
+            case 7:
+                REQUIRE(re == 0.0);
+                REQUIRE(1 / sqrt(2.0) == Approx(im).epsilon(0.0001));
+                break;
+            default:
+                REQUIRE(re == 0.0);
+                REQUIRE(im == 0.0);
+                break;
+            }
+            return true; // get full state
+        });
     REQUIRE(1.0 == Approx(norm).epsilon(0.0001));
     norm = 0.0;
 
