@@ -34,8 +34,8 @@ Push-Location $BuildDir
     else {
         if (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin")))) {
             Write-Host "On Linux build using Clang"
-            $CC = "clang-11"
-            $CXX = "clang++-11"
+            $CC = "clang"
+            $CXX = "clang++"
             #$clangTidy = "-DCMAKE_CXX_CLANG_TIDY=clang-tidy-11"
         }
         elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
