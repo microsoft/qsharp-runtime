@@ -423,7 +423,7 @@ namespace Quantum
             {
                 areaIndex = freeQubitsInAreas[(size_t)areaIndex].prevAreaWithFreeQubits;
                 id        = freeQubitsInAreas[(size_t)areaIndex].FreeQubitsReuseAllowed.TakeQubitFromFront(
-                    sharedQubitStatusArray);
+                           sharedQubitStatusArray);
             } while ((areaIndex != 0) && (id == NoneMarker));
 
             // We remember previous area where a free qubit was found or 0 if none were found.

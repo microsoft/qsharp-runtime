@@ -44,9 +44,9 @@ function Build-CMakeProject {
     }
     elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin")))) {
         Write-Host "On Linux build $Name using Clang"
-        $CMAKE_C_COMPILER = "-DCMAKE_C_COMPILER=clang-11"
-        $CMAKE_CXX_COMPILER = "-DCMAKE_CXX_COMPILER=clang++-11"
-        $clangTidy = "-DCMAKE_CXX_CLANG_TIDY=clang-tidy-11"
+        $CMAKE_C_COMPILER = "-DCMAKE_C_COMPILER=clang-13"
+        $CMAKE_CXX_COMPILER = "-DCMAKE_CXX_COMPILER=clang++-13"
+        $clangTidy = "-DCMAKE_CXX_CLANG_TIDY=clang-tidy-13"
     }
     elseif (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         Write-Host "On Windows build $Name using Clang"
