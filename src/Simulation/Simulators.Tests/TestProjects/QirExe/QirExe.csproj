@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.Quantum.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeProviderPackages>false</IncludeProviderPackages>

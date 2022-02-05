@@ -8,7 +8,7 @@ do
         do
             export OMP_NUM_THREADS=$thrd
             export QDK_SIM_FUSESPAN=$span
-            ./bin/Release/netcoreapp3.1/host $tst $tst 5
+            ./bin/Release/net6.0/host $tst $tst 5
         done
     done
 done
