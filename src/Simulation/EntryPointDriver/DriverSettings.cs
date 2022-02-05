@@ -20,6 +20,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal string QuantumSimulatorName { get; }
 
         /// <summary>
+        /// The name of the sparse simulator.
+        /// </summary>
+        internal string SparseSimulatorName { get; }
+
+        /// <summary>
         /// The name of the Toffoli simulator.
         /// </summary>
         internal string ToffoliSimulatorName { get; }
@@ -28,11 +33,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The name of the resources estimator.
         /// </summary>
         internal string ResourcesEstimatorName { get; }
-
-        // /// <summary>
-        // /// The name of the sparse simulator.
-        // /// </summary>
-        // internal string SparseSimulatorName { get; }
 
         /// <summary>
         /// The name of the default simulator to use when simulating the entry point.
@@ -58,15 +58,16 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="simulatorOptionAliases">The aliases for the simulator command-line option.</param>
         /// <param name="quantumSimulatorName">The name of the quantum simulator.</param>
+        /// <param name="sparseSimulatorName">The name of the sparse simulator.</param>
         /// <param name="toffoliSimulatorName">The name of the Toffoli simulator.</param>
         /// <param name="resourcesEstimatorName">The name of the resources estimator.</param>
-        // /// <param name="sparseSimulatorName">The name of the sparse simulator.</param>
         /// <param name="defaultSimulatorName">The name of the default simulator to use.</param>
         /// <param name="defaultExecutionTarget">The name of the default execution target to use.</param>
         /// <param name="createDefaultCustomSimulator">The function for creating a new instance of the default simulator if it is a custom simulator.</param>
         public DriverSettings(
             ImmutableList<string> simulatorOptionAliases,
             string quantumSimulatorName,
+            string sparseSimulatorName,
             string toffoliSimulatorName,
             string resourcesEstimatorName,
             //string sparseSimulatorName,   // TODO(kuzminrobin): Requires support in Q# compiler? 
@@ -77,9 +78,9 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             SimulatorOptionAliases = simulatorOptionAliases;
             QuantumSimulatorName = quantumSimulatorName;
+            SparseSimulatorName  = sparseSimulatorName;
             ToffoliSimulatorName = toffoliSimulatorName;
             ResourcesEstimatorName = resourcesEstimatorName;
-            //SparseSimulatorName  = sparseSimulatorName;
             DefaultSimulatorName = defaultSimulatorName;
             DefaultExecutionTarget = defaultExecutionTarget;
             CreateDefaultCustomSimulator = createDefaultCustomSimulator;
