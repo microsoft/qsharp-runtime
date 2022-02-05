@@ -61,7 +61,7 @@ namespace Microsoft.Quantum.Tests {
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckDrawRandomDoubleObeysRanges() : Unit {
         for j in 0..10000 {
             let random = DrawRandomDouble(0.0, 1.0);
@@ -76,7 +76,7 @@ namespace Microsoft.Quantum.Tests {
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckDrawRandomIntObeysRanges() : Unit {
         mutable randomInt = DrawRandomInt(0, 45);
         if (randomInt > 45 or randomInt < 0) {
@@ -103,7 +103,7 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.continuousuniformdistribution" has the
     /// expected moments.
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckContinuousUniformDistributionHasRightMoments() : Unit {
         CheckMeanAndVariance(
             "uniform",
@@ -118,7 +118,7 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.standardnormaldistribution" has the
     /// expected moments.
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckStandardNormalDistributionHasRightMoments() : Unit {
         CheckMeanAndVariance(
             "standard normal",
@@ -133,7 +133,7 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.normaldistribution" has the
     /// expected moments.
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckNormalDistributionHasRightMoments() : Unit {
         CheckMeanAndVariance(
             "normal(-2.0, 5.0)",
@@ -150,7 +150,7 @@ namespace Microsoft.Quantum.Tests {
     /// trial, it is entirely characterized by its first moment; we don't need
     /// to check variance here.
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckDrawRandomBoolHasRightExpectation() : Unit {
         // NB: DrawMany isn't available yet, since it's in the
         // Microsoft.Quantum.Standard package, not QSharpCore.
@@ -178,7 +178,7 @@ namespace Microsoft.Quantum.Tests {
     /// # Summary
     /// Checks that DrawCategorical never draws elements with probability zero.
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckImpossibleEventsAreNotDrawn() : Unit {
         let distribution = CategoricalDistribution([0.5, 0.0, 0.5]);
         let nTrials = 100000;
@@ -203,7 +203,7 @@ namespace Microsoft.Quantum.Tests {
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckCategoricalMomentsAreCorrect() : Unit {
         let categorical = DiscreteAsContinuous(
             CategoricalDistribution([0.2, 0.5, 0.3])
@@ -223,7 +223,7 @@ namespace Microsoft.Quantum.Tests {
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckRescaledCategoricalMomentsAreCorrect() : Unit {
         let categorical = DiscreteAsContinuous(
             CategoricalDistribution([2.0, 5.0, 3.0])
@@ -243,7 +243,7 @@ namespace Microsoft.Quantum.Tests {
     }
     
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckCategoricalHistogramIsCorrect() : Unit {
         let categorical = CategoricalDistribution([0.2, 0.5, 0.3]);
         mutable counts = new Int[3];
@@ -260,7 +260,7 @@ namespace Microsoft.Quantum.Tests {
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation CheckDiscreteUniformMomentsAreCorrect() : Unit {
         let (min, max) = (-3, 7);
         let expected = 0.5  * (IntAsDouble(min + max));

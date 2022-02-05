@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     using QubitIdType = System.UInt32;
 
-    public partial class SparseSimulator2 : CommonNativeSimulator
+    public partial class SparseSimulator : CommonNativeSimulator
     {
         /// <summary>
         /// Creates a an instance of a sparse simulator.
@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// <param name="randomNumberGeneratorSeed"> Seed for the random number generator used by a simulator for measurement outcomes and the Random operation. </param>
         /// <param name="disableBorrowing"> If true, Borrowing qubits will be disabled, and a new qubit will be allocated instead every time borrowing is requested. Performance may improve. </param>
         /// <param name="numQubits"> Qubit capacity. </param>
-        public SparseSimulator2(
+        public SparseSimulator(
             bool throwOnReleasingQubitsNotInZeroState = true,
             UInt32? randomNumberGeneratorSeed = null,
             bool disableBorrowing = false,
@@ -50,7 +50,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         {
             get
             {
-                return "SparseSimulator2";
+                return "SparseSimulator";
             }
         }
     }

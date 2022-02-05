@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var simulators = new CommonNativeSimulator[] { 
                 new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true),
-                new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: true)
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: true)
             };
 
             foreach (var sim in simulators)
@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var simulators = new CommonNativeSimulator[] { 
                 new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true),
-                new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: true)
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: true)
             };
 
             foreach (var sim in simulators)
@@ -68,7 +68,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var simulators = new CommonNativeSimulator[] { 
                 new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true),
-                new SparseSimulator2(throwOnReleasingQubitsNotInZeroState: true)
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: true)
             };
 
             foreach (var sim in simulators)

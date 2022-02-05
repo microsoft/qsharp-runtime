@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
     using QubitIdType = System.UInt32;
     using SimulatorIdType = System.UInt32;
 
-    public partial class SparseSimulator2
+    public partial class SparseSimulator
     {
         private const string simulatorDll = "SparseQuantumSimulator";
 

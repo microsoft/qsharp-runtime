@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests
         {
             var simulators = new CommonNativeSimulator[] {
                 new QuantumSimulator(),
-                new SparseSimulator2()
+                new SparseSimulator()
             };
 
             foreach (var sim in simulators)

@@ -8,14 +8,14 @@ namespace Microsoft.Quantum.Simulation.Testing.IonQ {
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation MeasureInMiddleTest() : Unit {
         MeasureInMiddle();
     }
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation QubitAfterMeasurementTest() : Unit {
         QubitAfterMeasurement();
     }

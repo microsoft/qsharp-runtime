@@ -3,62 +3,62 @@
     open Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultUnit() : Unit {
         AssertEqual((), Default<Unit>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultInt() : Unit {
         AssertEqual(0, Default<Int>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultBigInt() : Unit {
         AssertEqual(0L, Default<BigInt>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultDouble() : Unit {
         AssertEqual(0.0, Default<Double>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultBool() : Unit {
         AssertEqual(false, Default<Bool>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultString() : Unit {
         AssertEqual("", Default<String>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultQubit() : Unit {
         // Creating a default qubit (without using it) should succeed.
         let _ = Default<Qubit>();
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultPauli() : Unit {
         AssertEqual(PauliI, Default<Pauli>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultResult() : Unit {
         AssertEqual(Zero, Default<Result>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultRange() : Unit {
         let range = Default<Range>();
         AssertEqual(1, RangeStart(range));
@@ -67,20 +67,20 @@
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultCallable() : Unit {
         // Creating a default callable (without calling it) should succeed.
         let _ = Default<(Unit -> Unit)>();
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultArray() : Unit {
         AssertEqual(new Unit[0], Default<Unit[]>());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultTuple() : Unit {
         AssertEqual((false, 0), Default<(Bool, Int)>());
         AssertEqual((0, Zero, ""), Default<(Int, Result, String)>());
@@ -96,7 +96,7 @@
     newtype IntResultString = (Int, Result, String);
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     function DefaultUserDefinedType() : Unit {
         AssertEqual(BoolInt(false, 0), Default<BoolInt>());
         AssertEqual(IntResultString(0, Zero, ""), Default<IntResultString>());

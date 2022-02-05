@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
     using QubitIdType = System.UInt32;
     using SimulatorIdType = System.UInt32;
 
-    public partial class SparseSimulator2
+    public partial class SparseSimulator
     {
         protected override void MCX(uint count, uint[] ctrls, uint qubit)
         {

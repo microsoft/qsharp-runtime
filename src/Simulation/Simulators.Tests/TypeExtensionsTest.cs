@@ -84,7 +84,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             var simulators = new CommonNativeSimulator[] { 
                 new QuantumSimulator(),
-                new SparseSimulator2()
+                new SparseSimulator()
             };
 
             foreach (var sim in simulators)
@@ -159,7 +159,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             var simulators = new CommonNativeSimulator[] { 
                 new QuantumSimulator(),
-                new SparseSimulator2()
+                new SparseSimulator()
             };
 
             foreach (var sim in simulators)

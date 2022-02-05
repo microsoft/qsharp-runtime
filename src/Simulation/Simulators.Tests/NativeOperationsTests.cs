@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             TestOne(new QuantumSimulator(), "Simulator");
             TestOne(new ToffoliSimulator(), "Toffoli");
             TestOne(new ResourcesEstimator(), "hello");
-            TestOne(new SparseSimulator2(), "SparseSimulator2");
+            TestOne(new SparseSimulator(), "SparseSimulator");
         }
 
         [Fact]

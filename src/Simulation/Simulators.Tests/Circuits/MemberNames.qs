@@ -24,7 +24,7 @@
     operation Info() : Unit { }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation SupportsReservedOperationNames() : Unit {
         Body();
         AdjointBody();
@@ -36,14 +36,14 @@
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation SupportsConfusingQualifiedNames() : Unit {
         FooBar.Baz();
         Foo.Bar.Baz();
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation SupportsReservedNamedItems() : Unit {
         let foo = Foo(7);
         AssertEqual(7, foo::Foo);
@@ -57,7 +57,7 @@
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation AvoidsOperationPropertyShadowing1() : Unit {
         using (q = Qubit()) {
             let MicrosoftQuantumIntrinsicX = Z;
@@ -73,7 +73,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits.MemberNames2 {
     open Microsoft.Quantum.Simulation.Simulators.Tests.Circuits;
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator2")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation AvoidsOperationPropertyShadowing2() : Unit {
         using (q = Qubit()) {
             let X = Intrinsic.Z;

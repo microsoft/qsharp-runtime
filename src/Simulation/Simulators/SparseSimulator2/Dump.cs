@@ -12,7 +12,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     using QubitIdType = System.UInt32;
 
-    public partial class SparseSimulator2
+    public partial class SparseSimulator
     {
         /// <summary>
         ///     Returns the list of the qubits' ids currently allocated in the simulator.

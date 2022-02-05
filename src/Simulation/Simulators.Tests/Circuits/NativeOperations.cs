@@ -39,7 +39,7 @@ namespace NativeOperations
                 {
                     QuantumSimulator _ => "Simulator",
                     ToffoliSimulator _ => "Toffoli",
-                    SparseSimulator2 _ => "SparseSimulator2",
+                    SparseSimulator _ => "SparseSimulator",
                     _                  => base.__Body__(arg)
                 };
         }

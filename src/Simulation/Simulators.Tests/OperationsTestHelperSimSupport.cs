@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             var simulators = new SimulatorBase[] { 
                 new QuantumSimulator(), 
                 new ToffoliSimulator(),
-                new SparseSimulator2()
+                new SparseSimulator()
             };
 
             foreach (var s in simulators)
