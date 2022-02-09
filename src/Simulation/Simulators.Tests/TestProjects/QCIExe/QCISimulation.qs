@@ -289,7 +289,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI {
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator)
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation ControlledAdjointSupportDistribute_DistributeControlledTest() : Unit {
         ControlledAdjointSupportDistribute_DistributeControlled();
     }

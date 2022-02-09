@@ -7,6 +7,36 @@ using Newtonsoft.Json.Converters;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
+    public static class BigIntegerExtensions
+    {
+        public static string ToUnsignedBitString(this BigInteger bigInt, bool bigEndian = false)
+        {
+            byte[] bytes = bigInt.ToByteArray();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(bytes.Length * 8);
+            for(uint idx = 0; idx < bytes.Length; ++idx)
+            {
+                sb.Append(System.Convert.ToString(bytes[idx], 2)    .PadLeft(8, '0')          .Reverse().ToString());
+                    //                               0x3        "11"                "00000011"          "11000000"
+            }
+            string retVal = sb.ToString();
+            return (bigEndian ? retVal.Reverse().ToString() : retVal);
+        }
+
+        public static BigInteger ParseUnsignedBitString(string str/*, bool bigEndian = false*/)
+        {
+            //string tmpStr = (bigEndian ? str : str.Reverse().ToString());
+            var tmpStr = str;
+
+            BigInteger retVal = 0;
+            foreach(char c in tmpStr)
+            {
+                retVal <<= 1;
+                retVal += (c - '0');
+            }
+            return retVal;
+        }
+    }
+
     public partial class CommonNativeSimulator
     {
         /// <summary>
@@ -55,7 +85,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             private static readonly IComparer<string> ToIntComparer =
                 Comparer<string>.Create((label1, label2) =>
                     Comparer<BigInteger>.Default.Compare(
-                        BigInteger.Parse(label1), BigInteger.Parse(label2)
+                        //BigInteger.Parse(label1), BigInteger.Parse(label2)
+                        BigIntegerExtensions.ParseUnsignedBitString(label1), 
+                        BigIntegerExtensions.ParseUnsignedBitString(label2)
                     )
                 );
 
@@ -86,7 +118,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     <see cref="Microsoft.Quantum.Simulation.Simulators.CommonNativeSimulator.StateDumper.Dump" />.
             /// </remarks>
             [JsonProperty("amplitudes")]
-            public IDictionary<string, Complex>? Amplitudes { get; set; }
+            // public IDictionary<string, Complex>? Amplitudes { get; set; }
+            public IDictionary<BigInteger, Complex>? Amplitudes { get; set; }
 
             /// <summary>
             ///     An enumerable source of the significant amplitudes of this state
@@ -135,37 +168,57 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     into an integer index in the little-endian encoding.
             /// </summary>
             public string BasisStateLabel(
-                BasisStateLabelingConvention convention, string index // index is a string of bits
+                // BasisStateLabelingConvention convention, string index // index is a string of bits
+                BasisStateLabelingConvention convention, BigInteger index // index is a string of bits
             ) => convention switch
                 {
                     BasisStateLabelingConvention.Bitstring =>
-                        index,
+                        //index,
+                        // UnsignedBitStringFromBigInt(index),
+                        index.ToUnsignedBitString(),
                     BasisStateLabelingConvention.BigEndian =>
-                        DecimalFromBitString(index),
+                        // DecimalFromBitString(index),
+                        // UnsignedBitStringFromBigInt(index, true),
+                        index.ToUnsignedBitString(true),
                     BasisStateLabelingConvention.LittleEndian =>
-                        DecimalFromBitString(index, false),
+                        // DecimalFromBitString(index, false),
+                        // UnsignedBitStringFromBigInt(index),
+                        index.ToUnsignedBitString(),
                     _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")
                 };
 
-            /// <summary>
-            ///     Convert a bitstring string to a string containing the decimal number
-            ///     that corresponds to the bitstring.
-            /// </summary>
-            private string DecimalFromBitString(string bitString, bool bigEndian=true)
-            {
-                var integer = BigInteger.Zero;
+            // private string UnsignedBitStringFromBigInt(BigInteger bigInt, bool bigEndian = false)
+            // {
+            //     byte[] bytes = bigInt.ToByteArray();
+            //     System.Text.StringBuilder sb = new System.Text.StringBuilder(bytes.Length * 8);
+            //     for(uint idx = 0; idx < bytes.Length; ++idx)
+            //     {
+            //         sb.Append(System.Convert.ToString(bytes[idx], 2)    .PadLeft(8, '0')          .Reverse().ToString());
+            //             //                               0x3        "11"                "00000011"          "11000000"
+            //     }
+            //     string retVal = sb.ToString();
+            //     return (bigEndian ? retVal.Reverse().ToString() : retVal);
+            // }
 
-                foreach (var c in (bigEndian ? bitString : bitString.Reverse()))
-                {
-                    integer <<= 1;
-                    if (c == '1')
-                    {
-                        integer |= 1;
-                    }
-                }
+            // /// <summary>
+            // ///     Convert a bitstring string to a string containing the decimal number
+            // ///     that corresponds to the bitstring.
+            // /// </summary>
+            // private string DecimalFromBitString(string bitString, bool bigEndian=true)
+            // {
+            //     var integer = BigInteger.Zero;
 
-                return integer.ToString();
-            }
+            //     foreach (var c in (bigEndian ? bitString : bitString.Reverse()))
+            //     {
+            //         integer <<= 1;
+            //         if (c == '1')
+            //         {
+            //             integer |= 1;
+            //         }
+            //     }
+
+            //     return integer.ToString();
+            // }
 
             /// <summary>
             /// Returns a string that represents the magnitude of the  amplitude.
