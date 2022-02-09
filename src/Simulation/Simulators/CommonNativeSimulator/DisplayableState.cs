@@ -16,20 +16,22 @@ namespace Microsoft.Quantum.Simulation.Simulators
             return new string(charArray);
         }
 
-        public static string ToUnsignedBitString(this BigInteger bigInt, bool bigEndian = false)
+        public static string ToUnsignedBitString(this BigInteger bigInt, int qubitCount, bool bigEndian = false)
         {
             byte[] bytes = bigInt.ToByteArray();    // `bytes[0]` is the least significant byte.
             System.Text.StringBuilder sb = new System.Text.StringBuilder(bytes.Length * 8);
             for(uint idx = 0; idx < bytes.Length; ++idx)
             {
-                sb.Append(System.Convert.ToString(bytes[idx], 2)    .PadLeft(8, '0')          .Reverse()); //.ToString());
-                //                                   0x3        "11"                "00000011"          "11000000"
+                sb.Append(System.Convert.ToString(bytes[idx],   // 0x4
+                                                  2)            // "100"
+                            .PadLeft(qubitCount, '0')           // "000100" (qubitCount: 6)
+                            .Reverse()); //.ToString());        // "001000" (4 in little endian bit string)
             }
             string retVal = sb.ToString();
             return (bigEndian ? retVal.Reverse()/*.ToString()*/ : retVal);
         }
 
-        public static BigInteger ParseUnsignedBitString(string str/*, bool bigEndian = false*/)
+        public static BigInteger ParseUnsignedLEBitString(string str/*, bool bigEndian = false*/)
         {
             // string tmpStr = (bigEndian ? str : str.Reverse().ToString());
             // var tmpStr = str;
@@ -94,8 +96,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 Comparer<string>.Create((label1, label2) =>
                     Comparer<BigInteger>.Default.Compare(
                         //BigInteger.Parse(label1), BigInteger.Parse(label2)
-                        BigIntegerExtensions.ParseUnsignedBitString(label1), 
-                        BigIntegerExtensions.ParseUnsignedBitString(label2)
+                        BigIntegerExtensions.ParseUnsignedLEBitString(label1), 
+                        BigIntegerExtensions.ParseUnsignedLEBitString(label2)
                     )
                 );
 
@@ -183,15 +185,18 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     BasisStateLabelingConvention.Bitstring =>
                         //index,
                         // UnsignedBitStringFromBigInt(index),
-                        index.ToUnsignedBitString(),
+                        index.ToUnsignedBitString(NQubits),
                     BasisStateLabelingConvention.BigEndian =>
                         // DecimalFromBitString(index),
                         // UnsignedBitStringFromBigInt(index, true),
-                        index.ToUnsignedBitString(true),
+                        //index.ToUnsignedBitString(NQubits, true),
+                        BigIntegerExtensions.ParseUnsignedLEBitString(index.ToUnsignedBitString(NQubits, true)).ToString(),
+                        //index.ToUnsignedBitString(NQubits),
                     BasisStateLabelingConvention.LittleEndian =>
                         // DecimalFromBitString(index, false),
                         // UnsignedBitStringFromBigInt(index),
-                        index.ToUnsignedBitString(),
+                        //index.ToUnsignedBitString(NQubits),
+                        index.ToString(),
                     _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")
                 };
 
