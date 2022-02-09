@@ -177,7 +177,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 if (_data == null) throw new Exception("Expected data buffer to be initialized before callback, but it was null.");
                 // _data[idx] = new Complex(real, img);
                 //_data[new BigInteger(System.Text.Encoding.ASCII.GetBytes(idx))] = new Complex(real, img);
-                _data[BigIntegerExtensions.ParseUnsignedBitString(idx)] = new Complex(real, img);
+                _data[BigIntegerExtensions.ParseUnsignedLEBitString(idx)] = new Complex(real, img);
 
                 // byte[] array = System.Text.Encoding.ASCII.GetBytes(idx);
                 // BigInteger idxInt = new BigInteger(array);
