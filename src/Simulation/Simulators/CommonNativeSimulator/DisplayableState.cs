@@ -9,24 +9,31 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public static class BigIntegerExtensions
     {
+        public static string Reverse(this string s)
+        {
+           char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
         public static string ToUnsignedBitString(this BigInteger bigInt, bool bigEndian = false)
         {
             byte[] bytes = bigInt.ToByteArray();    // `bytes[0]` is the least significant byte.
             System.Text.StringBuilder sb = new System.Text.StringBuilder(bytes.Length * 8);
             for(uint idx = 0; idx < bytes.Length; ++idx)
             {
-                sb.Append(System.Convert.ToString(bytes[idx], 2)    .PadLeft(8, '0')          .Reverse().ToString());
+                sb.Append(System.Convert.ToString(bytes[idx], 2)    .PadLeft(8, '0')          .Reverse()); //.ToString());
                 //                                   0x3        "11"                "00000011"          "11000000"
             }
             string retVal = sb.ToString();
-            return (bigEndian ? retVal.Reverse().ToString() : retVal);
+            return (bigEndian ? retVal.Reverse()/*.ToString()*/ : retVal);
         }
 
         public static BigInteger ParseUnsignedBitString(string str/*, bool bigEndian = false*/)
         {
             // string tmpStr = (bigEndian ? str : str.Reverse().ToString());
             // var tmpStr = str;
-            string tmpStr = str.Reverse().ToString();
+            string tmpStr = str.Reverse();  //.ToString();
 
             BigInteger retVal = 0;
             foreach(char c in tmpStr)
