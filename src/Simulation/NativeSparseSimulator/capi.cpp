@@ -260,7 +260,7 @@ extern "C"
      // Same as Dump_cpp, but only dumps the wavefunction on the qubits in `q`, ensuring they are separable from the rest of the state first
     MICROSOFT_QUANTUM_DECL bool DumpQubits_cpp(
         simulator_id_type sim_id,
-        _In_ logical_qubit_id n,
+        _In_ int n,
         _In_reads_(n) logical_qubit_id* q,
         _In_ void (*callback)(const char*, double, double))
     {
