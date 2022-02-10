@@ -25,17 +25,15 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 sb.Append(System.Convert.ToString(bytes[idx],   // 0x4
                                                   2)            // "100"
                             .PadLeft(qubitCount, '0')           // "000100" (qubitCount: 6)
-                            .Reverse()); //.ToString());        // "001000" (4 in little endian bit string)
+                            .Reverse());                        // "001000" (4 in little endian bit string)
             }
             string retVal = sb.ToString();
-            return (bigEndian ? retVal.Reverse()/*.ToString()*/ : retVal);
+            return (bigEndian ? retVal.Reverse() : retVal);
         }
 
-        public static BigInteger ParseUnsignedLEBitString(string str/*, bool bigEndian = false*/)
+        public static BigInteger ParseUnsignedLEBitString(string str)
         {
-            // string tmpStr = (bigEndian ? str : str.Reverse().ToString());
-            // var tmpStr = str;
-            string tmpStr = str.Reverse();  //.ToString();
+            string tmpStr = str.Reverse();
 
             BigInteger retVal = 0;
             foreach(char c in tmpStr)
@@ -95,7 +93,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             private static readonly IComparer<string> ToIntComparer =
                 Comparer<string>.Create((label1, label2) =>
                     Comparer<BigInteger>.Default.Compare(
-                        //BigInteger.Parse(label1), BigInteger.Parse(label2)
                         BigIntegerExtensions.ParseUnsignedLEBitString(label1), 
                         BigIntegerExtensions.ParseUnsignedLEBitString(label2)
                     )
@@ -178,60 +175,18 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     into an integer index in the little-endian encoding.
             /// </summary>
             public string BasisStateLabel(
-                // BasisStateLabelingConvention convention, string index // index is a string of bits
                 BasisStateLabelingConvention convention, BigInteger index // index is a string of bits
             ) => convention switch
                 {
                     BasisStateLabelingConvention.Bitstring =>
-                        //index,
-                        // UnsignedBitStringFromBigInt(index),
                         index.ToUnsignedBitString(NQubits),
                     BasisStateLabelingConvention.BigEndian =>
-                        // DecimalFromBitString(index),
-                        // UnsignedBitStringFromBigInt(index, true),
-                        //index.ToUnsignedBitString(NQubits, true),
-                        BigIntegerExtensions.ParseUnsignedLEBitString(index.ToUnsignedBitString(NQubits, true)).ToString(),
-                        //index.ToUnsignedBitString(NQubits),
+                        BigIntegerExtensions.ParseUnsignedLEBitString(
+                            index.ToUnsignedBitString(NQubits, true)).ToString(),
                     BasisStateLabelingConvention.LittleEndian =>
-                        // DecimalFromBitString(index, false),
-                        // UnsignedBitStringFromBigInt(index),
-                        //index.ToUnsignedBitString(NQubits),
                         index.ToString(),
                     _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")
                 };
-
-            // private string UnsignedBitStringFromBigInt(BigInteger bigInt, bool bigEndian = false)
-            // {
-            //     byte[] bytes = bigInt.ToByteArray();
-            //     System.Text.StringBuilder sb = new System.Text.StringBuilder(bytes.Length * 8);
-            //     for(uint idx = 0; idx < bytes.Length; ++idx)
-            //     {
-            //         sb.Append(System.Convert.ToString(bytes[idx], 2)    .PadLeft(8, '0')          .Reverse().ToString());
-            //             //                               0x3        "11"                "00000011"          "11000000"
-            //     }
-            //     string retVal = sb.ToString();
-            //     return (bigEndian ? retVal.Reverse().ToString() : retVal);
-            // }
-
-            // /// <summary>
-            // ///     Convert a bitstring string to a string containing the decimal number
-            // ///     that corresponds to the bitstring.
-            // /// </summary>
-            // private string DecimalFromBitString(string bitString, bool bigEndian=true)
-            // {
-            //     var integer = BigInteger.Zero;
-
-            //     foreach (var c in (bigEndian ? bitString : bitString.Reverse()))
-            //     {
-            //         integer <<= 1;
-            //         if (c == '1')
-            //         {
-            //             integer |= 1;
-            //         }
-            //     }
-
-            //     return integer.ToString();
-            // }
 
             /// <summary>
             /// Returns a string that represents the magnitude of the  amplitude.

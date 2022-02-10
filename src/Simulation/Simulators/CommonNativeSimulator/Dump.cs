@@ -152,7 +152,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
         public class DisplayableStateDumper : StateDumper
         {
             private long _count = -1;
-            // private IDictionary<string, Complex>? _data = null;
             private IDictionary<BigInteger, Complex>? _data = null;
 
             /// <summary>
@@ -175,12 +174,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             public override bool Callback([MarshalAs(UnmanagedType.LPStr)] string idx, double real, double img)
             {
                 if (_data == null) throw new Exception("Expected data buffer to be initialized before callback, but it was null.");
-                // _data[idx] = new Complex(real, img);
-                //_data[new BigInteger(System.Text.Encoding.ASCII.GetBytes(idx))] = new Complex(real, img);
                 _data[BigIntegerExtensions.ParseUnsignedLEBitString(idx)] = new Complex(real, img);
-
-                // byte[] array = System.Text.Encoding.ASCII.GetBytes(idx);
-                // BigInteger idxInt = new BigInteger(array);
 
                 return true;
             }
@@ -196,7 +190,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 _count = qubits == null
                             ? this.Simulator.QubitManager.AllocatedQubitsCount
                             : qubits.Length;
-                // _data = new Dictionary<string, Complex>();        // If 0 qubits are allocated then the array has 
                 _data = new Dictionary<BigInteger, Complex>(); // If 0 qubits are allocated then the array has 
                                                                // a single element. The Hilbert space of the system is 
                                                                // ℂ¹ (that is, complex-valued scalars).
