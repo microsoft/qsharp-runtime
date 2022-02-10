@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         public class DisplayableState
         {
             /// <summary>
-            ///     Converst basis state label from unsigned little-endian bit string to BigInteger.
+            ///     Converst basis state label from unsigned little-endian bit string to BigInteger, e.g. "001" to 4.
             /// </summary>
             public static BigInteger BasisStateLabelToBigInt(string str)
             {
@@ -103,7 +103,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     <see cref="Microsoft.Quantum.Simulation.Simulators.CommonNativeSimulator.StateDumper.Dump" />.
             /// </remarks>
             [JsonProperty("amplitudes")]
-            // public IDictionary<string, Complex>? Amplitudes { get; set; }
             public IDictionary<BigInteger, Complex>? Amplitudes { get; set; }
 
             /// <summary>
