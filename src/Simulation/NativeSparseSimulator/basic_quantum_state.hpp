@@ -48,9 +48,9 @@ public:
 
     virtual amplitude probe(std::string const& label) = 0;
 
-    virtual bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(const char*, double, double)) = 0;
+    virtual bool dump_qubits(std::vector<logical_qubit_id> const& qubits, std::function<void(const char*, double, double)>const&) = 0;
 
-    virtual void dump_all(logical_qubit_id max_qubit_id, void (*callback)(const char*, double, double)) = 0;
+    virtual void dump_all(logical_qubit_id max_qubit_id, std::function<void(const char*, double, double)>const&) = 0;
 
     virtual void phase_and_permute(std::list<operation>const &) = 0;
 

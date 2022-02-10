@@ -660,10 +660,11 @@ public:
         return probe(bit_label);
     }
 
+    using callback_t = std::function<void(const char*, double, double)>;
     // Dumps the state of a subspace of particular qubits, if they are not entangled
     // This requires it to detect if the subspace is entangled, construct a new 
     // projected wavefunction, then call the `callback` function on each state.
-    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(const char*, double, double)) {
+    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, callback_t const& callback) {
         // Create two wavefunctions
         // check if they are tensor products
         wavefunction dump_wfn;
@@ -682,7 +683,7 @@ public:
     }
 
     // Dumps all the states in superposition via a callback function
-    void dump_all(logical_qubit_id max_qubit_id, void (*callback)(const char*, double, double)) {
+    void dump_all(logical_qubit_id max_qubit_id, callback_t const& callback) {
         _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback](qubit_label label, amplitude val){
             callback(label.to_string().substr(num_qubits-1-max_qubit_id).c_str(), val.real(), val.imag());
         });

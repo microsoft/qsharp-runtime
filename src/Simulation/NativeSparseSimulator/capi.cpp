@@ -253,11 +253,15 @@ extern "C"
     // Iterates through the entire wavefunction and calls `callback` on every state in the superposition
     // It will write the label of the state, in binary, from qubit 0 to `max_qubit_id`, into the char* pointer, then call `callback`
     //  with the real and complex values as the double arguments
-     MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ void (*callback)(const char*, double, double)){
+    MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ void (*callback)(const char*, double, double)){
         return getSimulator(sim_id)->dump_all(callback);
-     }
+    }
 
-     // Same as Dump_cpp, but only dumps the wavefunction on the qubits in `q`, ensuring they are separable from the rest of the state first
+    MICROSOFT_QUANTUM_DECL void ExtendedDump_cpp(simulator_id_type sim_id, _In_ void (*callback)(const char*, double, double, void*), _In_ void* arg){
+        return getSimulator(sim_id)->dump_all_ext(callback, arg);
+    }
+
+    // Same as Dump_cpp, but only dumps the wavefunction on the qubits in `q`, ensuring they are separable from the rest of the state first
     MICROSOFT_QUANTUM_DECL bool DumpQubits_cpp(
         simulator_id_type sim_id,
         _In_ int n,
@@ -266,6 +270,17 @@ extern "C"
     {
         std::vector<logical_qubit_id> qs(q, q + n);
         return getSimulator(sim_id)->dump_qubits(qs, callback);
+    }
+
+    MICROSOFT_QUANTUM_DECL bool ExtendedDumpQubits_cpp(
+        simulator_id_type sim_id,
+        _In_ int n,
+        _In_reads_(n) logical_qubit_id* q,
+        _In_ void (*callback)(const char*, double, double, void*),
+        _In_ void* arg)
+    {
+        std::vector<logical_qubit_id> qs(q, q + n);
+        return getSimulator(sim_id)->dump_qubits_ext(qs, callback, arg);
     }
 
     // // dump the list of logical qubit ids to given callback
