@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Numerics;
 using System.Diagnostics;
 using System.Linq;
 
@@ -13,6 +14,31 @@ namespace Microsoft.Quantum.Simulation
 
     public static partial class Extensions
     {
+        /// <summary>
+        /// Reverses the string.
+        /// </summary>
+        public static string Reverse(this string s)
+        {
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
+        public static string ToUnsignedBitString(this BigInteger bigInt, int qubitCount, bool bigEndian = false)
+        {
+            byte[] bytes = bigInt.ToByteArray();    // `bytes[0]` is the least significant byte.
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(bytes.Length * 8);
+            for(uint idx = 0; idx < bytes.Length; ++idx)
+            {
+                sb.Append(System.Convert.ToString(bytes[idx],   // 0x4
+                                                  2)            // "100"
+                            .PadLeft(qubitCount, '0')           // "000100" (qubitCount: 6)
+                            .Reverse());                        // "001000" (0x4 as little endian bit string)
+            }
+            string retVal = sb.ToString();
+            return (bigEndian ? retVal.Reverse() : retVal);
+        }
+
         /// <summary>
         /// Returns the ids of a qubit array as a uint[]
         /// </summary>

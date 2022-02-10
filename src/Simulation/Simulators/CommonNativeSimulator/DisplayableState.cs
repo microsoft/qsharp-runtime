@@ -9,28 +9,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public static class BigIntegerExtensions
     {
-        public static string Reverse(this string s)
-        {
-           char[] charArray = s.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
-        }
-
-        public static string ToUnsignedBitString(this BigInteger bigInt, int qubitCount, bool bigEndian = false)
-        {
-            byte[] bytes = bigInt.ToByteArray();    // `bytes[0]` is the least significant byte.
-            System.Text.StringBuilder sb = new System.Text.StringBuilder(bytes.Length * 8);
-            for(uint idx = 0; idx < bytes.Length; ++idx)
-            {
-                sb.Append(System.Convert.ToString(bytes[idx],   // 0x4
-                                                  2)            // "100"
-                            .PadLeft(qubitCount, '0')           // "000100" (qubitCount: 6)
-                            .Reverse());                        // "001000" (4 in little endian bit string)
-            }
-            string retVal = sb.ToString();
-            return (bigEndian ? retVal.Reverse() : retVal);
-        }
-
         public static BigInteger ParseUnsignedLEBitString(string str)
         {
             string tmpStr = str.Reverse();
