@@ -7,22 +7,6 @@ using Newtonsoft.Json.Converters;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public static class BigIntegerExtensions
-    {
-        public static BigInteger ParseUnsignedLEBitString(string str)
-        {
-            string tmpStr = str.Reverse();
-
-            BigInteger retVal = 0;
-            foreach(char c in tmpStr)
-            {
-                retVal <<= 1;
-                retVal += (c - '0');
-            }
-            return retVal;
-        }
-    }
-
     public partial class CommonNativeSimulator
     {
         /// <summary>
@@ -68,11 +52,27 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// </summary>
         public class DisplayableState
         {
+            /// <summary>
+            ///     Converst basis state label from unsigned little-endian bit string to BigInteger.
+            /// </summary>
+            public static BigInteger BasisStateLabelToBigInt(string str)
+            {
+                string tmpStr = str.Reverse();
+
+                BigInteger retVal = 0;
+                foreach(char c in tmpStr)
+                {
+                    retVal <<= 1;
+                    retVal += (c - '0');
+                }
+                return retVal;
+            }
+
             private static readonly IComparer<string> ToIntComparer =
                 Comparer<string>.Create((label1, label2) =>
                     Comparer<BigInteger>.Default.Compare(
-                        BigIntegerExtensions.ParseUnsignedLEBitString(label1), 
-                        BigIntegerExtensions.ParseUnsignedLEBitString(label2)
+                        BasisStateLabelToBigInt(label1), 
+                        BasisStateLabelToBigInt(label2)
                     )
                 );
 
@@ -159,7 +159,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     BasisStateLabelingConvention.Bitstring =>
                         index.ToUnsignedBitString(NQubits),
                     BasisStateLabelingConvention.BigEndian =>
-                        BigIntegerExtensions.ParseUnsignedLEBitString(
+                        BasisStateLabelToBigInt(
                             index.ToUnsignedBitString(NQubits, true)).ToString(),
                     BasisStateLabelingConvention.LittleEndian =>
                         index.ToString(),
