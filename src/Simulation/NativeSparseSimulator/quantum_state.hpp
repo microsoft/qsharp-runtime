@@ -126,10 +126,11 @@ public:
     void DumpWavefunction(wavefunction &wfn, size_t indent = 0){
         std::string spacing(indent, ' ');
         std::cout << spacing << "Wavefunction:\n";
-        auto line_dump = [spacing](qubit_label label, amplitude val){
+        auto line_dump = [spacing](qubit_label label, amplitude val) -> bool {
             std::cout << spacing << "  " << label.to_string() << ": ";
             std::cout << val.real();
             std::cout  << (val.imag() < 0 ? " - " : " + ") <<  std::abs(val.imag()) << "i\n";
+            return true;
         };
         _DumpWavefunction_base(wfn, line_dump);
         std::cout << spacing << "--end wavefunction\n";
@@ -660,7 +661,7 @@ public:
         return probe(bit_label);
     }
 
-    using callback_t = std::function<void(const char*, double, double)>;
+    using callback_t = std::function<bool(const char*, double, double)>;
     // Dumps the state of a subspace of particular qubits, if they are not entangled
     // This requires it to detect if the subspace is entangled, construct a new 
     // projected wavefunction, then call the `callback` function on each state.
@@ -672,11 +673,11 @@ public:
         if (!_split_wavefunction(_get_mask(qubits), dump_wfn, leftover_wfn)){
             return false;
         } else {
-            _DumpWavefunction_base(dump_wfn, [qubits, callback](qubit_label label, amplitude val){
+            _DumpWavefunction_base(dump_wfn, [qubits, callback](qubit_label label, amplitude val) -> bool {
                 std::string masked(qubits.size(),'0');
                 for (std::size_t i = 0; i < qubits.size(); ++i)
                     masked[i] = label[qubits[i]] ? '1' : '0';
-                callback(masked.c_str(), val.real(), val.imag());
+                return callback(masked.c_str(), val.real(), val.imag());
             });
             return true;
         }
@@ -684,8 +685,8 @@ public:
 
     // Dumps all the states in superposition via a callback function
     void dump_all(logical_qubit_id max_qubit_id, callback_t const& callback) {
-        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback](qubit_label label, amplitude val){
-            callback(label.to_string().substr(num_qubits-1-max_qubit_id).c_str(), val.real(), val.imag());
+        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback](qubit_label label, amplitude val) -> bool {
+            return callback(label.to_string().substr(num_qubits-1-max_qubit_id).c_str(), val.real(), val.imag());
         });
     }
 
@@ -1160,7 +1161,7 @@ private:
 
     // Iterates through a wavefunction and calls the output function on each value
     // It first sorts the labels before outputting
-    void _DumpWavefunction_base(wavefunction &wfn, std::function<void(qubit_label,amplitude)> output){
+    void _DumpWavefunction_base(wavefunction &wfn, std::function<bool(qubit_label,amplitude)> output){
         if (wfn.size() == 0){ return; }
         using pair_t = std::pair<qubit_label, amplitude>;
         std::vector<pair_t> sortedByLabels;
@@ -1174,7 +1175,8 @@ private:
             [](const pair_t& lhs, const pair_t& rhs){return lhs.first < rhs.first;});
         amplitude val;
         for (pair_t entry : sortedByLabels){
-            output(entry.first, entry.second);
+            if(!output(entry.first, entry.second))
+                break;
         }
     }
 

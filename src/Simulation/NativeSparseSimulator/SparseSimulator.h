@@ -697,8 +697,8 @@ public:
 		return _quantum_state->Sample();
 	}
 
-	using callback_t = std::function<void(const char*, double, double)>;
-	using extended_callback_t = std::function<void(const char*, double, double, void*)>;
+	using callback_t = std::function<bool(const char*, double, double)>;
+	using extended_callback_t = std::function<bool(const char*, double, double, void*)>;
 	// Dumps the state of a subspace of particular qubits, if they are not entangled
 	// This requires it to detect if the subspace is entangled, construct a new 
 	// projected wavefunction, then call the `callback` function on each state.
@@ -707,7 +707,7 @@ public:
 		return _quantum_state->dump_qubits(qubits, callback);
 	}
 	bool dump_qubits_ext(std::vector<logical_qubit_id> const& qubits, extended_callback_t const& callback, void* arg) {
-		return dump_qubits(qubits, [arg,&callback](const char* c, double re, double im) { callback(c, re, im, arg); });
+		return dump_qubits(qubits, [arg,&callback](const char* c, double re, double im) -> bool { return callback(c, re, im, arg); });
 	}
 
 	// Dumps all the states in superposition via a callback function
@@ -721,7 +721,7 @@ public:
 		_quantum_state->dump_all(max_qubit_id, callback);
 	}
 	void dump_all_ext(extended_callback_t const& callback, void* arg) {
-		dump_all([arg,&callback](const char* c, double re, double im) { callback(c, re, im, arg); });
+		dump_all([arg,&callback](const char* c, double re, double im) -> bool { return callback(c, re, im, arg); });
 	}
 
 	// Updates state to all queued gates
