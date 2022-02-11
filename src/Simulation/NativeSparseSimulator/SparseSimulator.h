@@ -86,6 +86,28 @@ public:
 		_execute_queued_ops();
 	}
 
+	// void dumpIds(void (*callback)(logical_qubit_id))
+	// {
+	//	 recursive_lock_type l(getmutex());
+	//	 flush();
+
+	//	 std::vector<logical_qubit_id> qubits = psi.get_qubit_ids();
+	//	 for (logical_qubit_id q : qubits)
+	//	 {
+	//		 callback(q);
+	//	 }
+	// }
+	void dump_ids(void (*callback)(logical_qubit_id))
+	{
+		for(size_t qid = 0; qid < _occupied_qubits.size(); ++qid)
+		{
+			if(_occupied_qubits[qid])
+			{
+				callback((logical_qubit_id)qid);
+			}
+		}
+	}
+
 	// Outputs the wavefunction to the console, after
 	// executing any queued operations
 	void DumpWavefunction(size_t indent = 0){
@@ -146,11 +168,16 @@ public:
 			// If not zero here, we must execute any remaining operations
 			// Then check if the result is all zero
 			_execute_queued_ops(qubit_id);
-			
-			if (!_quantum_state->is_qubit_zero(qubit_id)){
-				throw std::runtime_error("Released qubit not in zero state");
+			auto is_classical = _quantum_state->is_qubit_classical(qubit_id);
+			if (!is_classical.first){ // qubit isn't classical
+				_quantum_state->Reset(qubit_id);
+				_set_qubit_to_zero(qubit_id);
+				return false;
 			}
-
+			else if (is_classical.second) {// qubit is in |1>
+				X(qubit_id); // reset to |0> and release
+				_execute_queued_ops(qubit_id);
+			}
 		}
 		_set_qubit_to_zero(qubit_id);
 		return true;	
@@ -174,8 +201,12 @@ public:
 
 	// For both CNOT and all types of C*NOT
 	// If a control index is repeated, it just treats it as one control
-	//     (Q# will throw an error in that condition)
+	//	 (Q# will throw an error in that condition)
 	void MCX(std::vector<logical_qubit_id> const& controls, logical_qubit_id  target) {
+		if (controls.size() == 0) {
+			X(target);
+			return;
+		}
 		// Check for anything on the controls
 		if (controls.size() > 1){
 			_execute_if(controls);
@@ -230,6 +261,10 @@ public:
 	}
 
 	void MCY(std::vector<logical_qubit_id> const& controls, logical_qubit_id target) {
+		if (controls.size() == 0) {
+			Y(target);
+			return;
+		}
 		_execute_if(controls);
 		// Commutes with Ry on the target, not Rx
 		if (_queue_Rx[target]){
@@ -239,7 +274,10 @@ public:
 		if (_queue_H[target]){
 			// The phase added does not depend on the target
 			// Thus we use one of the controls as a target
-			_queued_operations.push_back(operation(OP::MCZ, controls[0], controls));
+			if (controls.size() == 1)
+				_queued_operations.push_back(operation(OP::Z, controls[0]));
+			else if (controls.size() > 1)
+				_queued_operations.push_back(operation(OP::MCZ, controls[0], controls));
 		}
 		_queued_operations.push_back(operation(OP::MCY, target, controls));
 		_set_qubit_to_nonzero(target);
@@ -267,6 +305,10 @@ public:
 	}
 
 	void MCZ(std::vector<logical_qubit_id> const& controls, logical_qubit_id target) {
+		if (controls.size() == 0) {
+			Z(target);
+			return;
+		}
 		// If the only thing on the controls is one H, we can switch
 		// this to an MCX. Any Rx or Ry, or more than 1 H, means we 
 		// must execute. 
@@ -286,13 +328,14 @@ public:
 		if (count > 1) {
 			_execute_queued_ops(controls, OP::Ry);
 			_execute_queued_ops(target, OP::Ry);
-		} else if (count == 1){
+		} else if (count == 1) {
 			// Transform to an MCX, but we need to swap one of the controls
-			// with the target
+			// with the target if the Hadamard is on one of the control qubits
 			std::vector<logical_qubit_id> new_controls(controls);
-			for (logical_qubit_id control : controls){
-				if (_queue_H[control]){
-					std::swap(new_controls[control], target);
+			for (std::size_t i = 0; i < new_controls.size(); ++i){
+				if (_queue_H[new_controls[i]]){
+					std::swap(new_controls[i], target);
+					break;
 				}
 			}
 			_queued_operations.push_back(operation(OP::MCX, target, new_controls));
@@ -306,13 +349,17 @@ public:
 	// Any phase gate
 	void Phase(amplitude const& phase, logical_qubit_id index) {
 		// Rx, Ry, and H do not commute well with arbitrary phase gates
-		if (_queue_Ry[index] || _queue_Ry[index] || _queue_H[index]){
+		if (_queue_Ry[index] || _queue_Rx[index] || _queue_H[index]){
 			_execute_queued_ops(index, OP::Ry);
 		}
 		_queued_operations.push_back(operation(OP::Phase, index, phase));
 	}
 
 	void MCPhase(std::vector<logical_qubit_id> const& controls, amplitude const& phase, logical_qubit_id target){
+		if (controls.size() == 0) {
+			Phase(phase, target);
+			return;
+		}
 		_execute_if(controls);
 		_execute_if(target);
 		_queued_operations.push_back(operation(OP::MCPhase, target, controls, phase));
@@ -328,11 +375,14 @@ public:
 	
 
 	void R1(double const& angle, logical_qubit_id index) {
-		Phase(amplitude(std::cos(angle), std::sin(angle)), index);
+		Phase(std::polar(1.0, angle), index);
 	}
 
 	void MCR1(std::vector<logical_qubit_id> const& controls, double const& angle, logical_qubit_id target){
-		MCPhase(controls, amplitude(std::cos(angle), std::sin(angle)), target);
+		if (controls.size() > 0)
+			MCPhase(controls, std::polar(1.0, angle), target);
+		else
+			R1(angle, target);
 	}
 
 	void R1Frac(std::int64_t numerator, std::int64_t power, logical_qubit_id index) {
@@ -340,7 +390,10 @@ public:
 	}
 
 	void MCR1Frac(std::vector<logical_qubit_id> const& controls, std::int64_t numerator, std::int64_t power, logical_qubit_id target){
-		MCR1(controls, (double)numerator * pow(0.5, power) * M_PI, target);
+		if (controls.size() > 0)
+			MCR1(controls, (double)numerator * pow(0.5, power) * M_PI, target);
+		else
+			R1Frac(numerator, power, target);
 	}
 
 	void S(logical_qubit_id index) {
@@ -393,12 +446,16 @@ public:
 	}
 
 	void MCR (std::vector<logical_qubit_id> const& controls, Gates::Basis b, double phi, logical_qubit_id target) {
+		if (controls.size() == 0) {
+			R(b, phi, target);
+			return;
+		}
 		if (b == Gates::Basis::PauliI){
 			// Controlled I rotations are equivalent to controlled phase gates
 			if (controls.size() > 1){
-				MCPhase(controls, amplitude(std::cos(phi),std::sin(phi)), controls[0]);
+				MCPhase(controls, std::polar(1.0, -0.5*phi), controls[0]);
 			} else {
-				Phase(amplitude(std::cos(phi),std::sin(phi)), controls[0]);
+				Phase(std::polar(1.0, -0.5*phi), controls[0]);
 			}
 			return;
 		}
@@ -444,6 +501,10 @@ public:
 	}
 
 	void MCExp(std::vector<logical_qubit_id> const& controls, std::vector<Gates::Basis> const& axes, double angle, std::vector<logical_qubit_id> const& qubits){
+		if (controls.size() == 0) {
+			Exp(axes, angle, qubits);
+			return;
+		}
 		amplitude cosAngle = std::cos(angle);
 		amplitude sinAngle = 1i*std::sin(angle);
 		// This does not commute nicely with anything, so we execute everything
@@ -470,6 +531,10 @@ public:
 	}
 
 	void MCH(std::vector<logical_qubit_id> const& controls, logical_qubit_id target) {
+		if (controls.size() == 0) {
+			H(target);
+			return;
+		}
 		// No commutation on controls
 		_execute_if(controls);
 		// No Ry or Rx commutation on target
@@ -502,6 +567,10 @@ public:
 	}
 
 	void CSWAP(std::vector<logical_qubit_id> const& controls, logical_qubit_id index_1, logical_qubit_id index_2){
+		if (controls.size() == 0) {
+			SWAP(index_1, index_2);
+			return;
+		}
 		if (index_1 > index_2){
 			std::swap(index_2, index_1);
 		}
@@ -519,27 +588,23 @@ public:
 		}
 	}
 
-	bool M(logical_qubit_id target) {
+	unsigned M(logical_qubit_id target) {
 		// Do nothing if the qubit is known to be 0
 		if (!_occupied_qubits[target]){ 
-			return false;
+			return 0;
 		}
 		// If we get a measurement, we take it as soon as we can
 		_execute_queued_ops(target, OP::Ry);
 		// If we measure 0, then this resets the occupied qubit register
-		if (_quantum_state->M(target)){
-			_set_qubit_to_nonzero(target);
-		} else {
+		unsigned res = _quantum_state->M(target);
+		if (res == 0)
 			_set_qubit_to_zero(target);
-		}
-		return _occupied_qubits[target];
-
+		return res;
 	}
 
 	void Reset(logical_qubit_id target) {
 		if (!_occupied_qubits[target]){ return; }
-		// If we get a measurement, we take it as soon as we can
-			_execute_queued_ops(target, OP::Ry);
+		_execute_queued_ops(target, OP::Ry);
 		_quantum_state->Reset(target);
 		_set_qubit_to_zero(target);
 	}
@@ -547,38 +612,29 @@ public:
 	void Assert(std::vector<Gates::Basis> axes, std::vector<logical_qubit_id> const& qubits, bool result) {
 		// Assertions will not commute well with Rx or Ry
 		for (auto qubit : qubits) {
-			if (_queue_Rx[qubit] || _queue_Ry[qubit]){
+			if (_queue_Rx[qubit] || _queue_Ry[qubit])
 				_execute_queued_ops(qubits, OP::Ry);
-			}
 		}
-		bool isAllZ = true;
 		bool isEmpty = true;
 		// Process each assertion by H commutation
 		for (int i = 0; i < qubits.size(); i++) { 		
 			switch (axes[i]){
 				case Gates::Basis::PauliY:
-					// HY=YH, so we switch the eigenvalue
-					if (_queue_H[qubits[i]]){
-						result ^= _queue_H[qubits[i]];
-					}
-					isAllZ = false;
+					// HY=-YH, so we switch the eigenvalue
+					if (_queue_H[qubits[i]])
+						result ^= 1;
 					isEmpty = false;
 					break; 
 				case Gates::Basis::PauliX:
 					// HX = ZH
-					if (_queue_H[qubits[i]]){
+					if (_queue_H[qubits[i]])
 						axes[i] = Gates::Basis::PauliZ;
-					} else {
-						isAllZ = false;
-					}
 					isEmpty = false;
 					break;
 				case Gates::Basis::PauliZ:
 					// HZ = XH
-					if (_queue_H[qubits[i]]){
+					if (_queue_H[qubits[i]])
 						axes[i] = Gates::Basis::PauliX;
-						isAllZ = false;
-					}
 					isEmpty = false;
 					break;
 				default:
@@ -588,21 +644,6 @@ public:
 		if (isEmpty) {
 			return;
 		}
-		// Z assertions are like phase gates
-		// If it's in release mode, it will queue them
-		// as a phase/permutation gate
-		// This means if an assert fails, it will fail
-		// at some future point, not at the point of failure
-		#if defined(NDEBUG)
-			if (isAllZ) {
-				_queued_operations.push_back(operation(OP::Assert, qubits, result));
-				// In release mode we queue Z assertion and return.
-				return;
-			}
-		#endif
-		// X or Y assertions require immediate execution.
-		// We also execute Z assertion immediately in debug mode
-		// to provide feedback at the point of failure.
 		_execute_queued_ops(qubits, OP::PermuteLarge);
 		_quantum_state->Assert(axes, qubits, result);
 	}
@@ -617,9 +658,9 @@ public:
 
 
 
-	bool Measure(std::vector<Gates::Basis> const& axes, std::vector<logical_qubit_id> const& qubits){
+	unsigned Measure(std::vector<Gates::Basis> const& axes, std::vector<logical_qubit_id> const& qubits){
 		_execute_queued_ops(qubits, OP::Ry);
-		bool result = _quantum_state->Measure(axes, qubits);
+		unsigned result = _quantum_state->Measure(axes, qubits);
 		// Switch basis to save space
 		// Idea being that, e.g., HH = I, but if we know 
 		// that the qubit is in the X-basis, we can apply H
@@ -656,18 +697,31 @@ public:
 		return _quantum_state->Sample();
 	}
 
+	using callback_t = std::function<bool(const char*, double, double)>;
+	using extended_callback_t = std::function<bool(const char*, double, double, void*)>;
 	// Dumps the state of a subspace of particular qubits, if they are not entangled
 	// This requires it to detect if the subspace is entangled, construct a new 
 	// projected wavefunction, then call the `callback` function on each state.
-	bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(char*, double, double)) {
+	bool dump_qubits(std::vector<logical_qubit_id> const& qubits, callback_t const& callback) {
 		_execute_queued_ops(qubits, OP::Ry);
 		return _quantum_state->dump_qubits(qubits, callback);
 	}
+	bool dump_qubits_ext(std::vector<logical_qubit_id> const& qubits, extended_callback_t const& callback, void* arg) {
+		return dump_qubits(qubits, [arg,&callback](const char* c, double re, double im) -> bool { return callback(c, re, im, arg); });
+	}
 
 	// Dumps all the states in superposition via a callback function
-	void dump_all(logical_qubit_id max_qubit_id, void (*callback)(char*, double, double)) {
+	void dump_all(callback_t const& callback) {
 		_execute_queued_ops();
+		logical_qubit_id max_qubit_id = 0;
+		for (std::size_t i = 0; i < _occupied_qubits.size(); ++i) {
+			if (_occupied_qubits[i])
+				max_qubit_id = i;
+		}
 		_quantum_state->dump_all(max_qubit_id, callback);
+	}
+	void dump_all_ext(extended_callback_t const& callback, void* arg) {
+		dump_all([arg,&callback](const char* c, double re, double im) -> bool { return callback(c, re, im, arg); });
 	}
 
 	// Updates state to all queued gates

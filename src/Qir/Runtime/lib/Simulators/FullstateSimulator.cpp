@@ -159,11 +159,11 @@ namespace Quantum
         {
             std::cout << "*********************" << std::endl;
             this->GetState(
-                [](size_t idx, double re, double im)
+                [](const char* idx, double re, double im)
                 {
                     if (!Close(re, 0.0) || !Close(im, 0.0))
                     {
-                        std::cout << "|" << std::bitset<8>(idx) << ">: " << re << "+" << im << "i" << std::endl;
+                        std::cout << "|" << idx << ">: " << re << "+" << im << "i" << std::endl;
                     }
                     return true;
                 });

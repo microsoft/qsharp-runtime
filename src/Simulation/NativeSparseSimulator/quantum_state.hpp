@@ -126,10 +126,11 @@ public:
     void DumpWavefunction(wavefunction &wfn, size_t indent = 0){
         std::string spacing(indent, ' ');
         std::cout << spacing << "Wavefunction:\n";
-        auto line_dump = [spacing](qubit_label label, amplitude val){
+        auto line_dump = [spacing](qubit_label label, amplitude val) -> bool {
             std::cout << spacing << "  " << label.to_string() << ": ";
             std::cout << val.real();
             std::cout  << (val.imag() < 0 ? " - " : " + ") <<  std::abs(val.imag()) << "i\n";
+            return true;
         };
         _DumpWavefunction_base(wfn, line_dump);
         std::cout << spacing << "--end wavefunction\n";
@@ -145,7 +146,7 @@ public:
     // Used to decide when an amplitude is close enough to 0 to discard
     void set_precision(double new_precision) {
          _precision = new_precision;
-         _precision_squared = _precision *_precision;
+         _rotation_precision = new_precision;
     }
 
     // Load factor of the underlying hash map
@@ -209,8 +210,8 @@ public:
             // To avoid saving states of zero amplitude, these if/else 
             // check for when one of the coefficients is 
             // close enough to zero to regard as zero
-            if (std::norm(pauli_coeff) > _rotation_precision_squared ){
-                if (std::norm(id_coeff) > _rotation_precision_squared){
+            if (std::norm(pauli_coeff) > _rotation_precision){
+                if (std::norm(id_coeff) > _rotation_precision){
                     // If both coefficients are non-zero, we can just modify the state in-place
                     for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
                         current_state->second *= (get_parity(current_state->first & YZs) ? id_coeff : pauli_coeff);
@@ -273,12 +274,12 @@ public:
                     // Each Y and Z gate adds a phase (since Y=iXZ)
                     bool parity = get_parity(current_state->first & YZs);
                     new_state = current_state->second * id_coeff + alt_state->second * (parity ? -pauli_coeff_alt : pauli_coeff_alt);
-                    if (std::norm(new_state) > _rotation_precision_squared) {
+                    if (std::norm(new_state) > _rotation_precision) {
                         new_qubit_data.emplace(current_state->first, new_state);
                     }
 
                     new_state = alt_state->second * id_coeff + current_state->second * (parity ? -pauli_coeff : pauli_coeff);
-                    if (std::norm(new_state) > _rotation_precision_squared) {
+                    if (std::norm(new_state) > _rotation_precision) {
                         new_qubit_data.emplace(alt_state->first, new_state);
                     }
                 }
@@ -333,8 +334,8 @@ public:
             // To avoid saving states of zero amplitude, these if/else 
             // check for when one of the coefficients is 
             // close enough to zero to regard as zero
-            if (std::norm(pauli_coeff) > _rotation_precision_squared ){
-                if (std::norm(id_coeff) > _rotation_precision_squared){
+            if (std::norm(pauli_coeff) > _rotation_precision){
+                if (std::norm(id_coeff) > _rotation_precision){
                     // If both coefficients are non-zero, we can just modify the state in-place
                     for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
                         if ((current_state->first & cmask)==cmask) {
@@ -399,12 +400,12 @@ public:
                         // Each Y and Z gate adds a phase (since Y=iXZ)
                         bool parity = get_parity(current_state->first & YZs);
                         new_state = current_state->second * id_coeff + alt_state->second * (parity ? -pauli_coeff_alt : pauli_coeff_alt);
-                        if (std::norm(new_state) > _rotation_precision_squared) {
+                        if (std::norm(new_state) > _rotation_precision) {
                             new_qubit_data.emplace(current_state->first, new_state);
                         }
 
                         new_state = alt_state->second * id_coeff + current_state->second * (parity ? -pauli_coeff : pauli_coeff);
-                        if (std::norm(new_state) > _rotation_precision_squared) {
+                        if (std::norm(new_state) > _rotation_precision) {
                             new_qubit_data.emplace(alt_state->first, new_state);
                         }
                     }
@@ -417,12 +418,7 @@ public:
     }
 
 
-    bool M(logical_qubit_id target) {
-        qubit_label flip = qubit_label();
-        flip.set(target);
-
-        bool result = _qubit_data.begin()->first[target];
-        
+    unsigned M(logical_qubit_id target) {
         double zero_probability = 0.0;
         double one_probability = 0.0;
 
@@ -444,11 +440,11 @@ public:
             }
         }
         // Randomly select
-        result = (_rng() <= one_probability);
+        unsigned result = (_rng() <= one_probability) ? 1 : 0;
 
-        wavefunction &new_qubit_data = result ? ones : zeros;
+        wavefunction &new_qubit_data = (result == 1) ? ones : zeros;
         // Create a new, normalized state
-        double normalizer = 1.0/std::sqrt((result) ? one_probability : zero_probability);
+        double normalizer = 1.0/std::sqrt((result == 1) ? one_probability : zero_probability);
         for (auto current_state = (new_qubit_data).begin(); current_state != (new_qubit_data).end(); ++current_state) {
             current_state->second *= normalizer;
         }
@@ -458,9 +454,6 @@ public:
     }
 
     void Reset(logical_qubit_id target) {
-        qubit_label flip = qubit_label(0);
-        flip.set(target);
-
         double zero_probability = 0.0;
         double one_probability = 0.0;
 
@@ -561,11 +554,11 @@ public:
             // is *not* a match, so the assertion should fail. 
             auto flipped_state = _qubit_data.find(current_state->first ^ XYs);
             if (flipped_state == _qubit_data.end() ||
-                std::norm(flipped_state->second -  current_state->second * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision_squared) {
+                std::norm(flipped_state->second   -  current_state->second * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift)) > _precision) {
                 qubit_label label = current_state->first;
                 amplitude val = current_state->second;
                 std::cout << "Problematic state: " << label << "\n";
-                std::cout << "Expected " << val * (get_parity(label & YZs) ? -phaseShift : phaseShift);
+                std::cout << "Expected " << val * (get_parity(current_state->first & YZs) ? -phaseShift : phaseShift);
                 std::cout << ", got " << (flipped_state == _qubit_data.end() ? 0.0 : flipped_state->second) << "\n";
                 std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
                 throw std::runtime_error("Not an eigenstate");
@@ -638,10 +631,12 @@ public:
         return 0.5 - 0.5 * projection.real();
     }
 
-    bool Measure(std::vector<Gates::Basis> const& axes, std::vector<logical_qubit_id> const& qubits){
+    unsigned Measure(std::vector<Gates::Basis> const& axes, std::vector<logical_qubit_id> const& qubits){
         // Find a probability to get a specific result
         double probability = MeasurementProbability(axes, qubits);
         bool result = _rng() <= probability;
+        if (!result)
+            probability = 1-probability;
         probability = std::sqrt(probability);
         // This step executes immediately so that we reduce the number of states in superposition
         PauliCombination(axes, qubits, 0.5/probability, (result ? -0.5 : 0.5)/probability);
@@ -666,10 +661,11 @@ public:
         return probe(bit_label);
     }
 
+    using callback_t = std::function<bool(const char*, double, double)>;
     // Dumps the state of a subspace of particular qubits, if they are not entangled
     // This requires it to detect if the subspace is entangled, construct a new 
     // projected wavefunction, then call the `callback` function on each state.
-    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, void (*callback)(char*, double, double)) {
+    bool dump_qubits(std::vector<logical_qubit_id> const& qubits, callback_t const& callback) {
         // Create two wavefunctions
         // check if they are tensor products
         wavefunction dump_wfn;
@@ -677,21 +673,20 @@ public:
         if (!_split_wavefunction(_get_mask(qubits), dump_wfn, leftover_wfn)){
             return false;
         } else {
-            _DumpWavefunction_base(dump_wfn, [qubits, callback](qubit_label label, amplitude val){ 
-                std::string label_string(qubits.size(), '0');
-                for (size_t i=0; i < qubits.size(); i++){
-                    label_string[i] = label[qubits[i]] ? '1' : '0';
-                }
-                callback(const_cast<char *>(label_string.c_str()), val.real(), val.imag());
+            _DumpWavefunction_base(dump_wfn, [qubits, callback](qubit_label label, amplitude val) -> bool {
+                std::string masked(qubits.size(),'0');
+                for (std::size_t i = 0; i < qubits.size(); ++i)
+                    masked[i] = label[qubits[i]] ? '1' : '0';
+                return callback(masked.c_str(), val.real(), val.imag());
             });
             return true;
         }
     }
 
     // Dumps all the states in superposition via a callback function
-    void dump_all(logical_qubit_id max_qubit_id, void (*callback)(char*, double, double)) {
-        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback](qubit_label label, amplitude val){
-            callback(const_cast<char *>(label.to_string().substr(num_qubits - 1 - max_qubit_id, max_qubit_id + 1).c_str()), val.real(), val.imag());
+    void dump_all(logical_qubit_id max_qubit_id, callback_t const& callback) {
+        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback](qubit_label label, amplitude val) -> bool {
+            return callback(label.to_string().substr(num_qubits-1-max_qubit_id).c_str(), val.real(), val.imag());
         });
     }
 
@@ -729,9 +724,6 @@ public:
                     break;
                 case OP::MCSWAP:
                     operation_vector.push_back(internal_operation(op.gate_type, op.target, _get_mask(op.controls), op.target_2));
-                    break;
-                case OP::Assert:
-                    operation_vector.push_back(internal_operation(op.gate_type, _get_mask(op.controls), op.result));
                     break;
                 default:
                     throw std::runtime_error("Unsupported operation");
@@ -791,14 +783,6 @@ public:
                             label.flip(op.target_2);
                         } 
                         break;
-                    case OP::Assert:
-                        if (get_parity(label & op.controls) != op.result && std::norm(val) > _precision_squared){
-                            std::cout << "Problematic state: " << label << "\n";
-                            std::cout << "Amplitude: " << val << "\n";
-                            std::cout << "Wavefunction size: " << _qubit_data.size() << "\n";
-                            throw std::runtime_error("Assert failed");
-                        }
-                        break;
                     default:
                         throw std::runtime_error("Unsupported operation");
                         break;
@@ -814,25 +798,25 @@ public:
     void R(Gates::Basis b, double phi, logical_qubit_id index){
         // Z rotation can be done in-place
         if (b == Gates::Basis::PauliZ) {
-            amplitude exp_0 = amplitude(std::cos(phi / 2.0), -std::sin(phi / 2.0));
-            amplitude exp_1 = amplitude(std::cos(phi / 2.0), std::sin(phi / 2.0));
+            amplitude exp_0 = std::polar(1.0, -0.5*phi);
+            amplitude exp_1 = std::polar(1.0, 0.5*phi);
             for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
                 current_state->second *= current_state->first[index] ? exp_1 : exp_0;
             }
         }
         else if (b == Gates::Basis::PauliX || b == Gates::Basis::PauliY) {
             amplitude M00 = std::cos(phi / 2.0);
-            amplitude M01 = -std::sin(phi / 2.0) * (b == Gates::Basis::PauliY ? 1 : 1i);
-            if (std::norm(M00) < _rotation_precision_squared){
+            amplitude M01 = -1i*std::sin(0.5 * phi) * (b == Gates::Basis::PauliY ? -1i : 1);
+            if (std::norm(M00) <= _rotation_precision){
                 // This is just a Y or X gate
                 phase_and_permute(std::list<operation>{operation(b==Gates::Basis::PauliY ? OP::Y : OP::X, index)});
                 return;
-            } else if (std::norm(M01) < _rotation_precision_squared){
+            } else if (std::norm(M01) <= _rotation_precision){
                 // just an identity
                 return;
             }
 
-            amplitude M10 = M01 * amplitude(b == Gates::Basis::PauliY ? -1 : 1);
+            amplitude M10 = M01 * (b == Gates::Basis::PauliY ? -1. : 1.);
             // Holds the amplitude of the new state to make it easier to check if it's non-zero
             amplitude new_state;
             qubit_label flip(0);
@@ -853,11 +837,11 @@ public:
                 // Add up the two values, only when reaching the zero value
                 else if (!(current_state->first[index])) {
                     new_state = current_state->second * M00 + flipped_state->second * M01; // zero state
-                    if (std::norm(new_state) > _rotation_precision_squared	) {
+                    if (std::norm(new_state) > _rotation_precision) {
                         new_qubit_data.emplace(current_state->first, new_state);
                     }
                     new_state = current_state->second * M10 + flipped_state->second * M00; // one state
-                    if (std::norm(new_state) > _rotation_precision_squared) {
+                    if (std::norm(new_state) > _rotation_precision) {
                         new_qubit_data.emplace(flipped_state->first, new_state);
                     }
                 }
@@ -871,8 +855,8 @@ public:
         qubit_label checks = _get_mask(controls);
         // A Z-rotation can be done without recreating the wavefunction
         if (b == Gates::Basis::PauliZ) {
-            amplitude exp_0 = amplitude(std::cos(phi / 2.0), -std::sin(phi / 2.0));
-            amplitude exp_1 = amplitude(std::cos(phi / 2.0), std::sin(phi / 2.0));
+            amplitude exp_0 = std::polar(1.0, -0.5*phi);
+            amplitude exp_1 = std::polar(1.0, 0.5*phi);
             for (auto current_state = (_qubit_data).begin(); current_state != (_qubit_data).end(); ++current_state) {
                 if ((current_state->first & checks)==checks){
                     current_state->second *= current_state->first[target] ? exp_1 : exp_0;
@@ -881,32 +865,29 @@ public:
         }
         // X or Y requires a new wavefunction
         else if (b == Gates::Basis::PauliX || b == Gates::Basis::PauliY) {
-            amplitude M00 = std::cos(phi / 2.0);
-            amplitude M01 = -std::sin(phi / 2.0) * (b == Gates::Basis::PauliY ? 1 : 1i);
+            amplitude M00 = std::cos(0.5 * phi);
+            amplitude M01 = -1i*std::sin(0.5 * phi) * (b == Gates::Basis::PauliY ? -1i : 1);
             amplitude M10 = (b == Gates::Basis::PauliY ? -1.0 : 1.0) * M01;
 
-            if (std::norm(M00) < _rotation_precision_squared){
+            if (std::norm(M00) <= _rotation_precision){
                 // This is just an MCY or MCX gate, but with a phase
                 // So we need to preprocess with a multi-controlled phase
                 if (b==Gates::Basis::PauliY){
-                    amplitude phase = -1i/M01;
+                    amplitude phase = -1i*std::sin(0.5 * phi);
                     phase_and_permute(std::list<operation>{
                         operation(OP::MCPhase, controls[0], controls, phase),
                         operation(OP::MCY, target, controls)
                     });
                 } else {
-                    amplitude phase = 1.0/M01;
+                    amplitude phase = -1i*std::sin(0.5 * phi);
                     phase_and_permute(std::list<operation>{
                         operation(OP::MCPhase, controls[0], controls, phase),
-                        operation(OP::MCY, target, controls)
+                        operation(OP::MCX, target, controls)
                     });
                 }
                 return;
-            } else if (std::norm(M01) < _rotation_precision_squared){
-                // This is equivalent to a multi-controlled Z if the rotation is -1
-                if (std::norm(M01 + 1.0) < _rotation_precision_squared){
-                    phase_and_permute(std::list<operation>{operation(OP::MCZ, controls[0], controls)});
-                }
+            } else if (std::norm(M01) <= _rotation_precision){
+                phase_and_permute(std::list<operation>{operation(OP::MCPhase, controls[0], controls, M00)});
                 return;
             }
 
@@ -930,12 +911,12 @@ public:
                     // Add up the two values, only when reaching the zero val
                     else if (!(current_state->first[target])) {
                         new_state = current_state->second * M00 + flipped_state->second * M01; // zero state
-                        if (std::norm(new_state) > _rotation_precision_squared) {
+                        if (std::norm(new_state) > _rotation_precision) {
                             new_qubit_data.emplace(current_state->first, new_state);
                         }
                         new_state = current_state->second * M10 + flipped_state->second * M00; // one state
-                        if (std::norm(new_state) > _rotation_precision_squared) {
-                            new_qubit_data.emplace(current_state->first | flip, new_state);
+                        if (std::norm(new_state) > _rotation_precision) {
+                            new_qubit_data.emplace(flipped_state->first, new_state);
                         }
                     }
                 } else {
@@ -969,12 +950,12 @@ public:
             }
             else if (!(current_state->first[index])) {
                 new_state = current_state->second + flipped_state->second; // zero state
-                if (std::norm(new_state) > _rotation_precision_squared) {
+                if (std::norm(new_state) > _rotation_precision) {
                     new_qubit_data.emplace(current_state->first, new_state * _normalizer);
                 }
 
                 new_state = current_state->second - flipped_state->second; // one state
-                if (std::norm(new_state) > _rotation_precision_squared) {
+                if (std::norm(new_state) > _rotation_precision) {
                     new_qubit_data.emplace(current_state->first | flip, new_state * _normalizer);
                 }
             }
@@ -1000,12 +981,12 @@ public:
                 }
                 else if (!(current_state->first[index])) {
                     new_state = current_state->second + flipped_state->second; // zero state
-                    if (std::norm(new_state) > _rotation_precision_squared) {
+                    if (std::norm(new_state) > _rotation_precision) {
                         new_qubit_data.emplace(current_state->first, new_state * _normalizer);
                     }
 
                     new_state = current_state->second - flipped_state->second; // one state
-                    if (std::norm(new_state) > _rotation_precision_squared) {
+                    if (std::norm(new_state) > _rotation_precision) {
                         new_qubit_data.emplace(current_state->first | flip, new_state * _normalizer);
                     }
                 }
@@ -1019,11 +1000,30 @@ public:
     // Checks whether a qubit is 0 in all states in the superposition
     bool is_qubit_zero(logical_qubit_id target){
         for (auto current_state = _qubit_data.begin(); current_state != _qubit_data.end(); ++current_state){
-            if (current_state->first[target] && std::norm(current_state->second) > _precision_squared) {
+            if (current_state->first[target] && std::norm(current_state->second) > _precision) {
                 return false;
             }
         }
         return true;
+    }
+
+    // Checks whether a qubit is classical
+    // result.first is true iff it is classical
+    // result.second holds its classical value if result.first == true
+    std::pair<bool,bool> is_qubit_classical(logical_qubit_id target){
+        bool value_found = false;
+        bool value = false;
+        for (auto current_state = _qubit_data.begin(); current_state != _qubit_data.end(); ++current_state){
+            if (std::norm(current_state->second) > _precision) {
+                if (!value_found) {
+                    value_found = true;
+                    value = current_state->first[target];
+                }
+                else if (value != current_state->first[target])
+                    return std::make_pair(false, false);
+            }
+        }
+        return std::make_pair(true, value);
     }
 
     // Creates a new wavefunction hash map indexed by strings
@@ -1052,18 +1052,14 @@ private:
     std::function<double()> _rng;
 
     // Threshold to assert that something is zero when asserting it is 0
-    double _precision = 1e-5;
+    double _precision = 1e-11;
     // Threshold at which something is zero when
     // deciding whether to add it into the superposition
-    double _rotation_precision = 1e-6;
-    // Often we compare to norms, so the precision must be squared
-    double _precision_squared = _precision * _precision;
-    double _rotation_precision_squared = _rotation_precision*_rotation_precision;
+    double _rotation_precision = 1e-11;
 
     // Normalizer for H and T gates (1/sqrt(2) as an amplitude)
     const amplitude _normalizer = amplitude(1.0, 0.0) / std::sqrt(2.0);
 
-    // The default for bytell_hash_map
     // Used when allocating new wavefunctions
     float _load_factor = 0.9375;
 
@@ -1094,10 +1090,6 @@ private:
     // a_bb*a_xx = a_bx * a_xb. 
     // If this holds: we write (a_xx/a_bx)|x1> into the first wavefunction and (a_xx/a_xb)|x2>
     // into the second. 
-    // This means the coefficients of wfn1 are all of the form (c_x/c_b); 
-    // Thus, the norm of wfn1 will be 1/|c_b|^2; thus the norm of wfn2 is 1/|d_b|^2 = |c_b|^2/|a_bb|^2
-    // So we iterate through the smaller wavefunction, to get the normalizing constant, 
-    // then normalize both
     bool _split_wavefunction(qubit_label const& first_mask, wavefunction &wfn1, wavefunction &wfn2){
         qubit_label second_mask = ~first_mask;
         // Guesses size
@@ -1105,12 +1097,17 @@ private:
         wfn2 = wavefunction((int)std::sqrt(_qubit_data.size()));
         // base_label_1 = b1 and base_label_2 = b2 in the notation above
         auto base_state = _qubit_data.begin();
+        for (; base_state != _qubit_data.end() && std::norm(base_state->second) <= _precision; ++base_state);
+        if (base_state == _qubit_data.end())
+            throw std::runtime_error("Invalid state: All amplitudes are ~ zero.");
         qubit_label base_label_1 = base_state->first & first_mask;
         qubit_label base_label_2 = base_state->first & second_mask;
         // base_val = a_bb
         amplitude base_val = base_state->second;
-        double normalizer_1 = 0.0;
-        double normalizer_2 = 0.0;
+        double norm1 = 1., norm2 = 1.;
+        wfn1[base_label_1] = 1.;
+        wfn2[base_label_2] = 1.;
+        std::size_t num_nonzero_states = 1;
         // From here on, base_state is |x1>|x2>
         ++base_state;
         for (; base_state != _qubit_data.end(); ++base_state){
@@ -1126,50 +1123,60 @@ private:
                 return false;
             } else { // label with base label exists
                 // Checks that a_bba_xx = a_xb*a_bx
-                if (std::norm(first_state->second * second_state->second - base_val * base_state->second) > _precision_squared*_precision_squared){
+                if (std::norm(first_state->second * second_state->second - base_val * base_state->second) > _precision){
                     return false;
                 } else {
+                    if (std::norm(base_state->second) <= _precision)
+                        continue;
+                    num_nonzero_states++;
                     // Not entangled so far, save the two states, with amplitudes a_xx/a_bx and a_xx/a_xb, respectively
-                    wfn1[label_1] =  base_state->second / second_state->second;
-                    wfn2[label_2] =  base_state->second / first_state->second;
+                    if (wfn1.find(label_1) == wfn1.end()) {
+                        auto amp1 = base_state->second / second_state->second;
+                        auto nrm = std::norm(amp1);
+                        if (nrm > _precision)
+                            wfn1[label_1] = amp1;
+                        norm1 += nrm;
+                    }
+                    if (wfn2.find(label_2) == wfn2.end()) {
+                        auto amp2 = base_state->second / first_state->second;
+                        auto nrm = std::norm(amp2);
+                        if (nrm > _precision)
+                            wfn2[label_2] = amp2;
+                        norm2 += nrm;
+                    }
                 }
             }
         }
+        if (num_nonzero_states != wfn1.size()*wfn2.size())
+            return false;
         // Normalize
-        // This cannot be done in the previous loop, as that loop will encounter the same data several times
-        wavefunction &smaller_wfn = (wfn1.size() < wfn2.size()) ? wfn1 : wfn2;
-        wavefunction &larger_wfn  = (wfn1.size() < wfn2.size()) ? wfn2 : wfn1;
-        for (auto current_state = smaller_wfn.begin(); current_state != smaller_wfn.end(); ++current_state){
-            normalizer_1 += std::norm(current_state->second);
+        for (auto current_state = wfn1.begin(); current_state != wfn1.end(); ++current_state){
+            current_state->second *= 1./std::sqrt(norm1);
         }
-        normalizer_2 = normalizer_1/std::norm(base_val);
-        normalizer_1 = 1.0/normalizer_1;
-        for (auto current_state = smaller_wfn.begin(); current_state != smaller_wfn.end(); ++current_state){
-            current_state->second *= normalizer_1;
-        }
-        for (auto current_state = larger_wfn.begin(); current_state != larger_wfn.end(); ++current_state){
-            current_state->second *= normalizer_2;
+        for (auto current_state = wfn2.begin(); current_state != wfn2.end(); ++current_state){
+            current_state->second *= 1./std::sqrt(norm2);
         }
         return true;
     }
 
     // Iterates through a wavefunction and calls the output function on each value
     // It first sorts the labels before outputting
-    void _DumpWavefunction_base(wavefunction &wfn, std::function<void(qubit_label,amplitude)> output){
+    void _DumpWavefunction_base(wavefunction &wfn, std::function<bool(qubit_label,amplitude)> output){
         if (wfn.size() == 0){ return; }
-        std::vector<qubit_label> sortedLabels;
-        sortedLabels.reserve(wfn.size());
+        using pair_t = std::pair<qubit_label, amplitude>;
+        std::vector<pair_t> sortedByLabels;
+        sortedByLabels.reserve(wfn.size());
         for (auto current_state = (wfn).begin(); current_state != (wfn).end(); ++current_state) {
-            sortedLabels.push_back(current_state->first);
+            sortedByLabels.push_back(*current_state);
         }
         std::sort(
-            sortedLabels.begin(), 
-            sortedLabels.end(),
-            [](const qubit_label& lhs, const qubit_label& rhs){return lhs < rhs;});
+            sortedByLabels.begin(), 
+            sortedByLabels.end(),
+            [](const pair_t& lhs, const pair_t& rhs){return lhs.first < rhs.first;});
         amplitude val;
-        for (qubit_label label : sortedLabels){
-            output(label, _qubit_data.find(label)->second);
-            
+        for (pair_t entry : sortedByLabels){
+            if(!output(entry.first, entry.second))
+                break;
         }
     }
 

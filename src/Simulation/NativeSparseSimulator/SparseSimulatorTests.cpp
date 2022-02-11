@@ -633,18 +633,137 @@ TEST_CASE("AssertTest") {
             sim.Assert(basis, qubits, val);
             sim.update_state();
         };
-    REQUIRE_THROWS_AS(sim_assert(basis, true), std::exception);
-    
     basis = { Basis::PauliZ, Basis::PauliZ, Basis::PauliI };
-    REQUIRE_THROWS_AS(sim_assert(basis, true), std::exception);
-    
+    sim_assert(basis, false);
+    sim.X(0);
+    sim_assert(basis, true);
+
     basis = { Basis::PauliX, Basis::PauliI, Basis::PauliI };
     REQUIRE_THROWS_AS(sim_assert(basis, false), std::exception);
-    REQUIRE_THROWS_AS(sim_assert(basis, true), std::exception);
+}
+
+// Tests an assortment of assertions to both pass and to throw exceptions
+TEST_CASE("AssertTest2") {
+    const logical_qubit_id num_qubits = 32;
+    const qubit_label_type<num_qubits> zero(0);
+    SparseSimulator sim = SparseSimulator(num_qubits);
+    using namespace Gates;
+    std::vector<Basis> basis{ Basis::PauliZ, Basis::PauliZ };
+    std::vector<logical_qubit_id> qubits{ 0,1 };
+    sim.Assert(basis, qubits, false);
+    sim.update_state();
+    // These require forcing the simulator to update the state for it to actually throw the exception
     
-    basis = { Basis::PauliY, Basis::PauliI, Basis::PauliI };
-    REQUIRE_THROWS_AS(sim_assert(basis, false), std::exception);
-    REQUIRE_THROWS_AS(sim_assert(basis, true), std::exception);
+    auto sim_assert = [&](std::vector<Basis> const& basis, bool val) {
+            sim.Assert(basis, qubits, val);
+            sim.update_state();
+        };
+    sim.X(0);
+    sim.X(1);
+    sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
+    
+    sim.H(0);
+    sim.H(1);
+    basis = {Basis::PauliX, Basis::PauliX};
+    sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
+    
+    sim.S(0);
+    sim.S(1);
+    basis = {Basis::PauliY, Basis::PauliY};
+    sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
+    
+    
+    sim.X(0);
+    sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
+    sim.AdjS(0);
+    sim.AdjS(1);
+    
+    basis = {Basis::PauliX, Basis::PauliX};
+    sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
+    sim.H(0);
+    sim.H(1);
+
+    basis = {Basis::PauliZ, Basis::PauliZ};
+    sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
+    sim.X(1);
+    sim.X(0);
+    
+    sim_assert(basis, true);
+    sim.X(0);
+    sim_assert(basis, false);
+}
+
+// Tests an assortment of assertions to both pass with decomposed measurements
+TEST_CASE("AssertTest3") {
+    const logical_qubit_id num_qubits = 32;
+    const qubit_label_type<num_qubits> zero(0);
+    SparseSimulator sim = SparseSimulator(num_qubits);
+    using namespace Gates;
+    std::vector<Basis> basis{ Basis::PauliZ, Basis::PauliZ };
+    std::vector<logical_qubit_id> qubits{ 0,1,2 };
+    sim.Assert(basis, qubits, false);
+    sim.update_state();
+    // These require forcing the simulator to update the state for it to actually throw the exception
+
+    auto sim_assert = [&](std::vector<Basis> const& basis, bool val) {
+            sim.Assert(basis, qubits, val);
+            sim.update_state();
+        };
+    sim.X(0);
+    sim.X(1);
+    sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
+
+    sim.H(0);
+    sim.H(1);
+    basis = {Basis::PauliX, Basis::PauliX};
+    sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
+
+    sim.S(0);
+    sim.S(1);
+    basis = {Basis::PauliY, Basis::PauliY};
+    sim_assert(basis, false);
+    REQUIRE(sim.Measure(basis, {0,1}) == false);
+
+
+    sim.X(0);
+    sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
+    sim.AdjS(0);
+    sim.AdjS(1);
+
+    basis = {Basis::PauliX, Basis::PauliX};
+    sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
+    sim.H(0);
+    sim.H(1);
+
+    basis = {Basis::PauliZ, Basis::PauliZ};
+    sim_assert(basis, true);
+    REQUIRE(sim.Measure(basis, {0,1}));
+    sim.H(2);
+    sim.MCZ({2}, 0);
+    sim.MCZ({2}, 1);
+    sim.H(2);
+    REQUIRE(sim.M(2));
+    sim.X(2);
+    sim.MCX({0}, 2);
+    sim.MCX({1}, 2);
+    REQUIRE(sim.M(2));
+    sim.X(2);
+    sim.X(1);
+    sim.X(0);
+
+    sim_assert(basis, true);
+    sim.X(0);
+    sim_assert(basis, false);
 }
 
 // Tests an assortment of assertions on GHZ states
@@ -672,6 +791,7 @@ TEST_CASE("AssertGHZTest") {
     sim.Assert(basis, qubits, true);
     REQUIRE_THROWS_AS(sim.Assert(basis, qubits, false), std::exception);
     sim.probe("0");
+    sim.update_state();
 }
 
 // Basic test of quantum teleportation

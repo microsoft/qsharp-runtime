@@ -32,7 +32,7 @@ extern "C"
     MICROSOFT_QUANTUM_DECL void seed_cpp(simulator_id_type sim_id, _In_ unsigned int s);
     // allocate and release
     MICROSOFT_QUANTUM_DECL void allocateQubit_cpp(simulator_id_type sim_id, logical_qubit_id q);
-    MICROSOFT_QUANTUM_DECL void releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q);
+    MICROSOFT_QUANTUM_DECL bool releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q);
     MICROSOFT_QUANTUM_DECL logical_qubit_id num_qubits_cpp(simulator_id_type sim_id);
 
     // single-qubit gates
@@ -114,9 +114,9 @@ extern "C"
         _In_reads_(n) logical_qubit_id* q);
 
     // measurements
-    MICROSOFT_QUANTUM_DECL bool M_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q);
+    MICROSOFT_QUANTUM_DECL unsigned M_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q);
     MICROSOFT_QUANTUM_DECL void Reset_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q);
-    MICROSOFT_QUANTUM_DECL bool Measure_cpp(
+    MICROSOFT_QUANTUM_DECL unsigned Measure_cpp(
         simulator_id_type sim_id,
         _In_ int n,
         _In_reads_(n) int* b,
@@ -129,12 +129,20 @@ extern "C"
         _In_reads_(n) int* b,
         _In_reads_(n) logical_qubit_id* q);
 
-    MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ logical_qubit_id max_qubit_id, _In_ void (*callback)(char*, double, double));
+    MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ bool (*callback)(const char*, double, double));
+    MICROSOFT_QUANTUM_DECL void ExtendedDump_cpp(simulator_id_type sim_id, _In_ bool (*callback)(const char*, double, double, void*), void*);
     MICROSOFT_QUANTUM_DECL bool DumpQubits_cpp(
         simulator_id_type sim_id,
-        _In_ logical_qubit_id n,
+        _In_ int n,
         _In_reads_(n) logical_qubit_id* q,
-        _In_ void (*callback)(char* , double, double));
+        _In_ bool (*callback)(const char*, double, double));
+    MICROSOFT_QUANTUM_DECL bool ExtendedDumpQubits_cpp(
+        simulator_id_type sim_id,
+        _In_ int n,
+        _In_reads_(n) logical_qubit_id* q,
+        _In_ bool (*callback)(const char*, double, double, void*),
+        _In_ void*);
+    MICROSOFT_QUANTUM_DECL void QubitIds_cpp(simulator_id_type sim_id, void (*callback)(logical_qubit_id));
 
     MICROSOFT_QUANTUM_DECL bool Assert_cpp(simulator_id_type sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result);
 }

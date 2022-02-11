@@ -290,15 +290,19 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         return psi.data().data();
     }
 
-    void dump(bool (*callback)(size_t, double, double))
+    void dump(bool (*callback)(const char*, double, double))
     {
         recursive_lock_type l(getmutex());
         flush();
 
         auto wfn = psi.data();
+        auto nq = num_qubits();
+        std::string label_str(nq, '0');
         for (std::size_t i = 0; i < wfn.size(); i++)
         {
-            if (!callback(i, wfn[i].real(), wfn[i].imag())) return;
+            for (std::size_t j = 0; j < nq; ++j)
+                label_str[j] = ((i >> j)&1) ? '1' : '0';
+            if (!callback(label_str.c_str(), wfn[i].real(), wfn[i].imag())) return;
         }
     }
 
@@ -345,17 +349,20 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
         }
     }
 
-    bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(size_t, double, double))
+    bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(const char*, double, double))
     {
         assert(qs.size() <= num_qubits());
 
         WavefunctionStorage wfn(1ull << qs.size());
-
+        auto nq = num_qubits();
+        std::string label_str(nq, '0');
         if (subsytemwavefunction(qs, wfn, 1e-10))
         {
             for (std::size_t i = 0; i < wfn.size(); i++)
             {
-                if (!callback(i, wfn[i].real(), wfn[i].imag())) break;
+                for (std::size_t j = 0; j < nq; ++j)
+                    label_str[j] = ((i >> j)&1) ? '1' : '0';
+                if (!callback(label_str.c_str(), wfn[i].real(), wfn[i].imag())) break;
             }
             return true;
         }

@@ -9,6 +9,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
     @Test("ResourcesEstimator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation QSharpUnitTest() : Unit {
 		Message("Worked!");
 	}
@@ -17,6 +18,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     @Test("Microsoft.Quantum.Simulation.Simulators.Tests.TrivialSimulator")
     @Test("Microsoft.Quantum.Simulation.Simulators.Tests.ModifiedTrivialSimulator")
     @Test("Microsoft.Quantum.Simulation.Simulators.Tests.UnitTests.TrivialSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
     operation ArbitraryUnitTestTarget() : Unit {
 		Message("Worked!");
 	}

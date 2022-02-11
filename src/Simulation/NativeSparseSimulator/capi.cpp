@@ -42,9 +42,9 @@ extern "C"
         getSimulator(sim_id)->allocate_specific_qubit(q);
     }
 
-    MICROSOFT_QUANTUM_DECL void releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL bool releaseQubit_cpp(simulator_id_type sim_id, logical_qubit_id q)
     {
-        getSimulator(sim_id)->release(q);
+        return (getSimulator(sim_id)->release(q));
     }
 
     MICROSOFT_QUANTUM_DECL logical_qubit_id num_qubits_cpp(simulator_id_type sim_id)
@@ -211,7 +211,7 @@ extern "C"
     }
 
     // measurements
-    MICROSOFT_QUANTUM_DECL bool M_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q)
+    MICROSOFT_QUANTUM_DECL unsigned M_cpp(simulator_id_type sim_id, _In_ logical_qubit_id q)
     {
         return getSimulator(sim_id)->M(q);
     }
@@ -220,7 +220,7 @@ extern "C"
         getSimulator(sim_id)->Reset(q);
     }
 
-    MICROSOFT_QUANTUM_DECL bool Measure_cpp(
+    MICROSOFT_QUANTUM_DECL unsigned Measure_cpp(
         simulator_id_type sim_id,
         _In_ int n,
         _In_reads_(n) int* b,
@@ -253,21 +253,45 @@ extern "C"
     // Iterates through the entire wavefunction and calls `callback` on every state in the superposition
     // It will write the label of the state, in binary, from qubit 0 to `max_qubit_id`, into the char* pointer, then call `callback`
     //  with the real and complex values as the double arguments
-     MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ logical_qubit_id max_qubit_id, _In_ void (*callback)(char* , double, double)){
-        return getSimulator(sim_id)->dump_all(max_qubit_id, callback);
-     }
+    MICROSOFT_QUANTUM_DECL void Dump_cpp(simulator_id_type sim_id, _In_ bool (*callback)(const char*, double, double)){
+        return getSimulator(sim_id)->dump_all(callback);
+    }
 
-     // Same as Dump_cpp, but only dumps the wavefunction on the qubits in `q`, ensuring they are separable from the rest of the state first
+    MICROSOFT_QUANTUM_DECL void ExtendedDump_cpp(simulator_id_type sim_id, _In_ bool (*callback)(const char*, double, double, void*), _In_ void* arg){
+        return getSimulator(sim_id)->dump_all_ext(callback, arg);
+    }
+
+    // Same as Dump_cpp, but only dumps the wavefunction on the qubits in `q`, ensuring they are separable from the rest of the state first
     MICROSOFT_QUANTUM_DECL bool DumpQubits_cpp(
         simulator_id_type sim_id,
-        _In_ logical_qubit_id n,
+        _In_ int n,
         _In_reads_(n) logical_qubit_id* q,
-        _In_ void (*callback)(char* , double, double))
+        _In_ bool (*callback)(const char*, double, double))
     {
         std::vector<logical_qubit_id> qs(q, q + n);
         return getSimulator(sim_id)->dump_qubits(qs, callback);
     }
 
+    MICROSOFT_QUANTUM_DECL bool ExtendedDumpQubits_cpp(
+        simulator_id_type sim_id,
+        _In_ int n,
+        _In_reads_(n) logical_qubit_id* q,
+        _In_ bool (*callback)(const char*, double, double, void*),
+        _In_ void* arg)
+    {
+        std::vector<logical_qubit_id> qs(q, q + n);
+        return getSimulator(sim_id)->dump_qubits_ext(qs, callback, arg);
+    }
+
+    // // dump the list of logical qubit ids to given callback
+    // MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned id, _In_ void (*callback)(unsigned))
+    // {
+    //     Microsoft::Quantum::Simulator::get(id)->dumpIds(callback);
+    // }
+    MICROSOFT_QUANTUM_DECL void QubitIds_cpp(simulator_id_type sim_id, void (*callback)(logical_qubit_id))
+    {
+        getSimulator(sim_id)->dump_ids(callback);
+    }
 
     // Asserts that the gates in `b`, measured on the qubits in `q`, return `result`
     MICROSOFT_QUANTUM_DECL bool Assert_cpp(simulator_id_type sim_id, _In_ int n, _In_reads_(n) int* b, _In_reads_(n) logical_qubit_id* q, bool result){

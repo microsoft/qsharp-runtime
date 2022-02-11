@@ -48,10 +48,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <BondCodegen Remove="SparseSimulator\**" />
-    <Compile Remove="SparseSimulator\**" />
-    <EmbeddedResource Remove="SparseSimulator\**" />
-    <QSharpCompile Remove="SparseSimulator\**" />
+    <BondCodegen Remove="SparseSimulatorDeprecated\**" />
+    <Compile Remove="SparseSimulatorDeprecated\**" />
+    <EmbeddedResource Remove="SparseSimulatorDeprecated\**" />
+    <QSharpCompile Remove="SparseSimulatorDeprecated\**" />
   </ItemGroup>
 
 </Project>
