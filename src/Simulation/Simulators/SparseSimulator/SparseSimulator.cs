@@ -9,6 +9,7 @@ using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.Quantum.Telemetry;
 
 #nullable enable
 
@@ -18,6 +19,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class SparseSimulator : CommonNativeSimulator
     {
+        protected TelemetryManagerConfig TelemetryConfig { get; private set; }
+        IDisposable TelemetryManagerDisposer;
+
         /// <summary>
         /// Creates a an instance of a sparse simulator.
         /// </summary>
@@ -34,16 +38,50 @@ namespace Microsoft.Quantum.Simulation.Simulators
                randomNumberGeneratorSeed,
                disableBorrowing)
         {
-            Id = init_cpp((QubitIdType)numQubits);
+            // Init the telemetry first, to catch/log the construction issues:
+            TelemetryConfig = new TelemetryManagerConfig()
+            {
+                AppId = this.Name,
+                SendTelemetryInitializedEvent = true,
+                SendTelemetryTearDownEvent = true,
+            };
+            TelemetryManagerDisposer = TelemetryManager.Initialize(TelemetryConfig);
 
-            // Make sure that the same seed used by the built-in System.Random
-            // instance is also used by the native simulator itself.
-            seed_cpp(this.Id, (uint)this.Seed);
+            Microsoft.Applications.Events.EventProperties eventProperties = new Applications.Events.EventProperties()
+                {
+                    Name = "Quantum.SparseSim.Constructed",
+                };
+            eventProperties.SetProperty("throwOnReleasingQubitsNotInZeroState", throwOnReleasingQubitsNotInZeroState);
+            eventProperties.SetProperty("randomNumberGeneratorSeed", randomNumberGeneratorSeed);
+            eventProperties.SetProperty("disableBorrowing", disableBorrowing);
+            eventProperties.SetProperty("numQubits", numQubits);
+            TelemetryManager.LogEvent(eventProperties);
+
+            try
+            {
+                Id = init_cpp((QubitIdType)numQubits);
+
+                // Make sure that the same seed used by the built-in System.Random
+                // instance is also used by the native simulator itself.
+                seed_cpp(this.Id, (uint)this.Seed);
+            }
+            catch (Exception exception)
+            {
+                TelemetryManager.LogObject(exception);
+            }
         }
 
         public override void Dispose()
         {
-            destroy_cpp(this.Id);
+            try
+            {
+                destroy_cpp(this.Id);
+            }
+            catch (Exception exception)
+            {
+                TelemetryManager.LogObject(exception);
+            }
+            TelemetryManagerDisposer.Dispose();
         }
 
         public override string Name
