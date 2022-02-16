@@ -10,3 +10,6 @@ foo*
 CMakeFiles/
 CMakeCache.txt
 *.so
+win10/SparseQuantumSimulator.dll
+osx/libSparseQuantumSimulator.dylib
+linux/libSparseQuantumSimulator.so
