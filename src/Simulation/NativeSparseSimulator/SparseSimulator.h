@@ -58,7 +58,7 @@ std::shared_ptr<BasicQuantumState> expand_wfn_helper(std::shared_ptr<BasicQuantu
 // Reallocation is saved for some gates that can be performed in one round.
 class SparseSimulator
 {
-public: 
+public:
 
 	std::set<std::string> operations_done;
 
@@ -86,17 +86,6 @@ public:
 		_execute_queued_ops();
 	}
 
-	// void dumpIds(void (*callback)(logical_qubit_id))
-	// {
-	//	 recursive_lock_type l(getmutex());
-	//	 flush();
-
-	//	 std::vector<logical_qubit_id> qubits = psi.get_qubit_ids();
-	//	 for (logical_qubit_id q : qubits)
-	//	 {
-	//		 callback(q);
-	//	 }
-	// }
 	void dump_ids(void (*callback)(logical_qubit_id))
 	{
 		for(size_t qid = 0; qid < _occupied_qubits.size(); ++qid)
@@ -158,7 +147,7 @@ public:
 		// is already available for use with this data structure
 	}
 
-	
+
 
 	// Removes a qubit in the zero state from the list
 	// of occupied qubits
@@ -180,7 +169,7 @@ public:
 			}
 		}
 		_set_qubit_to_zero(qubit_id);
-		return true;	
+		return true;
 	}
 
 
@@ -256,7 +245,7 @@ public:
 			_angles_Rx[index] *= -1.0;
 		}
 		// commutes with H up to phase, so we ignore the H queue
-		_queued_operations.push_back(operation(OP::Y, index));	
+		_queued_operations.push_back(operation(OP::Y, index));
 		_set_qubit_to_nonzero(index);
 	}
 
@@ -283,7 +272,7 @@ public:
 		_set_qubit_to_nonzero(target);
 	}
 
-	
+
 	void Z(logical_qubit_id index) {
 		// ZY = -YZ
 		if (_queue_Ry[index]){
@@ -310,8 +299,8 @@ public:
 			return;
 		}
 		// If the only thing on the controls is one H, we can switch
-		// this to an MCX. Any Rx or Ry, or more than 1 H, means we 
-		// must execute. 
+		// this to an MCX. Any Rx or Ry, or more than 1 H, means we
+		// must execute.
 		size_t count = 0;
 		for (auto control : controls) {
 			if (_queue_Ry[control] || _queue_Rx[control]){
@@ -372,7 +361,7 @@ public:
 	void AdjT(logical_qubit_id index) {
 		Phase(amplitude(_normalizer_double, -_normalizer_double), index);
 	}
-	
+
 
 	void R1(double const& angle, logical_qubit_id index) {
 		Phase(std::polar(1.0, angle), index);
@@ -400,7 +389,7 @@ public:
 		Phase(1i, index);
 	}
 
-	void AdjS(logical_qubit_id index) {	
+	void AdjS(logical_qubit_id index) {
 		Phase(-1i, index);
 	}
 
@@ -464,7 +453,7 @@ public:
 		// The target can commute with rotations of the same type
 		if (_queue_Ry[target] && b != Gates::Basis::PauliY){
 			_execute_queued_ops(target, OP::Ry);
-		} 
+		}
 		if (_queue_Rx[target] && b != Gates::Basis::PauliX){
 			_execute_queued_ops(target, OP::Rx);
 		}
@@ -472,19 +461,19 @@ public:
 			_execute_queued_ops(target, OP::H);
 		}
 		// Execute any phase and permutation gates
-		// These are not indexed by qubit so it does 
+		// These are not indexed by qubit so it does
 		// not matter what the qubit argument is
 		_execute_queued_ops(0, OP::PermuteLarge);
 		_quantum_state->MCR(controls, b, phi, target);
-		_set_qubit_to_nonzero(target);		
+		_set_qubit_to_nonzero(target);
 	}
-	
+
 	void RFrac(Gates::Basis axis, std::int64_t numerator, std::int64_t power, logical_qubit_id index) {
 		// Opposite sign convention
 		R(axis, -(double)numerator * std::pow(0.5, power-1 )*M_PI, index);
 	}
 
-	void MCRFrac(std::vector<logical_qubit_id> const& controls, Gates::Basis axis, std::int64_t numerator, std::int64_t power, logical_qubit_id target) {	
+	void MCRFrac(std::vector<logical_qubit_id> const& controls, Gates::Basis axis, std::int64_t numerator, std::int64_t power, logical_qubit_id target) {
 		// Opposite sign convention
 		MCR(controls, axis, -(double)numerator * std::pow(0.5, power - 1) * M_PI, target);
 	}
@@ -516,8 +505,8 @@ public:
 		}
 	}
 
-	
-	
+
+
 	void H(logical_qubit_id index) {
 		// YH = -HY
 		_angles_Ry[index] *= (_queue_Ry[index] ? -1.0 : 1.0);
@@ -540,7 +529,7 @@ public:
 		// No Ry or Rx commutation on target
 		if (_queue_Ry[target] || _queue_Rx[target]){
 			_execute_queued_ops(target, OP::Ry);
-		} 
+		}
 		// Commutes through H gates on the target, so it does not check
 		_execute_phase_and_permute();
 		_quantum_state->MCH(controls, target);
@@ -548,13 +537,13 @@ public:
 	}
 
 
-	
+
 
 	void SWAP(logical_qubit_id index_1, logical_qubit_id index_2){
 		// This is necessary for the "shift" to make sense
 		if (index_1 > index_2){
 			std::swap(index_2, index_1);
-		} 
+		}
 		// Everything commutes nicely with a swap
 		_queue_Ry.swap(_queue_Ry[index_1],  _queue_Ry[index_2]);
 		std::swap(_angles_Ry[index_1], _angles_Ry[index_2]);
@@ -577,7 +566,7 @@ public:
 		// Nothing commutes nicely with a controlled swap
 		_execute_if(controls);
 		_execute_if(index_1);
-		_execute_if(index_2);	
+		_execute_if(index_2);
 
 		logical_qubit_id shift = index_2 - index_1;
 		_queued_operations.push_back(operation(OP::MCSWAP, index_1, shift, controls, index_2));
@@ -590,7 +579,7 @@ public:
 
 	unsigned M(logical_qubit_id target) {
 		// Do nothing if the qubit is known to be 0
-		if (!_occupied_qubits[target]){ 
+		if (!_occupied_qubits[target]){
 			return 0;
 		}
 		// If we get a measurement, we take it as soon as we can
@@ -617,14 +606,14 @@ public:
 		}
 		bool isEmpty = true;
 		// Process each assertion by H commutation
-		for (int i = 0; i < qubits.size(); i++) { 		
+		for (int i = 0; i < qubits.size(); i++) {
 			switch (axes[i]){
 				case Gates::Basis::PauliY:
 					// HY=-YH, so we switch the eigenvalue
 					if (_queue_H[qubits[i]])
 						result ^= 1;
 					isEmpty = false;
-					break; 
+					break;
 				case Gates::Basis::PauliX:
 					// HX = ZH
 					if (_queue_H[qubits[i]])
@@ -662,7 +651,7 @@ public:
 		_execute_queued_ops(qubits, OP::Ry);
 		unsigned result = _quantum_state->Measure(axes, qubits);
 		// Switch basis to save space
-		// Idea being that, e.g., HH = I, but if we know 
+		// Idea being that, e.g., HH = I, but if we know
 		// that the qubit is in the X-basis, we can apply H
 		// and execute, and this will send that qubit to all ones
 		// or all zeros; then we leave the second H in the queue
@@ -673,15 +662,15 @@ public:
 			if (axes[i]==Gates::Basis::PauliX){
 				H(qubits[i]);
 				measurements.push_back(qubits[i]);
-			} 
+			}
 		}
 		_execute_queued_ops(measurements, OP::H);
-		// These operations undo the previous operations, but they will be 
-		// queued 
+		// These operations undo the previous operations, but they will be
+		// queued
 		for (int i =0; i < axes.size(); i++){
 			if (axes[i]==Gates::Basis::PauliX){
 				H(qubits[i]);
-			} 
+			}
 		}
 		return result;
 	}
@@ -700,7 +689,7 @@ public:
 	using callback_t = std::function<bool(const char*, double, double)>;
 	using extended_callback_t = std::function<bool(const char*, double, double, void*)>;
 	// Dumps the state of a subspace of particular qubits, if they are not entangled
-	// This requires it to detect if the subspace is entangled, construct a new 
+	// This requires it to detect if the subspace is entangled, construct a new
 	// projected wavefunction, then call the `callback` function on each state.
 	bool dump_qubits(std::vector<logical_qubit_id> const& qubits, callback_t const& callback) {
 		_execute_queued_ops(qubits, OP::Ry);
@@ -733,7 +722,7 @@ public:
 private:
 
 	// These indicate whether there are any H, Rx, or Ry gates
-	// that have yet to be applied to the wavefunction. 
+	// that have yet to be applied to the wavefunction.
 	// Since HH=I and Rx(theta_1)Rx(theta_2) = Rx(theta_1+theta_2)
 	// it only needs a boolean to track them.
 	std::vector<bool> _queue_H;
@@ -778,7 +767,7 @@ private:
 	// Queued phase and permutation operations
 	std::list<operation> _queued_operations;
 
-	// The next three functions execute the H, and/or Rx, and/or Ry 
+	// The next three functions execute the H, and/or Rx, and/or Ry
 	// queues on a single qubit
 	void _execute_RyRxH_single_qubit(logical_qubit_id const &index){
 		if (_queue_H[index]){
@@ -815,7 +804,7 @@ private:
 			_queue_H[index] = false;
 		}
 	}
-	
+
 	// Executes all phase and permutation operations, if any exist
 	void _execute_phase_and_permute(){
 		if (_queued_operations.size() != 0){
@@ -826,7 +815,7 @@ private:
 
 	// Executes all queued operations (including H and rotations)
 	// on all qubits
-	void _execute_queued_ops() { 
+	void _execute_queued_ops() {
 		_execute_phase_and_permute();
 		logical_qubit_id num_qubits = _quantum_state->get_num_qubits();
 		for (logical_qubit_id index =0; index < num_qubits; index++){
@@ -835,7 +824,7 @@ private:
 	}
 
 	// Executes all phase and permutation operations,
-	// then any H, Rx, or Ry gates queued on the qubit index, 
+	// then any H, Rx, or Ry gates queued on the qubit index,
 	// up to the level specified (where H < Rx < Ry)
 	void _execute_queued_ops(logical_qubit_id index, OP level = OP::Ry){
 		_execute_phase_and_permute();
@@ -855,7 +844,7 @@ private:
 	}
 
 	// Executes all phase and permutation operations,
-	// then any H, Rx, or Ry gates queued on any of the qubit indices, 
+	// then any H, Rx, or Ry gates queued on any of the qubit indices,
 	// up to the level specified (where H < Rx < Ry)
 	void _execute_queued_ops(std::vector<logical_qubit_id> const& indices, OP level = OP::Ry){
 		_execute_phase_and_permute();
