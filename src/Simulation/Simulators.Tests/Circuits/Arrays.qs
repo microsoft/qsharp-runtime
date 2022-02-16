@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             let m = mapper(source[i]);
             set result = result w/ i <- m;
         }
-        
+
         return result;
     }
 
@@ -28,14 +28,14 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     function CreateArrayWithPositiveSize() : Unit {
         let xs = [true, size = 3];
         AssertEqual([true, true, true], xs);
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     function CreateArrayWithZeroSize() : Unit {
         let xs = [true, size = 0];
         AssertEqual(0, Length(xs));
@@ -46,7 +46,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     function CreateArrayWithSizeExpression() : Unit {
         let n = 2;
         let xs = [7, size = n + 1];
@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     function CreateArrayWithValueExpression() : Unit {
         let x = "foo";
         let xs = [x + "bar", size = 3];
@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     function SizedArrayShouldIncrementArrayItemRefCount() : Unit {
         mutable item = [1];
         let items = [item, size = 2];
@@ -73,7 +73,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     function ArrayOfArraysShouldCopyOnUpdate() : Unit {
         mutable items = [[1], size = 2];
         set items w/= 0 <- items[0] w/ 0 <- 2;

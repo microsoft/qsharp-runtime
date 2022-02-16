@@ -5,15 +5,15 @@
     open Microsoft.Quantum.Testing;
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation BothCallables () : Unit {
-        
+
         FactI(1, Library1.LibraryId());
         FactI(2, Library2.LibraryId());
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation OneCallable () : Unit {
 
         FactS("Library1", Microsoft.Quantum.Library.DllName());
@@ -21,9 +21,9 @@
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation BothTypes () : Unit {
-        
+
         let i1 = Library1.MyInt(1);
         let i2 = Library2.MyInt(2);
         FactMyInt1(1, i1);
@@ -31,9 +31,9 @@
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation OneType () : Unit {
-        
+
         let s1 = Microsoft.Quantum.Library.MyString("Library1");
         let s2 = Library2.MyString("Library2");
         FactMyString1("Library1", s1);
@@ -41,7 +41,7 @@
     }
 
     @Test("QuantumSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation ConflictingWithSource () : Unit {
 
         let h1 = Library1.Hello(Library1.Token());
