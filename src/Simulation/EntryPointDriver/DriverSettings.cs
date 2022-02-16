@@ -70,8 +70,6 @@ namespace Microsoft.Quantum.EntryPointDriver
             string sparseSimulatorName,
             string toffoliSimulatorName,
             string resourcesEstimatorName,
-            //string sparseSimulatorName,   // TODO(kuzminrobin): Requires support in Q# compiler? 
-                                            // Is invoked from the .cs code generated from .qs, and the arg for this param is not provided.
             string defaultSimulatorName,
             string defaultExecutionTarget,
             Func<IOperationFactory> createDefaultCustomSimulator)
