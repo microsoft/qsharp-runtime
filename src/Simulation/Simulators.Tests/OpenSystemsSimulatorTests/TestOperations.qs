@@ -124,7 +124,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
 
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     @Test("QuantumSimulator") // validate against full-state simulator.
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation CheckToffoliOnComputationalBasisStates() : Unit {
         for in0 in [false, true] {
             for in1 in [false, true] {
@@ -163,7 +163,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
 
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     @Test("QuantumSimulator") // validate against full-state simulator.
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation CheckXHSZSHIsNoOp() : Unit {
         use q = Qubit();
 
@@ -180,7 +180,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
 
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     @Test("QuantumSimulator") // validate against full-state simulator.
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation CheckControlledHWorks() : Unit {
         use control = Qubit();
         use target = Qubit();

@@ -17,15 +17,15 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    internal operation ApplyToFirstTwoQubitsCA (op : ((Qubit, Qubit) => Unit is Adj + Ctl), register : Qubit[]) 
+    internal operation ApplyToFirstTwoQubitsCA (op : ((Qubit, Qubit) => Unit is Adj + Ctl), register : Qubit[])
     : Unit is Adj + Ctl {
         if (Length(register) < 2)
         {
             fail $"Must have at least two qubits to act on.";
         }
-        
+
         op(register[0], register[1]);
-    }    
+    }
 
     internal function Zipped<'T, 'U>(left : 'T[], right : 'U[]) : ('T, 'U)[] {
         let nElements = Length(left) < Length(right)
@@ -50,7 +50,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         (Controlled Exp)(qubits[1..Length(qubits)-1], ([pauli], theta, [qubits[0]]));
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation ExpRCompare() : Unit {
         for angle in 0..2*314 {
            AssertOperationsEqualReferenced(1, _R(PauliX, -IntAsDouble(angle)/100.0, _), Exp([PauliX], IntAsDouble(angle)/200.0, _));
@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation MCExpMCRCompare() : Unit {
         for angle in 0..2*314 {
            AssertOperationsEqualReferenced(1, _MCR(PauliX, -IntAsDouble(angle)/100.0, _), _MCExp(PauliX, IntAsDouble(angle)/200.0, _));
@@ -81,7 +81,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         DumpMachine();
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation TestEqualityOfControlledRz() : Unit {
         for _ in 1..10 {
             let angle = Microsoft.Quantum.Random.DrawRandomDouble(0.0, 2.0 * PI());
@@ -89,7 +89,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation LargeStateTests() : Unit {
         let nqubits = 12;
         LargeStateTestWrapper(Rotation1CompareTest, nqubits);
@@ -114,7 +114,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         (Controlled SWAP)([targets[0]], (targets[1], targets[2]));
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation CCNOTvToffoliTest() : Unit {
         AssertOperationsEqualReferenced(3, _ArrayCSwap, _ToffoliCSwap);
     }
@@ -133,7 +133,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         ResetAll(qubits);
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
 	operation PartialDumpTest() : Unit  {
         use qubits = Qubit[4] {
             ApplyToEachCA(H, qubits);
@@ -149,12 +149,12 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    
+
     internal operation FakeR1Frac(numerator : Int, denominator : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
         RFrac(PauliZ, -numerator, denominator + 1, qubit[0]);
         RFrac(PauliI, numerator, denominator + 1, qubit[0]);
     }
-    
+
     internal operation R1FracWithArray(numerator : Int, denominator : Int, qubit : Qubit[]) : Unit is Adj + Ctl {
         R1Frac(numerator, denominator, qubit[0]);
     }
@@ -167,7 +167,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         R1(angle, qubit[0]);
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation Rotation1CompareTest() : Unit {
         for denom in 0..5{
             for num in 1..2..(2^denom - 1){
@@ -188,7 +188,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         R(axis, angle, qubit[0]);
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation RotationFracCompareTest() : Unit {
         for denom in 0..5{
             for num in 1..2..(2^denom - 1){
@@ -208,7 +208,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         RFrac(PauliX, -1, 1, qubit[0]);
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation RotationCompareTest() : Unit {
         AssertOperationsEqualReferenced(1, _HadamardByRotations(_), ApplyToEachCA(H, _));
         AssertOperationsEqualReferenced(1, ApplyToEachCA(R1Frac(1,0,_), _), ApplyToEachCA(Z, _));
@@ -219,7 +219,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         AssertOperationsEqualReferenced(1, ApplyToEachCA(RFrac(PauliZ, 1, 1, _), _), ApplyToEachCA(Z, _));
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation AllocationTest() : Unit {
         use qubits = Qubit[512]{
             for idx in 0..511 {
@@ -267,7 +267,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation AssertProbTest() : Unit {
         let tolerance = 0.000001;
         use qubit = Qubit() {
@@ -310,7 +310,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation AssertTest() : Unit {
         use qubits = Qubit[3] {
             AssertMeasurement([PauliZ, PauliZ, PauliZ], qubits, Zero, "Assert fails Pauli Z");
@@ -336,7 +336,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation MTest() : Unit {
         use qubit = Qubit() {
             X(qubit);
@@ -348,7 +348,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation ResetTest() : Unit {
         use qubit = Qubit() {
             Reset(qubit);
@@ -368,7 +368,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation SWAPTest () : Unit {
         use qubits = Qubit[2] {
             SWAP(qubits[0], qubits[1]);
@@ -393,7 +393,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
     operation AreAllQubitsOne(qubits : Qubit[]) : Bool {
         mutable qubits_all_true = true;
         for idx in 0..Length(qubits) - 1 {
-            if (M(qubits[idx]) == Zero){ 
+            if (M(qubits[idx]) == Zero){
                 set qubits_all_true = false;
             }
         }
@@ -401,7 +401,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
     }
 
     operation CNOTTestInternal(target : Qubit) : Unit {
-        body (...){ 
+        body (...){
 
         }
         controlled (controls, ...){
@@ -421,7 +421,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation CNOTTest() : Unit {
         use qubits = Qubit[3] {
             (Controlled CNOTTestInternal)(qubits[0..1], qubits[2]);
@@ -478,7 +478,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation CSWAPTest () : Unit {
         use qubits = Qubit[4] {
             (Controlled CSwapTestInternal)(qubits[0..1], qubits[2..3]);
@@ -498,7 +498,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
         }
     }
 
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     operation BasicTest () : Unit {
         use new_qubit = Qubit() {
             H(new_qubit);
@@ -512,7 +512,7 @@ namespace Microsoft.Quantum.Testing.SparseSimulator {
             Y(new_qubit);
             Z(new_qubit);
             X(new_qubit);
-            H(new_qubit); 
+            H(new_qubit);
         }
         use new_qubits = Qubit[4] {
             for idx in 0..3 {

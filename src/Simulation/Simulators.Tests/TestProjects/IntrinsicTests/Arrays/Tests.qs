@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Arrays {
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
     @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
-    @Test("Microsoft.Quantum.Simulation.Simulators.SparseSimulator")
+    @Test("SparseSimulator")
     function EmptyArraysAreEmpty() : Unit {
         Fact(
             Length(EmptyArray<Int>()) == 0,
