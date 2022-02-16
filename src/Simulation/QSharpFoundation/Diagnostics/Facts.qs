@@ -5,20 +5,20 @@ namespace Microsoft.Quantum.Diagnostics {
     open Microsoft.Quantum.Math;
 
     /// # Summary
-    /// Declares that a classical condition is true.
+    /// Checks whether a classical condition is true, and throws an exception if it is not.
     ///
     /// # Input
     /// ## actual
-    /// The condition to be declared.
+    /// The condition to be checked.
     /// ## message
-    /// Failure message string to be printed in the case that the classical
+    /// Failure message string to be used as an error message if the classical
     /// condition is false.
     ///
     /// # See Also
     /// - Microsoft.Quantum.Diagnostics.Contradiction
     ///
     /// # Example
-    /// The following Q# snippet will fail:
+    /// The following Q# snippet will throw an exception:
     /// ```qsharp
     /// Fact(false, "Expected true.");
     /// ```
@@ -27,13 +27,13 @@ namespace Microsoft.Quantum.Diagnostics {
     }
 
     /// # Summary
-    /// Declares that a classical condition is false.
+    /// Checks whether a classical condition is false, and throws an exception if it is not.
     ///
     /// # Input
     /// ## actual
-    /// The condition to be declared.
+    /// The condition to be checked.
     /// ## message
-    /// Failure message string to be printed in the case that the classical
+    /// Failure message string to be used as an error message if the classical
     /// condition is true.
     ///
     /// # See Also
@@ -50,18 +50,18 @@ namespace Microsoft.Quantum.Diagnostics {
     }
 
     /// # Summary
-    /// Declares that a given floating-point value represents a finite
-    /// number, failing when this is not the case.
+    /// Checks whether a given floating-point value represents a finite
+    /// number, and throws an exception if this is not the case.
     ///
     /// # Input
     /// ## d
     /// The floating-point value that is to be checked.
     /// ## message
-    /// Failure message to be printed in the case that `d` is either
+    /// Failure message to be used as an error message if `d` is either
     /// not finite, or not a number.
     ///
     /// # Example
-    /// The following Q# code will fail when run:
+    /// The following Q# code will throw an exception:
     /// ```qsharp
     /// FiniteFact(NaN(), "NaN is not a finite number.");
     /// ```
