@@ -47,11 +47,4 @@
 
   </ItemGroup>
 
-  <ItemGroup>
-    <BondCodegen Remove="SparseSimulatorDeprecated\**" />
-    <Compile Remove="SparseSimulatorDeprecated\**" />
-    <EmbeddedResource Remove="SparseSimulatorDeprecated\**" />
-    <QSharpCompile Remove="SparseSimulatorDeprecated\**" />
-  </ItemGroup>
-
 </Project>
