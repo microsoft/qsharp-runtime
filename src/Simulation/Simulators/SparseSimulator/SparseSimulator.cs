@@ -52,7 +52,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
                     Name = "Quantum.SparseSim.Constructed",
                 };
             eventProperties.SetProperty("throwOnReleasingQubitsNotInZeroState", throwOnReleasingQubitsNotInZeroState);
-            eventProperties.SetProperty("randomNumberGeneratorSeed", randomNumberGeneratorSeed);
+            // (`SimulatorBase.Seed` is assigned to `randomNumberGeneratorSeed ?? Guid.NewGuid().GetHashCode()`):
+            eventProperties.SetProperty("randomNumberGeneratorSeed", Seed); 
             eventProperties.SetProperty("disableBorrowing", disableBorrowing);
             eventProperties.SetProperty("numQubits", numQubits);
             TelemetryManager.LogEvent(eventProperties);
