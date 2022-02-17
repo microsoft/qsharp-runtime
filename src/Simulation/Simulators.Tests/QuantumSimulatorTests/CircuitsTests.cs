@@ -18,9 +18,21 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [OperationDriver(TestCasePrefix ="QSim", TestNamespace = "Microsoft.Quantum.Simulation.Simulators.Tests.Circuits")]
         public void QSimTestTarget( TestOperation op )
         {
-            using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: true),
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: true)
+            };
+
+            foreach (var sim in simulators)
             {
-                op.TestOperationRunner(sim);
+                try
+                {
+                    op.TestOperationRunner(sim);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
     }
