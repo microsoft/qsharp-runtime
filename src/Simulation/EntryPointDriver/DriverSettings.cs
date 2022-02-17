@@ -20,6 +20,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal string QuantumSimulatorName { get; }
 
         /// <summary>
+        /// The name of the sparse simulator.
+        /// </summary>
+        internal string SparseSimulatorName { get; }
+
+        /// <summary>
         /// The name of the Toffoli simulator.
         /// </summary>
         internal string ToffoliSimulatorName { get; }
@@ -53,6 +58,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="simulatorOptionAliases">The aliases for the simulator command-line option.</param>
         /// <param name="quantumSimulatorName">The name of the quantum simulator.</param>
+        /// <param name="sparseSimulatorName">The name of the sparse simulator.</param>
         /// <param name="toffoliSimulatorName">The name of the Toffoli simulator.</param>
         /// <param name="resourcesEstimatorName">The name of the resources estimator.</param>
         /// <param name="defaultSimulatorName">The name of the default simulator to use.</param>
@@ -61,6 +67,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         public DriverSettings(
             ImmutableList<string> simulatorOptionAliases,
             string quantumSimulatorName,
+            string sparseSimulatorName,
             string toffoliSimulatorName,
             string resourcesEstimatorName,
             string defaultSimulatorName,
@@ -69,6 +76,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             SimulatorOptionAliases = simulatorOptionAliases;
             QuantumSimulatorName = quantumSimulatorName;
+            SparseSimulatorName  = sparseSimulatorName;
             ToffoliSimulatorName = toffoliSimulatorName;
             ResourcesEstimatorName = resourcesEstimatorName;
             DefaultSimulatorName = defaultSimulatorName;

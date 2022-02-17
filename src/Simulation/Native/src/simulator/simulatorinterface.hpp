@@ -91,7 +91,7 @@ class SimulatorInterface
         return false;
     };
 
-    virtual void dump(bool (*callback)(size_t, double, double))
+    virtual void dump(bool (*callback)(const char*, double, double))
     {
         assert(false);
     }
@@ -99,7 +99,7 @@ class SimulatorInterface
     {
         assert(false);
     }
-    virtual bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(size_t, double, double))
+    virtual bool dumpQubits(std::vector<logical_qubit_id> const& qs, bool (*callback)(const char*, double, double))
     {
         assert(false);
         return false;
