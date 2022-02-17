@@ -29,9 +29,9 @@
       <NativeDll Include="$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/qdk_sim.dll))" Dest="win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll" />
 
       <!-- Native Sparse Simulator: -->
-      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeSparseSimBuildPath)/libSparseQuantumSimulator.dylib))" Dest="osx/libSparseQuantumSimulator.dylib" />
-      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeSparseSimBuildPath)/libSparseQuantumSimulator.so))" Dest="linux/libSparseQuantumSimulator.so" />
-      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeSparseSimBuildPath)/SparseQuantumSimulator.dll))" Dest="win10/SparseQuantumSimulator.dll" />
+      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeSparseSimBuildPath)/libNativeSparseSimulator.dylib))" Dest="osx/libNativeSparseSimulator.dylib" />
+      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeSparseSimBuildPath)/libNativeSparseSimulator.so))" Dest="linux/libNativeSparseSimulator.so" />
+      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeSparseSimBuildPath)/NativeSparseSimulator.dll))" Dest="win10/NativeSparseSimulator.dll" />
     </ItemGroup>
 
     <Copy

@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
     public partial class SparseSimulator
     {
-        private const string simulatorDll = "SparseQuantumSimulator";
+        private const string simulatorDll = "NativeSparseSimulator";
 
         [DllImport(simulatorDll)]
         private static extern QubitIdType num_qubits_cpp(SimulatorIdType sim);
