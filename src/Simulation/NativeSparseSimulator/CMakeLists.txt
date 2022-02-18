@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(NativeSparseSimulator)
+project(Microsoft.Quantum.SparseSimulator.Runtime)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -7,16 +7,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MACOSX_RPATH 1)
 # Main build files
-add_library(NativeSparseSimulator SHARED factory.cpp capi.cpp)
+add_library(Microsoft.Quantum.SparseSimulator.Runtime SHARED factory.cpp capi.cpp)
 
 # Windows adds a special dllexport command which must be defined
 if (WIN32)
-	target_compile_options(NativeSparseSimulator PUBLIC -fdeclspec)
-	target_compile_definitions(NativeSparseSimulator PRIVATE BUILD_DLL=1)
+	target_compile_options(Microsoft.Quantum.SparseSimulator.Runtime PUBLIC -fdeclspec)
+	target_compile_definitions(Microsoft.Quantum.SparseSimulator.Runtime PRIVATE BUILD_DLL=1)
 endif()
 # Try to optimize with gcc
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	target_compile_options(NativeSparseSimulator PUBLIC -O3 -ftree-vectorize -mavx2 -mfma)
+	target_compile_options(Microsoft.Quantum.SparseSimulator.Runtime PUBLIC -O3 -ftree-vectorize -mavx2 -mfma)
 endif()
 
 message("Compiler flags: ${CMAKE_CXX_FLAGS_RELEASE}")

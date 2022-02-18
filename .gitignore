@@ -357,9 +357,9 @@ xplat
 src/Simulation/Native/win10/Microsoft.Quantum.Simulator.Runtime.dll
 src/Simulation/Native/linux/libMicrosoft.Quantum.Simulator.Runtime.so
 src/Simulation/Native/osx/libMicrosoft.Quantum.Simulator.Runtime.dylib
-src/Simulation/Native/win10/SparseQuantumSimulator.dll
-src/Simulation/Native/linux/libSparseQuantumSimulator.so
-src/Simulation/Native/osx/libSparseQuantumSimulator.dylib
+src/Simulation/Native/win10/Microsoft.Quantum.SparseSimulator.Runtime.dll
+src/Simulation/Native/linux/libMicrosoft.Quantum.SparseSimulator.Runtime.so
+src/Simulation/Native/osx/libMicrosoft.Quantum.SparseSimulator.Runtime.dylib
 src/Simulation/Native/win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll
 src/Simulation/Native/linux/Microsoft.Quantum.Experimental.Simulators.Runtime.dll
 src/Simulation/Native/osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll
