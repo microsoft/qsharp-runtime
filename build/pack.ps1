@@ -28,14 +28,14 @@ Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
 
     $DROP = "$Env:DROP_NATIVE/src/Simulation/NativeSparseSimulator/build"
     Write-Host "##[info]Copying NativeSparseSimulator files from $DROP...";
-    If (Test-Path "$DROP/libSparseQuantumSimulator.dylib") {
-        Copy-Item -Verbose "$DROP/libSparseQuantumSimulator.dylib" "osx/libSparseQuantumSimulator.dylib"
+    If (Test-Path "$DROP/libMicrosoft.Quantum.SparseSimulator.Runtime.dylib") {
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.SparseSimulator.Runtime.dylib" "osx/libMicrosoft.Quantum.SparseSimulator.Runtime.dylib"
     }
-    If (Test-Path "$DROP/libSparseQuantumSimulator.so") {
-        Copy-Item -Verbose "$DROP/libSparseQuantumSimulator.so" "linux/libSparseQuantumSimulator.so"
+    If (Test-Path "$DROP/libMicrosoft.Quantum.SparseSimulator.Runtime.so") {
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.SparseSimulator.Runtime.so" "linux/libMicrosoft.Quantum.SparseSimulator.Runtime.so"
     }
-    If (Test-Path "$DROP/SparseQuantumSimulator.dll") {
-        Copy-Item -Verbose "$DROP/SparseQuantumSimulator.dll" "win10/SparseQuantumSimulator.dll"
+    If (Test-Path "$DROP/Microsoft.Quantum.SparseSimulator.Runtime.dll") {
+        Copy-Item -Verbose "$DROP/Microsoft.Quantum.SparseSimulator.Runtime.dll" "win10/Microsoft.Quantum.SparseSimulator.Runtime.dll"
     }
 
     $DROP = "$Env:DROP_NATIVE/src/Simulation/qdk_sim_rs/drop";
