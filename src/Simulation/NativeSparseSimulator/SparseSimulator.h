@@ -23,7 +23,6 @@ using namespace std::literals::complex_literals;
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
 
-constexpr logical_qubit_id MAX_QUBITS = 1024;
 constexpr logical_qubit_id MIN_QUBITS = 64;
 
 #ifndef M_PI
@@ -32,19 +31,20 @@ constexpr logical_qubit_id MIN_QUBITS = 64;
 
 // Recrusively compiles sizes of QuantumState types between MIN_QUBITS and MAX_QUBITS
 // qubits large, growing by powers of 2
-template<size_t max_num_bits>
+template<size_t max_num_bits = MIN_QUBITS>
 std::shared_ptr<BasicQuantumState> construct_wfn_helper(logical_qubit_id nqubits) {
-	return (nqubits > max_num_bits / 2) ?
+	return (nqubits < max_num_bits) ?
 		std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>())
-		: (nqubits > MIN_QUBITS ? construct_wfn_helper<max_num_bits / 2>(nqubits) :
-			std::shared_ptr<BasicQuantumState>(new QuantumState<MIN_QUBITS>()));
+		: construct_wfn_helper<max_num_bits * 2>(nqubits);
 }
 
 // Constructs a new quantum state, templated to use enough qubits to hold `nqubits`,
 // with the same state as `old_sim`
-template<size_t max_num_bits>
+template<size_t max_num_bits = MIN_QUBITS>
 std::shared_ptr<BasicQuantumState> expand_wfn_helper(std::shared_ptr<BasicQuantumState> old_sim, logical_qubit_id nqubits) {
-	return (nqubits > max_num_bits / 2) ? std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>(old_sim)): expand_wfn_helper<max_num_bits / 2>(old_sim, nqubits);
+	return (nqubits < max_num_bits) ?
+        std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>(old_sim))
+        : expand_wfn_helper<max_num_bits * 2>(old_sim, nqubits);
 }
 
 // Sparse simulator only stores non-zero coefficients of the quantum state.
@@ -65,7 +65,7 @@ public:
 	SparseSimulator(logical_qubit_id num_qubits) {
 		// Constructs a quantum state templated to the right number of qubits
 		// and returns a pointer to it as a basic_quantum_state
-		_quantum_state = construct_wfn_helper<MAX_QUBITS>(num_qubits);
+		_quantum_state = construct_wfn_helper<>(num_qubits);
 		// Return the number of qubits this actually produces
 		num_qubits = _quantum_state->get_num_qubits();
 		// Initialize with no qubits occupied
@@ -129,7 +129,7 @@ public:
 		if (qubit >= num_qubits){
 			// We create a new wavefunction and reallocate
 			std::shared_ptr<BasicQuantumState> old_state = _quantum_state;
-			_quantum_state = expand_wfn_helper<MAX_QUBITS>(old_state, qubit+1);
+			_quantum_state = expand_wfn_helper<>(old_state, qubit+1);
 
 			num_qubits = _quantum_state->get_num_qubits();
 			_occupied_qubits.resize(num_qubits, 0);
