@@ -33,7 +33,7 @@ constexpr logical_qubit_id MIN_QUBITS = 64;
 // qubits large, and growing by a factor of two per step
 template<size_t max_num_bits = MIN_QUBITS>
 std::shared_ptr<BasicQuantumState> construct_wfn_helper(logical_qubit_id nqubits) {
-	return (nqubits < max_num_bits) ?
+	return (nqubits <= max_num_bits) ?
 		std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>())
 		: construct_wfn_helper<max_num_bits * 2>(nqubits);
 }
@@ -42,7 +42,7 @@ std::shared_ptr<BasicQuantumState> construct_wfn_helper(logical_qubit_id nqubits
 // with the same state as `old_sim`
 template<size_t max_num_bits = MIN_QUBITS>
 std::shared_ptr<BasicQuantumState> expand_wfn_helper(std::shared_ptr<BasicQuantumState> old_sim, logical_qubit_id nqubits) {
-	return (nqubits < max_num_bits) ?
+	return (nqubits <= max_num_bits) ?
         std::shared_ptr<BasicQuantumState>(new QuantumState<max_num_bits>(old_sim))
         : expand_wfn_helper<max_num_bits * 2>(old_sim, nqubits);
 }
