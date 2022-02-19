@@ -204,6 +204,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The exit code.</returns>
         private static async Task<int> DisplayJobOrError(AzureSettings settings, Task<IQuantumMachineJob> job)
         {
+            LogIfVerbose(settings, "DisplayJobOrError.");
             try
             {
                 DisplayJob(await job, settings.Output);
@@ -211,6 +212,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
             catch (AzureQuantumException ex)
             {
+                LogIfVerbose(settings, "AzureQuantumException.");
                 DisplayError(
                     "Something went wrong when submitting the program to the Azure Quantum service.",
                     ex.Message);
@@ -218,8 +220,17 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
             catch (QuantumProcessorTranslationException ex)
             {
+                LogIfVerbose(settings, "QuantumProcessorTranslationException.");
                 DisplayError(
                     "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.",
+                    ex.Message);
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                LogIfVerbose(settings, $"Exception: Type={ex.GetType()}, Inner={ex.InnerException?.GetType()}, Source={ex.Source}, Stack={ex.StackTrace}");
+                DisplayError(
+                    "Unknown error.",
                     ex.Message);
                 return 1;
             }
