@@ -41,7 +41,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 {
                     expectedPr = 1 - expectedPr;
                 }
-
                 var ensemblePr = this.Simulator.JointEnsembleProbability((uint)paulis.Length, paulis.ToArray(), qubits.GetIds());
 
                 if (Abs(ensemblePr - expectedPr) > tol)

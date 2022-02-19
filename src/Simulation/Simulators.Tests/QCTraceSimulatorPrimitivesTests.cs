@@ -33,32 +33,44 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorPrimitivesTests
         [OperationDriver(TestCasePrefix = "QSim:Circuits:")]
         public void QSimTestTarget(TestOperation op)
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] {
+                new QuantumSimulator(),
+                new SparseSimulator()
+            };
+
+            foreach (var sim in simulators)
             {
-                OverrideOperation<
-                    ICallable<(Qubit, Qubit), QVoid>,
-                    Simulators.QCTraceSimulators.Implementation.Interface_CX,
-                    Intrinsic.CNOT>(sim);
+                try
+                {
+                    OverrideOperation<
+                        ICallable<(Qubit, Qubit), QVoid>,
+                        Simulators.QCTraceSimulators.Implementation.Interface_CX,
+                        Intrinsic.CNOT>(sim);
 
-                OverrideOperation<
-                    ICallable<(Pauli, Int64, Int64, Qubit), QVoid>,
-                    Simulators.QCTraceSimulators.Implementation.Interface_RFrac,
-                    Intrinsic.RFrac>(sim);
+                    OverrideOperation<
+                        ICallable<(Pauli, Int64, Int64, Qubit), QVoid>,
+                        Simulators.QCTraceSimulators.Implementation.Interface_RFrac,
+                        Intrinsic.RFrac>(sim);
 
-                OverrideOperation<
-                    ICallable<(Pauli, Double, Qubit), QVoid>,
-                    Simulators.QCTraceSimulators.Implementation.Interface_R,
-                    Intrinsic.R>(sim);
+                    OverrideOperation<
+                        ICallable<(Pauli, Double, Qubit), QVoid>,
+                        Simulators.QCTraceSimulators.Implementation.Interface_R,
+                        Intrinsic.R>(sim);
 
-                OverrideOperation<
-                    ICallable<(Int64, Pauli, Qubit), QVoid>,
-                    Simulators.QCTraceSimulators.Implementation.Interface_Clifford,
-                    Interface_Clifford>(sim);
+                    OverrideOperation<
+                        ICallable<(Int64, Pauli, Qubit), QVoid>,
+                        Simulators.QCTraceSimulators.Implementation.Interface_Clifford,
+                        Interface_Clifford>(sim);
 
-                sim.OnLog += (msg) => { output.WriteLine(msg); };
-                sim.OnLog += (msg) => { Debug.WriteLine(msg); };
+                    sim.OnLog += (msg) => { output.WriteLine(msg); };
+                    sim.OnLog += (msg) => { Debug.WriteLine(msg); };
 
-                op.TestOperationRunner(sim);
+                    op.TestOperationRunner(sim);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
     }

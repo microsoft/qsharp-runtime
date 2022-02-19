@@ -38,7 +38,7 @@ void CRx(unsigned sim_id, double phi, unsigned c, unsigned q)
 
 void dump(unsigned sim_id, const char* label)
 {
-    auto dump_callback = [](size_t idx, double r, double i) {
+    auto dump_callback = [](const char* idx, double r, double i) {
         std::cout << idx << ":\t" << r << '\t' << i << '\n';
         return true;
     };
