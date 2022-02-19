@@ -29,8 +29,8 @@ constexpr logical_qubit_id MIN_QUBITS = 64;
 #define M_PI 3.14159265358979323846
 #endif
 
-// Recrusively compiles sizes of QuantumState types between MIN_QUBITS and MAX_QUBITS
-// qubits large, growing by powers of 2
+// Recursively compiles sizes of QuantumState types starting at MIN_QUBITS
+// qubits large, and growing by a factor of two per step
 template<size_t max_num_bits = MIN_QUBITS>
 std::shared_ptr<BasicQuantumState> construct_wfn_helper(logical_qubit_id nqubits) {
 	return (nqubits < max_num_bits) ?
