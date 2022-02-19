@@ -145,7 +145,9 @@ namespace Microsoft.Quantum.EntryPointDriver
                 InputParams = settings.JobParams
             };
 
+            LogIfVerbose(settings, "Before submitting.");
             var job = machine.SubmitAsync(submission.EntryPointInfo, submission.Argument, context);
+            LogIfVerbose(settings, "After submitting.");
             return await DisplayJobOrError(settings, job);
         }
 
