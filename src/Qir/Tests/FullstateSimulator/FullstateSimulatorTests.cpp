@@ -3,6 +3,7 @@
 
 #include <complex>
 #include <memory>
+#include <string>
 #include <vector>
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
@@ -347,9 +348,14 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     // 1/sqrt(2)(|00> + |11>)x|0>
 
     dynamic_cast<IDiagnostics*>(sim.get())->GetState(
-        [](size_t idx, double re, double im)
+        [](const char* idxStr, double re, double im)
         {
             norm += re * re + im * im;
+            size_t idx = 0;
+            for (size_t i = 0; idxStr[i] != '\0'; ++i)
+            {
+                idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
+            }
             REQUIRE(idx < 4);
             switch (idx)
             {
@@ -372,9 +378,14 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     // 1/sqrt(2)(|00> + |11>)xi|1>
 
     dynamic_cast<IDiagnostics*>(sim.get())->GetState(
-        [](size_t idx, double re, double im)
+        [](const char* idxStr, double re, double im)
         {
             norm += re * re + im * im;
+            size_t idx = 0;
+            for (size_t i = 0; idxStr[i] != '\0'; ++i)
+            {
+                idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
+            }
             switch (idx)
             {
             case 4:
