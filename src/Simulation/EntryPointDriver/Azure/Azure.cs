@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Exceptions;
@@ -204,6 +205,32 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>The exit code.</returns>
         private static async Task<int> DisplayJobOrError(AzureSettings settings, Task<IQuantumMachineJob> job)
         {
+            void DisplayAzureQuantumException(AzureQuantumException ex) =>
+                DisplayError(
+                    "Something went wrong when submitting the program to the Azure Quantum service.",
+                    ex.Message);
+            
+            void DisplayQuantumProcessorTranslationException(QuantumProcessorTranslationException ex) =>
+                DisplayError(
+                    "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.",
+                    ex.Message);
+
+            bool HandleTargetInvocationException(TargetInvocationException ex)
+            {
+                if (ex.InnerException is AzureQuantumException azureQuantumEx)
+                {
+                    DisplayAzureQuantumException(azureQuantumEx);
+                    return true;
+                }
+                else if (ex.InnerException is QuantumProcessorTranslationException quantumProcessorTranslationEx)
+                {
+                    DisplayQuantumProcessorTranslationException(quantumProcessorTranslationEx);
+                    return true;
+                }
+
+                return false;
+            }
+
             try
             {
                 DisplayJob(await job, settings.Output);
@@ -211,16 +238,20 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
             catch (AzureQuantumException ex)
             {
-                DisplayError(
-                    "Something went wrong when submitting the program to the Azure Quantum service.",
-                    ex.Message);
+                DisplayAzureQuantumException(ex);
                 return 1;
             }
             catch (QuantumProcessorTranslationException ex)
             {
-                DisplayError(
-                    "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.",
-                    ex.Message);
+                DisplayQuantumProcessorTranslationException(ex);
+                return 1;
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (!HandleTargetInvocationException(ex))
+                {
+                    throw;
+                }
                 return 1;
             }
         }
