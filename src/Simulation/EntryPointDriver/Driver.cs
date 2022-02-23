@@ -189,7 +189,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 suggestions: new[]
                 {
                     this.settings.QuantumSimulatorName,
-                    // this.settings.SparseSimulatorName, // uncomment to enable listing the sparse simulator in the command line help
+                    this.settings.SparseSimulatorName,
                     this.settings.ToffoliSimulatorName,
                     this.settings.ResourcesEstimatorName,
                     this.settings.DefaultSimulatorName
