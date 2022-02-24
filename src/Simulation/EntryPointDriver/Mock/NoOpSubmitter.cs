@@ -28,9 +28,21 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
             Stream qir, string entryPoint, IReadOnlyList<Argument> arguments, SubmissionOptions options) =>
             Task.FromResult<IQuantumMachineJob>(new ExampleJob());
 
+        public Task<IQuantumMachineJob> SubmitAsync(
+            Stream qir,
+            string entryPoint,
+            IReadOnlyList<EntryPointArgument> arguments,
+            SubmissionOptions submissionOptions) => Task.FromResult<IQuantumMachineJob>(new ExampleJob());
+
         public Task<IQuantumMachineJob> SubmitAsync<TIn, TOut>(
             EntryPointInfo<TIn, TOut> entryPoint, TIn argument, SubmissionOptions options) =>
             Task.FromResult<IQuantumMachineJob>(new ExampleJob());
+
+        public Task<IQuantumMachineJob> SubmitAsync<TIn, TOut>(
+            EntryPointInfo<TIn, TOut> entryPoint,
+            IReadOnlyList<EntryPointArgument> arguments,
+            SubmissionOptions options,
+            Stream qir) => Task.FromResult<IQuantumMachineJob>(new ExampleJob());
 
         public string? Validate<TIn, TOut>(EntryPointInfo<TIn, TOut> entryPoint, TIn argument) => null;
 

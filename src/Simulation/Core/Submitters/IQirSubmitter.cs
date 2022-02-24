@@ -31,6 +31,20 @@ namespace Microsoft.Quantum.Runtime.Submitters
             Stream qir, string entryPoint, IReadOnlyList<Argument> arguments, SubmissionOptions options);
 
         /// <summary>
+        /// Submits a job to execute a QIR program without waiting for execution to complete.
+        /// </summary>
+        /// <param name="qir">The QIR program as a byte stream.</param>
+        /// <param name="entryPoint">The fully-qualified name of the entry point to execute.</param>
+        /// <param name="arguments">List of arguments used to execute the entry point.</param>
+        /// <param name="options">Additional options for the submission.</param>
+        /// <returns>The submitted job.</returns>
+        Task<IQuantumMachineJob> SubmitAsync(
+            Stream qir,
+            string entryPoint,
+            IReadOnlyList<EntryPointArgument> arguments, 
+            SubmissionOptions submissionOptions);
+
+        /// <summary>
         /// Validates a QIR program for execution on Azure Quantum.
         /// </summary>
         /// <param name="qir">The QIR program as a byte stream.</param>

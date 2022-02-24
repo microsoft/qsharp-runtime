@@ -3,8 +3,11 @@
 
 #nullable enable
 
-using Microsoft.Quantum.Simulation.Core;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+
+using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Runtime.Submitters
 {
@@ -29,6 +32,22 @@ namespace Microsoft.Quantum.Runtime.Submitters
         /// <returns>The submitted job.</returns>
         Task<IQuantumMachineJob> SubmitAsync<TIn, TOut>(
             EntryPointInfo<TIn, TOut> entryPoint, TIn argument, SubmissionOptions options);
+
+        /// <summary>
+        /// Submits a job to execute a Q# program without waiting for execution to complete.
+        /// </summary>
+        /// <typeparam name="TIn">The entry point argument type.</typeparam>
+        /// <typeparam name="TOut">The entry point return type.</typeparam>
+        /// <param name="entryPoint">The entry point information for the submitted program.</param>
+        /// <param name="arguments">List of arguments used to execute the entry point.</param>
+        /// <param name="options">Additional options for the submission.</param>
+        /// <param name="options">QIR bitcode corresponding to the program.</param>
+        /// <returns>The submitted job.</returns>
+        Task<IQuantumMachineJob> SubmitAsync<TIn, TOut>(
+            EntryPointInfo<TIn, TOut> entryPoint,
+            IReadOnlyList<EntryPointArgument> arguments,
+            SubmissionOptions options,
+            Stream qir);
 
         /// <summary>
         /// Validates a Q# program for execution on Azure Quantum.
