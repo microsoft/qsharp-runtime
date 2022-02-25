@@ -207,12 +207,12 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             void DisplayAzureQuantumException(AzureQuantumException ex) =>
                 DisplayError(
-                    "Something went wrong when submitting the program to the Azure Quantum service.",
+                    "An error occurred when submitting to the Azure Quantum service.",
                     ex.Message);
             
             void DisplayQuantumProcessorTranslationException(QuantumProcessorTranslationException ex) =>
                 DisplayError(
-                    "Something went wrong when performing translation to the intermediate representation used by the target quantum machine.",
+                    "Unable to translate the program for execution on the target quantum machine.",
                     ex.Message);
 
             bool HandleTargetInvocationException(TargetInvocationException ex)
