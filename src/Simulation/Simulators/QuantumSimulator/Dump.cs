@@ -25,6 +25,5 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 return ids.ToArray();
             }
         }
-
     }
 }

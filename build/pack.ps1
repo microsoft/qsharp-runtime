@@ -26,6 +26,17 @@ Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
         Copy-Item -Verbose "$DROP/Microsoft.Quantum.Simulator.Runtime.dll" "win10/Microsoft.Quantum.Simulator.Runtime.dll"
     }
 
+    $DROP = "$Env:DROP_NATIVE/src/Simulation/NativeSparseSimulator/build"
+    Write-Host "##[info]Copying NativeSparseSimulator files from $DROP...";
+    If (Test-Path "$DROP/libSparseQuantumSimulator.dylib") {
+        Copy-Item -Verbose "$DROP/libSparseQuantumSimulator.dylib" "osx/libSparseQuantumSimulator.dylib"
+    }
+    If (Test-Path "$DROP/libSparseQuantumSimulator.so") {
+        Copy-Item -Verbose "$DROP/libSparseQuantumSimulator.so" "linux/libSparseQuantumSimulator.so"
+    }
+    If (Test-Path "$DROP/SparseQuantumSimulator.dll") {
+        Copy-Item -Verbose "$DROP/SparseQuantumSimulator.dll" "win10/SparseQuantumSimulator.dll"
+    }
 
     $DROP = "$Env:DROP_NATIVE/src/Simulation/qdk_sim_rs/drop";
     Write-Host "##[info]Copying qdk_sim_rs files from $DROP...";
@@ -43,7 +54,7 @@ Pop-Location
 
 function Pack-One() {
     Param(
-        $project, 
+        $project,
         $option1 = "",
         $option2 = "",
         $option3 = "",
@@ -74,7 +85,7 @@ function Pack-One() {
 
 function Pack-Dotnet() {
     Param(
-        $project, 
+        $project,
         $option1 = "",
         $option2 = "",
         $option3 = "",

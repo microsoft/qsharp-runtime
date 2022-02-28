@@ -202,7 +202,7 @@ extern "C"
     }
 
     // dump wavefunction to given callback until callback returns false
-    MICROSOFT_QUANTUM_DECL void Dump(_In_ unsigned id, _In_ bool (*callback)(size_t, double, double))
+    MICROSOFT_QUANTUM_DECL void Dump(_In_ unsigned id, _In_ bool (*callback)(const char*, double, double))
     {
         Microsoft::Quantum::Simulator::get(id)->dump(callback);
     }
@@ -217,7 +217,7 @@ extern "C"
         _In_ unsigned id,
         _In_ unsigned n,
         _In_reads_(n) unsigned* q,
-        _In_ bool (*callback)(size_t, double, double))
+        _In_ bool (*callback)(const char*, double, double))
     {
         std::vector<unsigned> qs(q, q + n);
         return Microsoft::Quantum::Simulator::get(id)->dumpQubits(qs, callback);

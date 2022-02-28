@@ -53,4 +53,16 @@ namespace Microsoft.Quantum.Simulation.Core
         : base(operation)
         { }
     }
+
+    /// <summary>
+    /// Base class containing information about an entry point 
+    /// for a Q# executable targeted for a Quantinuum quantum processor.
+    /// </summary>
+    public class QuantinuumEntryPointInfo<I, O>
+    : EntryPointInfo<I, O>
+    {
+        public QuantinuumEntryPointInfo(Type operation)
+        : base(operation)
+        { }
+    }
 }

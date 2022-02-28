@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Microsoft.Quantum.Simulation.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -119,7 +120,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             /// <param name="real">The real portion of the amplitude of the given basis state vector.</param>
             /// <param name="img">The imaginary portion of the amplitude of the given basis state vector.</param>
             /// <returns>true if dumping should continue, false to stop dumping.</returns>
-            public abstract bool Callback(uint idx, double real, double img);
+            public abstract bool Callback([MarshalAs(UnmanagedType.LPStr)] string idx, double real, double img);
 
             /// <summary>
             /// The Simulator being reported.
@@ -151,7 +152,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
         public class DisplayableStateDumper : StateDumper
         {
             private long _count = -1;
-            private IDictionary<int, Complex>? _data = null;
+            private IDictionary<BigInteger, Complex>? _data = null;
 
             /// <summary>
             /// A method to call to output a string representation.
@@ -170,10 +171,11 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     Used by the simulator to provide states when dumping.
             ///     Not intended to be called directly.
             /// </summary>
-            public override bool Callback(uint idx, double real, double img)
+            public override bool Callback([MarshalAs(UnmanagedType.LPStr)] string idx, double real, double img)
             {
                 if (_data == null) throw new Exception("Expected data buffer to be initialized before callback, but it was null.");
-                _data[(int)idx] = new Complex(real, img);
+                _data[DisplayableState.BasisStateLabelToBigInt(idx)] = new Complex(real, img);
+
                 return true;
             }
 
@@ -188,7 +190,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
                 _count = qubits == null
                             ? this.Simulator.QubitManager.AllocatedQubitsCount
                             : qubits.Length;
-                _data = new Dictionary<int, Complex>();        // If 0 qubits are allocated then the array has 
+                _data = new Dictionary<BigInteger, Complex>(); // If 0 qubits are allocated then the array has 
                                                                // a single element. The Hilbert space of the system is 
                                                                // ℂ¹ (that is, complex-valued scalars).
                 var result = base.Dump(qubits);
