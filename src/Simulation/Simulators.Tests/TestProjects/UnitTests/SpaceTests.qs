@@ -3,6 +3,7 @@
     open Microsoft.Quantum.Testing;
 
     @Test("QuantumSimulator")
+    @Test("SparseSimulator")
     function LibraryWithSpacesTest() : Unit {
         FactS("Hello quantum world!", LibraryWithSpaces.HelloQ());
     }

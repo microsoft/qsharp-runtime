@@ -43,6 +43,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Null(ex);
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
+
+            // TODO(kuzminrobin): Uncomment the block below once the following issue is resolved:
+            // https://github.com/microsoft/qsharp-compiler/issues/1326
+            // ProcessRunner.Run("dotnet", $"{exe} --simulator SparseSimulator", out var _, out error, out exitCode, out ex);
+            // Assert.Null(ex);
+            // Assert.Equal(0, exitCode);
+            // Assert.Empty(error.ToString().Trim());
         }
 
         [Fact]
@@ -279,6 +286,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             RunOne(new QCTraceSimulator());
             RunOne(new ResourcesEstimator());
             RunOne(new QuantumSimulator());
+            RunOne(new SparseSimulator());
         }
 
 
