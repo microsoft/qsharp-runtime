@@ -52,10 +52,27 @@ namespace Microsoft.Quantum.Simulation.Simulators
         /// </summary>
         public class DisplayableState
         {
+            /// <summary>
+            ///     Converst basis state label from unsigned little-endian bit string to BigInteger, e.g. "001" to 4.
+            /// </summary>
+            public static BigInteger BasisStateLabelToBigInt(string str)
+            {
+                string tmpStr = str.Reverse();
+
+                BigInteger retVal = 0;
+                foreach(char c in tmpStr)
+                {
+                    retVal <<= 1;
+                    retVal += (c - '0');
+                }
+                return retVal;
+            }
+
             private static readonly IComparer<string> ToIntComparer =
                 Comparer<string>.Create((label1, label2) =>
-                    Comparer<int>.Default.Compare(
-                        Int32.Parse(label1), Int32.Parse(label2)
+                    Comparer<BigInteger>.Default.Compare(
+                        BasisStateLabelToBigInt(label1), 
+                        BasisStateLabelToBigInt(label2)
                     )
                 );
 
@@ -86,7 +103,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     <see cref="Microsoft.Quantum.Simulation.Simulators.CommonNativeSimulator.StateDumper.Dump" />.
             /// </remarks>
             [JsonProperty("amplitudes")]
-            public IDictionary<int, Complex>? Amplitudes { get; set; }
+            public IDictionary<BigInteger, Complex>? Amplitudes { get; set; }
 
             /// <summary>
             ///     An enumerable source of the significant amplitudes of this state
@@ -135,25 +152,14 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ///     into an integer index in the little-endian encoding.
             /// </summary>
             public string BasisStateLabel(
-                BasisStateLabelingConvention convention, int index
+                BasisStateLabelingConvention convention, BigInteger index // index is a string of bits
             ) => convention switch
                 {
                     BasisStateLabelingConvention.Bitstring =>
-                        String.Concat(
-                            System
-                                .Convert
-                                .ToString(index, 2)
-                                .PadLeft(NQubits, '0')
-                                .Reverse()
-                        ),
+                        index.ToUnsignedBitString(NQubits),
                     BasisStateLabelingConvention.BigEndian =>
-                        System.Convert.ToInt64(
-                            String.Concat(
-                                System.Convert.ToString(index, 2).PadLeft(NQubits, '0').Reverse()
-                            ),
-                            fromBase: 2
-                        )
-                        .ToString(),
+                        BasisStateLabelToBigInt(
+                            index.ToUnsignedBitString(NQubits, true)).ToString(),
                     BasisStateLabelingConvention.LittleEndian =>
                         index.ToString(),
                     _ => throw new ArgumentException($"Invalid basis state labeling convention {convention}.")

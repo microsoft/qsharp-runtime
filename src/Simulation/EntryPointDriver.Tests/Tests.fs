@@ -929,7 +929,7 @@ let ``Submit has required options`` () =
 let ``Submit catches exceptions`` () =
     let given = test "Returns Unit"
     given submitWithErrorTarget
-    |> failsWith "Something went wrong when submitting the program to the Azure Quantum service.
+    |> failsWith "An error occurred when submitting to the Azure Quantum service.
 
                   This machine always has an error."
 
