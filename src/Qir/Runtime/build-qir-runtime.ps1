@@ -3,6 +3,11 @@
 
 . (Join-Path $PSScriptRoot .. qir-utils.ps1)
 
+Write-Host "##[info]Compile QIR Runtime"
+
+& (Join-Path $PSScriptRoot ".." check-sources-formatted.ps1) -Path $PSScriptRoot
+& (Join-Path $PSScriptRoot ".." check-sources-formatted.ps1) -Path (Join-Path $PSScriptRoot ".." Common)
+
 if (-not (Build-CMakeProject $PSScriptRoot "QIR Runtime")) {
     throw "At least one project failed to compile. Check the logs."
 }

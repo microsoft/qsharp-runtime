@@ -12,12 +12,17 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The aliases for the simulator command-line option.
         /// </summary>
-        internal IImmutableList<string> SimulatorOptionAliases { get; }
+        internal ImmutableList<string> SimulatorOptionAliases { get; }
 
         /// <summary>
         /// The name of the quantum simulator.
         /// </summary>
         internal string QuantumSimulatorName { get; }
+
+        /// <summary>
+        /// The name of the sparse simulator.
+        /// </summary>
+        internal string SparseSimulatorName { get; }
 
         /// <summary>
         /// The name of the Toffoli simulator.
@@ -53,14 +58,16 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="simulatorOptionAliases">The aliases for the simulator command-line option.</param>
         /// <param name="quantumSimulatorName">The name of the quantum simulator.</param>
+        /// <param name="sparseSimulatorName">The name of the sparse simulator.</param>
         /// <param name="toffoliSimulatorName">The name of the Toffoli simulator.</param>
         /// <param name="resourcesEstimatorName">The name of the resources estimator.</param>
         /// <param name="defaultSimulatorName">The name of the default simulator to use.</param>
         /// <param name="defaultExecutionTarget">The name of the default execution target to use.</param>
         /// <param name="createDefaultCustomSimulator">The function for creating a new instance of the default simulator if it is a custom simulator.</param>
         public DriverSettings(
-            IImmutableList<string> simulatorOptionAliases,
+            ImmutableList<string> simulatorOptionAliases,
             string quantumSimulatorName,
+            string sparseSimulatorName,
             string toffoliSimulatorName,
             string resourcesEstimatorName,
             string defaultSimulatorName,
@@ -69,6 +76,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             SimulatorOptionAliases = simulatorOptionAliases;
             QuantumSimulatorName = quantumSimulatorName;
+            SparseSimulatorName  = sparseSimulatorName;
             ToffoliSimulatorName = toffoliSimulatorName;
             ResourcesEstimatorName = resourcesEstimatorName;
             DefaultSimulatorName = defaultSimulatorName;

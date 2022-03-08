@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.Quantum.QsCompiler;
 using Microsoft.Quantum.QsCompiler.CsharpGeneration;
 using Microsoft.Quantum.QsCompiler.SyntaxTokens;
 using Microsoft.Quantum.QsCompiler.SyntaxTree;
@@ -27,8 +28,8 @@ namespace Microsoft.Quantum.QsCompiler.AutoSubstitution
     {
         public string Name => "AutoSubstitution";
 
-        // This rewrite step needs to be run before C# code generation
-        public int Priority => -2;
+        // This rewrite step needs to be run before syntax tree trimming
+        public int Priority => RewriteStepPriorities.SyntaxTreeTrimming + 1;
 
         public IDictionary<string, string?> AssemblyConstants { get; } = new Dictionary<string, string?>();
 

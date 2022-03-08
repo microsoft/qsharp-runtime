@@ -101,7 +101,7 @@ pub extern "C" fn lasterr() -> *const c_char {
 /// - **`pure`**: Creates the simulator with an initial state represented by
 ///   a state vector.
 /// - **`mixed`**: Creates the simulator with an initial state represented by
-///   a density operat.
+///   a density operator.
 /// - **`stabilizer`**: Creates the simulator with an initial state represented by
 ///   a stabilizer tableau.
 ///

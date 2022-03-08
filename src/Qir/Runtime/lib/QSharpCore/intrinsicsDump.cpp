@@ -11,12 +11,12 @@ static Microsoft::Quantum::IDiagnostics* GetDiagnostics()
 // Implementation:
 extern "C"
 {
-    void quantum__qis__dumpmachine__body(uint8_t* location)
+    void __quantum__qis__dumpmachine__body(uint8_t* location)
     {
         GetDiagnostics()->DumpMachine(location);
     }
 
-    void quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits)
+    void __quantum__qis__dumpregister__body(uint8_t* location, const QirArray* qubits)
     {
         GetDiagnostics()->DumpRegister(location, qubits);
     }

@@ -1,4 +1,4 @@
-name: $(Build.Major).$(Build.Minor).$(date:yyMM).$(DayOfMonth)$(rev:rr)
+name: $(Build.Major).$(Build.Minor).$(DayOfMonth)$(rev:rr)
 
 trigger: none
 
@@ -36,6 +36,7 @@ jobs:
         imageName: 'windows-latest'
   pool: 
     vmImage: $(imageName)
+  timeoutInMinutes: 90
 
   steps:
   - template: steps.yml

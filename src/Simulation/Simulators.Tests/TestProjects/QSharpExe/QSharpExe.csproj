@@ -7,7 +7,6 @@
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <DefaultSimulator>ToffoliSimulator</DefaultSimulator>
-    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>

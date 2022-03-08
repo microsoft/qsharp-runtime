@@ -20,7 +20,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../Common/cmake")
 
 set(public_includes "${PROJECT_SOURCE_DIR}/../Runtime/public")
 set(common_includes "${PROJECT_SOURCE_DIR}/../Common/Include")
-set(test_includes "${PROJECT_SOURCE_DIR}/../Common/externals/catch2")
+set(test_includes "${PROJECT_SOURCE_DIR}/../Common/Externals/catch2")
 
 set(runtime_lib_path "${PROJECT_SOURCE_DIR}/../Runtime/bin/$ENV{BUILD_CONFIGURATION}/bin")
 

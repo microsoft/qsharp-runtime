@@ -5,6 +5,8 @@
 $all_ok = $True
 
 if ($Env:ENABLE_NATIVE -ne "false") {
+    ( & (Join-Path $PSScriptRoot .. src Simulation NativeSparseSimulator test.ps1 ) ) || ( $script:all_ok = $False )
+
     $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
     & "$nativeSimulator/test-native-simulator.ps1"
     if ($LastExitCode -ne 0) {
@@ -83,7 +85,7 @@ if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
         }
     }
 } else {
-    Write-Host "Skipping test of experimental simulators because ENABLE_OPENSIM variable is set to: $Env:ENABLE_OPENSIM."
+    Write-Host "Skipping test of experimental simulators because ENABLE_EXPERIMENTALSIM variable is set to: $Env:ENABLE_EXPERIMENTALSIM."
 }
 
 if (-not $all_ok) {

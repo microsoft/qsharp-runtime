@@ -20,9 +20,9 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
         /// </summary>
         internal const string Target = "test.submitter.noop";
 
-        public string ProviderId => nameof(NoOpSubmitter);
+        string IQirSubmitter.Target => Target;
 
-        string IAzureSubmitter.Target => Target;
+        string IQSharpSubmitter.Target => Target;
 
         public Task<IQuantumMachineJob> SubmitAsync(
             Stream qir, string entryPoint, IReadOnlyList<Argument> arguments, SubmissionOptions options) =>
@@ -33,5 +33,9 @@ namespace Microsoft.Quantum.EntryPointDriver.Mock
             Task.FromResult<IQuantumMachineJob>(new ExampleJob());
 
         public string? Validate<TIn, TOut>(EntryPointInfo<TIn, TOut> entryPoint, TIn argument) => null;
+
+        public string? Validate(
+            Stream qir, string entryPoint, IReadOnlyList<Argument> arguments) =>
+            null;
     }
 }

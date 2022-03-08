@@ -137,6 +137,7 @@ class Fused
             wfnCapacity = wfn.capacity();
             char* envNT = NULL;
             size_t len;
+#ifdef _OPENMP
 #ifdef _MSC_VER
             errno_t err = _dupenv_s(&envNT, &len, "OMP_NUM_THREADS");
 #else
@@ -154,6 +155,7 @@ class Fused
                 }
                 omp_set_num_threads(nMaxThrds);
             }
+#endif
 
             // Set the max fused depth
             char* envFD = NULL;

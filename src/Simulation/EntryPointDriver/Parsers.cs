@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.CommandLine.Parsing;
 using System.ComponentModel;
 using System.Linq;
@@ -10,6 +12,8 @@ using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
+    using Environment = System.Environment;
+
     /// <summary>
     /// Parsers for command-line arguments.
     /// </summary>
@@ -22,7 +26,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="value">The string to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
         /// <returns>A validation of the parsed value.</returns>
-        private delegate Validation<T> TryParseValue<T>(string value, string optionName);
+        private delegate Validation<T, string> TryParseValue<T>(string value, string optionName);
 
         /// <summary>
         /// Creates an argument parser for a single-valued argument of the given type.
@@ -30,10 +34,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <typeparam name="T">The type of the argument.</typeparam>
         /// <returns>The argument parser.</returns>
         internal static ParseArgument<T> ParseOneArgument<T>() => argument =>
-        {
-            var values = ParseManyArguments<T>()(argument);
-            return (values == null ? default : values.Single())!;
-        };
+            ParseManyArguments<T>()(argument).SingleOrDefault();
 
         /// <summary>
         /// Creates an argument parser for a many-valued argument of the given type.
@@ -44,10 +45,42 @@ namespace Microsoft.Quantum.EntryPointDriver
         {
             var parse = ValueParser<T>();
             var optionName = ((OptionResult)argument.Parent).Token.Value;
-            var validation = argument.Tokens.Select(token => parse(token.Value, optionName)).Sequence();
-            argument.ErrorMessage = validation.ErrorMessage;
-            return validation.IsSuccess ? new QArray<T>(validation.Value) : default!;
+            var parsedValues = argument.Tokens.Select(token => parse(token.Value, optionName)).Sequence();
+
+            return parsedValues.Case(
+                values => new QArray<T>(values),
+                errors => 
+                { 
+                    argument.ErrorMessage = string.Join(Environment.NewLine, errors); 
+                    return new QArray<T>(); 
+                });
         };
+
+        /// <summary>
+        /// Parses a sequence of <c>key=value</c> arguments as a dictionary of key-value pairs.
+        /// </summary>
+        /// <param name="argument">The argument result.</param>
+        /// <returns>The parsed dictionary.</returns>
+        internal static ImmutableDictionary<string, string> ParseDictionary(ArgumentResult argument)
+        {
+            var parsedPairs = argument.Tokens
+                .Select(token =>
+                {
+                    var items = token.Value.Split('=', 2);
+                    return items.Length == 2
+                        ? Validation.Success<KeyValuePair<string, string>, string>(KeyValuePair.Create(items[0], items[1]))
+                        : Validation.Failure<KeyValuePair<string, string>, string>($"This is not a \"key=value\" pair: '{token.Value}'");
+                })
+                .Sequence();
+
+            return parsedPairs.Case(
+                ImmutableDictionary.CreateRange,
+                errors =>
+                {
+                    argument.ErrorMessage = string.Join(Environment.NewLine, errors);
+                    return ImmutableDictionary<string, string>.Empty;
+                });
+        }
 
         /// <summary>
         /// Returns the value parser for the given type.
@@ -77,10 +110,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="value">The string value to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
         /// <returns>A validation of the parsed <see cref="BigInteger"/>.</returns>
-        private static Validation<BigInteger> TryParseBigInteger(string value, string optionName) =>
+        private static Validation<BigInteger, string> TryParseBigInteger(string value, string optionName) =>
             BigInteger.TryParse(value, out var result)
-            ? Validation<BigInteger>.Success(result)
-            : Validation<BigInteger>.Failure(ArgumentErrorMessage(value, optionName, typeof(BigInteger)));
+                ? Validation.Success<BigInteger, string>(result)
+                : Validation.Failure<BigInteger, string>(ArgumentErrorMessage(value, optionName, typeof(BigInteger)));
 
         /// <summary>
         /// Parses a <see cref="QRange"/>.
@@ -88,22 +121,24 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="value">The string value to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
         /// <returns>A validation of the parsed <see cref="QRange"/>.</returns>
-        private static Validation<QRange> TryParseQRange(string value, string optionName)
+        private static Validation<QRange, string> TryParseQRange(string value, string optionName)
         {
-            Validation<long> TryParseLong(string longValue) =>
+            Validation<long, string> TryParseLong(string longValue) =>
                 long.TryParse(longValue, out var result)
-                ? Validation<long>.Success(result)
-                : Validation<long>.Failure(ArgumentErrorMessage(longValue, optionName, typeof(long)));
+                ? Validation.Success<long, string>(result)
+                : Validation.Failure<long, string>(ArgumentErrorMessage(longValue, optionName, typeof(long)));
 
-            return value.Split("..").Select(TryParseLong).Sequence().Bind(values =>
+            var parsedItems = value
+                .Split("..")
+                .Select(TryParseLong)
+                .Sequence()
+                .Map(items => items.ToList(), errors => string.Concat(Environment.NewLine, errors));
+
+            return parsedItems.Bind(items => items.Count switch
             {
-                var list = values.ToList();
-                return list.Count switch
-                {
-                    2 => Validation<QRange>.Success(new QRange(list[0], list[1])),
-                    3 => Validation<QRange>.Success(new QRange(list[0], list[1], list[2])),
-                    _ => Validation<QRange>.Failure(ArgumentErrorMessage(value, optionName, typeof(QRange)))
-                };
+                2 => Validation.Success<QRange, string>(new QRange(items[0], items[1])),
+                3 => Validation.Success<QRange, string>(new QRange(items[0], items[1], items[2])),
+                _ => Validation.Failure<QRange, string>(ArgumentErrorMessage(value, optionName, typeof(QRange)))
             });
         }
 
@@ -113,10 +148,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="value">The string value to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
         /// <returns>A validation of the parsed <see cref="QVoid"/>.</returns>
-        private static Validation<QVoid> TryParseQVoid(string value, string optionName) =>
+        private static Validation<QVoid, string> TryParseQVoid(string value, string optionName) =>
             value.Trim() == QVoid.Instance.ToString()
-            ? Validation<QVoid>.Success(QVoid.Instance)
-            : Validation<QVoid>.Failure(ArgumentErrorMessage(value, optionName, typeof(QVoid)));
+            ? Validation.Success<QVoid, string>(QVoid.Instance)
+            : Validation.Failure<QVoid, string>(ArgumentErrorMessage(value, optionName, typeof(QVoid)));
 
         /// <summary>
         /// Parses a <see cref="Result"/>.
@@ -124,15 +159,15 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="value">The string value to parse.</param>
         /// <param name="optionName">The name of the option that the value was used with.</param>
         /// <returns>A validation of the parsed <see cref="Result"/>.</returns>
-        private static Validation<Result> TryParseResult(string value, string optionName) =>
+        private static Validation<Result, string> TryParseResult(string value, string optionName) =>
             Enum.TryParse(value, ignoreCase: true, out ResultValue result)
-            ? Validation<Result>.Success(result switch
+            ? Validation.Success<Result, string>(result switch
             {
                 ResultValue.Zero => Result.Zero,
                 ResultValue.One => Result.One,
                 var invalid => throw new Exception($"Invalid result value '{invalid}'.")
             })
-            : Validation<Result>.Failure(ArgumentErrorMessage(value, optionName, typeof(Result)));
+            : Validation.Failure<Result, string>(ArgumentErrorMessage(value, optionName, typeof(Result)));
 
         /// <summary>
         /// Parses a string into the given type using the corresponding type converter.
@@ -141,21 +176,21 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="optionName">The name of the option that the value was used with.</param>
         /// <typeparam name="T">The type of the parsed value.</typeparam>
         /// <returns>A validation of the parsed <typeparamref name="T"/>.</returns>
-        private static Validation<T> TryParseWithTypeConverter<T>(string value, string optionName)
+        private static Validation<T, string> TryParseWithTypeConverter<T>(string value, string optionName)
         {
             var converter = TypeDescriptor.GetConverter(typeof(T));
             if (!converter.CanConvertFrom(typeof(string)))
             {
-                return Validation<T>.Failure(ArgumentErrorMessage(value, optionName, typeof(T)));
+                return Validation.Failure<T, string>(ArgumentErrorMessage(value, optionName, typeof(T)));
             }
-            
+
             try
             {
-                return Validation<T>.Success((T)converter.ConvertFromInvariantString(value));
+                return Validation.Success<T, string>((T)converter.ConvertFromInvariantString(value));
             }
-            catch (Exception)
+            catch
             {
-                return Validation<T>.Failure(ArgumentErrorMessage(value, optionName, typeof(T)));
+                return Validation.Failure<T, string>(ArgumentErrorMessage(value, optionName, typeof(T)));
             }
         }
         

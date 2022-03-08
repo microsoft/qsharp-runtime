@@ -27,7 +27,7 @@ fun:*uniform_int_distribution*
 ##                                    /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/bits/stl_tree.h:2092:7
 #fun:*_Rb_tree*_M_get_insert_unique_pos*
 ## 1:     #0 0x754bc8 in Catch::(anonymous namespace)::parseSpecialTag(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) 
-##            /mnt/c/ed/dev/QSharpCompiler/qsharp-runtime/qsharp-runtime/src/Qir/Runtime/bin/Debug/../../../Common/externals/catch2/catch.hpp:14014:40
+##            /mnt/c/ed/dev/QSharpCompiler/qsharp-runtime/qsharp-runtime/src/Qir/Runtime/bin/Debug/../../../Common/Externals/catch2/catch.hpp:14014:40
 #fun:*Catch*parseSpecialTag*
 ## 1:     #0 0x440f6e in memcmp (/mnt/c/ed/dev/QSharpCompiler/qsharp-runtime/qsharp-runtime/src/Qir/Runtime/bin/Debug/unittests/qir-runtime-unittests+0x440f6e)
 #fun:*memcmp*
@@ -38,5 +38,5 @@ fun:*uniform_int_distribution*
 ## Instrumenting libstdc++ during CI builds seems impractical (https://stackoverflow.com/a/22301584/6362941).
 #
 ##1:   Uninitialized value was created by an allocation of 'tag' in the stack frame of function '_ZN5Catch12makeTestCaseEPNS_12ITestInvokerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11NameAndTagsERKNS_14SourceLineInfoE'
-##1:     #0 0x752310 in Catch::makeTestCase(Catch::ITestInvoker*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, Catch::NameAndTags const&, Catch::SourceLineInfo const&) /mnt/c/ed/dev/QSharpCompiler/qsharp-runtime/qsharp-runtime/src/Qir/Runtime/bin/Debug/../../../Common/externals/catch2/catch.hpp:14045
+##1:     #0 0x752310 in Catch::makeTestCase(Catch::ITestInvoker*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, Catch::NameAndTags const&, Catch::SourceLineInfo const&) /mnt/c/ed/dev/QSharpCompiler/qsharp-runtime/qsharp-runtime/src/Qir/Runtime/bin/Debug/../../../Common/Externals/catch2/catch.hpp:14045
 #fun:*_ZN5Catch12makeTestCaseEPNS_12ITestInvokerERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11NameAndTagsERKNS_14SourceLineInfoE*

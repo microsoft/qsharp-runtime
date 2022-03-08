@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "QirContext.hpp"
+#include "QirContext.h"
 
 #include "CoreTypes.hpp"
 #include "QirRuntimeApi_I.hpp"
@@ -14,12 +15,20 @@ namespace Microsoft
 namespace Quantum
 {
     std::unique_ptr<QirExecutionContext> g_context = nullptr;
-    std::unique_ptr<QirExecutionContext>& GlobalContext() { return g_context; }
+    std::unique_ptr<QirExecutionContext>& GlobalContext()
+    {
+        return g_context;
+    }
 
     void InitializeQirContext(IRuntimeDriver* driver, bool trackAllocatedObjects)
     {
         assert(g_context == nullptr);
         g_context = std::make_unique<QirExecutionContext>(driver, trackAllocatedObjects);
+    }
+
+    extern "C" void InitializeQirContext(void* driver, bool trackAllocatedObjects)
+    {
+        InitializeQirContext((IRuntimeDriver*)driver, trackAllocatedObjects);
     }
 
     void ReleaseQirContext()
@@ -44,10 +53,10 @@ namespace Quantum
         }
     }
 
-    // If we just remove this user-declared-and-defined dtor 
+    // If we just remove this user-declared-and-defined dtor
     // then it will be automatically defined together with the class definition,
-    // which will require the `AllocationsTracker` to be a complete type 
-    // everywhere where `public/QirContext.hpp` is included 
+    // which will require the `AllocationsTracker` to be a complete type
+    // everywhere where `public/QirContext.hpp` is included
     // (we'll have to move `allocationsTracker.hpp` to `public/`).
     QirExecutionContext::~QirExecutionContext() = default;
 
@@ -71,7 +80,7 @@ namespace Quantum
 
     void QirExecutionContext::OnAddRef(void* object)
     {
-        if(trackAllocatedObjects)
+        if (trackAllocatedObjects)
         {
             this->allocationsTracker->OnAddRef(object);
         }
@@ -79,7 +88,7 @@ namespace Quantum
 
     void QirExecutionContext::OnRelease(void* object)
     {
-        if(this->trackAllocatedObjects)
+        if (this->trackAllocatedObjects)
         {
             this->allocationsTracker->OnRelease(object);
         }
@@ -87,7 +96,7 @@ namespace Quantum
 
     void QirExecutionContext::OnAllocate(void* object)
     {
-        if(this->trackAllocatedObjects)
+        if (this->trackAllocatedObjects)
         {
             this->allocationsTracker->OnAllocate(object);
         }
@@ -112,7 +121,7 @@ namespace Quantum
     {
         InitializeQirContext(driver, trackAllocatedObj);
     }
-    
+
     QirContextScope::~QirContextScope()
     {
         ReleaseQirContext();

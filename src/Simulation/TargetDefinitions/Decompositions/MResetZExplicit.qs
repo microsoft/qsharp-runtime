@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Measurement {
     /// # Output
     /// The result of measuring `target` in the Pauli $Z$ basis.
     operation MResetZ (target : Qubit) : Result {
-        let result = M(target);
+        let result = MZ(target);
         Reset(target);
         return result;
     }

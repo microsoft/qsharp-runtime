@@ -16,18 +16,18 @@
 
 extern "C"
 {
-    char* quantum__rt__memory_allocate(uint64_t size)
+    char* __quantum__rt__memory_allocate(uint64_t size)
     {
-        return (char *)malloc((size_t)size);
+        return (char*)malloc((size_t)size);
     }
 
     // Fail the computation with the given error message.
-    void quantum__rt__fail(QirString* msg) // NOLINT
+    void __quantum__rt__fail(QirString* msg) // NOLINT
     {
-        quantum__rt__fail_cstr(msg->str.c_str());
+        __quantum__rt__fail_cstr(msg->str.c_str());
     }
 
-    void quantum__rt__fail_cstr(const char* cstr)
+    void __quantum__rt__fail_cstr(const char* cstr)
     {
         Microsoft::Quantum::OutputStream::Get() << cstr << std::endl;
         Microsoft::Quantum::OutputStream::Get().flush();

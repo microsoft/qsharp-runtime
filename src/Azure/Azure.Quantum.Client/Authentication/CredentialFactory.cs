@@ -29,6 +29,11 @@ namespace Microsoft.Azure.Quantum.Authentication
         Default,
 
         /// <summary>
+        /// A custom TokenCredential implementation which uses a local token file.
+        /// </summary>
+        TokenFile,
+
+        /// <summary>
         /// Authenticates a service principal or user via credential information specified in environment variables.
         /// See: https://docs.microsoft.com/dotnet/api/azure.identity.environmentcredential
         /// </summary>
@@ -107,6 +112,7 @@ namespace Microsoft.Azure.Quantum.Authentication
             CredentialType.VisualStudio => new VisualStudioCredential(options: VisualStudioOptions(subscriptionId)),
             CredentialType.VisualStudioCode => new VisualStudioCodeCredential(options: VisualStudioCodeOptions(subscriptionId)),
             CredentialType.Interactive => new InteractiveBrowserCredential(options: InteractiveOptions(subscriptionId)),
+            CredentialType.TokenFile => new TokenFileCredential(),
             _ => throw new ArgumentException($"Credentials of type {credentialType} are not supported.")
         };
 

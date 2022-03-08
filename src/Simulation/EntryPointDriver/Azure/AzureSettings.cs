@@ -2,10 +2,13 @@
 // Licensed under the MIT License.
 
 using Azure.Core;
+using Azure.Quantum;
+
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Quantum.Runtime.Submitters;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -87,9 +90,19 @@ namespace Microsoft.Quantum.EntryPointDriver
         public string? Location { get; set; }
 
         /// <summary>
+        /// A string to identify this application when making requests to Azure Quantum.
+        /// </summary>
+        public string? UserAgent { get; set; }
+
+        /// <summary>
         /// The name of the submitted job.
         /// </summary>
         public string JobName { get; set; } = "";
+
+        /// <summary>
+        /// Additional target-specific parameters for the submitted job.
+        /// </summary>
+        public ImmutableDictionary<string, string> JobParams { get; set; } = ImmutableDictionary<string, string>.Empty;
 
         /// <summary>
         /// The number of times the program is executed on the target machine.
@@ -123,10 +136,27 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
         }
 
+        internal QuantumJobClientOptions CreateClientOptions()
+        {
+            var options = new QuantumJobClientOptions();
+
+            // This value will be added as a prefix in the UserAgent when
+            // calling the Azure Quantum API
+            // It cannot be larger than 24 characters.
+            var applicationId = string.Join('@', "Q#Run", UserAgent?.Trim()).Trim(' ', '@');
+            if (applicationId?.Length > 24)
+            {
+                applicationId = applicationId.Substring(0, 24);
+            }
+
+            options.Diagnostics.ApplicationId = applicationId;
+            return options;
+        }
+
         /// <summary>
         /// The submission options corresponding to these settings.
         /// </summary>
-        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots);
+        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams);
 
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
@@ -135,6 +165,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal Workspace CreateWorkspace()
         {
             var credentials = CreateCredentials();
+            var clientOptions = CreateClientOptions();
             var location = NormalizeLocation(Location ?? ExtractLocation(BaseUri));
 
             return new Workspace(
@@ -142,7 +173,8 @@ namespace Microsoft.Quantum.EntryPointDriver
                 resourceGroupName: ResourceGroup,
                 workspaceName: Workspace,
                 location: location,
-                credential: credentials);
+                credential: credentials,
+                options: clientOptions);
         }
 
         public override string ToString() => string.Join(
@@ -156,7 +188,9 @@ namespace Microsoft.Quantum.EntryPointDriver
             $"Location: {Location ?? ExtractLocation(BaseUri)}",
             $"Credential: {Credential}",
             $"AadToken: {AadToken?.Substring(0, 5)}",
+            $"UserAgent: {UserAgent}",
             $"Job Name: {JobName}",
+            $"Job Parameters: {string.Join(", ", JobParams.OrderBy(item => item.Key))}",
             $"Shots: {Shots}",
             $"Output: {Output}",
             $"Dry Run: {DryRun}",

@@ -7,11 +7,13 @@
 #include <memory>
 #include <vector>
 
+// clang-format off
 #pragma clang diagnostic push
     // Temporarily disable `-Wswitch-enum`, one of the `switch`es in "CLI11.hpp" handles not all the enumerators.
     #pragma clang diagnostic ignored "-Wswitch-enum"
     #include "CLI11.hpp"
 #pragma clang diagnostic pop
+// clang-format on
 
 #include "QirContext.hpp"
 #include "SimFactory.hpp"
@@ -20,16 +22,16 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
-namespace   // == `static`
+namespace // == `static`
 {
 struct InteropArray
 {
-    size_t Size;   // TODO: Never used?
+    size_t Size; // TODO: Never used?
     void* Data;
 
-    InteropArray(size_t size, void* data) :
-        Size(size),
-        Data(data){}
+    InteropArray(size_t size, void* data) : Size(size), Data(data)
+    {
+    }
 };
 
 using RangeTuple = tuple<int64_t, int64_t, int64_t>;
@@ -39,56 +41,44 @@ struct InteropRange
     int64_t Step;
     int64_t End;
 
-    [[maybe_unused]] InteropRange() :
-        Start(0),
-        Step(0),
-        End(0){}
+    [[maybe_unused]] InteropRange() : Start(0), Step(0), End(0)
+    {
+    }
 
-    [[maybe_unused]] InteropRange(RangeTuple rangeTuple) :
-        Start(get<0>(rangeTuple)),
-        Step(get<1>(rangeTuple)),
-        End(get<2>(rangeTuple)){}
+    [[maybe_unused]] InteropRange(RangeTuple rangeTuple)
+        : Start(get<0>(rangeTuple))
+        , Step(get<1>(rangeTuple))
+        , End(get<2>(rangeTuple))
+    {
+    }
 };
 
-} // namespace   // == `static`
+} // namespace
 
 // This is the function corresponding to the QIR entry-point.
 extern "C" void Quantum__StandaloneSupportedInputs__ExerciseInputs( // NOLINT
-    int64_t intValue,
-    InteropArray* integerArray,
-    double doubleValue,
-    InteropArray* doubleArray,
-    char boolValue,
-    InteropArray* boolArray,
-    char pauliValue,
-    InteropArray* pauliArray,
-    InteropRange* rangeValue,
-    char resultValue,
-    InteropArray* resultArray,
-    const char* stringValue);
+    int64_t intValue, InteropArray* integerArray, double doubleValue, InteropArray* doubleArray, char boolValue,
+    InteropArray* boolArray, char pauliValue, InteropArray* pauliArray, InteropRange* rangeValue, char resultValue,
+    InteropArray* resultArray, const char* stringValue);
 
 static const char InteropFalseAsChar = 0x0;
-static const char InteropTrueAsChar = 0x1;
-static map<string, bool> BoolAsCharMap{
-    {"0", InteropFalseAsChar},
-    {"false", InteropFalseAsChar},
-    {"1", InteropTrueAsChar},
-    {"true", InteropTrueAsChar}};
+static const char InteropTrueAsChar  = 0x1;
+static map<string, bool> BoolAsCharMap{{"0", InteropFalseAsChar},
+                                       {"false", InteropFalseAsChar},
+                                       {"1", InteropTrueAsChar},
+                                       {"true", InteropTrueAsChar}};
 
-static map<string, PauliId> PauliMap{
-    {"PauliI", PauliId::PauliId_I},
-    {"PauliX", PauliId::PauliId_X},
-    {"PauliY", PauliId::PauliId_Y},
-    {"PauliZ", PauliId::PauliId_Z}};
+static map<string, PauliId> PauliMap{{"PauliI", PauliId::PauliId_I},
+                                     {"PauliX", PauliId::PauliId_X},
+                                     {"PauliY", PauliId::PauliId_Y},
+                                     {"PauliZ", PauliId::PauliId_Z}};
 
 static const char InteropResultZeroAsChar = 0x0;
-static const char InteropResultOneAsChar = 0x1;
-static map<string, char> ResultAsCharMap{
-    {"0", InteropResultZeroAsChar},
-    {"Zero", InteropResultZeroAsChar},
-    {"1", InteropResultOneAsChar},
-    {"One", InteropResultOneAsChar}
-};
+static const char InteropResultOneAsChar  = 0x1;
+static map<string, char> ResultAsCharMap{{"0", InteropResultZeroAsChar},
+                                         {"Zero", InteropResultZeroAsChar},
+                                         {"1", InteropResultOneAsChar},
+                                         {"One", InteropResultOneAsChar}};
 
 template<typename T>
 unique_ptr<InteropArray> CreateInteropArray(vector<T>& v)
@@ -146,9 +136,9 @@ int main(int argc, char* argv[])
     // Add the --simulation-output options.
     // N.B. This option should be present in all standalone drivers.
     string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt = app.add_option(
-        "-s,--simulation-output", simulationOutputFile,
-        "File where the output produced during the simulation is written");
+    CLI::Option* simulationOutputFileOpt =
+        app.add_option("-s,--simulation-output", simulationOutputFile,
+                       "File where the output produced during the simulation is written");
 
     // Add the options that correspond to the parameters that the QIR entry-point needs.
     // Option for a Q# Int type.
@@ -259,7 +249,7 @@ int main(int argc, char* argv[])
     unique_ptr<InteropArray> resultArray = CreateInteropArray(resultAsCharVector);
 
     // Create an interop array of String values.
-    vector<const char *> stringBufferVector;
+    vector<const char*> stringBufferVector;
     TranslateVector<string, const char*>(stringVector, stringBufferVector, TranslateStringToCharBuffer);
     unique_ptr<InteropArray> stringArray = CreateInteropArray(stringBufferVector);
 
@@ -274,19 +264,10 @@ int main(int argc, char* argv[])
     }
 
     // Run simulation and write the output of the operation to the corresponding stream.
-    Quantum__StandaloneSupportedInputs__ExerciseInputs(
-        intValue,
-        integerArray.get(),
-        doubleValue,
-        doubleArray.get(),
-        boolAsCharValue,
-        boolArray.get(),
-        pauliAsCharValue,
-        pauliArray.get(),
-        rangeValue.get(),
-        resultAsCharValue,
-        resultArray.get(),
-        stringValue.c_str());
+    Quantum__StandaloneSupportedInputs__ExerciseInputs(intValue, integerArray.get(), doubleValue, doubleArray.get(),
+                                                       boolAsCharValue, boolArray.get(), pauliAsCharValue,
+                                                       pauliArray.get(), rangeValue.get(), resultAsCharValue,
+                                                       resultArray.get(), stringValue.c_str());
 
     FreePointerVector(rangeVector);
     simulatorOutputStream->flush();

@@ -25,26 +25,24 @@ namespace Quantum
     // implemented as a plain allocation.
     class QIR_SHARED_API CQubitManager
     {
-    public:
-        using QubitIdType = ::int32_t;
-
+      public:
         // We want status array to be reasonably large.
         constexpr static QubitIdType DefaultQubitCapacity = 8;
 
-        // Indexes in the status array can potentially be in range 0 .. QubitIdType.MaxValue-1.
-        // This gives maximum capacity as QubitIdType.MaxValue. Actual configured capacity may be less than this.
-        // Index equal to QubitIdType.MaxValue doesn't exist and is reserved for 'NoneMarker' - list terminator.
+        // Indexes in the status array can potentially be in range 0 .. QubitId.MaxValue-1.
+        // This gives maximum capacity as QubitId.MaxValue. Actual configured capacity may be less than this.
+        // Index equal to QubitId.MaxValue doesn't exist and is reserved for 'NoneMarker' - list terminator.
         constexpr static QubitIdType MaximumQubitCapacity = std::numeric_limits<QubitIdType>::max();
 
-    public:
-        CQubitManager(
-            QubitIdType initialQubitCapacity = DefaultQubitCapacity,
-            bool mayExtendCapacity = true);
+      public:
+        CQubitManager(QubitIdType initialQubitCapacity = DefaultQubitCapacity, bool mayExtendCapacity = true);
 
         // No complex scenarios for now. Don't need to support copying/moving.
         CQubitManager(const CQubitManager&) = delete;
-        CQubitManager& operator = (const CQubitManager&) = delete;
-        virtual ~CQubitManager();
+        CQubitManager& operator=(const CQubitManager&) = delete;
+        ~CQubitManager(); // If this dtor is made _virtual_ then the QIR RT tests crash (at least in Debug config)
+                          // if the native simulator is compiled with Clang (as opposed to GCC). Nothing wrong found in
+                          // the code,  probably is the compiler bug.
 
         // Restricted reuse area control
         void StartRestrictedReuseArea();
@@ -54,83 +52,78 @@ namespace Quantum
         // Allocate a qubit. Extend capacity if necessary and possible.
         // Fail if the qubit cannot be allocated.
         // Computation complexity is O(number of nested restricted reuse areas) worst case, O(1) amortized cost.
-        Qubit Allocate();
-        // Allocate qubitCountToAllocate qubits and store them in the provided array. Extend manager capacity if necessary and possible.
+        QubitIdType Allocate();
+        // Allocate qubitCountToAllocate qubits and store them in the provided array.
+        // Extend manager capacity if necessary and possible.
         // Fail without allocating any qubits if the qubits cannot be allocated.
         // Caller is responsible for providing array of sufficient size to hold qubitCountToAllocate.
-        void Allocate(Qubit* qubitsToAllocate, int32_t qubitCountToAllocate);
+        void Allocate(QubitIdType* qubitsToAllocate, int32_t qubitCountToAllocate);
 
         // Releases a given qubit.
-        void Release(Qubit qubit);
+        void Release(QubitIdType qubit);
         // Releases qubitCountToRelease qubits in the provided array.
-        // Caller is responsible for managing memory used by the array itself (i.e. delete[] array if it was dynamically allocated).
-        void Release(Qubit* qubitsToRelease, int32_t qubitCountToRelease);
+        // Caller is responsible for managing memory used by the array itself
+        // (i.e. delete[] array if it was dynamically allocated).
+        void Release(QubitIdType* qubitsToRelease, int32_t qubitCountToRelease);
 
         // Borrow (We treat borrowing as allocation currently)
-        Qubit Borrow();
-        void Borrow(Qubit* qubitsToBorrow, int32_t qubitCountToBorrow);
+        QubitIdType Borrow();
+        void Borrow(QubitIdType* qubitsToBorrow, int32_t qubitCountToBorrow);
         // Return (We treat returning as release currently)
-        void Return(Qubit qubit);
-        void Return(Qubit* qubitsToReturn, int32_t qubitCountToReturn);
+        void Return(QubitIdType qubit);
+        void Return(QubitIdType* qubitsToReturn, int32_t qubitCountToReturn);
 
         // Disables a given qubit.
         // Once a qubit is disabled it can never be "enabled" or reallocated.
-        void Disable(Qubit qubit);
+        void Disable(QubitIdType qubit);
         // Disables a set of given qubits.
         // Once a qubit is disabled it can never be "enabled" or reallocated.
-        void Disable(Qubit* qubitsToDisable, int32_t qubitCountToDisable);
+        void Disable(QubitIdType* qubitsToDisable, int32_t qubitCountToDisable);
 
-        bool IsValidQubit(Qubit qubit) const;
-        bool IsDisabledQubit(Qubit qubit) const;
-        bool IsExplicitlyAllocatedQubit(Qubit qubit) const;
+        bool IsValidQubit(QubitIdType qubit) const;
+        bool IsDisabledQubit(QubitIdType qubit) const;
+        bool IsExplicitlyAllocatedQubit(QubitIdType qubit) const;
         bool IsFreeQubitId(QubitIdType id) const;
-
-        QubitIdType GetQubitId(Qubit qubit) const;
 
         // Qubit counts:
 
         // Number of qubits that are disabled. When an explicitly allocated qubit
         // gets disabled, it is removed from allocated count and is added to
         // disabled count immediately. Subsequent Release doesn't affect counts.
-        int32_t GetDisabledQubitCount() const { return disabledQubitCount; }
+        QubitIdType GetDisabledQubitCount() const
+        {
+            return disabledQubitCount;
+        }
 
         // Number of qubits that are explicitly allocated. This counter gets
         // increased on allocation of a qubit and decreased on release of a qubit.
-        // Note that we treat borrowing as allocation now. 
-        int32_t GetAllocatedQubitCount() const { return allocatedQubitCount; }
+        // Note that we treat borrowing as allocation now.
+        QubitIdType GetAllocatedQubitCount() const
+        {
+            return allocatedQubitCount;
+        }
 
         // Number of free qubits that are currently tracked by this qubit manager.
         // Note that when qubit manager may extend capacity, this doesn't account
         // for qubits that may be potentially added in future via capacity extension.
         // If qubit manager may extend capacity and reuse is discouraged, released
         // qubits still increase this number even though they cannot be reused.
-        int32_t GetFreeQubitCount() const { return freeQubitCount; }
+        QubitIdType GetFreeQubitCount() const
+        {
+            return freeQubitCount;
+        }
 
         // Total number of qubits that are currently tracked by this qubit manager.
-        int32_t GetQubitCapacity() const { return qubitCapacity; }
-        bool GetMayExtendCapacity() const { return mayExtendCapacity; }
+        QubitIdType GetQubitCapacity() const
+        {
+            return qubitCapacity;
+        }
+        bool GetMayExtendCapacity() const
+        {
+            return mayExtendCapacity;
+        }
 
-    protected:
-        // May be overriden to create a custom Qubit object.
-        // When not overriden, it just stores qubit Id in place of a pointer to a qubit.
-        // id: unique qubit id
-        // Returns a newly instantiated qubit.
-        virtual Qubit CreateQubitObject(QubitIdType id);
-
-        // May be overriden to delete a custom Qubit object.
-        // Must be overriden if CreateQubitObject is overriden.
-        // When not overriden, it does nothing.
-        // qubit: pointer to QUBIT
-        virtual void DeleteQubitObject(Qubit qubit);
-
-        // May be overriden to get a qubit id from a custom qubit object.
-        // Must be overriden if CreateQubitObject is overriden.
-        // When not overriden, it just reinterprets pointer to qubit as a qubit id.
-        // qubit: pointer to QUBIT
-        // Returns id of a qubit pointed to by qubit.
-        virtual QubitIdType QubitToId(Qubit qubit) const;
-
-    private:
+      private:
         // The end of free lists are marked with NoneMarker value. It is used like null for pointers.
         // This value is non-negative just like other values in the free lists. See sharedQubitStatusArray.
         constexpr static QubitIdType NoneMarker = std::numeric_limits<QubitIdType>::max();
@@ -152,13 +145,13 @@ namespace Quantum
         // This class is small, contains no C++ pointers and relies on default shallow copying/destruction.
         struct QubitListInSharedArray final
         {
-        private:
+          private:
             QubitIdType firstElement = NoneMarker;
-            QubitIdType lastElement = NoneMarker;
+            QubitIdType lastElement  = NoneMarker;
             // We are not storing pointer to shared array because it can be reallocated.
             // Indexes and special values remain the same on such reallocations.
 
-        public:
+          public:
             // Initialize empty list
             QubitListInSharedArray() = default;
 
@@ -180,7 +173,7 @@ namespace Quantum
         // This class is small, contains no C++ pointers and relies on default shallow copying/destruction.
         struct RestrictedReuseArea final
         {
-        public:
+          public:
             QubitListInSharedArray FreeQubitsReuseProhibited;
             QubitListInSharedArray FreeQubitsReuseAllowed;
             // When we are looking for free qubits we skip areas that are known not
@@ -193,26 +186,27 @@ namespace Quantum
             int32_t prevAreaWithFreeQubits = 0;
 
             RestrictedReuseArea() = default;
-            RestrictedReuseArea(QubitListInSharedArray freeQubits);
+            explicit RestrictedReuseArea(QubitListInSharedArray freeQubits);
         };
 
         // This is NOT a pure stack! We modify it only by push/pop, but we also iterate over elements.
         class CRestrictedReuseAreaStack final : public std::vector<RestrictedReuseArea>
         {
-        public:
+          public:
             // No complex scenarios for now. Don't need to support copying/moving.
-            CRestrictedReuseAreaStack() = default;
+            CRestrictedReuseAreaStack()                                 = default;
             CRestrictedReuseAreaStack(const CRestrictedReuseAreaStack&) = delete;
-            CRestrictedReuseAreaStack& operator = (const CRestrictedReuseAreaStack&) = delete;
-            ~CRestrictedReuseAreaStack() = default;
+            CRestrictedReuseAreaStack& operator=(const CRestrictedReuseAreaStack&) = delete;
+            CRestrictedReuseAreaStack(CRestrictedReuseAreaStack&&)                 = delete;
+            CRestrictedReuseAreaStack& operator=(CRestrictedReuseAreaStack&&) = delete;
+            ~CRestrictedReuseAreaStack()                                      = default;
 
             void PushToBack(RestrictedReuseArea area);
             RestrictedReuseArea PopFromBack();
             RestrictedReuseArea& PeekBack();
-            int32_t Count() const;
+            [[nodiscard]] int32_t Count() const;
         };
 
-    private:
         void EnsureCapacity(QubitIdType requestedCapacity);
 
         // Take free qubit id from a free list without extending capacity.
@@ -223,11 +217,12 @@ namespace Quantum
         // Put qubit id back into a free list for the current restricted reuse area.
         void ReleaseQubitId(QubitIdType id);
 
-        bool IsValidId(QubitIdType id) const;
-        bool IsDisabledId(QubitIdType id) const;
-        bool IsFreeId(QubitIdType id) const;
-        bool IsExplicitlyAllocatedId(QubitIdType id) const;
+        [[nodiscard]] bool IsValidId(QubitIdType id) const;
+        [[nodiscard]] bool IsDisabledId(QubitIdType id) const;
+        [[nodiscard]] bool IsFreeId(QubitIdType id) const;
+        [[nodiscard]] bool IsExplicitlyAllocatedId(QubitIdType id) const;
 
+      private:
         // Configuration Properties:
         bool mayExtendCapacity = true;
 
@@ -251,10 +246,10 @@ namespace Quantum
         CRestrictedReuseAreaStack freeQubitsInAreas;
 
         // Counts:
-        int32_t disabledQubitCount = 0;
-        int32_t allocatedQubitCount = 0;
-        int32_t freeQubitCount = 0;
+        QubitIdType disabledQubitCount  = 0;
+        QubitIdType allocatedQubitCount = 0;
+        QubitIdType freeQubitCount      = 0;
     };
 
-}
-}
+} // namespace Quantum
+} // namespace Microsoft

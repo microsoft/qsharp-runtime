@@ -350,7 +350,7 @@ namespace EntryPointTest {
     ///
     /// # Input
     /// ## n
-    /// A number.
+    /// An integer.
     /// 
     /// ## pauli
     /// The name of a Pauli matrix.

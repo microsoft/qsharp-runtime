@@ -162,7 +162,7 @@ impl Trace for &State {
     fn trace(self) -> Self::Output {
         match &self.data {
             Pure(_) | StateData::Stabilizer(_) => C64::one(),
-            Mixed(ref rho) => (&rho).trace(),
+            Mixed(ref rho) => rho.trace(),
         }
     }
 }

@@ -7,7 +7,6 @@
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <ExecutionTarget>honeywell.qpu</ExecutionTarget>
-    <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
 
   <ItemGroup>

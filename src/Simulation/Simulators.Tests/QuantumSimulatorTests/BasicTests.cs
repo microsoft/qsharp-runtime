@@ -23,57 +23,88 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void SparseSimConstructor()
+        {
+            using var subject = new SparseSimulator();
+            Assert.Equal("SparseSimulator", subject.Name);
+        }
+
+        [Fact]
         public void QSimVerifyPrimitivesCompleteness()
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator()
+            };
+
+            foreach (var sim in simulators)
             {
-                var ops =
-                    from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
-                    where op.IsSubclassOf(typeof(AbstractCallable))
-                    where !op.IsNested
-                    select op;
-
-                var missing = new List<Type>();
-
-                foreach (var op in ops)
+                try
                 {
-                    try
-                    {
-                        var i = sim.GetInstance(op);
-                        Assert.NotNull(i);
-                    }
-                    catch (Exception)
-                    {
-                        missing.Add(op);
-                    }
-                }
+                    var ops =
+                        from op in typeof(Intrinsic.X).Assembly.GetExportedTypes()
+                        where op.IsSubclassOf(typeof(AbstractCallable))
+                        where !op.IsNested
+                        select op;
 
-                Assert.Empty(missing);
+                    var missing = new List<Type>();
+
+                    foreach (var op in ops)
+                    {
+                        try
+                        {
+                            var i = sim.GetInstance(op);
+                            Assert.NotNull(i);
+                        }
+                        catch (Exception)
+                        {
+                            missing.Add(op);
+                        }
+                    }
+
+                    Assert.Empty(missing);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
         [Fact]
         public void QSimX()
         {
-            using (var sim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: false)
+            };
+
+            foreach (var sim in simulators)
             {
-                var x = sim.Get<Intrinsic.X>();
-                var measure = sim.Get<Intrinsic.M>();
-                var set = sim.Get<Measurement.SetToBasisState>();
-
-                var ctrlX = x.__ControlledBody__.AsAction();
-                OperationsTestHelper.ctrlTestShell(sim, ctrlX, (enabled, ctrls, q) =>
+                try
                 {
-                    set.Apply((Result.Zero, q));
-                    var result = measure.Apply(q);
-                    var expected = Result.Zero;
-                    Assert.Equal(expected, result);
+                    var x = sim.Get<Intrinsic.X>();
+                    var measure = sim.Get<Intrinsic.M>();
+                    var set = sim.Get<Measurement.SetToBasisState>();
 
-                    x.__ControlledBody__((ctrls, q));
-                    result = measure.Apply(q);
-                    expected = (enabled) ? Result.One : Result.Zero;
-                    Assert.Equal(expected, result);
-                });
+                    var ctrlX = x.__ControlledBody__.AsAction();
+                    OperationsTestHelper.ctrlTestShell(sim, ctrlX, (enabled, ctrls, q) =>
+                    {
+                        set.Apply((Result.Zero, q));
+                        var result = measure.Apply(q);
+                        var expected = Result.Zero;
+                        Assert.Equal(expected, result);
+
+                        x.__ControlledBody__((ctrls, q));
+                        result = measure.Apply(q);
+                        expected = (enabled) ? Result.One : Result.Zero;
+                        Assert.Equal(expected, result);
+                    });
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -101,42 +132,66 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimRandom()
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator()
+            };
+
+            foreach (var sim in simulators)
             {
-                var r = sim.Get<Intrinsic.Random>();
-                var probs = new QArray<double> (0.0, 0.0, 0.0, 0.7, 0.0, 0.0);
-                var result = r.Apply(probs);
-                Assert.Equal(3, result);
+                try
+                {
+                    var r = sim.Get<Intrinsic.Random>();
+                    var probs = new QArray<double> (0.0, 0.0, 0.0, 0.7, 0.0, 0.0);
+                    var result = r.Apply(probs);
+                    Assert.Equal(3, result);
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
         [Fact]
         public void QSimAssert()
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator()
+            };
+
+            foreach (var sim in simulators)
             {
-                var assert = sim.Get<Intrinsic.Assert>();
-                var h = sim.Get<Intrinsic.H>();
-
-                Func<Qubit, (IQArray<Pauli>, IQArray<Qubit>, Result, string)> mapper =
-                    (q) => (new QArray<Pauli>(Pauli.PauliZ), new QArray<Qubit> (q), Result.Zero, "Assert failed");
-                var applyWithZero = new OperationPartial<Qubit, (IQArray<Pauli>, IQArray<Qubit>, Result, string), QVoid>(assert, mapper);
-
-                OperationsTestHelper.applyTestShell(sim, applyWithZero, (q) =>
+                try
                 {
-                    h.Apply(q);
-                    assert.Apply((new QArray<Pauli>(Pauli.PauliX), new QArray<Qubit> (q), Result.Zero, "Assert failed"));
+                    var assert = sim.Get<Intrinsic.Assert>();
+                    var h = sim.Get<Intrinsic.H>();
 
-                    OperationsTestHelper.IgnoreDebugAssert(() =>
+                    Func<Qubit, (IQArray<Pauli>, IQArray<Qubit>, Result, string)> mapper =
+                        (q) => (new QArray<Pauli>(Pauli.PauliZ), new QArray<Qubit> (q), Result.Zero, "Assert failed");
+                    var applyWithZero = new OperationPartial<Qubit, (IQArray<Pauli>, IQArray<Qubit>, Result, string), QVoid>(assert, mapper);
+
+                    OperationsTestHelper.applyTestShell(sim, applyWithZero, (q) =>
                     {
-                        Assert.Throws<ExecutionFailException>(() => assert.Apply((new QArray<Pauli> (Pauli.PauliX), new QArray<Qubit> (q), Result.One, "Assert failed")));
-
                         h.Apply(q);
-                        Assert.Throws<ExecutionFailException>(() => assert.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit> (q), Result.One, "Assert failed")));
-                    });
+                        assert.Apply((new QArray<Pauli>(Pauli.PauliX), new QArray<Qubit> (q), Result.Zero, "Assert failed"));
 
-                    assert.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit>(q), Result.Zero, "Assert failed"));
-                });
+                        OperationsTestHelper.IgnoreDebugAssert(() =>
+                        {
+                            Assert.Throws<ExecutionFailException>(() => assert.Apply((new QArray<Pauli> (Pauli.PauliX), new QArray<Qubit> (q), Result.One, "Assert failed")));
+
+                            h.Apply(q);
+                            Assert.Throws<ExecutionFailException>(() => assert.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit> (q), Result.One, "Assert failed")));
+                        });
+
+                        assert.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit>(q), Result.Zero, "Assert failed"));
+                    });
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -144,59 +199,71 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void QSimAssertProb()
         {
-            using (var sim = new QuantumSimulator())
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator()
+            };
+
+            foreach (var sim in simulators)
             {
-                var tolerance = 0.02;
-                var assertProb = sim.Get<Intrinsic.AssertProb>();
-                var h = sim.Get<Intrinsic.H>();
-                var allocate = sim.Get<Intrinsic.Allocate>();
-                var release = sim.Get<Intrinsic.Release>();
-
-                Func<Qubit, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)> mapper = (q) =>
+                try
                 {
-                    return (new QArray<Pauli>(Pauli.PauliZ), new QArray<Qubit>(q), Result.Zero, 1.0, "Assert failed", tolerance);
-                };
-                var applyWithZero = new OperationPartial<Qubit, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid>(assertProb, mapper);
+                    var tolerance = 0.02;
+                    var assertProb = sim.Get<Intrinsic.AssertProb>();
+                    var h = sim.Get<Intrinsic.H>();
+                    var allocate = sim.Get<Intrinsic.Allocate>();
+                    var release = sim.Get<Intrinsic.Release>();
 
-                OperationsTestHelper.applyTestShell(sim, applyWithZero, (q1) =>
-                {
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit>(q1), Result.One, 0.01, "Assert failed", tolerance));
-
-                    // Within tolerance
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliX), new QArray<Qubit> (q1), Result.Zero, 0.51, "Assert failed", tolerance));
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliX), new QArray<Qubit> (q1), Result.One, 0.51, "Assert failed", tolerance));
-                    // Outside of tolerance
-                    OperationsTestHelper.IgnoreDebugAssert(() =>
+                    Func<Qubit, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double)> mapper = (q) =>
                     {
-                        Assert.Throws<ExecutionFailException>(() => assertProb.Apply((new QArray<Pauli>(Pauli.PauliX), new QArray<Qubit>(q1), Result.One, 0.51, "Assert failed", 0.0)));
-                        Assert.Throws<ExecutionFailException>(() => assertProb.Apply((new QArray<Pauli>(Pauli.PauliX), new QArray<Qubit>(q1), Result.Zero, 0.51, "Assert failed", 0.0)));
-                    });
+                        return (new QArray<Pauli>(Pauli.PauliZ), new QArray<Qubit>(q), Result.Zero, 1.0, "Assert failed", tolerance);
+                    };
+                    var applyWithZero = new OperationPartial<Qubit, (IQArray<Pauli>, IQArray<Qubit>, Result, double, string, double), QVoid>(assertProb, mapper);
 
-                    // Add a qubit
-                    var qubits = allocate.Apply(1);
-                    var q2 = qubits[0];
-
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit> (q1), Result.Zero, 0.99, "Assert failed", tolerance));
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit> (q1), Result.One, 0.01, "Assert failed", tolerance));
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.Zero, 0.99, "Assert failed", tolerance));
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.One, 0.01, "Assert failed", tolerance));
-
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliX), new QArray<Qubit> (q1, q2), Result.Zero, 0.51, "Assert failed", tolerance));
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliX, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.Zero, 0.51, "Assert failed", tolerance));
-                    assertProb.Apply((new QArray<Pauli> (Pauli.PauliX, Pauli.PauliX), new QArray<Qubit> (q1, q2), Result.Zero, 0.51, "Assert failed", tolerance));
-
-                    OperationsTestHelper.IgnoreDebugAssert(() =>
+                    OperationsTestHelper.applyTestShell(sim, applyWithZero, (q1) =>
                     {
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit>(q1), Result.One, 0.01, "Assert failed", tolerance));
+
+                        // Within tolerance
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliX), new QArray<Qubit> (q1), Result.Zero, 0.51, "Assert failed", tolerance));
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliX), new QArray<Qubit> (q1), Result.One, 0.51, "Assert failed", tolerance));
                         // Outside of tolerance
-                        Assert.Throws<ExecutionFailException>(() => assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.Zero, 0.51, "Assert failed", 0.0)));
-                        Assert.Throws<ExecutionFailException>(() => assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.One, 0.51, "Assert failed", 0.0)));
+                        OperationsTestHelper.IgnoreDebugAssert(() =>
+                        {
+                            Assert.Throws<ExecutionFailException>(() => assertProb.Apply((new QArray<Pauli>(Pauli.PauliX), new QArray<Qubit>(q1), Result.One, 0.51, "Assert failed", 0.0)));
+                            Assert.Throws<ExecutionFailException>(() => assertProb.Apply((new QArray<Pauli>(Pauli.PauliX), new QArray<Qubit>(q1), Result.Zero, 0.51, "Assert failed", 0.0)));
+                        });
 
-                        // Missmatch number of arrays
-                        Assert.Throws<InvalidOperationException>(() => assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1), Result.Zero, 0.51, "Assert failed", tolerance)));
+                        // Add a qubit
+                        var qubits = allocate.Apply(1);
+                        var q2 = qubits[0];
+
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit> (q1), Result.Zero, 0.99, "Assert failed", tolerance));
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ), new QArray<Qubit> (q1), Result.One, 0.01, "Assert failed", tolerance));
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.Zero, 0.99, "Assert failed", tolerance));
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.One, 0.01, "Assert failed", tolerance));
+
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliX), new QArray<Qubit> (q1, q2), Result.Zero, 0.51, "Assert failed", tolerance));
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliX, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.Zero, 0.51, "Assert failed", tolerance));
+                        assertProb.Apply((new QArray<Pauli> (Pauli.PauliX, Pauli.PauliX), new QArray<Qubit> (q1, q2), Result.Zero, 0.51, "Assert failed", tolerance));
+
+                        OperationsTestHelper.IgnoreDebugAssert(() =>
+                        {
+                            // Outside of tolerance
+                            Assert.Throws<ExecutionFailException>(() => assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.Zero, 0.51, "Assert failed", 0.0)));
+                            Assert.Throws<ExecutionFailException>(() => assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1, q2), Result.One, 0.51, "Assert failed", 0.0)));
+
+                            // Missmatch number of arrays
+                            Assert.Throws<InvalidOperationException>(() => assertProb.Apply((new QArray<Pauli> (Pauli.PauliZ, Pauli.PauliZ), new QArray<Qubit> (q1), Result.Zero, 0.51, "Assert failed", tolerance)));
+                        });
+
+                        release.Apply(qubits);
                     });
-
-                    release.Apply(qubits);
-                });
+                }
+                finally
+                {
+                    sim.Dispose();
+                }
             }
         }
 
@@ -264,7 +331,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             TestMultiControllable(gate.Adjoint, ctrls, targets);
         }
 
-        private void TestOne<T>(QuantumSimulator qsim, T gate, Action<T, IQArray<Qubit>, IQArray<Qubit>> action)
+        private void TestOne<T>(CommonNativeSimulator qsim, T gate, Action<T, IQArray<Qubit>, IQArray<Qubit>> action)
         {
             var allocate = qsim.Get<Intrinsic.Allocate>();
             var release = qsim.Get<Intrinsic.Release>();
@@ -300,7 +367,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
                 foreach (var t in gateTypes)
                 {
-                    using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+                    var simulators = new CommonNativeSimulator[] { 
+                        new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                        new SparseSimulator(throwOnReleasingQubitsNotInZeroState: false)
+                    };
+
+                    foreach (var qsim in simulators)
                     {
                         var gate = qsim.Get<IUnitary<Qubit>>(t);
                         TestOne(qsim, gate, TestUnitary);
@@ -312,35 +384,59 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestRCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: false)
+            };
+
+            foreach (var qsim in simulators)
             {
-                // R
-                var mapper = new Func<Qubit, (Pauli, Double, Qubit)>(qubit => (Pauli.PauliZ, 1.0, qubit));
-                var gate = qsim.Get<Intrinsic.R>();
-                var p = gate.Partial(mapper);
-                TestOne(qsim, p, TestUnitary);
+                try
+                {
+                    // R
+                    var mapper = new Func<Qubit, (Pauli, Double, Qubit)>(qubit => (Pauli.PauliZ, 1.0, qubit));
+                    var gate = qsim.Get<Intrinsic.R>();
+                    var p = gate.Partial(mapper);
+                    TestOne(qsim, p, TestUnitary);
+                }
+                finally
+                {
+                    qsim.Dispose();
+                }
             }
         }
 
         [Fact]
         public void TestExpCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
-            {
-                // Exp
-                {
-                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, Double, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliX, Pauli.PauliY), 1.0, qubits));
-                    var gate = qsim.Get<Intrinsic.Exp>();
-                    var p = gate.Partial(mapper);
-                    TestOne(qsim, p, TestMultiUnitary);
-                }
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: false)
+            };
 
-                // ExpFrac
+            foreach (var qsim in simulators)
+            {
+                try
                 {
-                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliX, Pauli.PauliY), 1, 2, qubits));
-                    var gate = qsim.Get<Intrinsic.ExpFrac>();
-                    var p = gate.Partial(mapper);
-                    TestOne(qsim, p, TestMultiUnitary);
+                    // Exp
+                    {
+                        var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, Double, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliX, Pauli.PauliY), 1.0, qubits));
+                        var gate = qsim.Get<Intrinsic.Exp>();
+                        var p = gate.Partial(mapper);
+                        TestOne(qsim, p, TestMultiUnitary);
+                    }
+
+                    // ExpFrac
+                    {
+                        var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, long, long, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliX, Pauli.PauliY), 1, 2, qubits));
+                        var gate = qsim.Get<Intrinsic.ExpFrac>();
+                        var p = gate.Partial(mapper);
+                        TestOne(qsim, p, TestMultiUnitary);
+                    }
+                }
+                finally
+                {
+                    qsim.Dispose();
                 }
             }
         }
@@ -349,23 +445,35 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestMeasureCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: false)
+            };
+
+            foreach (var qsim in simulators)
             {
-                // M
+                try
                 {
-                    var gate = qsim.Get<Intrinsic.M>();
-                    TestOne(qsim, gate, (g, ctrls, t) => TestCallable(g, t[0]));
+                    // M
+                    {
+                        var gate = qsim.Get<Intrinsic.M>();
+                        TestOne(qsim, gate, (g, ctrls, t) => TestCallable(g, t[0]));
+                    }
+
+                    // Measure
+                    {
+                        var gate = qsim.Get<Intrinsic.Measure>();
+                        var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), qubits));
+                        var p = gate.Partial(mapper);
+
+                        // On systems that decompose joint measurement a qubit can actually be duplictated in
+                        // the targets, so skip the duplicate qubit check.
+                        TestOne(qsim, p, (g, ctrls, t) => TestMultiCallable<Result>(p, t));
+                    }
                 }
-
-                // Measure
+                finally
                 {
-                    var gate = qsim.Get<Intrinsic.Measure>();
-                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), qubits));
-                    var p = gate.Partial(mapper);
-
-                    // On systems that decompose joint measurement a qubit can actually be duplictated in
-                    // the targets, so skip the duplicate qubit check.
-                    TestOne(qsim, p, (g, ctrls, t) => TestMultiCallable<Result>(p, t));
+                    qsim.Dispose();
                 }
             }
         }
@@ -373,22 +481,34 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         [Fact]
         public void TestAssertCheckQubits()
         {
-            using (var qsim = new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false))
-            {
-                // Assert
-                {
-                    var gate = qsim.Get<Intrinsic.Assert>();
-                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, String)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), qubits, Result.Zero, ""));
-                    var p = gate.Partial(mapper);
-                    TestOne(qsim, gate, (g, ctrls, t) => TestMultiCallable(p, t));
-                }
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(throwOnReleasingQubitsNotInZeroState: false),
+                new SparseSimulator(throwOnReleasingQubitsNotInZeroState: false)
+            };
 
-                // AssertProb
+            foreach (var qsim in simulators)
+            {
+                try
                 {
-                    var gate = qsim.Get<Intrinsic.AssertProb>();
-                    var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, Double, String, Double)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), qubits, Result.Zero, 1.000, "", 0.002));
-                    var p = gate.Partial(mapper);
-                    TestOne(qsim, p, (g, ctrls, t) => TestMultiCallable(p, t));
+                    // Assert
+                    {
+                        var gate = qsim.Get<Intrinsic.Assert>();
+                        var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, String)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), qubits, Result.Zero, ""));
+                        var p = gate.Partial(mapper);
+                        TestOne(qsim, gate, (g, ctrls, t) => TestMultiCallable(p, t));
+                    }
+
+                    // AssertProb
+                    {
+                        var gate = qsim.Get<Intrinsic.AssertProb>();
+                        var mapper = new Func<IQArray<Qubit>, (IQArray<Pauli>, IQArray<Qubit>, Result, Double, String, Double)>(qubits => (new QArray<Pauli>(Pauli.PauliZ, Pauli.PauliI, Pauli.PauliI), qubits, Result.Zero, 1.000, "", 0.002));
+                        var p = gate.Partial(mapper);
+                        TestOne(qsim, p, (g, ctrls, t) => TestMultiCallable(p, t));
+                    }
+                }
+                finally
+                {
+                    qsim.Dispose();
                 }
             }
         }

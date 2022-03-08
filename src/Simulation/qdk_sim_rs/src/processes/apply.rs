@@ -27,9 +27,9 @@ impl Process {
         }
 
         match &self.data {
-            Unitary(u) => apply_unitary(&u, state),
-            KrausDecomposition(ks) => apply_kraus_decomposition(&ks, state),
-            MixedPauli(paulis) => apply_pauli_channel(&paulis, state),
+            Unitary(u) => apply_unitary(u, state),
+            KrausDecomposition(ks) => apply_kraus_decomposition(ks, state),
+            MixedPauli(paulis) => apply_pauli_channel(paulis, state),
             Sequence(processes) => {
                 // TODO[perf]: eliminate the extraneous clone here.
                 let mut acc_state = state.clone();

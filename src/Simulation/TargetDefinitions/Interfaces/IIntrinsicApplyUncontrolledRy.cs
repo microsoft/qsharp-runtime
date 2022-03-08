@@ -8,7 +8,5 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
     public interface IIntrinsicApplyUncontrolledRy : IOperationFactory
     {
         void Body(double angle, Qubit target);
-
-        void AdjointBody(double angle, Qubit target);
     }
 }

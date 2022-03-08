@@ -3,6 +3,7 @@
 
 #include <complex>
 #include <memory>
+#include <string>
 #include <vector>
 
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
@@ -18,15 +19,15 @@ using namespace std;
 
 // The tests rely on the implementation detail of CFullstateSimulator that the qubits are nothing more but contiguously
 // incremented ids.
-static unsigned GetQubitId(Qubit q)
+static unsigned GetQubitId(QubitIdType q)
 {
-    return static_cast<unsigned>(reinterpret_cast<size_t>(q));
+    return static_cast<unsigned>(static_cast<size_t>(q));
 }
 
-static Result MZ(IQuantumGateSet* iqa, Qubit q)
+static Result MZ(IQuantumGateSet* iqa, QubitIdType q)
 {
     PauliId pauliZ[1] = {PauliId_Z};
-    Qubit qs[1] = {q};
+    QubitIdType qs[1] = {q};
     return iqa->Measure(1, pauliZ, 1, qs);
 }
 
@@ -34,8 +35,8 @@ TEST_CASE("Fullstate simulator: allocate qubits", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
 
-    Qubit q0 = sim->AllocateQubit();
-    Qubit q1 = sim->AllocateQubit();
+    QubitIdType q0 = sim->AllocateQubit();
+    QubitIdType q1 = sim->AllocateQubit();
     REQUIRE(GetQubitId(q0) == 0);
     REQUIRE(GetQubitId(q1) == 1);
     sim->ReleaseQubit(q0);
@@ -45,10 +46,10 @@ TEST_CASE("Fullstate simulator: allocate qubits", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: multiple instances", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim1 = CreateFullstateSimulator();
-    Qubit q1 = sim1->AllocateQubit();
+    QubitIdType q1                       = sim1->AllocateQubit();
 
     std::unique_ptr<IRuntimeDriver> sim2 = CreateFullstateSimulator();
-    Qubit q2 = sim2->AllocateQubit();
+    QubitIdType q2                       = sim2->AllocateQubit();
 
     REQUIRE(GetQubitId(q1) == 0);
     REQUIRE(GetQubitId(q2) == 0);
@@ -60,10 +61,10 @@ TEST_CASE("Fullstate simulator: multiple instances", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: X and measure", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit q = sim->AllocateQubit();
-    Result r1 = MZ(iqa, q);
+    QubitIdType q = sim->AllocateQubit();
+    Result r1     = MZ(iqa, q);
     REQUIRE(Result_Zero == sim->GetResultValue(r1));
     REQUIRE(sim->AreEqualResults(r1, sim->UseZero()));
 
@@ -80,10 +81,10 @@ TEST_CASE("Fullstate simulator: X and measure", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: X, M, reuse, M", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit q = sim->AllocateQubit();
-    Result r1 = MZ(iqa, q);
+    QubitIdType q = sim->AllocateQubit();
+    Result r1     = MZ(iqa, q);
     REQUIRE(Result_Zero == sim->GetResultValue(r1));
     REQUIRE(sim->AreEqualResults(r1, sim->UseZero()));
 
@@ -96,13 +97,13 @@ TEST_CASE("Fullstate simulator: X, M, reuse, M", "[fullstate_simulator]")
     sim->ReleaseResult(r1);
     sim->ReleaseResult(r2);
 
-    Qubit qq = sim->AllocateQubit();
-    Result r3 = MZ(iqa, qq);
+    QubitIdType qq = sim->AllocateQubit();
+    Result r3      = MZ(iqa, qq);
     // Allocated qubit should always be in |0> state even though we released
     // q in |1> state, and qq is likely reusing the same underlying qubit as q.
     REQUIRE(Result_Zero == sim->GetResultValue(r3));
     REQUIRE(sim->AreEqualResults(r3, sim->UseZero()));
-    
+
     sim->ReleaseQubit(qq);
     sim->ReleaseResult(r3);
 }
@@ -110,10 +111,10 @@ TEST_CASE("Fullstate simulator: X, M, reuse, M", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: measure Bell state", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit q1 = sim->AllocateQubit();
-    Qubit q2 = sim->AllocateQubit();
+    QubitIdType q1 = sim->AllocateQubit();
+    QubitIdType q2 = sim->AllocateQubit();
 
     iqa->H(q1);
     iqa->ControlledX(1, &q1, q2);
@@ -129,9 +130,9 @@ TEST_CASE("Fullstate simulator: measure Bell state", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: ZZ measure", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit q[2];
+    QubitIdType q[2];
     PauliId paulis[2] = {PauliId_Z, PauliId_Z};
 
     q[0] = sim->AllocateQubit();
@@ -145,6 +146,10 @@ TEST_CASE("Fullstate simulator: ZZ measure", "[fullstate_simulator]")
     Result rOne = iqa->Measure(2, paulis, 2, q);
     REQUIRE(Result_One == sim->GetResultValue(rOne));
 
+    iqa->X(q[1]);
+    iqa->ControlledX(1, &q[0], q[1]);
+    iqa->H(q[0]);
+
     sim->ReleaseQubit(q[0]);
     sim->ReleaseQubit(q[1]);
 }
@@ -152,9 +157,9 @@ TEST_CASE("Fullstate simulator: ZZ measure", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: assert probability", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit qs[2];
+    QubitIdType qs[2];
     qs[0] = sim->AllocateQubit();
     qs[1] = sim->AllocateQubit();
     iqa->X(qs[0]);
@@ -173,6 +178,8 @@ TEST_CASE("Fullstate simulator: assert probability", "[fullstate_simulator]")
     REQUIRE(!idig->Assert(2, xi, qs, sim->UseZero(), ""));
     REQUIRE(!idig->Assert(2, xi, qs, sim->UseOne(), ""));
 
+    iqa->X(qs[0]);
+
     sim->ReleaseQubit(qs[0]);
     sim->ReleaseQubit(qs[1]);
 }
@@ -180,9 +187,9 @@ TEST_CASE("Fullstate simulator: assert probability", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: toffoli", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit qs[3];
+    QubitIdType qs[3];
     for (int i = 0; i < 3; i++)
     {
         qs[i] = sim->AllocateQubit();
@@ -196,6 +203,9 @@ TEST_CASE("Fullstate simulator: toffoli", "[fullstate_simulator]")
     iqa->ControlledX(2, qs, qs[2]);
     REQUIRE(Result_One == sim->GetResultValue(MZ(iqa, qs[2])));
 
+    iqa->X(qs[1]);
+    iqa->X(qs[0]);
+
     for (int i = 0; i < 3; i++)
     {
         sim->ReleaseQubit(qs[i]);
@@ -205,9 +215,9 @@ TEST_CASE("Fullstate simulator: toffoli", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: SSZ=Id", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit q = sim->AllocateQubit();
+    QubitIdType q = sim->AllocateQubit();
 
     bool identitySSZ = true;
     for (int i = 0; i < 100 && identitySSZ; i++)
@@ -227,9 +237,9 @@ TEST_CASE("Fullstate simulator: SSZ=Id", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: TTSAdj=Id", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit q = sim->AllocateQubit();
+    QubitIdType q = sim->AllocateQubit();
 
     bool identityTTSAdj = true;
     for (int i = 0; i < 100 && identityTTSAdj; i++)
@@ -249,9 +259,9 @@ TEST_CASE("Fullstate simulator: TTSAdj=Id", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: TTAdj=Id", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit q = sim->AllocateQubit();
+    QubitIdType q = sim->AllocateQubit();
 
     bool identityTTadj = true;
     for (int i = 0; i < 100 && identityTTadj; i++)
@@ -269,11 +279,11 @@ TEST_CASE("Fullstate simulator: TTAdj=Id", "[fullstate_simulator]")
 
 TEST_CASE("Fullstate simulator: R", "[fullstate_simulator]")
 {
-    constexpr double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062;
+    constexpr double pi                 = 3.1415926535897932384626433832795028841971693993751058209749445923078164062;
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    Qubit q = sim->AllocateQubit();
+    QubitIdType q = sim->AllocateQubit();
     bool identity = true;
     for (int i = 0; i < 100 && identity; i++)
     {
@@ -295,10 +305,10 @@ TEST_CASE("Fullstate simulator: R", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: exponents", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
-    const int n = 5;
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
+    const int n                         = 5;
 
-    Qubit qs[n];
+    QubitIdType qs[n];
     for (int i = 0; i < n; i++)
     {
         qs[i] = sim->AllocateQubit();
@@ -307,6 +317,8 @@ TEST_CASE("Fullstate simulator: exponents", "[fullstate_simulator]")
     PauliId paulis[3] = {PauliId_X, PauliId_Y, PauliId_Z};
     iqa->Exp(2, paulis, qs, 0.42);
     iqa->ControlledExp(2, qs, 3, paulis, &qs[2], 0.17);
+    iqa->ControlledExp(2, qs, 3, paulis, &qs[2], -0.17);
+    iqa->Exp(2, paulis, qs, -0.42);
 
     // not crashes? consider it passing
     REQUIRE(true);
@@ -320,12 +332,12 @@ TEST_CASE("Fullstate simulator: exponents", "[fullstate_simulator]")
 TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simulator]")
 {
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    IQuantumGateSet* iqa = dynamic_cast<IQuantumGateSet*>(sim.get());
+    IQuantumGateSet* iqa                = dynamic_cast<IQuantumGateSet*>(sim.get());
 
-    const int n = 3;
+    const int n        = 3;
     static double norm = 0.0;
 
-    Qubit qs[n];
+    QubitIdType qs[n];
     for (int i = 0; i < n; i++)
     {
         qs[i] = sim->AllocateQubit();
@@ -335,52 +347,86 @@ TEST_CASE("Fullstate simulator: get qubit state of Bell state", "[fullstate_simu
     iqa->ControlledX(1, &qs[0], qs[1]);
     // 1/sqrt(2)(|00> + |11>)x|0>
 
-    dynamic_cast<IDiagnostics*>(sim.get())->GetState([](size_t idx, double re, double im) {
-        norm += re * re + im * im;
-        REQUIRE(idx < 4);
-        switch (idx)
+    dynamic_cast<IDiagnostics*>(sim.get())->GetState(
+        [](const char* idxStr, double re, double im)
         {
-        case 0:
-        case 3:
-            REQUIRE((1 / sqrt(2.0) == Approx(re).epsilon(0.0001)));
-            REQUIRE(im == 0.0);
-            break;
-        default:
-            REQUIRE(re == 0.0);
-            REQUIRE(im == 0.0);
-            break;
-        }
-        return idx < 3; // the last qubit is in separable |0> state
-    });
+            norm += re * re + im * im;
+            size_t idx = 0;
+            for (size_t i = 0; idxStr[i] != '\0'; ++i)
+            {
+                idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
+            }
+            REQUIRE(idx < 4);
+            switch (idx)
+            {
+            case 0:
+            case 3:
+                REQUIRE((1 / sqrt(2.0) == Approx(re).epsilon(0.0001)));
+                REQUIRE(im == 0.0);
+                break;
+            default:
+                REQUIRE(re == 0.0);
+                REQUIRE(im == 0.0);
+                break;
+            }
+            return idx < 3; // the last qubit is in separable |0> state
+        });
     REQUIRE(1.0 == Approx(norm).epsilon(0.0001));
     norm = 0.0;
 
     iqa->Y(qs[2]);
     // 1/sqrt(2)(|00> + |11>)xi|1>
 
-    dynamic_cast<IDiagnostics*>(sim.get())->GetState([](size_t idx, double re, double im) {
-        norm += re * re + im * im;
-        switch (idx)
+    dynamic_cast<IDiagnostics*>(sim.get())->GetState(
+        [](const char* idxStr, double re, double im)
         {
-        case 4:
-        case 7:
-            REQUIRE(re == 0.0);
-            REQUIRE(1 / sqrt(2.0) == Approx(im).epsilon(0.0001));
-            break;
-        default:
-            REQUIRE(re == 0.0);
-            REQUIRE(im == 0.0);
-            break;
-        }
-        return true; // get full state
-    });
+            norm += re * re + im * im;
+            size_t idx = 0;
+            for (size_t i = 0; idxStr[i] != '\0'; ++i)
+            {
+                idx |= (idxStr[i] == '1' ? 1u : 0u) << i;
+            }
+            switch (idx)
+            {
+            case 4:
+            case 7:
+                REQUIRE(re == 0.0);
+                REQUIRE(1 / sqrt(2.0) == Approx(im).epsilon(0.0001));
+                break;
+            default:
+                REQUIRE(re == 0.0);
+                REQUIRE(im == 0.0);
+                break;
+            }
+            return true; // get full state
+        });
     REQUIRE(1.0 == Approx(norm).epsilon(0.0001));
     norm = 0.0;
+
+    iqa->Y(qs[2]);
+    iqa->ControlledX(1, &qs[0], qs[1]);
+    iqa->H(qs[0]);
 
     for (int i = 0; i < n; i++)
     {
         sim->ReleaseQubit(qs[i]);
     }
+}
+
+extern "C" int Microsoft__Quantum__Testing__QIR__InvalidRelease__Interop(); // NOLINT
+TEST_CASE("QIR: Simulator rejects unmeasured, non-zero release", "[fullstate_simulator]")
+{
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__InvalidRelease__Interop());
+}
+
+extern "C" int Microsoft__Quantum__Testing__QIR__MeasureRelease__Interop(); // NOLINT
+TEST_CASE("QIR: Simulator accepts measured release", "[fullstate_simulator]")
+{
+    std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
+    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__MeasureRelease__Interop());
 }
 
 extern "C" int Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop(); // NOLINT
