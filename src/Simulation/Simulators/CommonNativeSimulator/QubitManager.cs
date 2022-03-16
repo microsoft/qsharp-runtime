@@ -31,8 +31,6 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             public override Qubit CreateQubitObject(long id)
             {
-                Debug.Assert(id < 50, "Using a qubit id > 50. This is a full-state simulator! Validating ids uniqueness might start becoming slow.");
-
                 if (id >= this.MaxId)
                 {
                     this.MaxId = id + 1;
