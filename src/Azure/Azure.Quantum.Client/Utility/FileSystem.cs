@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Quantum.Utility
         public async Task<T> GetFileContentAsync<T>(string path, CancellationToken cancellationToken)
         {
             using FileStream stream = File.OpenRead(path);
-            return await JsonSerializer.DeserializeAsync<T>(stream, null, cancellationToken);
+            return await JsonSerializer.DeserializeAsync<T>(stream, options: null, cancellationToken);
         }
     }
 }
