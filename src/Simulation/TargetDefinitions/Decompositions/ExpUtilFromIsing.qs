@@ -14,11 +14,11 @@ namespace Microsoft.Quantum.Intrinsic {
             }
             apply {
                 if (paulis[0] == PauliX) {
-                    IsingXX(theta / 2.0, qubits[0], qubits[1]);
+                    IsingXX(-2.0 * theta , qubits[0], qubits[1]);
                 } elif (paulis[0] == PauliY) {
-                    IsingYY(theta / 2.0, qubits[0], qubits[1]);
+                    IsingYY(-2.0 * theta, qubits[0], qubits[1]);
                 } elif (paulis[0] == PauliZ) {
-                    IsingZZ(theta / 2.0, qubits[0], qubits[1]);
+                    IsingZZ(-2.0 * theta, qubits[0], qubits[1]);
                 } else {
                     fail "Type2 decompositions do not support PauliI as an input to Exp";
                 }
@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Intrinsic {
                     SpreadZ(qubits[1], qubits[2 .. Length(qubits) - 1]);
                 }
                 apply {
-                    IsingZZ(theta / 2.0, qubits[0], qubits[1]);
+                    IsingZZ(-2.0 * theta, qubits[0], qubits[1]);
                 }
             }
         }
