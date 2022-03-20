@@ -43,9 +43,9 @@ To update the *.ll files to a newer version:
 - the generated file name.ll will be placed into `s` folder
 */
 
-struct Array
+struct Array    // TODO(rokuzmin, #969): Document the mechanism of passing an array to the QIR generated from Q#.
 {
-    int64_t itemSize;
+    int64_t itemCount;
     void* buffer;
 };
 
@@ -60,7 +60,7 @@ TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 
     constexpr int64_t n = 5;
     int64_t values[n]   = {0, 1, 2, 3, 4};
-    auto array          = Array{5, values};
+    auto array          = Array{n, values};
 
     int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop(&array, 2, 42);
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
