@@ -43,7 +43,7 @@ To update the *.ll files to a newer version:
 - the generated file name.ll will be placed into `s` folder
 */
 
-struct Array    // TODO(rokuzmin, #969): Document the mechanism of passing an array to the QIR generated from Q#.
+struct Array // TODO(rokuzmin, #969): Document the mechanism of passing an array to the QIR generated from Q#.
 {
     int64_t itemCount;
     void* buffer;
