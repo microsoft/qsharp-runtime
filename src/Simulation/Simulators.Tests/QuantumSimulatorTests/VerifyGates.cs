@@ -561,6 +561,20 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
+        public void QSimVerifyExpUsingDecompositions()
+        {
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator()
+            };
+            
+            foreach (var sim in simulators)
+            {
+                VerifyExpUsingDecompositions.Run(sim).Wait();
+            }
+        }
+
+        [Fact]
         public void QSimVerifyExpFrac()
         {
             var simulators = new CommonNativeSimulator[] { 
