@@ -3,7 +3,7 @@
 
 [package]
 name = "qdk_sim_experimental"
-version = "0.1.0"
+version = "0.0.1-alpha"
 authors = ["Microsoft"]
 edition = "2018"
 license = "MIT"
