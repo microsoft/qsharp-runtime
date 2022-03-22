@@ -27,7 +27,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             ResetAll(qubits);
         }
     }
-    
+
+    /// Verify that Exp behaves as expected by using it in two decompositions: SWAP and CNOT.
+    /// Note that this verifies that Exp uses the correct angle magnitudes, but does not verify
+    /// the angle sign.
     operation VerifyExpUsingDecompositions() : Unit {
         AssertOperationsEqualReferenced(2, (qs => SwapFromExp(qs[0], qs[1])), (qs => SWAP(qs[0], qs[1])));
         AssertOperationsEqualReferenced(2, (qs => CnotFromExp(qs[0], qs[1])), (qs => CNOT(qs[0], qs[1])));
