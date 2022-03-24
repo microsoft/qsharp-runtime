@@ -31,7 +31,7 @@ include(qir_cmake_include)  # target_source_from_qir
 set(TEST_FILES
   #est-energy_fix.ll
   #est-energy.pqAndPqqrTermIdxs.ll
-  est-energy.dbg.ll
+  est-energy.qpe.dbginfo.ll
 )
 foreach(file ${TEST_FILES})
   target_source_from_qir(qpe ${file})      #qir-static-tests ${file})
