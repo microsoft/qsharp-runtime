@@ -5,8 +5,15 @@ macro(target_source_from_qir target_name source_file)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CLANG_ARGS
         "${CLANG_ARGS}"
-        "-O0"
-        "-DDEBUG"
+        #"-Og"
+        #"-DDEBUG"
+        #"-DDEBUG -O0 -g"
+        #"-DDEBUG -Og -g"
+        #"-DDEBUG -Og -ggdb"
+        "-DDEBUG -Og -ggdb3"
+        #"-DDEBUG -Og -gdwarf"
+        #"-DDEBUG -Og -gstabs"  # Unsupported
+        #"-DDEBUG -Og -gxcoff"   # Unsupported
         )
     endif()
 
@@ -130,6 +137,8 @@ set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-exit-time-destructors")
 
 # https://clang.llvm.org/docs/DiagnosticsReference.html#wextra-semi-stmt
 set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-extra-semi-stmt")
+
+set(WARNING_FLAGS "${WARNING_FLAGS} -Wno-unused-template")
 
 # Save the assembled warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS}")
