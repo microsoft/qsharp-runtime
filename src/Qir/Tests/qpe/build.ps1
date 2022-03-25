@@ -1,6 +1,13 @@
 $Env:BUILD_CONFIGURATION = "Debug"
 $Name = "QPE"
 
+# Build the QIR:
+if (-not (Test-Path (Join-Path "qsharp" "qir" "est-energy.ll" ))) {
+    Push-Location "qsharp"
+        dotnet build
+    Pop-Location
+}
+
 if ( -not (Test-Path nlohmann_json) ) {
   git clone https://github.com/nlohmann/json.git nlohmann_json
 }
@@ -28,7 +35,7 @@ else {
 $BuildPath = (Join-Path $PSScriptRoot "build")
 if (-not (Test-Path $BuildPath)) {
     New-Item -Path $BuildPath -ItemType "directory" > $Null
-    Copy-Item -Verbose -Path "$PSScriptRoot/../../Runtime/bin/Debug/bin/*" -Destination "$BuildPath"
+    Copy-Item -Verbose -Path "$PSScriptRoot/../../Runtime/bin/Release/bin/*" -Destination "$BuildPath"
     Copy-Item -Verbose -Path "$PSScriptRoot/../../../Simulation/Native/build/*Microsoft.Quantum.Simulator.Runtime.*" -Destination "$BuildPath"
 }
 
