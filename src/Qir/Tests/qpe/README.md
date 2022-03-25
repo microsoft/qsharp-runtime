@@ -100,13 +100,13 @@ Two options here.
 ### Command-line LLDB
 
 ```
-lldb build/qpe py_out.json
-(lldb) r
-<Ctrl+c>
-(lldb) bt
-(lldb) f 1
-(lldb) f 5
-(lldb) q
+lldb build/qpe py_out.json      # Launch the debugging session with LLDB debugger.
+(lldb) r        # Run.
+<Ctrl+c>        # Break.
+(lldb) bt       # Stack Trace.
+(lldb) f 1      # Select the stack trace frame 1.
+(lldb) f 5      #                              5.
+(lldb) q        # Quit the debugger.
 ```
 ### Visual Studio Code with the extension CodeLLDB (v1.7.0)
 Make sure that you can run `./build/qpe py_out.json` in command line. For that you will likely need to adjust the `LD_LIBRARY_PATH` env var. 
@@ -121,6 +121,9 @@ ldd ./build/qpe
 
 # Make sure the executable runs
 ./build/qpe py_out.json
+
+# Kill the run
+<Ctrl+c>
 ```
 Now start the VSCode.  
 
