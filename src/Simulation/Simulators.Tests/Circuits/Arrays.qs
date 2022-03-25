@@ -4,14 +4,13 @@
 namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     open Microsoft.Quantum.Diagnostics;
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Math;
 
-    operation MapF<'T, 'U>(mapper : ('T -> 'U), source : 'T[]) : 'U[] {
-        mutable result = new 'U[Length(source)];
-        for (i in 0 .. Length(source) - 1) {
-            let m = mapper(source[i]);
-            set result = result w/ i <- m;
+    operation MapF<'T, 'U>(mapper : 'T -> 'U, source : 'T[]) : 'U[] {
+        mutable result = [];
+        for x in source {
+            set result += [mapper(x)];
         }
-
         return result;
     }
 
@@ -22,7 +21,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         AssertEqual(2, Length(a1));
         AssertEqual(3, Length(a2));
 
-        let values = MapF(Length<Result>, [a1, a2]);
+        let values = MapF(Length, [a1, a2]);
         AssertEqual(2, values[0]);
         AssertEqual(3, values[1]);
     }
@@ -79,5 +78,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         set items w/= 0 <- items[0] w/ 0 <- 2;
 
         AssertEqual([[2], [1]], items);
+    }
+
+    @Test("QuantumSimulator")
+    operation RepeatedValueIsEvaluatedOnceSize0() : Unit {
+        use q = Qubit();
+        let _ = [H(q), size = 0];
+        AssertMeasurement([PauliX], [q], Zero, "");
+    }
+
+    @Test("QuantumSimulator")
+    operation RepeatedValueIsEvaluatedOnceSize2() : Unit {
+        use q = Qubit();
+        let _ = [H(q), size = 2];
+        AssertMeasurement([PauliX], [q], Zero, "");
     }
 }
