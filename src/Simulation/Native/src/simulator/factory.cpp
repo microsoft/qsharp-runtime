@@ -63,7 +63,7 @@ MICROSOFT_QUANTUM_DECL unsigned create(unsigned maxlocal)
 {
     std::lock_guard<std::shared_mutex> lock(_mutex);
 
-    size_t emptySlot = -1;
+    size_t emptySlot = (size_t)-1;
     for (auto const& s : _psis)
     {
         if (s == NULL)
@@ -73,7 +73,7 @@ MICROSOFT_QUANTUM_DECL unsigned create(unsigned maxlocal)
         }
     }
 
-    if (emptySlot == -1)
+    if (emptySlot == (size_t)-1)
     {
         _psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal)));
         emptySlot = _psis.size() - 1;
