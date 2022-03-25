@@ -16,10 +16,10 @@ Or instead, you can set the env var `BUILD_CONFIGURATION` to `Release` and run t
   * [Pre-requisites](https://github.com/microsoft/qsharp-runtime/blob/main/src/Qir/Runtime/prerequisites.ps1).
   * [Build](https://github.com/microsoft/qsharp-runtime/blob/main/src/Qir/Runtime/build-qir-runtime.ps1).
 
-#Build 
+# Build 
 `.\build.ps1`. 
 The build result is in the `.\build` folder. If during the rebuild you hit unclear errors then remove the `.\build` folder and run `.\build.ps1` again.
 
-#Run
+# Run
 `.\run.ps1`.
 Can take tens of minutes (or even a few hours) on a laptop to get the result.
