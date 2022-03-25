@@ -1,8 +1,8 @@
 # Structure
 
-I can walk you through all the steps during the Teams call with a screen share. Feel free to get in touch with.
+I can walk you through all the steps during the Teams call with a screen share. Feel free to get in touch with me.
 
-The `py_out.json` has been generated from 
+The `.\py_out.json` has been generated from 
 [Quantum/samples/chemistry/IntegralData/Broombridge_v0.2/LiH_sto-3g.yaml](https://github.com/microsoft/Quantum/blob/main/samples/chemistry/IntegralData/Broombridge_v0.2/LiH_sto-3g.yaml)
 with the following Python script
 (in Anaconda env with installed `qsharp`)
@@ -37,13 +37,13 @@ The QAT tool, [this patch](https://github.com/qir-alliance/qat/pull/66), has bee
 in order to add the debugging information to the .ll file. The result is `.\est-energy.qat.dbginfo.ll`.
 
 # Prerequisites
-Run the `bootstrap.ps1` in the root dir of this repo. It builds the required native part of the QuantumSimulator, the QIR Runtime (and other things).
+Run the `<Repo Root>\bootstrap.ps1` in the root dir of this repo. It builds the required native part of the QuantumSimulator, the QIR Runtime (and other things).
 Or instead, you can set the env var `BUILD_CONFIGURATION` to `Release` and run the following scripts
 * Native part of the QuantumSimulator
   * [Pre-requisites](https://github.com/microsoft/qsharp-runtime/blob/main/src/Simulation/Native/prerequisites.ps1).
   * [Build](https://github.com/microsoft/qsharp-runtime/blob/main/src/Simulation/Native/build-native-simulator.ps1).  
-    If the build reports `Native/src/simulator/dbw_test.cpp:12:10: fatal error: 'omp.h' file not found` then feel free to ignore (it is a test) or install `libomp`.
-    Just make sure that `src/Simulation/Native/build/libMicrosoft.Quantum.Simulator.Runtime.so` has been built.
+    If the build reports `<Repo Root>/.../Native/src/simulator/dbw_test.cpp:12:10: fatal error: 'omp.h' file not found` then feel free to ignore (it is a test) or install `libomp`.
+    Just make sure that `<Repo Root>/src/Simulation/Native/build/libMicrosoft.Quantum.Simulator.Runtime.so` has been built.
 * QIR Runtime
   * [Pre-requisites](https://github.com/microsoft/qsharp-runtime/blob/main/src/Qir/Runtime/prerequisites.ps1).
   * [Build](https://github.com/microsoft/qsharp-runtime/blob/main/src/Qir/Runtime/build-qir-runtime.ps1).
@@ -66,7 +66,7 @@ As has been mentioned above, in order to see the QIR function names in the debug
 
 We used the Visual Studio Code with the extension CodeLLDB (v1.7.0).  
 
-<details><summary>The debuger configuration file ".vscode\launch.json":</summary>
+<details><summary>The debuger configuration file "{Repo Root}/.vscode/launch.json":</summary>
 
 ```json
 {
@@ -124,7 +124,7 @@ ldd ./build/qpe
 ```
 Now start the VSCode.  
 
-<details><summary>The debuger configuration file ".vscode\launch.json:":</summary>
+<details><summary>The debuger configuration file "{Repo Root}/.vscode/launch.json:":</summary>
 
 ```json
 {
