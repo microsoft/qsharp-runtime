@@ -43,13 +43,22 @@ endforeach()
 target_link_libraries(qpe PRIVATE nlohmann_json::nlohmann_json)
 
 set(runtime_lib_path "${PROJECT_SOURCE_DIR}/../../Runtime/bin/$ENV{BUILD_CONFIGURATION}/bin")   # Microsoft.Quantum.Qir.Runtime DLL
-target_link_libraries(qpe PUBLIC      #qir-static-tests PUBLIC
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+target_link_libraries(qpe PUBLIC
   "-L${runtime_lib_path}"
   -lMicrosoft.Quantum.Qir.Runtime
   -lMicrosoft.Quantum.Qir.QSharp.Foundation
   -lMicrosoft.Quantum.Qir.QSharp.Core
   -llibcmt
 )
+else()
+target_link_libraries(qpe PUBLIC
+  "-L${runtime_lib_path}"
+  -lMicrosoft.Quantum.Qir.Runtime
+  -lMicrosoft.Quantum.Qir.QSharp.Foundation
+  -lMicrosoft.Quantum.Qir.QSharp.Core
+)
+endif()
 
 set(public_includes "${PROJECT_SOURCE_DIR}/../../Runtime/public")
 target_include_directories(qpe PUBLIC
