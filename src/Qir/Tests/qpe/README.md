@@ -1,5 +1,6 @@
 # Structure
 See https://github.com/cgranade/qpe-for-pnnl  
+
 The `qsharp` folder from there was copied to here and the work-around fixes were applied to `.\qsharp\Program.qs`.  
 The `.\qsharp\est-energy.csproj` refers the version `0.24.39585-alpha` (artifacts are [here](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_build/results?buildId=39585&view=artifacts&pathAsName=false&type=publishedArtifacts), at `drop/drops/nugets`) that has a [Q# compiler fix](https://github.com/microsoft/qsharp-compiler/pull/1373). Or you can get the latest [Q# compiler](https://github.com/microsoft/qsharp-compiler), build it and used it.
 
