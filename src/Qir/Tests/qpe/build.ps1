@@ -1,8 +1,10 @@
+#Requires -PSEdition Core
+
 $Env:BUILD_CONFIGURATION = "Debug"
 $Name = "QPE"
 
 # Build the QIR:
-if (-not (Test-Path (Join-Path "qsharp" "qir" "est-energy.ll" ))) {
+if (-not (Test-Path (Join-Path $PSScriptRoot "qsharp" "qir" "est-energy.ll" ))) {
     Push-Location "qsharp"
         dotnet build
     Pop-Location
@@ -36,10 +38,12 @@ $BuildPath = (Join-Path $PSScriptRoot "build")
 if (-not (Test-Path $BuildPath)) {
     New-Item -Path $BuildPath -ItemType "directory" > $Null
     Copy-Item -Verbose -Path "$PSScriptRoot/../../Runtime/bin/Release/bin/*" -Destination "$BuildPath"
-    Copy-Item -Verbose -Path "$PSScriptRoot/../../../Simulation/Native/build/*Microsoft.Quantum.Simulator.Runtime.*" -Destination "$BuildPath"
+    Copy-Item -Verbose -Path "$PSScriptRoot/../../../Simulation/Native/build/*Microsoft.Quantum.Simulator.Runtime.*" `
+                       -Destination "$BuildPath"
 }
 
 Push-Location $BuildPath 
-    cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON .. | Write-Host
-    cmake --build . --verbose| Write-Host
+    cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER `
+        -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" .. | Write-Host
+    cmake --build . --verbose | Write-Host
 Pop-Location
