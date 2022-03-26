@@ -1,15 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.Runtime.InteropServices;
-using Microsoft.Quantum.Simulation.Core;
 
 #nullable enable
 namespace Microsoft.Quantum.Simulation.Simulators
 {
     using QubitIdType = System.UInt32;
-    using SimulatorIdType = System.UInt32;
+    using SimulatorIdType = System.IntPtr;
 
     public partial class SparseSimulator
     {

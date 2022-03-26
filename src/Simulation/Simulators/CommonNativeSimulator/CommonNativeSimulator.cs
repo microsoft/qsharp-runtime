@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
             ((QSimQubitManager)this.QubitManager).Simulator = this;
         }
 
-        public uint Id { get; protected set; }
+        public IntPtr Id { get; protected set; }
 
         public abstract uint[] QubitIds { get; }
 

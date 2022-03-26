@@ -96,8 +96,8 @@ namespace Quantum
         , public IQuantumGateSet
         , public IDiagnostics
     {
-        typedef void (*TSingleQubitGate)(unsigned /*simulator id*/, unsigned /*qubit id*/);
-        typedef void (*TSingleQubitControlledGate)(unsigned /*simulator id*/, unsigned /*number of controls*/,
+        typedef void (*TSingleQubitGate)(uintptr_t /*simulator id*/, unsigned /*qubit id*/);
+        typedef void (*TSingleQubitControlledGate)(uintptr_t /*simulator id*/, unsigned /*number of controls*/,
                                                    unsigned* /*controls*/, unsigned /*qubit id*/);
 
         // QuantumSimulator defines paulis as:
@@ -127,10 +127,8 @@ namespace Quantum
 
         const QUANTUM_SIMULATOR handle = nullptr;
 
-        using TSimulatorId = unsigned; // TODO: Use `void*` or a fixed-size integer,
-                                       // starting in native simulator (breaking change).
-        static constexpr TSimulatorId NULL_SIMULATORID = UINT_MAX;
-        // Should be `= std::numeric_limits<TSimulatorId>::max()` but the Clang 12.0.0 complains.
+        using TSimulatorId                             = uintptr_t;
+        static constexpr TSimulatorId NULL_SIMULATORID = 0;
 
         TSimulatorId simulatorId = NULL_SIMULATORID;
 
@@ -196,13 +194,13 @@ namespace Quantum
       public:
         CFullstateSimulator(uint32_t userProvidedSeed = 0) : handle(LoadQuantumSimulator())
         {
-            typedef unsigned (*TInit)();
+            typedef uintptr_t (*TInit)();
             static TInit initSimulatorInstance = reinterpret_cast<TInit>(this->GetProc("init"));
 
             qubitManager      = std::make_unique<CQubitManager>();
             this->simulatorId = initSimulatorInstance();
 
-            typedef void (*TSeed)(unsigned, unsigned);
+            typedef void (*TSeed)(uintptr_t, unsigned);
             static TSeed setSimulatorSeed = reinterpret_cast<TSeed>(this->GetProc("seed"));
             setSimulatorSeed(this->simulatorId,
                              (userProvidedSeed == 0)
@@ -213,7 +211,7 @@ namespace Quantum
         {
             if (this->simulatorId != NULL_SIMULATORID)
             {
-                typedef void (*TDestroy)(unsigned);
+                typedef void (*TDestroy)(uintptr_t);
                 static TDestroy destroySimulatorInstance =
                     reinterpret_cast<TDestroy>(LoadProc(this->handle, "destroy"));
                 assert(destroySimulatorInstance);
@@ -228,7 +226,7 @@ namespace Quantum
         // Deprecated, use `DumpMachine()` and `DumpRegister()` instead.
         void GetState(TGetStateCallback callback) override
         {
-            typedef void (*TDump)(unsigned, TGetStateCallback);
+            typedef void (*TDump)(uintptr_t, TGetStateCallback);
             static TDump dump = reinterpret_cast<TDump>(this->GetProc("Dump"));
             dump(this->simulatorId, callback);
         }
@@ -243,7 +241,7 @@ namespace Quantum
 
         QubitIdType AllocateQubit() override
         {
-            typedef void (*TAllocateQubit)(unsigned, unsigned);
+            typedef void (*TAllocateQubit)(uintptr_t, unsigned);
             static TAllocateQubit allocateQubit = reinterpret_cast<TAllocateQubit>(this->GetProc("allocateQubit"));
 
             QubitIdType q = qubitManager->Allocate(); // Allocate qubit in qubit manager.
@@ -258,7 +256,7 @@ namespace Quantum
 
         void ReleaseQubit(QubitIdType q) override
         {
-            typedef bool (*TReleaseQubit)(unsigned, unsigned);
+            typedef bool (*TReleaseQubit)(uintptr_t, unsigned);
             static TReleaseQubit releaseQubit = reinterpret_cast<TReleaseQubit>(this->GetProc("release"));
 
             // Release qubit in the simulator, checking to make sure that release was valid.
@@ -292,7 +290,7 @@ namespace Quantum
         Result Measure(long numBases, PauliId bases[], long numTargets, QubitIdType targets[]) override
         {
             assert(numBases == numTargets);
-            typedef unsigned (*TMeasure)(unsigned, unsigned, unsigned*, unsigned*);
+            typedef unsigned (*TMeasure)(uintptr_t, unsigned, unsigned*, unsigned*);
             static TMeasure m         = reinterpret_cast<TMeasure>(this->GetProc("Measure"));
             std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
             if (ids.size() == 1)
@@ -464,7 +462,7 @@ namespace Quantum
 
         void R(PauliId axis, QubitIdType target, double theta) override
         {
-            typedef void (*TR)(unsigned, unsigned, double, unsigned);
+            typedef void (*TR)(uintptr_t, unsigned, double, unsigned);
             static TR r = reinterpret_cast<TR>(this->GetProc("R"));
 
             r(this->simulatorId, GetBasis(axis), theta, GetQubitId(target));
@@ -474,7 +472,7 @@ namespace Quantum
         void ControlledR(long numControls, QubitIdType controls[], PauliId axis, QubitIdType target,
                          double theta) override
         {
-            typedef void (*TMCR)(unsigned, unsigned, double, unsigned, unsigned*, unsigned);
+            typedef void (*TMCR)(uintptr_t, unsigned, double, unsigned, unsigned*, unsigned);
             static TMCR cr = reinterpret_cast<TMCR>(this->GetProc("MCR"));
 
             std::vector<unsigned> ids = GetQubitIds(numControls, controls);
@@ -485,7 +483,7 @@ namespace Quantum
 
         void Exp(long numTargets, PauliId paulis[], QubitIdType targets[], double theta) override
         {
-            typedef void (*TExp)(unsigned, unsigned, unsigned*, double, unsigned*);
+            typedef void (*TExp)(uintptr_t, unsigned, unsigned*, double, unsigned*);
             static TExp exp                      = reinterpret_cast<TExp>(this->GetProc("Exp"));
             std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);
             std::vector<unsigned> convertedBases = GetBases(numTargets, paulis);
@@ -496,7 +494,7 @@ namespace Quantum
         void ControlledExp(long numControls, QubitIdType controls[], long numTargets, PauliId paulis[],
                            QubitIdType targets[], double theta) override
         {
-            typedef void (*TMCExp)(unsigned, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
+            typedef void (*TMCExp)(uintptr_t, unsigned, unsigned*, double, unsigned, unsigned*, unsigned*);
             static TMCExp cexp                   = reinterpret_cast<TMCExp>(this->GetProc("MCExp"));
             std::vector<unsigned> idsTargets     = GetQubitIds(numTargets, targets);
             std::vector<unsigned> idsControls    = GetQubitIds(numControls, controls);
@@ -517,7 +515,7 @@ namespace Quantum
         bool AssertProbability(long numTargets, PauliId bases[], QubitIdType targets[], double probabilityOfZero,
                                double precision, const char* /*failureMessage*/) override
         {
-            typedef double (*TOp)(unsigned id, unsigned n, int* b, unsigned* q);
+            typedef double (*TOp)(uintptr_t id, unsigned n, int* b, unsigned* q);
             static TOp jointEnsembleProbability = reinterpret_cast<TOp>(this->GetProc("JointEnsembleProbability"));
 
             std::vector<unsigned> ids            = GetQubitIds(numTargets, targets);

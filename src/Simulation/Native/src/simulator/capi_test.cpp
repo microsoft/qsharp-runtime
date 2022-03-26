@@ -11,32 +11,32 @@
 
 // some convenience functions
 
-void CX(unsigned sim_id, unsigned c, unsigned q)
+void CX(uintptr_t sim_id, unsigned c, unsigned q)
 {
     MCX(sim_id, 1, &c, q);
 }
 
-void CZ(unsigned sim_id, unsigned c, unsigned q)
+void CZ(uintptr_t sim_id, unsigned c, unsigned q)
 {
     MCZ(sim_id, 1, &c, q);
 }
 
-void Ry(unsigned sim_id, double phi, unsigned q)
+void Ry(uintptr_t sim_id, double phi, unsigned q)
 {
     R(sim_id, 3, phi, q);
 }
 
-void CRz(unsigned sim_id, double phi, unsigned c, unsigned q)
+void CRz(uintptr_t sim_id, double phi, unsigned c, unsigned q)
 {
     MCR(sim_id, 2, phi, 1, &c, q);
 }
 
-void CRx(unsigned sim_id, double phi, unsigned c, unsigned q)
+void CRx(uintptr_t sim_id, double phi, unsigned c, unsigned q)
 {
     MCR(sim_id, 1, phi, 1, &c, q);
 }
 
-void dump(unsigned sim_id, const char* label)
+void dump(uintptr_t sim_id, const char* label)
 {
     auto dump_callback = [](const char* idx, double r, double i) {
         std::cout << idx << ":\t" << r << '\t' << i << '\n';

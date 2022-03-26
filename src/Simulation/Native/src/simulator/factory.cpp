@@ -36,8 +36,6 @@ namespace Quantum
 {
 namespace Simulator
 {
-std::shared_mutex _mutex;
-std::vector<std::shared_ptr<SimulatorInterface>> _psis;
 
 SimulatorInterface* createSimulator(unsigned maxlocal)
 {
@@ -59,45 +57,19 @@ SimulatorInterface* createSimulator(unsigned maxlocal)
     }
 }
 
-MICROSOFT_QUANTUM_DECL unsigned create(unsigned maxlocal)
+MICROSOFT_QUANTUM_DECL uintptr_t create(unsigned maxlocal)
 {
-    std::lock_guard<std::shared_mutex> lock(_mutex);
-
-    size_t emptySlot = -1;
-    for (auto const& s : _psis)
-    {
-        if (s == NULL)
-        {
-            emptySlot = &s - &_psis[0];
-            break;
-        }
-    }
-
-    if (emptySlot == -1)
-    {
-        _psis.push_back(std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal)));
-        emptySlot = _psis.size() - 1;
-    }
-    else
-    {
-        _psis[emptySlot] = std::shared_ptr<SimulatorInterface>(createSimulator(maxlocal));
-    }
-
-    return static_cast<unsigned>(emptySlot);
+    return (uintptr_t)createSimulator(maxlocal);
 }
 
-MICROSOFT_QUANTUM_DECL void destroy(unsigned id)
+MICROSOFT_QUANTUM_DECL void destroy(uintptr_t id)
 {
-    std::lock_guard<std::shared_mutex> lock(_mutex);
-
-    _psis[id].reset();
+    delete (SimulatorInterface*)id;
 }
 
-MICROSOFT_QUANTUM_DECL std::shared_ptr<SimulatorInterface>& get(unsigned id)
+MICROSOFT_QUANTUM_DECL SimulatorInterface* get(uintptr_t id)
 {
-    std::shared_lock<std::shared_mutex> shared_lock(_mutex);
-
-    return _psis[id];
+    return (SimulatorInterface*)id;
 }
 
 } // namespace Simulator

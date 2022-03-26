@@ -13,51 +13,21 @@
 namespace Microsoft::Quantum::SPARSESIMULATOR
 {
 
-// Ensures exclusive access to _simulators, the vector of simulators
-std::shared_mutex _mutex;
-std::vector<std::shared_ptr<SparseSimulator>> _simulators;
-
 simulator_id_type createSimulator(logical_qubit_id num_qubits)
 {
-    if (num_qubits > MAX_QUBITS)
-        throw std::runtime_error("Max number of qubits is exceeded!");
-    std::lock_guard<std::shared_mutex> lock(_mutex);
-    size_t emptySlot = -1;
-    for (auto const& s : _simulators)
-    {
-        if (s == nullptr)
-        {
-            emptySlot = &s - &_simulators[0];
-            break;
-        }
-    }
-    if (emptySlot == -1)
-    {
-        _simulators.push_back(std::make_shared<SparseSimulator>(num_qubits));
-        emptySlot = _simulators.size() - 1;
-    }
-    else
-    {
-        _simulators[emptySlot] = std::make_shared<SparseSimulator>(num_qubits);
-    }
-
-    return static_cast<simulator_id_type>(emptySlot);
+    return (simulator_id_type)(new SparseSimulator(num_qubits));
 }
 
 // Deletes a simulator in the vector
 void destroySimulator(simulator_id_type id)
 {
-    std::lock_guard<std::shared_mutex> lock(_mutex);
-
-    _simulators[id].reset(); // Set pointer to nullptr
+    delete (SparseSimulator*)id;
 }
 
 // Returns a simulator at some id (used for the C++/C# API)
-std::shared_ptr<SparseSimulator>& getSimulator(simulator_id_type id)
+SparseSimulator* getSimulator(simulator_id_type id)
 {
-    std::shared_lock<std::shared_mutex> shared_lock(_mutex);
-
-    return _simulators[id];
+    return (SparseSimulator*)id;
 }
 
 } // namespace Microsoft::Quantum::SPARSESIMULATOR

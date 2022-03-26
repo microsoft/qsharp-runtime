@@ -606,7 +606,7 @@ public:
 		}
 		bool isEmpty = true;
 		// Process each assertion by H commutation
-		for (int i = 0; i < qubits.size(); i++) {
+		for (int i = 0; i < axes.size(); i++) {
 			switch (axes[i]){
 				case Gates::Basis::PauliY:
 					// HY=-YH, so we switch the eigenvalue
