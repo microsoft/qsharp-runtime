@@ -2,12 +2,12 @@
 # Licensed under the MIT License.
 
 [package]
-name = "qdk_sim_experimental"
+name = "qdk_sim_rs"
 version = "0.0.1-alpha"
 authors = ["Microsoft"]
 edition = "2018"
 license = "MIT"
-description = "Experimental simulators for use with the Quantum Development Kit."
+description = "Rust-based simulators for use with the Quantum Development Kit."
 homepage = "https://github.com/microsoft/qsharp-runtime"
 repository = "https://github.com/microsoft/qsharp-runtime"
 readme = "README.md"
@@ -74,6 +74,9 @@ numpy = {version = "0.13.1", optional = true}
 # We use built to expose compile-time metadata about how this crate
 # was built to C and Rust callers.
 built = "0.5.0"
+cauchy = "0.4.0"
+thiserror = "1.0.30"
+miette = "4.3.0"
 
 [build-dependencies]
 built = "0.5.0"
