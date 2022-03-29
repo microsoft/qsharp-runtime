@@ -8,6 +8,7 @@
 #![cfg_attr(doc, feature(extended_key_value_attributes))]
 #![cfg_attr(doc, cfg_attr(doc, doc = include_str!("../docs/c-api.md")))]
 
+use crate::error::{QdkSimError, QdkSimError::*};
 use crate::{built_info, NoiseModel, Process, State};
 use lazy_static::lazy_static;
 use serde_json::json;
@@ -32,12 +33,12 @@ lazy_static! {
 
 /// Exposes a result to C callers by setting LAST_ERROR in the Error
 /// case, and generating an appropriate error code.
-fn as_capi_err<F: FnOnce() -> Result<(), String>>(result_fn: F) -> i64 {
+fn as_capi_err<F: FnOnce() -> Result<(), QdkSimError>>(result_fn: F) -> i64 {
     let result = result_fn();
     match result {
         Ok(_) => 0,
-        Err(msg) => {
-            *LAST_ERROR.lock().unwrap() = Some(msg);
+        Err(err) => {
+            *LAST_ERROR.lock().unwrap() = Some(err.to_string());
             -1
         }
     }
@@ -47,7 +48,7 @@ fn apply<F: Fn(&NoiseModel) -> &Process>(
     sim_id: usize,
     idxs: &[usize],
     channel_fn: F,
-) -> Result<(), String> {
+) -> Result<(), QdkSimError> {
     let state = &mut *STATE.lock().unwrap();
     if let Some(sim_state) = state.get_mut(&sim_id) {
         let channel = channel_fn(&sim_state.noise_model);
@@ -59,7 +60,10 @@ fn apply<F: Fn(&NoiseModel) -> &Process>(
             Err(err) => Err(err),
         }
     } else {
-        return Err(format!("No simulator with id {}.", sim_id));
+        Err(NoSuchSimulator {
+            invalid_id: sim_id,
+            expected: state.keys().into_iter().cloned().collect(),
+        })
     }
 }
 
@@ -121,11 +125,15 @@ pub unsafe extern "C" fn init(
 ) -> i64 {
     as_capi_err(|| {
         if representation.is_null() {
-            return Err("init called with null pointer for representation".to_string());
+            return Err(NullPointer("representation".to_string()));
         }
-        let representation = CStr::from_ptr(representation)
-            .to_str()
-            .map_err(|e| format!("UTF-8 error decoding representation argument: {}", e))?;
+        let representation =
+            CStr::from_ptr(representation)
+                .to_str()
+                .map_err(|e| InvalidUtf8InArgument {
+                    arg_name: "representation".to_string(),
+                    source: e,
+                })?;
 
         let state = &mut *STATE.lock().unwrap();
         let id = 1 + state.keys().fold(std::usize::MIN, |a, b| a.max(*b));
@@ -136,12 +144,7 @@ pub unsafe extern "C" fn init(
                     "mixed" => State::new_mixed(initial_capacity),
                     "pure" => State::new_pure(initial_capacity),
                     "stabilizer" => State::new_stabilizer(initial_capacity),
-                    _ => {
-                        return Err(format!(
-                            "Unknown initial state representation {}.",
-                            representation
-                        ))
-                    }
+                    _ => return Err(InvalidRepresentation(representation.to_string())),
                 },
                 noise_model: NoiseModel::ideal(),
             },
@@ -161,7 +164,10 @@ pub extern "C" fn destroy(sim_id: usize) -> i64 {
             state.remove(&sim_id);
             Ok(())
         } else {
-            Err(format!("No simulator with id {} exists.", sim_id))
+            Err(NoSuchSimulator {
+                invalid_id: sim_id,
+                expected: state.keys().into_iter().cloned().collect(),
+            })
         }
     })
 }
@@ -249,7 +255,10 @@ pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) ->
             *result_out = result;
             Ok(())
         } else {
-            Err(format!("No simulator with id {} exists.", sim_id))
+            Err(NoSuchSimulator {
+                invalid_id: sim_id,
+                expected: state.keys().into_iter().cloned().collect(),
+            })
         }
     })
 }
@@ -288,7 +297,10 @@ pub extern "C" fn get_noise_model_by_name(
     as_capi_err(|| {
         let name = unsafe { CStr::from_ptr(name) }
             .to_str()
-            .map_err(|e| format!("UTF-8 error decoding representation argument: {}", e))?;
+            .map_err(|e| InvalidUtf8InArgument {
+                arg_name: "name".to_string(),
+                source: e,
+            })?;
         let noise_model = NoiseModel::get_by_name(name)?;
         let noise_model = CString::new(noise_model.as_json()).unwrap();
         unsafe {
@@ -320,20 +332,28 @@ pub extern "C" fn get_noise_model_by_name(
 #[no_mangle]
 pub extern "C" fn get_noise_model(sim_id: usize, noise_model_json: *mut *const c_char) -> i64 {
     as_capi_err(|| {
-        let state = &*STATE
+        let state = STATE
             .lock()
-            .map_err(|e| format!("Lock poisoning error: {}", e))?;
+            .map_err(|e| {
+                // Note that as per https://github.com/dtolnay/anyhow/issues/81#issuecomment-609247231,
+                // common practice is for poison errors to indicate that the containing thread
+                // has been irrevocably corrupted and must panic.
+                panic!("The lock on shared state for the C API has been poisoned.");
+            })
+            .unwrap();
         if let Some(sim_state) = state.get(&sim_id) {
-            let c_str = CString::new(sim_state.noise_model.as_json().as_str()).map_err(|e| {
-                format!("Null error while converting noise model to C string: {}", e)
-            })?;
+            let c_str = CString::new(sim_state.noise_model.as_json().as_str())
+                .map_err(|e| UnanticipatedCApiError(anyhow::Error::new(e)))?;
             unsafe {
                 *noise_model_json = c_str.into_raw();
-            }
+            };
+            Ok(())
         } else {
-            return Err(format!("No simulator with id {} exists.", sim_id));
+            Err(NoSuchSimulator {
+                invalid_id: sim_id,
+                expected: state.keys().into_iter().cloned().collect(),
+            })
         }
-        Ok(())
     })
 }
 
@@ -354,7 +374,7 @@ pub extern "C" fn get_noise_model(sim_id: usize, noise_model_json: *mut *const c
 pub unsafe extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char) -> i64 {
     as_capi_err(|| {
         if new_model.is_null() {
-            return Err("set_noise_model called with null pointer".to_string());
+            return Err(NullPointer("new_model".to_string()));
         }
 
         let c_str = CStr::from_ptr(new_model);
@@ -366,25 +386,18 @@ pub unsafe extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char
                         sim_state.noise_model = noise_model;
                         Ok(())
                     } else {
-                        Err(format!("No simulator with id {} exists.", sim_id))
+                        Err(NoSuchSimulator {
+                            invalid_id: sim_id,
+                            expected: state.keys().into_iter().cloned().collect(),
+                        })
                     }
                 }
-                Err(serialization_error) => Err(format!(
-                    "{} error deserializing noise model at line {}, column {}.",
-                    match serialization_error.classify() {
-                        serde_json::error::Category::Data => "Data / schema",
-                        serde_json::error::Category::Eof => "End-of-file",
-                        serde_json::error::Category::Io => "I/O",
-                        serde_json::error::Category::Syntax => "Syntax",
-                    },
-                    serialization_error.line(),
-                    serialization_error.column()
-                )),
+                Err(err) => Err(JsonDeserializationError(err)),
             },
-            Err(msg) => Err(format!(
-                "UTF-8 error decoding serialized noise model; was valid until byte {}.",
-                msg.valid_up_to()
-            )),
+            Err(msg) => Err(InvalidUtf8InArgument {
+                arg_name: "new_model".to_string(),
+                source: msg,
+            }),
         }
     })
 }
@@ -406,19 +419,25 @@ pub unsafe extern "C" fn set_noise_model(sim_id: usize, new_model: *const c_char
 pub unsafe extern "C" fn set_noise_model_by_name(sim_id: usize, name: *const c_char) -> i64 {
     as_capi_err(|| {
         if name.is_null() {
-            return Err("set_noise_model_by_name called with null pointer".to_string());
+            return Err(NullPointer("name".to_string()));
         }
 
         let name = CStr::from_ptr(name)
             .to_str()
-            .map_err(|e| format!("UTF-8 error decoding name: {}", e))?;
+            .map_err(|e| InvalidUtf8InArgument {
+                arg_name: "name".to_string(),
+                source: e,
+            })?;
         let noise_model = NoiseModel::get_by_name(name)?;
         let state = &mut *STATE.lock().unwrap();
         if let Some(sim_state) = state.get_mut(&sim_id) {
             sim_state.noise_model = noise_model;
             Ok(())
         } else {
-            Err(format!("No simulator with id {} exists.", sim_id))
+            Err(NoSuchSimulator {
+                invalid_id: sim_id,
+                expected: state.keys().into_iter().cloned().collect(),
+            })
         }
     })
 }

@@ -6,14 +6,15 @@ mod apply;
 use crate::chp_decompositions::ChpOperation;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
 use crate::processes::ProcessData::{KrausDecomposition, MixedPauli, Unitary};
-use crate::NoiseModel;
 use crate::QubitSized;
 use crate::C64;
 use crate::{AsUnitary, Pauli};
+use crate::{NoiseModel, VariantName};
 use itertools::Itertools;
 use ndarray::{Array, Array2, Array3, Axis, NewAxis};
 use num_complex::Complex;
 use num_traits::{One, Zero};
+
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
 use std::ops::Add;
@@ -53,6 +54,19 @@ pub enum ProcessData {
     /// Represents a process that is not supported by a given noise model,
     /// and thus always fails when applied.
     Unsupported,
+}
+
+impl VariantName for Process {
+    fn variant_name(&self) -> &'static str {
+        match &self.data {
+            MixedPauli(_) => "MixedPauli",
+            Unitary(_) => "Unitary",
+            KrausDecomposition(_) => "KrausDecomposition",
+            ProcessData::Sequence(_) => "Sequence",
+            ProcessData::ChpDecomposition(_) => "ChpDecomposition",
+            ProcessData::Unsupported => "Unsupported",
+        }
+    }
 }
 
 impl Process {

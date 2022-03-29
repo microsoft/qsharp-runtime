@@ -4,6 +4,14 @@
 use ndarray::{s, Array1, Array2, ArrayView1};
 use num_complex::Complex;
 
+use crate::error::QdkSimError;
+
+/// Used for enums whose variant names are meaningful.
+/// In the future, this should be derived and not hard-coded.
+pub(crate) trait VariantName {
+    fn variant_name(&self) -> &'static str;
+}
+
 /// A complex number with two 64-bit floating point fields.
 /// That is, the analogy of [`f64`] to complex values.
 pub type C64 = Complex<f64>;
@@ -31,9 +39,9 @@ fn log_message(msg: &str) {
 }
 
 /// Prints a message as an error, and returns it as a [`Result`].
-pub fn log_as_err<T>(msg: String) -> Result<T, String> {
+pub fn log_as_err<T>(msg: String) -> Result<T, QdkSimError> {
     log(&msg);
-    Err(msg)
+    Err(QdkSimError::MiscError(msg))
 }
 
 /// Prints a message as an error.

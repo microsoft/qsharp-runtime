@@ -1,5 +1,6 @@
 use crate::chp_decompositions::ChpOperation;
 use crate::common_matrices;
+use crate::error::QdkSimError;
 use crate::instrument::Instrument;
 use crate::linalg::HasDagger;
 use crate::processes::Process;
@@ -90,11 +91,11 @@ impl NoiseModel {
     /// # use qdk_sim::NoiseModel;
     /// let noise_model = NoiseModel::get_by_name("ideal");
     /// ```
-    pub fn get_by_name(name: &str) -> Result<NoiseModel, String> {
+    pub fn get_by_name(name: &str) -> Result<NoiseModel, QdkSimError> {
         match name {
             "ideal" => Ok(NoiseModel::ideal()),
             "ideal_stabilizer" => Ok(NoiseModel::ideal_stabilizer()),
-            _ => Err(format!("Unrecognized noise model name {}.", name)),
+            _ => Err(QdkSimError::InvalidNoiseModel(name.to_string())),
         }
     }
 
