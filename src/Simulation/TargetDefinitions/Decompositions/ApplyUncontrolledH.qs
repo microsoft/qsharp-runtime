@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Math;
 
     /// # Summary
     /// Applies the Hadamard transformation to a single qubit. Note that the Controlled 
@@ -22,7 +23,9 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Qubit to which the gate should be applied.
     internal operation ApplyUncontrolledH (qubit : Qubit) : Unit is Adj {
         body (...) {
-            fail "NOT IMPLEMENTED!";
+            Rx(-PI() / 2.0, qubit);
+            Rz(-PI() / 2.0, qubit);
+            Rx(-PI() / 2.0, qubit);
         }
         adjoint self;
     }

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Math;
 
     /// # Summary
     /// Applies the -π/8 gate to a single qubit. Note that the Controlled functor is
@@ -20,8 +21,6 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit
     /// Qubit to which the gate should be applied.
     internal operation ApplyUncontrolledTAdj (qubit : Qubit) : Unit {
-        body (...) {
-            fail "NOT IMPLEMENTED!";
-        }
+        ApplyUncontrolledRz(-PI() / 4.0, qubit);
     }
 }
