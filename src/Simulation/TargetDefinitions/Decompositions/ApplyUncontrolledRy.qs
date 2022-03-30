@@ -30,7 +30,9 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```
     internal operation ApplyUncontrolledRy (theta : Double, qubit : Qubit) : Unit {
         body (...) {
-            fail "NOT IMPLEMENTED!";
+            ApplyUncontrolledH(qubit);
+            ApplyUncontrolledRz(theta, qubit);
+            ApplyUncontrolledH(qubit);
         }
     }
 }
