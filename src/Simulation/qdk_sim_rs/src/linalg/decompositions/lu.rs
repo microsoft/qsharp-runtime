@@ -12,6 +12,7 @@ use crate::{
     linalg::array_ext::{RemoveAxisExt, ShapeExt},
 };
 
+/// Represents the output of an LU decomposition acting on a matrix.
 #[derive(Debug)]
 pub struct LU<A, S>
 where
@@ -22,13 +23,22 @@ where
     pub(self) pivots: Array1<usize>,
 }
 
+/// Represents types that represent matrices that are decomposable into lower-
+/// and upper-triangular parts.
 pub trait LUDecomposable {
+    /// The element type for the output matrices.
     type Elem: Scalar;
-    type Repr: Data<Elem = Self::Elem>;
+
+    /// Type of owned data in the output matrices.
     type OwnedRepr: Data + RawData<Elem = Self::Elem>;
+
+    /// The output type for LU decompositions on this type.
     type Output: LUDecomposition<Self::Elem, Self::OwnedRepr>;
+
+    /// The type used to represent errors in the decomposition.
     type Error;
 
+    /// Performs an LU decomposition on the given type.
     fn lu(&self) -> Result<Self::Output, Self::Error>;
 }
 
@@ -38,7 +48,6 @@ where
     A: Scalar,
 {
     type Elem = A;
-    type Repr = S;
     type OwnedRepr = OwnedRepr<A>;
     type Error = QdkSimError;
     type Output = LU<A, OwnedRepr<A>>;
@@ -51,7 +60,7 @@ where
             QdkSimError::CannotConvertElement("f64".to_string(), type_name::<A::Real>().to_string())
         })?;
 
-        let mut factors = &mut (*self).to_owned();
+        let factors = &mut (*self).to_owned();
         let mut pivots: Array1<_> = (0..n_rows).collect::<Vec<_>>().into();
 
         for j in 0..n_rows {
@@ -178,16 +187,84 @@ where
 
 #[cfg(test)]
 mod tests {
-    use ndarray::array;
+    use approx::assert_abs_diff_eq;
+    use cauchy::c64;
+    use ndarray::{array, Array2, OwnedRepr};
 
-    use crate::{error::QdkSimError, linalg::decompositions::LUDecomposable};
+    use crate::{
+        error::QdkSimError,
+        linalg::decompositions::{LUDecomposable, LU},
+    };
 
     #[test]
     fn lu_decomposition_works_f64() -> Result<(), QdkSimError> {
         let mtx = array![[6.0, 18.0, 3.0], [2.0, 12.0, 1.0], [4.0, 15.0, 3.0]];
-        // TODO: Actually write the test!
-        let lu = mtx.lu()?;
-        println!("{:?}", lu);
+        let lu: LU<f64, OwnedRepr<f64>> = mtx.lu()?;
+
+        // NB: This tests the internal structure of the LU decomposition, and
+        //     may validly fail if the algorithm above is modified.
+        let expected_factors = array![
+            [6.0, 18.0, 3.0],
+            [0.3333333333333333, 6.0, 0.0],
+            [0.6666666666666666, 0.5, 1.0],
+        ];
+        for (actual, expected) in lu.factors.iter().zip(expected_factors.iter()) {
+            assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
+        }
+
+        let expected_pivots = vec![0, 1, 2];
+        assert_eq!(lu.pivots.to_vec(), expected_pivots);
+        Ok(())
+    }
+
+    #[test]
+    fn lu_decomposition_works_c64() -> Result<(), QdkSimError> {
+        // In [1]: import scipy.linalg as la
+        // In [2]: la.lu([
+        //    ...:     [-1, 1j, -2],
+        //    ...:     [3, 0, -4j],
+        //    ...:     [-1, 5, -1]
+        //    ...: ])
+        // Out[2]: (array([[0., 0., 1.],
+        //                 [1., 0., 0.],
+        //                 [0., 1., 0.]]),
+        //          array([[ 1.        +0.j ,  0.        +0.j ,  0.        +0.j ],
+        //                 [-0.33333333+0.j ,  1.        +0.j ,  0.        +0.j ],
+        //                 [-0.33333333+0.j ,  0.        +0.2j,  1.        +0.j ]]),
+        //          array([[ 3.        +0.j        ,  0.        +0.j        ,
+        //                  -0.        -4.j        ],
+        //                 [ 0.        +0.j        ,  5.        +0.j        ,
+        //                  -1.        -1.33333333j],
+        //                 [ 0.        +0.j        ,  0.        +0.j        ,
+        //                  -2.26666667-1.13333333j]]))
+        let mtx: Array2<c64> = array![
+            [c64::new(-1.0, 0.0), c64::new(0.0, 1.0), c64::new(-2.0, 0.0)],
+            [c64::new(3.0, 0.0), c64::new(0.0, 0.0), c64::new(0.0, -4.0)],
+            [c64::new(-1.0, 0.0), c64::new(5.0, 0.0), c64::new(-1.0, 0.0)]
+        ];
+        let lu: LU<c64, OwnedRepr<c64>> = mtx.lu()?;
+
+        // NB: This tests the internal structure of the LU decomposition, and
+        //     may validly fail if the algorithm above is modified.
+        let expected_factors = array![
+            [c64::new(3.0, 0.0), c64::new(0.0, 0.0), c64::new(0.0, -4.0)],
+            [
+                c64::new(-0.3333333333333333, 0.0),
+                c64::new(5.0, 0.0),
+                c64::new(-1.0, -1.3333333333333333)
+            ],
+            [
+                c64::new(-0.3333333333333333, 0.0),
+                c64::new(0.0, 0.2),
+                c64::new(-2.26666667, -1.13333333)
+            ],
+        ];
+        for (actual, expected) in lu.factors.iter().zip(expected_factors.iter()) {
+            assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
+        }
+
+        let expected_pivots = vec![1, 2, 2];
+        assert_eq!(lu.pivots.to_vec(), expected_pivots);
         Ok(())
     }
 }

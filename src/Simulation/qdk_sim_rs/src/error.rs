@@ -27,14 +27,22 @@ pub enum QdkSimError {
     /// process.
     #[error("Channel acts on {expected} qubits, but was applied to an {actual}-qubit state.")]
     #[diagnostic(code(qdk_sim::process::wrong_n_qubits))]
-    WrongNumberOfQubits { expected: usize, actual: usize },
+    WrongNumberOfQubits {
+        /// The number of qubits that was expected, as given by the size of the
+        /// channel to be applied.
+        expected: usize,
+        /// The actual number of qubits for the given state.
+        actual: usize,
+    },
 
     /// Raised when a channel cannot be applied to a given state due to a
     /// mismatch between channel and state kinds.
     #[error("Unsupported quantum process variant {channel_variant} for applying to state variant {state_variant}.")]
     #[diagnostic(code(qdk_sim::process::unsupported_apply))]
     UnsupportedApply {
+        /// The enum variant of the channel to be applied.
         channel_variant: &'static str,
+        /// The enum variant of the state that the channel is to be applied to.
         state_variant: &'static str,
     },
 
@@ -77,7 +85,9 @@ pub enum QdkSimError {
     #[error("C API error: No simulator with ID {invalid_id} exists. Expected: {expected:?}.")]
     #[diagnostic(code(qdk_sim::c_api::invalid_sim))]
     NoSuchSimulator {
+        /// The invalid simulator id which caused this error.
         invalid_id: usize,
+        /// A list of valid simulator ids at the point when this error occured.
         expected: Vec<usize>,
     },
 
@@ -86,7 +96,10 @@ pub enum QdkSimError {
     #[error("C API error: UTF-8 error decoding {arg_name} argument: {source}")]
     #[diagnostic(code(qdk_sim::c_api::utf8))]
     InvalidUtf8InArgument {
+        /// The name of the argument containing invalid UTF-8 data.
         arg_name: String,
+
+        /// The underlying UTF-8 error that caused this error.
         #[source]
         source: Utf8Error,
     },

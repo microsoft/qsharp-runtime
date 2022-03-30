@@ -1,12 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// The following two attributes include the README.md for this crate when
-// building docs (requires +nightly).
-// See https://github.com/rust-lang/rust/issues/82768#issuecomment-803935643
-// for discussion.
-#![cfg_attr(doc, feature(extended_key_value_attributes))]
-#![cfg_attr(doc, cfg_attr(doc, doc = include_str!("../README.md")))]
+#![cfg_attr(all(), doc = include_str!("../README.md"))]
 // Set linting rules for documentation. We will stop the build on missing docs,
 // or docs with known broken links. We only enable this when all relevant
 // features are enabled, otherwise the docs build will fail on links to
@@ -17,7 +12,7 @@
 // that are missing an `# Example` section. Currently, that raises a lot of
 // warnings when building docs, but ideally we should make sure to address
 // warnings going forward by adding relevant examples.
-#![cfg_attr(doc, warn(missing_doc_code_examples))]
+#![cfg_attr(doc, warn(rustdoc::missing_doc_code_examples))]
 
 #[macro_use(array, s)]
 extern crate ndarray;

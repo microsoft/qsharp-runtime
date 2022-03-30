@@ -1,12 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// The following two attributes include the README.md for this module when
-// building docs (requires +nightly).
-// See https://github.com/rust-lang/rust/issues/82768#issuecomment-803935643
-// for discussion.
-#![cfg_attr(doc, feature(extended_key_value_attributes))]
-#![cfg_attr(doc, cfg_attr(doc, doc = include_str!("../docs/c-api.md")))]
+#![cfg_attr(all(), doc = include_str!("../docs/c-api.md"))]
 
 use crate::error::{QdkSimError, QdkSimError::*};
 use crate::{built_info, NoiseModel, Process, State};

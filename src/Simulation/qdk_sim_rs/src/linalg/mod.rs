@@ -14,6 +14,9 @@ use crate::{common_matrices::nq_eye, C64};
 mod tensor;
 pub use tensor::*;
 
+mod inv;
+pub use inv::*;
+
 pub mod decompositions;
 
 // Define private modules as well.

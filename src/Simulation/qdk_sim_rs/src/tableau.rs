@@ -3,7 +3,10 @@
 
 use std::fmt::Display;
 
-use crate::utils::{set_row_to_row_sum, set_vec_to_row_sum, swap_columns};
+use crate::{
+    error::QdkSimError,
+    utils::{set_row_to_row_sum, set_vec_to_row_sum, swap_columns},
+};
 use ndarray::{s, Array, Array1, Array2};
 use serde::{Deserialize, Serialize};
 
@@ -91,16 +94,18 @@ impl Tableau {
     ///
     /// If the assertion would pass, `Ok(())` is returned, otherwise an [`Err`]
     /// describing the assertion failure is returned.
-    pub fn assert_meas(&self, idx_target: usize, expected: bool) -> Result<(), String> {
-        let actual = self.determinstic_result(idx_target).ok_or(format!(
-            "Expected {}, but measurement result would be random.",
-            expected
-        ))?;
+    pub fn assert_meas(&self, idx_target: usize, expected: bool) -> Result<(), QdkSimError> {
+        let actual = self
+            .determinstic_result(idx_target)
+            .ok_or(QdkSimError::MiscError(format!(
+                "Expected {}, but measurement result would be random.",
+                expected
+            )))?;
         if actual != expected {
-            Err(format!(
+            Err(QdkSimError::MiscError(format!(
                 "Expected {}, but measurement result would actually be {}.",
                 expected, actual
-            ))
+            )))
         } else {
             Ok(())
         }
