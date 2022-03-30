@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.Quantum.Sdk">
+  <Import Project="..\TargetDefinitions\TargetPackages\PNNL.Rigetti.Package.props" />
+
+  <PropertyGroup>
+    <Description>Type1 Targeting support for the Q# programming language.</Description>
+    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Microsoft.Quantum.PNNL.Rigetti.props" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>true</Pack>
+      <PackagePath>build/</PackagePath>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+</Project>
