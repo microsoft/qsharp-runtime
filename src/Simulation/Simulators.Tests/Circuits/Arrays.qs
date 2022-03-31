@@ -11,13 +11,13 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         for x in source {
             set result += [mapper(x)];
         }
+
         return result;
     }
 
     operation LengthTest() : Unit {
         let a1 = [One, Zero];
         let a2 = [Zero, Zero, Zero];
-
         AssertEqual(2, Length(a1));
         AssertEqual(3, Length(a2));
 
@@ -76,7 +76,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     function ArrayOfArraysShouldCopyOnUpdate() : Unit {
         mutable items = [[1], size = 2];
         set items w/= 0 <- items[0] w/ 0 <- 2;
-
         AssertEqual([[2], [1]], items);
     }
 
@@ -85,6 +84,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         use q = Qubit();
         let _ = [H(q), size = 0];
         AssertMeasurement([PauliX], [q], Zero, "");
+        Reset(q);
     }
 
     @Test("QuantumSimulator")
@@ -92,5 +92,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         use q = Qubit();
         let _ = [H(q), size = 2];
         AssertMeasurement([PauliX], [q], Zero, "");
+        Reset(q);
     }
 }
