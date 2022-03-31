@@ -36,7 +36,7 @@ pub trait LUDecomposable {
     type Output: LUDecomposition<Self::Elem, Self::OwnedRepr>;
 
     /// The type used to represent errors in the decomposition.
-    type Error;
+    type Error: std::error::Error;
 
     /// Performs an LU decomposition on the given type.
     fn lu(&self) -> Result<Self::Output, Self::Error>;
@@ -108,19 +108,41 @@ where
     }
 }
 
+/// Represents the result of decomposing a square matrix $A$ into lower- and
+/// upper-triangular components $L$ and $U$, respectively.
 pub trait LUDecomposition<A, S>
 where
     S: Data<Elem = A>,
     A: Scalar,
 {
+    /// The type used to represent errors in using this decomposition to solve
+    /// matrix equations.
     type Error: std::error::Error;
+
+    /// The type resulting from using this decomposition to solve problems
+    /// of the form $A\vec{x} = \vec{y}$.
     type VectorSolution;
+
+    /// The type resulting from using this decomposition to solve problems
+    /// of the form $AX = Y$.
     type MatrixSolution;
 
+    /// The size $n$ of the matrix whose decomposition is represented. In
+    /// particular, $L\Pi U$ is taken to be an $n \times n$ matrix, where $L$
+    /// and $U$ are the lower- and upper-triangular factors, and where $\Pi$
+    /// is a permutation matrix.
     fn order(&self) -> usize;
 
     // TODO: Change signature to be in-place.
+    /// Uses this decomposition to solve an equation of the form
+    /// $A\vec{x} = \vec{y}$ for $\vec{x}$ given $\vec{y}$, where $A$ is
+    /// implicitly represented by this decomposition.
     fn solve_vector(&self, rhs: &ArrayBase<S, Ix1>) -> Result<Self::VectorSolution, Self::Error>;
+
+    // TODO: Change signature to be in-place.
+    /// Uses this decomposition to solve an equation of the form
+    /// $AX = Y$ for $X$ given $Y$, where $A$ is
+    /// implicitly represented by this decomposition.
     fn solve_matrix(&self, rhs: &ArrayBase<S, Ix2>) -> Result<Self::MatrixSolution, Self::Error>;
 }
 

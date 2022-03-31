@@ -32,8 +32,12 @@ crate-type = ["rlib", "staticlib", "cdylib"]
 # Optional build-time features: we use this to create Python and WASM bindings.
 [features]
 default = []
+
+## Ensures that the crate is compatible with usage from WebAssembly.
 wasm = ["web-sys"]
+
 # When Python bindings are enabled, we also need the pyo3 dependency.
+## Enables Python bindings for this crate.
 python = ["pyo3", "numpy"]
 
 # Enable LaTeX on docs.rs.
@@ -41,6 +45,7 @@ python = ["pyo3", "numpy"]
 # https://github.com/rust-num/num/pull/226/files for why this works.
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "docs-includes/header.html", "--html-after-content", "docs-includes/after.html" ]
+features = ["document-features"]
 
 
 [profile.release]
@@ -81,6 +86,10 @@ cauchy = "0.4.0"
 thiserror = "1.0.30"
 miette = "4.3.0"
 anyhow = "1.0.56"
+
+# We use document-features to automatically generate feature documentation from
+# Cargo.toml, following the example at 
+document-features = { version = "0.2", optional = true }
 
 [build-dependencies]
 built = "0.5.0"

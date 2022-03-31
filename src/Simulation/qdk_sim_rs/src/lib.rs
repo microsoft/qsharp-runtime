@@ -2,6 +2,10 @@
 // Licensed under the MIT License.
 
 #![cfg_attr(all(), doc = include_str!("../README.md"))]
+#![cfg_attr(
+    feature = "document-features",
+    cfg_attr(doc, doc = ::document_features::document_features!())
+)]
 // Set linting rules for documentation. We will stop the build on missing docs,
 // or docs with known broken links. We only enable this when all relevant
 // features are enabled, otherwise the docs build will fail on links to
