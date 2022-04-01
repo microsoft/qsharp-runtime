@@ -147,6 +147,9 @@ macro_rules! c64 {
     ($re:literal + $im:literal i) => {
         c64::new($re, $im)
     };
+    ($re:literal - $im:literal i) => {
+        c64::new($re, -$im)
+    };
     ($im:literal i) => {
         c64::new(0.0, $im)
     };
