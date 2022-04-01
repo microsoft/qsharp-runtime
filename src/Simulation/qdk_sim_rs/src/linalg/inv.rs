@@ -1,5 +1,5 @@
 use cauchy::Scalar;
-use ndarray::{Array1, Array2, Data, OwnedRepr, RawData};
+use ndarray::{Array1, Array2, OwnedRepr};
 
 use crate::linalg::decompositions::{LUDecomposable, LUDecomposition};
 

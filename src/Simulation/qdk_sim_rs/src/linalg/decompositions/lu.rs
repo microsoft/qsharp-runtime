@@ -214,6 +214,7 @@ mod tests {
     use ndarray::{array, Array2, OwnedRepr};
 
     use crate::{
+        c64,
         error::QdkSimError,
         linalg::decompositions::{LUDecomposable, LU},
     };
@@ -260,9 +261,9 @@ mod tests {
         //                 [ 0.        +0.j        ,  0.        +0.j        ,
         //                  -2.26666667-1.13333333j]]))
         let mtx: Array2<c64> = array![
-            [c64::new(-1.0, 0.0), c64::new(0.0, 1.0), c64::new(-2.0, 0.0)],
-            [c64::new(3.0, 0.0), c64::new(0.0, 0.0), c64::new(0.0, -4.0)],
-            [c64::new(-1.0, 0.0), c64::new(5.0, 0.0), c64::new(-1.0, 0.0)]
+            [c64!(-1.0), c64!(1.0 i), c64!(-2.0)],
+            [c64!(3.0), c64!(0.0), c64!(-4.0 i)],
+            [c64!(-1.0), c64!(5.0), c64!(-1.0)]
         ];
         let lu: LU<c64, OwnedRepr<c64>> = mtx.lu()?;
 

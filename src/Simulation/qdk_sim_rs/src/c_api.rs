@@ -329,7 +329,7 @@ pub extern "C" fn get_noise_model(sim_id: usize, noise_model_json: *mut *const c
     as_capi_err(|| {
         let state = STATE
             .lock()
-            .map_err(|e| {
+            .map_err(|_| {
                 // Note that as per https://github.com/dtolnay/anyhow/issues/81#issuecomment-609247231,
                 // common practice is for poison errors to indicate that the containing thread
                 // has been irrevocably corrupted and must panic.
