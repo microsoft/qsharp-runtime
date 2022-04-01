@@ -36,7 +36,7 @@ namespace Microsoft.Azure.Quantum.Authentication.Test
         public async Task<T> GetFileContentAsync<T>(string path, CancellationToken cancellationToken)
         {
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(_fileContent));
-            return await JsonSerializer.DeserializeAsync<T>(stream, null, cancellationToken);
+            return await JsonSerializer.DeserializeAsync<T>(stream, options: null, cancellationToken);
         }
     }
 

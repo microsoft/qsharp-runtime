@@ -6,6 +6,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     open Microsoft.Quantum.Diagnostics;
 
     @Test("QuantumSimulator")
+    @Test("SparseSimulator")
     // TODO: Disabled until we have a noise model for Rz.
     // @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
     operation TestTeleport() : Unit {

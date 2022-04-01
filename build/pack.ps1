@@ -26,6 +26,17 @@ Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
         Copy-Item -Verbose "$DROP/Microsoft.Quantum.Simulator.Runtime.dll" "win10/Microsoft.Quantum.Simulator.Runtime.dll"
     }
 
+    $DROP = "$Env:DROP_NATIVE/src/Simulation/NativeSparseSimulator/build"
+    Write-Host "##[info]Copying NativeSparseSimulator files from $DROP...";
+    If (Test-Path "$DROP/libMicrosoft.Quantum.SparseSimulator.Runtime.dylib") {
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.SparseSimulator.Runtime.dylib" "osx/libMicrosoft.Quantum.SparseSimulator.Runtime.dylib"
+    }
+    If (Test-Path "$DROP/libMicrosoft.Quantum.SparseSimulator.Runtime.so") {
+        Copy-Item -Verbose "$DROP/libMicrosoft.Quantum.SparseSimulator.Runtime.so" "linux/libMicrosoft.Quantum.SparseSimulator.Runtime.so"
+    }
+    If (Test-Path "$DROP/Microsoft.Quantum.SparseSimulator.Runtime.dll") {
+        Copy-Item -Verbose "$DROP/Microsoft.Quantum.SparseSimulator.Runtime.dll" "win10/Microsoft.Quantum.SparseSimulator.Runtime.dll"
+    }
 
     $DROP = "$Env:DROP_NATIVE/src/Simulation/qdk_sim_rs/drop";
     Write-Host "##[info]Copying qdk_sim_rs files from $DROP...";
@@ -43,7 +54,7 @@ Pop-Location
 
 function Pack-One() {
     Param(
-        $project, 
+        $project,
         $option1 = "",
         $option2 = "",
         $option3 = "",
@@ -74,7 +85,7 @@ function Pack-One() {
 
 function Pack-Dotnet() {
     Param(
-        $project, 
+        $project,
         $option1 = "",
         $option2 = "",
         $option3 = "",
@@ -129,7 +140,7 @@ function Pack-Crate() {
         $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
     }
     Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
-    cargo package;
+    cargo package --allow-dirty;
     # Copy only the .crate file, since we don't need all the intermediate
     # artifacts brought in by the full folder under target/package.
     Copy-Item -Force (Join-Path $PSScriptRoot .. "target" "package" "*.crate") $OutPath;

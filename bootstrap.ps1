@@ -7,25 +7,22 @@ Push-Location (Join-Path $PSScriptRoot "build")
     .\prerequisites.ps1
 Pop-Location
 
+cargo install cargo-edit
 Push-Location (Join-Path $PSScriptRoot "./src/Simulation/qdk_sim_rs")
-    # We use dotnet-script to inject the version number into Cargo.toml,
-    # so we go on ahead here and restore any missing tools.
-    # Since that Cargo.toml is referenced by CMake lists in the QIR
-    # runtime, this injection has to be the first thing we do.
-    dotnet tool restore
-    dotnet script inject-version.csx -- `
-        --template Cargo.toml.template `
-        --out-path Cargo.toml `
-        --version $Env:NUGET_VERSION;
+    cargo set-version $Env:NUGET_VERSION;
 Pop-Location
 
 if (-not (Test-Path Env:/AGENT_OS)) {                                    # If not CI build, i.e. local build (if AGENT_OS envvar is not defined)
     if ($Env:ENABLE_NATIVE -ne "false") {
-        Write-Host "Build release flavor of the native simulator"
         $Env:BUILD_CONFIGURATION = "Release"
+        Write-Host "Build release flavor of the full state simulator"
         Push-Location (Join-Path $PSScriptRoot "src/Simulation/Native")
             .\build-native-simulator.ps1
         Pop-Location
+
+        Write-Host "Build release flavor of the Sparse Simulator"
+        Invoke-Expression (Join-Path $PSScriptRoot "src" "Simulation" "NativeSparseSimulator" "build.ps1")
+
         Push-Location (Join-Path $PSScriptRoot "src/Simulation/qdk_sim_rs")
             # Don't run the experimental simulator build if we're local
             # and prerequisites are missing.
