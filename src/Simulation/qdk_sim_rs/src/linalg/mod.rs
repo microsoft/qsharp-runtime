@@ -17,6 +17,9 @@ pub use tensor::*;
 mod inv;
 pub use inv::*;
 
+mod pow;
+pub use pow::*;
+
 pub mod decompositions;
 
 // Define private modules as well.
