@@ -9,5 +9,5 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\Simulation\PNNL.IBMQ\Microsoft.Quantum.PNNL.IBMQ.csproj" IsTargetPackage="true" />
         <PackageReference Include="Microsoft.Quantum.Chemistry" Version="0.24.201332" />
-  </ItemGroup>
+    </ItemGroup>
 </Project>

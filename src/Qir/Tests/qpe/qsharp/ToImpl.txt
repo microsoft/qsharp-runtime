@@ -1,0 +1,23 @@
+All:
+    declare %Result* @__quantum__qis__m__body(%Qubit*)
+        ; If you (PNNL) already have the implementation of 
+        ; `__quantum__qis__Measure__body(%Array*, %Array*)`
+        ; then Stefan can provide the C++ implementation of `__quantum__qis__m__body`
+        ; in terms of `__quantum__qis__Measure__body(%Array*, %Array*)`.
+
+IBMQ:
+    declare void @__quantum__qis__cnot__body(%Qubit*, %Qubit*)
+    declare void @__quantum__qis__sqrtx__body(%Qubit*)
+    declare void @__quantum__qis__rz__body(double, %Qubit*)
+    declare void @__quantum__qis__x__body(%Qubit*)
+
+Regetti:
+    declare void @__quantum__qis__rx__body(double, %Qubit*)
+    declare void @__quantum__qis__rz__body(double, %Qubit*)
+    declare void @__quantum__qis__cz__body(%Qubit*, %Qubit*)
+    declare void @__quantum__qis__xy__body(%Qubit*, %Qubit*)    ; TODO(cgranade): Double-check the signature.
+
+Honeywell:
+    declare void @__quantum__qis__rx__body(double, %Qubit*)
+    declare void @__quantum__qis__rz__body(double, %Qubit*)
+    declare void @__quantum__qis__zz__body(%Qubit*, %Qubit*)    ; TODO(cgranade): Double-check the signature.
