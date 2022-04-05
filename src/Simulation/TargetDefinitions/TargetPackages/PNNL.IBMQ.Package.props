@@ -9,6 +9,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledSqrtX.qs" />
 
+    <!-- DOUBLE CHECK SIGNATURE -->
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
   </ItemGroup>
 
