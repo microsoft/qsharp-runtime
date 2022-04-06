@@ -62,7 +62,8 @@ cauchy = "0.4.0"
 cfg-if = "1.0.0"
 derive_more = "0.99.10"
 # We use document-features to automatically generate feature documentation from
-# Cargo.toml, following the example at 
+# Cargo.toml, following the example at
+# https://docs.rs/document-features/latest/document_features#examples.
 document-features = { version = "0.2", optional = true }
 # See https://github.com/rust-random/rand/issues/990
 # and https://docs.rs/getrandom/0.1.15/getrandom/index.html#support-for-webassembly-and-asmjs
