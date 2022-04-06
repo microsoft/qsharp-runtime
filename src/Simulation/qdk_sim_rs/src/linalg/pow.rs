@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 use cauchy::Scalar;
 use ndarray::{linalg::Dot, Array, Array2, Ix2};
 use num_traits::Zero;

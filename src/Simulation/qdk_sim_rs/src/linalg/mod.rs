@@ -20,6 +20,9 @@ pub use inv::*;
 mod pow;
 pub use pow::*;
 
+mod expm;
+pub use expm::*;
+
 pub mod decompositions;
 
 // Define private modules as well.

@@ -32,6 +32,7 @@ pub mod common_matrices;
 pub mod error;
 mod instrument;
 pub mod linalg;
+pub mod math;
 mod noise_model;
 mod paulis;
 mod processes;
