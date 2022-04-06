@@ -9,7 +9,7 @@ use num_traits::FromPrimitive;
 
 use crate::{
     error::QdkSimError,
-    linalg::array_ext::{RemoveAxisExt, ShapeExt},
+    linalg::array_ext::{ArrayBaseRemoveAxisExt, ArrayBaseShapeExt},
 };
 
 /// Represents the output of an LU decomposition acting on a matrix.
