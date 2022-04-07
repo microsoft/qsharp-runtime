@@ -33,7 +33,9 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```
     internal operation ApplyControlledX (control : Qubit, target : Qubit) : Unit is Adj {
         body (...) {
-            fail "NOT IMPLEMENTED!";
+            ApplyUncontrolledH(target);
+            ApplyControlledZ(control, target);
+            ApplyUncontrolledH(target);
         }
         adjoint self;
     }
