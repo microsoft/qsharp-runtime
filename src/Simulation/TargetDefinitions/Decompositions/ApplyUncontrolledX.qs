@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Math;
 
     /// # Summary
     /// Applies the Pauli $X$ gate. Note that the Controlled functor is not supported.

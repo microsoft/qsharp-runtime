@@ -15,9 +15,9 @@ Regetti:
     declare void @__quantum__qis__rx__body(double, %Qubit*)
     declare void @__quantum__qis__rz__body(double, %Qubit*)
     declare void @__quantum__qis__cz__body(%Qubit*, %Qubit*)
-    declare void @__quantum__qis__xy__body(%Qubit*, %Qubit*)    ; TODO(cgranade): Double-check the signature.
+    ; declare void @__quantum__qis__xy__body(%Qubit*, %Qubit*)    ; Excluded.
 
 Honeywell:
     declare void @__quantum__qis__rx__body(double, %Qubit*)
     declare void @__quantum__qis__rz__body(double, %Qubit*)
-    declare void @__quantum__qis__zz__body(%Qubit*, %Qubit*)    ; TODO(cgranade): Double-check the signature.
+    declare void @__quantum__qis__zz__body(double, %Qubit*, %Qubit*)
