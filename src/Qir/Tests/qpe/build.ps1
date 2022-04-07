@@ -3,12 +3,12 @@
 $Env:BUILD_CONFIGURATION = "Debug"
 $Name = "QPE"
 
-# Build the QIR:
-if (-not (Test-Path (Join-Path $PSScriptRoot "qsharp" "qir" "est-energy.ll" ))) {
-    Push-Location "qsharp"
-        dotnet build
-    Pop-Location
-}
+# # Build the QIR:
+# if (-not (Test-Path (Join-Path $PSScriptRoot "qsharp" "qir" "est-energy.ll" ))) {
+#     Push-Location "qsharp"
+#         dotnet build
+#     Pop-Location
+# }
 
 if ( -not (Test-Path nlohmann_json) ) {
   git clone https://github.com/nlohmann/json.git nlohmann_json
