@@ -10,11 +10,11 @@ use num_traits::Zero;
 
 use crate::error::QdkSimError;
 
-pub(crate) trait ShapeExt {
+pub(crate) trait ArrayBaseShapeExt {
     fn require_square(&self) -> Result<usize, QdkSimError>;
 }
 
-impl<S, D> ShapeExt for ArrayBase<S, D>
+impl<S, D> ArrayBaseShapeExt for ArrayBase<S, D>
 where
     S: RawData,
     D: Dimension,
@@ -29,7 +29,7 @@ where
     }
 }
 
-pub trait MatrixExt
+pub trait ArrayBaseMatrixExt
 where
     Self: Sized,
 {
@@ -37,7 +37,7 @@ where
     fn lower_triangular(&self) -> Self::Output;
     fn upper_triangular(&self) -> Self::Output;
 }
-impl<S, A> MatrixExt for ArrayBase<S, Ix2>
+impl<S, A> ArrayBaseMatrixExt for ArrayBase<S, Ix2>
 where
     S: Data<Elem = A>,
     A: Zero + Clone,
@@ -66,19 +66,19 @@ where
     }
 }
 
-pub(crate) trait RemoveAxisExt {
+pub(crate) trait ArrayBaseRemoveAxisExt {
     fn swap_index_axis(&mut self, axis: Axis, idx_source: usize, idx_dest: usize);
 }
-impl<S, D> RemoveAxisExt for ArrayBase<S, D>
+impl<S, D> ArrayBaseRemoveAxisExt for ArrayBase<S, D>
 where
     S: Data + DataMut,
     <S as RawData>::Elem: Clone,
     D: Dimension + RemoveAxis,
 {
     fn swap_index_axis(&mut self, axis: Axis, idx_source: usize, idx_dest: usize) {
-        // TODO: Avoid copying both; this is needed currently to avoid mutably
-        //       borrowing something which has an outstanding immutable
-        //       borrow.
+        // TODO[perf]: Avoid copying both; this is needed currently to avoid mutably
+        //             borrowing something which has an outstanding immutable
+        //             borrow.
         let source = self.index_axis(axis, idx_source).clone().to_owned();
         let dest = self.index_axis(axis, idx_dest).clone().to_owned();
         self.index_axis_mut(axis, idx_source).assign(&dest);
@@ -88,7 +88,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::MatrixExt;
+    use super::{ArrayBaseMatrixExt, ArrayBaseRemoveAxisExt};
     use ndarray::{array, Array2};
 
     #[test]
@@ -109,5 +109,21 @@ mod tests {
             lower,
             array![[6.0, 0.0, 0.0], [2.0, 12.0, 0.0], [4.0, 15.0, 3.0]]
         );
+    }
+
+    #[test]
+    fn swap_index_axis_swaps_rows_correctly() {
+        let mut mtx = array![[6.0, 18.0, 3.0], [2.0, 12.0, 1.0], [4.0, 15.0, 3.0]];
+        mtx.swap_index_axis(ndarray::Axis(0), 1, 2);
+        let expected = array![[6.0, 18.0, 3.0], [4.0, 15.0, 3.0], [2.0, 12.0, 1.0]];
+        assert_eq!(mtx, expected);
+    }
+
+    #[test]
+    fn swap_index_axis_swaps_columns_correctly() {
+        let mut mtx = array![[6.0, 18.0, 3.0], [2.0, 12.0, 1.0], [4.0, 15.0, 3.0]];
+        mtx.swap_index_axis(ndarray::Axis(1), 1, 2);
+        let expected = array![[6.0, 3.0, 18.0], [2.0, 1.0, 12.0], [4.0, 3.0, 15.0]];
+        assert_eq!(mtx, expected);
     }
 }
