@@ -6,15 +6,10 @@
   <ItemGroup>
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
-
-    <!-- DOUBLE CHECK SIGNATURE (CG: done) -->
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZZ.qs" />
 
+    <!-- DOUBLE CHECK SIGNATURE -->
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
-  </ItemGroup>
-
-  <!-- YET TO BE DEFINED -->
-  <ItemGroup>
   </ItemGroup>
 
   <ItemGroup>
