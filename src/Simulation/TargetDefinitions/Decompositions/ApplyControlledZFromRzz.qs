@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Math;
 
     internal operation ApplyControlledZ(control : Qubit, target : Qubit) : Unit is Adj {
         body (...) {
