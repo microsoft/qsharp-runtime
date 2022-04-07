@@ -145,3 +145,4 @@ TODO
 - Too many APIs `panic!` or `unwrap`, and need replaced with `Result` returns instead.
 
 # Crate features
+<!-- Note that this section is filled in automatically by document-features. -->

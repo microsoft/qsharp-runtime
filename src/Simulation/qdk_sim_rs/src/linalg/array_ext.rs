@@ -76,9 +76,9 @@ where
     D: Dimension + RemoveAxis,
 {
     fn swap_index_axis(&mut self, axis: Axis, idx_source: usize, idx_dest: usize) {
-        // TODO: Avoid copying both; this is needed currently to avoid mutably
-        //       borrowing something which has an outstanding immutable
-        //       borrow.
+        // TODO[perf]: Avoid copying both; this is needed currently to avoid mutably
+        //             borrowing something which has an outstanding immutable
+        //             borrow.
         let source = self.index_axis(axis, idx_source).clone().to_owned();
         let dest = self.index_axis(axis, idx_dest).clone().to_owned();
         self.index_axis_mut(axis, idx_source).assign(&dest);
@@ -88,7 +88,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::ArrayBaseMatrixExt;
+    use super::{ArrayBaseMatrixExt, ArrayBaseRemoveAxisExt};
     use ndarray::{array, Array2};
 
     #[test]
@@ -109,5 +109,21 @@ mod tests {
             lower,
             array![[6.0, 0.0, 0.0], [2.0, 12.0, 0.0], [4.0, 15.0, 3.0]]
         );
+    }
+
+    #[test]
+    fn swap_index_axis_swaps_rows_correctly() {
+        let mut mtx = array![[6.0, 18.0, 3.0], [2.0, 12.0, 1.0], [4.0, 15.0, 3.0]];
+        mtx.swap_index_axis(ndarray::Axis(0), 1, 2);
+        let expected = array![[6.0, 18.0, 3.0], [4.0, 15.0, 3.0], [2.0, 12.0, 1.0]];
+        assert_eq!(mtx, expected);
+    }
+
+    #[test]
+    fn swap_index_axis_swaps_columns_correctly() {
+        let mut mtx = array![[6.0, 18.0, 3.0], [2.0, 12.0, 1.0], [4.0, 15.0, 3.0]];
+        mtx.swap_index_axis(ndarray::Axis(1), 1, 2);
+        let expected = array![[6.0, 3.0, 18.0], [2.0, 1.0, 12.0], [4.0, 3.0, 15.0]];
+        assert_eq!(mtx, expected);
     }
 }

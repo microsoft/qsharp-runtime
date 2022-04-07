@@ -11,8 +11,8 @@ use thiserror::Error;
 /// Represents errors that can occur during linear algebra operations.
 #[derive(Debug, Diagnostic, Error)]
 pub enum QdkSimError {
-    // NB: As a design note, these should be eliminated before stabilizing the
-    //     API for this simulator crate.
+    // NB: As a design note, please consider if a more specific error is better
+    //     suited for your usecase before returning `MiscError`.
     /// Raised on miscellaneous errors.
     #[error("{0}")]
     #[diagnostic(code(qdk_sim::other))]
