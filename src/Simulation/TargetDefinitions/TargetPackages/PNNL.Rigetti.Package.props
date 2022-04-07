@@ -7,11 +7,10 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyControlledZ.qs" />
-
-    <!-- DOUBLE CHECK SIGNATURE -->
     <!-- CG: Excluding as we don't use this gate in our choice of decompositions. -->
     <!-- <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledXY.qs" /> -->
 
+    <!-- DOUBLE CHECK SIGNATURE -->
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
   </ItemGroup>
 

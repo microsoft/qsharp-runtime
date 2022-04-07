@@ -5,7 +5,7 @@ namespace Microsoft.Quantum.Intrinsic {
 
     internal operation ApplyControlledZ(control : Qubit, target : Qubit) : Unit is Adj {
         body (...) {
-            // NB: CZ is symmetic under swap, so we need for the below decomposition to
+            // NB: CZ is symmetric under swap, so we need for the below decomposition to
             //     treat control and target identically.
             ApplyUncontrolledZZ(PI(), control, target);
             ApplyUncontrolledRz(-PI() / 2.0, control);
