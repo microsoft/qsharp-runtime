@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Qubit to which the gate should be applied.
     internal operation ApplyUncontrolledX (qubit : Qubit) : Unit is Adj {
         body (...) {
-            fail "NOT IMPLEMENTED!";
+            ApplyUncontrolledRx(PI(), qubit);
         }
         adjoint self;
     }

@@ -7,7 +7,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
 
-    <!-- DOUBLE CHECK SIGNATURE -->
+    <!-- DOUBLE CHECK SIGNATURE (CG: done) -->
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZZ.qs" />
 
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
@@ -15,12 +15,14 @@
 
   <!-- YET TO BE DEFINED -->
   <ItemGroup>
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledX.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledX.qs" />
   </ItemGroup>
 
   <ItemGroup>
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledZ.qs" />
+    <!-- NB: Cannot use ApplyControlledZ.qs here since it uses ApplyControlledX.qs, circular in this case. -->
+    <!-- <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledZ.qs" /> -->
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledX.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledZFromRzz.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledX.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledY.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRy.qs" />
