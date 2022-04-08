@@ -3,11 +3,28 @@
 
 //! Provides common linear algebra functions and traits.
 
-use ndarray::{Array, Array1, Array2, ArrayView1, ArrayView2};
+use ndarray::{Array, Array2, ArrayView2};
 use num_traits::Zero;
-use std::{convert::TryInto, ops::Mul};
+use std::convert::TryInto;
 
 use crate::{common_matrices::nq_eye, C64};
+
+// Define the public API surface for submodules.
+
+mod tensor;
+pub use tensor::*;
+
+mod inv;
+pub use inv::*;
+
+mod pow;
+pub use pow::*;
+
+pub mod decompositions;
+
+// Define private modules as well.
+
+mod array_ext;
 
 /// Represents types that have hermitian conjugates (e.g.: $A^\dagger$ for
 /// a matrix $A$ is defined as the complex conjugate transpose of $A$,
@@ -50,73 +67,6 @@ pub trait ConjBy {
 impl ConjBy for Array2<C64> {
     fn conjugate_by(&self, op: &ArrayView2<C64>) -> Self {
         op.dot(self).dot(&op.dag())
-    }
-}
-
-/// The tensor product operator ($\otimes$).
-pub trait Tensor<Rhs = Self> {
-    /// The resulting type after applying the tensor product.
-    type Output;
-
-    /// Performs the tensor product.
-    ///
-    /// # Example
-    /// ```
-    /// // TODO
-    /// ```
-    fn tensor(self, rhs: Rhs) -> Self::Output;
-}
-
-impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView1<'_, T> {
-    type Output = Array1<T>;
-    fn tensor(self, other: Other) -> Self::Output {
-        let other: Self = other.into();
-        let unflat = Array::from_shape_fn((self.shape()[0], other.shape()[0]), |(i, j)| {
-            self[(i)] * other[(j)]
-        });
-        unflat
-            .into_shape(self.shape()[0] * other.shape()[0])
-            .unwrap()
-    }
-}
-
-impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array1<T> {
-    type Output = Array1<T>;
-
-    fn tensor(self, other: Other) -> Self::Output {
-        let other: Self = other.into();
-        self.view().tensor(other)
-    }
-}
-
-impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView2<'_, T> {
-    type Output = Array2<T>;
-    fn tensor(self, other: Other) -> Self::Output {
-        let other: Self = other.into();
-        let unflat = Array::from_shape_fn(
-            (
-                self.shape()[0],
-                other.shape()[0],
-                self.shape()[1],
-                other.shape()[1],
-            ),
-            |(i, j, k, l)| self[(i, k)] * other[(j, l)],
-        );
-        unflat
-            .into_shape((
-                self.shape()[0] * other.shape()[0],
-                self.shape()[1] * other.shape()[1],
-            ))
-            .unwrap()
-    }
-}
-
-impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array2<T> {
-    type Output = Array2<T>;
-
-    fn tensor(self, other: Other) -> Self::Output {
-        let other: Self = other.into();
-        self.view().tensor(other).to_owned()
     }
 }
 

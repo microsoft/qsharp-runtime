@@ -4,7 +4,7 @@
          To generate and view the documentation for this crate locally, please
          run:
 
-         $ cargo +nightly doc --features python --open
+         $ cargo doc --features python,document-features --open
 -->
 
 # Quantum Development Kit Preview Simulators
@@ -27,11 +27,6 @@ This crate implements simulation functionality for the Quantum Development Kit, 
 The [`c_api`] module allows for using the simulation functionality in this crate from C, or from other languages with a C FFI (e.g.: C++ or C#), while Rust callers can take advantage of the structs and methods in this crate directly.
 
 Similarly, the [`python`] module allows exposing data structures in this crate to Python programs.
-
-## Cargo Features
-
-- **`python`**: Enables Python bindings for this crate.
-- **`wasm`**: Ensures that the crate is compatible with usage from WebAssembly.
 
 ## Representing quantum systems
 
@@ -148,3 +143,6 @@ TODO
 - Stabilizer simulation not yet exposed via C API.
 - Test and microbenchmark coverage still incomplete.
 - Too many APIs `panic!` or `unwrap`, and need replaced with `Result` returns instead.
+
+# Crate features
+<!-- Note that this section is filled in automatically by document-features. -->

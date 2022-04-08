@@ -9,8 +9,8 @@ use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
 use rand::{distributions::WeightedIndex, prelude::Distribution, thread_rng};
 
 use crate::{
-    chp_decompositions::ChpOperation, linalg::ConjBy, log, log_as_err, Pauli, Process,
-    ProcessData::*, State, StateData::*, Tableau, C64,
+    chp_decompositions::ChpOperation, error::QdkSimError, linalg::ConjBy, log, log_as_err, Pauli,
+    Process, ProcessData::*, State, StateData::*, Tableau, VariantName, C64,
 };
 
 use super::promote_pauli_channel;
@@ -18,12 +18,12 @@ use super::promote_pauli_channel;
 impl Process {
     /// Applies this process to a quantum register with a given
     /// state, returning the new state of that register.
-    pub fn apply(&self, state: &State) -> Result<State, String> {
+    pub fn apply(&self, state: &State) -> Result<State, QdkSimError> {
         if state.n_qubits != self.n_qubits {
-            return Err(format!(
-                "Channel acts on {} qubits, but was applied to {}-qubit state.",
-                self.n_qubits, state.n_qubits
-            ));
+            return Err(QdkSimError::WrongNumberOfQubits {
+                expected: self.n_qubits,
+                actual: state.n_qubits,
+            });
         }
 
         match &self.data {
@@ -39,13 +39,16 @@ impl Process {
                 Ok(acc_state)
             }
             ChpDecomposition(_operations) => todo!(),
-            Unsupported => Err("Unsupported quantum process.".to_string()),
+            Unsupported => Err(QdkSimError::UnsupportedApply {
+                channel_variant: self.variant_name(),
+                state_variant: state.variant_name(),
+            }),
         }
     }
 
     /// Applies this process to the given qubits in a register with a given
     /// state, returning the new state of that register.
-    pub fn apply_to(&self, idx_qubits: &[usize], state: &State) -> Result<State, String> {
+    pub fn apply_to(&self, idx_qubits: &[usize], state: &State) -> Result<State, QdkSimError> {
         // If we have a sequence, we can apply each in turn and exit early.
         if let Sequence(channels) = &self.data {
             // TODO[perf]: eliminate the extraneous clone here.
@@ -137,7 +140,7 @@ fn apply_chp_decomposition_to(
     n_qubits: usize,
     idx_qubits: &[usize],
     tableau: &Tableau,
-) -> Result<State, String> {
+) -> Result<State, QdkSimError> {
     let mut new_tableau = tableau.clone();
     for operation in operations {
         match *operation {
@@ -155,22 +158,25 @@ fn apply_chp_decomposition_to(
     })
 }
 
-pub(crate) fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, String> {
+pub(crate) fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, QdkSimError> {
     Ok(State {
         n_qubits: state.n_qubits,
         data: match &state.data {
             Pure(psi) => Pure(u.dot(psi)),
             Mixed(rho) => Mixed(rho.conjugate_by(&u.into())),
             Stabilizer(_tableau) => {
-                return Err(
+                return Err(QdkSimError::NotYetImplemented(
                     "TODO: Promote stabilizer state to state vector and recurse.".to_string(),
-                )
+                ))
             }
         },
     })
 }
 
-pub(crate) fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Result<State, String> {
+pub(crate) fn apply_kraus_decomposition(
+    ks: &Array3<C64>,
+    state: &State,
+) -> Result<State, QdkSimError> {
     Ok(State {
         n_qubits: state.n_qubits,
         data: match &state.data {
@@ -195,9 +201,9 @@ pub(crate) fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Resu
                 sum
             }),
             Stabilizer(_tableau) => {
-                return Err(
+                return Err(QdkSimError::NotYetImplemented(
                     "TODO: Promote stabilizer state to state vector and recurse.".to_string(),
-                )
+                ))
             }
         },
     })
@@ -206,7 +212,7 @@ pub(crate) fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Resu
 pub(crate) fn apply_pauli_channel(
     paulis: &[(f64, Vec<Pauli>)],
     state: &State,
-) -> Result<State, String> {
+) -> Result<State, QdkSimError> {
     Ok(State {
         n_qubits: state.n_qubits,
         data: match &state.data {
