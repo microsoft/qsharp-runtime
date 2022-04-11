@@ -56,7 +56,7 @@ inline size_t set_register(
     assert(basis_vector_in_ps < (1ull << ps.size()));
 
     size_t result = basis_vector_target & ~qmask;
-    for (unsigned i = 0; i < ps.size(); ++i)
+    for (size_t i = 0; i < ps.size(); ++i)
     {
         result |= ((basis_vector_in_ps >> i) & 1) << ps[i];
     }
