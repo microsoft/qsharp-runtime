@@ -150,7 +150,7 @@ public:
 		for (auto& item : items_){
 			auto const& idx = item.get_indices();
 			IndexVector idx2mat(idx.size());
-			for (unsigned i = 0; i < idx.size(); ++i)
+			for (size_t i = 0; i < idx.size(); ++i)
 				idx2mat[i] = static_cast<unsigned>(((std::equal_range(index_list.begin(), index_list.end(), idx[i])).first - index_list.begin()));
 			
 			#pragma omp parallel for schedule(static)

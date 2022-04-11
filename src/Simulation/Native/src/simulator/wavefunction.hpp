@@ -35,7 +35,7 @@ namespace detail
 inline size_t get_register(const std::vector<positional_qubit_id>& ps, size_t basis_vector)
 {
     size_t result = 0;
-    for (unsigned i = 0; i < ps.size(); ++i)
+    for (size_t i = 0; i < ps.size(); ++i)
     {
         result |= ((basis_vector >> ps[i]) & 1) << i;
     }

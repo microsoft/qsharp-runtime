@@ -514,7 +514,7 @@ bool subsytemwavefunction(
     }
 
     // put back to original sorting:
-    for (unsigned i = 0; i < qs.size(); ++i)
+    for (size_t i = 0; i < qs.size(); ++i)
     {
         if (sorted[i] != qs[i])
         {
