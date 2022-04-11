@@ -13,7 +13,7 @@ template <class M, class I>
 inline void permute_qubits_and_matrix(I *delta_list, unsigned n, M & matrix){
 	using Pair = std::pair<std::size_t, std::size_t>;
 	std::vector<Pair> qubits(n);
-	for (size_t i = 0; i < qubits.size(); ++i){
+	for (std::size_t i = 0; i < qubits.size(); ++i){
 		qubits[i].first = i;
 		qubits[i].second = delta_list[i];
 	}

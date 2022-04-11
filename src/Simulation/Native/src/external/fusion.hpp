@@ -150,7 +150,7 @@ public:
 		for (auto& item : items_){
 			auto const& idx = item.get_indices();
 			IndexVector idx2mat(idx.size());
-			for (size_t i = 0; i < idx.size(); ++i)
+			for (std::size_t i = 0; i < idx.size(); ++i)
 				idx2mat[i] = static_cast<unsigned>(((std::equal_range(index_list.begin(), index_list.end(), idx[i])).first - index_list.begin()));
 			
 			#pragma omp parallel for schedule(static)
@@ -163,13 +163,13 @@ public:
 
 				for (std::size_t i = 0; i < (1ULL<<N); ++i){
 					unsigned local_i = 0;
-					for (size_t l = 0; l < idx.size(); ++l)
+					for (std::size_t l = 0; l < idx.size(); ++l)
 						local_i |= ((i >> idx2mat[l])&1)<<l;
 						
 					Complex res = 0.;
 					for (std::size_t j = 0; j < (1ULL<<idx.size()); ++j){
 						std::size_t locidx = i;
-						for (size_t l = 0; l < idx.size(); ++l)
+						for (std::size_t l = 0; l < idx.size(); ++l)
 							if (((j >> l)&1) != ((i >> idx2mat[l])&1))
 								locidx ^= (1ULL << idx2mat[l]);
 						res += oldcol[locidx] * item.get_matrix()[local_i][j];
