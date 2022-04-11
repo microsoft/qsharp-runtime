@@ -431,7 +431,7 @@ class Wavefunction
     std::vector<logical_qubit_id> get_qubit_ids() const
     {
         std::vector<logical_qubit_id> qs;
-        for (unsigned i = 0; i < qubitmap_.size(); i++)
+        for (size_t i = 0; i < qubitmap_.size(); i++)
         {
             if (qubitmap_[i] != invalid_qubit_position())
             {
@@ -533,7 +533,7 @@ class Wavefunction
         positional_qubit_id p = get_qubit_position(q);
         flush();
         kernels::collapse(wfn_, p, getvalue(q), true);
-        for (int i = 0; i < qubitmap_.size(); ++i)
+        for (size_t i = 0; i < qubitmap_.size(); ++i)
             if (qubitmap_[i] > p && qubitmap_[i] != invalid_qubit_position()) qubitmap_[i]--;
         qubitmap_[q] = invalid_qubit_position();
         --num_qubits_;
@@ -589,7 +589,7 @@ class Wavefunction
 
             // For full state injection we can copy the user's wave function into our store and reorder the
             // positions map without doing any math.
-            for (unsigned i = 0; i < qubits.size(); i++)
+            for (size_t i = 0; i < qubits.size(); i++)
             {
                 qubitmap_[qubits[i]] = i;
             }

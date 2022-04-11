@@ -24,7 +24,7 @@ inline void permute_qubits_and_matrix(I *delta_list, unsigned n, M & matrix){
 	for (std::size_t i = 0; i < (1ULL << qubits.size()); ++i){
 		for (std::size_t j = 0; j < (1ULL << qubits.size()); ++j){
 			std::size_t old_i=0, old_j=0;
-			for (unsigned k = 0; k < qubits.size(); ++k){
+			for (std::size_t k = 0; k < qubits.size(); ++k){
 				old_i |= ((i >> k)&1ULL) << qubits[k].first;
 				old_j |= ((j >> k)&1ULL) << qubits[k].first;
 			}
