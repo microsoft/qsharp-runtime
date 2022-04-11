@@ -4,54 +4,57 @@
 namespace Microsoft.Quantum.Intrinsic {
 
     /// # Summary
-    /// Applies the Pauli $X$ gate.
+    /// Applies a rotation about the $\ket{1}$ state by a given angle.
     ///
     /// # Description
     /// \begin{align}
-    ///     \sigma_x \mathrel{:=}
-    ///     \begin{bmatrix}
-    ///         0 & 1 \\\\
-    ///         1 & 0
-    ///     \end{bmatrix}.
+    ///     R_1(\theta) \mathrel{:=}
+    ///     \operatorname{diag}(1, e^{i\theta}).
     /// \end{align}
     ///
     /// # Input
+    /// ## theta
+    /// Angle about which the qubit is to be rotated.
     /// ## qubit
     /// Qubit to which the gate should be applied.
-    operation X (qubit : Qubit) : Unit is Adj + Ctl {
+    ///
+    /// # Remarks
+    /// Equivalent to:
+    /// ```qsharp
+    /// R(PauliZ, theta, qubit);
+    /// R(PauliI, -theta, qubit);
+    /// ```
+    operation R1 (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
         body (...) {
-            ApplyUncontrolledX(qubit);
+            Rz(theta, qubit);
         }
         controlled (ctls, ...) {
             if Length(ctls) == 0 {
-                ApplyUncontrolledX(qubit);
+                Rz(theta, qubit);
             }
             elif Length(ctls) == 1 {
-                ApplyControlledX(ctls[0], qubit);
+                CR1(theta, ctls[0], qubit);
             }
             elif Length(ctls) == 2 {
-                CCNOT(ctls[0], ctls[1], qubit);
-            }
-            elif Length(ctls) == 3 {
                 use temp = Qubit();
                 within {
                     PhaseCCX(ctls[0], ctls[1], temp);
                 }
                 apply {
-                    CCNOT(temp, ctls[2], qubit);
+                    CR1(theta, temp, qubit);
                 }
             }
-            elif Length(ctls) == 4 {
+            elif Length(ctls) == 3 {
                 use temps = Qubit[2];
                 within {
                     PhaseCCX(ctls[0], ctls[1], temps[0]);
-                    PhaseCCX(ctls[2], ctls[3], temps[1]);
+                    PhaseCCX(ctls[2], temps[0], temps[1]);
                 }
                 apply {
-                    CCNOT(temps[0], temps[1], qubit);
+                    CR1(theta, temps[1], qubit);
                 }
             }
-            elif Length(ctls) == 5 {
+            elif Length(ctls) == 4 {
                 use temps = Qubit[3];
                 within {
                     PhaseCCX(ctls[0], ctls[1], temps[0]);
@@ -59,22 +62,22 @@ namespace Microsoft.Quantum.Intrinsic {
                     PhaseCCX(temps[0], temps[1], temps[2]);
                 }
                 apply {
-                    CCNOT(temps[2], ctls[4], qubit);
+                    CR1(theta, temps[2], qubit);
                 }
             }
-            elif Length(ctls) == 6 {
+            elif Length(ctls) == 5 {
                 use temps = Qubit[4];
                 within {
                     PhaseCCX(ctls[0], ctls[1], temps[0]);
                     PhaseCCX(ctls[2], ctls[3], temps[1]);
-                    PhaseCCX(ctls[4], ctls[5], temps[2]);
-                    PhaseCCX(temps[0], temps[1], temps[3]);
+                    PhaseCCX(ctls[4], temps[0], temps[2]);
+                    PhaseCCX(temps[1], temps[2], temps[3]);
                 }
                 apply {
-                    CCNOT(temps[2], temps[3], qubit);
+                    CR1(theta, temps[3], qubit);
                 }
             }
-            elif Length(ctls) == 7 {
+            elif Length(ctls) == 6 {
                 use temps = Qubit[5];
                 within {
                     PhaseCCX(ctls[0], ctls[1], temps[0]);
@@ -84,11 +87,25 @@ namespace Microsoft.Quantum.Intrinsic {
                     PhaseCCX(temps[2], temps[3], temps[4]);
                 }
                 apply {
-                    CCNOT(temps[4], ctls[6], qubit);
+                    CR1(theta, temps[4], qubit);
+                }
+            }
+            elif Length(ctls) == 7 {
+                use temps = Qubit[6];
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temps[0]);
+                    PhaseCCX(ctls[2], ctls[3], temps[1]);
+                    PhaseCCX(ctls[4], ctls[5], temps[2]);
+                    PhaseCCX(ctls[6], temps[0], temps[3]);
+                    PhaseCCX(temps[1], temps[2], temps[4]);
+                    PhaseCCX(temps[3], temps[4], temps[5]);
+                }
+                apply {
+                    CR1(theta, temps[5], qubit);
                 }
             }
             elif Length(ctls) == 8 {
-                use temps = Qubit[6];
+                use temps = Qubit[7];
                 within {
                     PhaseCCX(ctls[0], ctls[1], temps[0]);
                     PhaseCCX(ctls[2], ctls[3], temps[1]);
@@ -96,18 +113,27 @@ namespace Microsoft.Quantum.Intrinsic {
                     PhaseCCX(ctls[6], ctls[7], temps[3]);
                     PhaseCCX(temps[0], temps[1], temps[4]);
                     PhaseCCX(temps[2], temps[3], temps[5]);
+                    PhaseCCX(temps[4], temps[5], temps[6]);
                 }
                 apply {
-                    CCNOT(temps[4], temps[5], qubit);
+                    CR1(theta, temps[6], qubit);
                 }
             }
             else {
-                fail "Too many control qubits specified to X gate.";
-
-                // Eventually, we can use recursion via callables with the below utility:
-                // ApplyWithLessControlsA(Controlled X, (ctls, qubit));
+                fail "Too many control qubits specified to R1 gate.";
             }
         }
-        adjoint self;
+
+        // R(PauliZ, theta, qubit);
+        // R(PauliI, -theta, qubit);
     }
+
+    internal operation CR1(theta : Double, control : Qubit, target : Qubit) : Unit is Adj {
+        Rz(theta/2.0, target);
+        Rz(theta/2.0, control);
+        CNOT(control,target);
+        Rz(-theta/2.0, target);
+        CNOT(control,target);
+    }
+
 }

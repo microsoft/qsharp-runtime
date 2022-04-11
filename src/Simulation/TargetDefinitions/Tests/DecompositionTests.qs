@@ -95,6 +95,13 @@ namespace DecompositionTests {
     }
 
     @Test("SparseSimulator")
+    operation VerifyR1() : Unit {
+        // Use an angle that doesn't have any symmetries as a stand-in for broader validation.
+        let angle = PI() / 7.0;
+        VerifyUnitaryAndFunctors(q => R1(angle, q), q => Reference.R1(angle, q));
+    }
+
+    @Test("SparseSimulator")
     operation VerifySWAP() : Unit {
         VerifyUnitaryAndFunctors2(SWAP, Reference.SWAP);
     }
@@ -124,6 +131,8 @@ namespace DecompositionTests {
         // Verify equality up to 8 controls.
         Reference.AssertOperationsEqualReferenced(1, qs => unitary(qs[0]),
             qs => reference(qs[0]));
+        Reference.AssertOperationsEqualReferenced(1, qs => Controlled unitary([], qs[0]),
+            qs => Controlled reference([], qs[0]));
         Reference.AssertOperationsEqualReferenced(2, qs => Controlled unitary([qs[0]], qs[1]),
             qs => Controlled reference([qs[0]], qs[1]));
         Reference.AssertOperationsEqualReferenced(3, (qs => Controlled unitary([qs[0], qs[1]], qs[2])),
@@ -144,6 +153,8 @@ namespace DecompositionTests {
         // Verify equality up to 8 controls.
         Reference.AssertOperationsEqualReferenced(2, qs => unitary(qs[0], qs[1]),
             qs => reference(qs[0], qs[1]));
+        Reference.AssertOperationsEqualReferenced(2, qs => Controlled unitary([], (qs[0], qs[1])),
+            qs => Controlled reference([], (qs[0], qs[1])));
         Reference.AssertOperationsEqualReferenced(3, qs => Controlled unitary([qs[0]], (qs[1], qs[2])),
             qs => Controlled reference([qs[0]], (qs[1], qs[2])));
         Reference.AssertOperationsEqualReferenced(4, qs => Controlled unitary([qs[0], qs[1]], (qs[2], qs[3])),
@@ -164,6 +175,8 @@ namespace DecompositionTests {
         // Verify equality up to 8 controls.
         Reference.AssertOperationsEqualReferenced(3, qs => unitary(qs[0], qs[1], qs[2]),
             qs => reference(qs[0], qs[1], qs[2]));
+        Reference.AssertOperationsEqualReferenced(3, qs => Controlled unitary([], (qs[0], qs[1], qs[2])),
+            qs => Controlled reference([], (qs[0], qs[1], qs[2])));
         Reference.AssertOperationsEqualReferenced(4, qs => Controlled unitary([qs[0]], (qs[1], qs[2], qs[3])),
             qs => Controlled reference([qs[0]], (qs[1], qs[2], qs[3])));
         Reference.AssertOperationsEqualReferenced(5, qs => Controlled unitary([qs[0], qs[1]], (qs[2], qs[3], qs[4])),
@@ -184,6 +197,8 @@ namespace DecompositionTests {
         // Verify equality up to 8 controls.
         Reference.AssertOperationsEqualReferenced(4, qs => unitary(qs[0], qs[1], qs[2], qs[3]),
             qs => reference(qs[0], qs[1], qs[2], qs[3]));
+        Reference.AssertOperationsEqualReferenced(4, qs => Controlled unitary([], (qs[0], qs[1], qs[2], qs[3])),
+            qs => Controlled reference([], (qs[0], qs[1], qs[2], qs[3])));
         Reference.AssertOperationsEqualReferenced(5, qs => Controlled unitary([qs[0]], (qs[1], qs[2], qs[3], qs[4])),
             qs => Controlled reference([qs[0]], (qs[1], qs[2], qs[3], qs[4])));
         Reference.AssertOperationsEqualReferenced(6, qs => Controlled unitary([qs[0], qs[1]], (qs[2], qs[3], qs[4], qs[5])),

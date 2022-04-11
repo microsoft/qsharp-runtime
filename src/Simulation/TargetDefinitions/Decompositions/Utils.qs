@@ -14,31 +14,6 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    internal operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
-        body (...) {}
-        controlled (controls, (...)) {
-            if (Length(controls) > 0) {
-                let qubit = controls[0];
-                let rest = controls[1...];
-                // Invoke Controlled R1, which will recursively call back into ApplyGlobalPhase.
-                // Each time the controls is one shorter, until it is empty and the recursion stops.
-                Controlled R1(rest, (theta, qubit));
-            }
-        }
-    }
-
-    internal operation ApplyGlobalPhaseFracWithR1Frac (numerator : Int, power : Int) : Unit is Adj + Ctl {
-        body (...) {}
-        controlled (ctrls, ...) {
-            let numControls =  Length(ctrls);
-            if (numControls > 0 ) {
-                // Invoke Controlled R1Frac, which will recursively call back into ApplyGlobalPhase.
-                // Each time the controls is one shorter, until it is empty and the recursion stops.
-                Controlled R1Frac(ctrls[1 .. numControls - 1], (numerator, power, ctrls[0]));
-            }
-        }
-    }
-
     internal operation MapPauli (qubit : Qubit, from : Pauli, to : Pauli) : Unit is Adj {
         if (from == to) {
         }

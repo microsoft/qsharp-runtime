@@ -33,20 +33,111 @@ namespace Microsoft.Quantum.Intrinsic {
         }
         controlled (ctls, ...) {
             if (Length(ctls) == 0) {
-                Rz(theta, qubit);
+                ApplyUncontrolledRz(theta, qubit);
             }
-            elif (Length(ctls) == 1) {
-                Rz(theta/2.0, qubit);
-                CNOT(ctls[0], qubit);
-                Rz(-theta/2.0, qubit);
-                CNOT(ctls[0], qubit);
+            elif Length(ctls) == 1 {
+                CRz(ctls[0], theta, qubit);
+            }
+            elif Length(ctls) == 2 {
+                use temp = Qubit();
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temp);
+                }
+                apply {
+                    CRz(temp, theta, qubit);
+                }
+            }
+            elif Length(ctls) == 3 {
+                use temps = Qubit[2];
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temps[0]);
+                    PhaseCCX(ctls[2], temps[0], temps[1]);
+                }
+                apply {
+                    CRz(temps[1], theta, qubit);
+                }
+            }
+            elif Length(ctls) == 4 {
+                use temps = Qubit[3];
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temps[0]);
+                    PhaseCCX(ctls[2], ctls[3], temps[1]);
+                    PhaseCCX(temps[0], temps[1], temps[2]);
+                }
+                apply {
+                    CRz(temps[2], theta, qubit);
+                }
+            }
+            elif Length(ctls) == 5 {
+                use temps = Qubit[4];
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temps[0]);
+                    PhaseCCX(ctls[2], ctls[3], temps[1]);
+                    PhaseCCX(ctls[4], temps[0], temps[2]);
+                    PhaseCCX(temps[1], temps[2], temps[3]);
+                }
+                apply {
+                    CRz(temps[3], theta, qubit);
+                }
+            }
+            elif Length(ctls) == 6 {
+                use temps = Qubit[5];
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temps[0]);
+                    PhaseCCX(ctls[2], ctls[3], temps[1]);
+                    PhaseCCX(ctls[4], ctls[5], temps[2]);
+                    PhaseCCX(temps[0], temps[1], temps[3]);
+                    PhaseCCX(temps[2], temps[3], temps[4]);
+                }
+                apply {
+                    CRz(temps[4], theta, qubit);
+                }
+            }
+            elif Length(ctls) == 7 {
+                use temps = Qubit[6];
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temps[0]);
+                    PhaseCCX(ctls[2], ctls[3], temps[1]);
+                    PhaseCCX(ctls[4], ctls[5], temps[2]);
+                    PhaseCCX(ctls[6], temps[0], temps[3]);
+                    PhaseCCX(temps[1], temps[2], temps[4]);
+                    PhaseCCX(temps[3], temps[4], temps[5]);
+                }
+                apply {
+                    CRz(temps[5], theta, qubit);
+                }
+            }
+            elif Length(ctls) == 8 {
+                use temps = Qubit[7];
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temps[0]);
+                    PhaseCCX(ctls[2], ctls[3], temps[1]);
+                    PhaseCCX(ctls[4], ctls[5], temps[2]);
+                    PhaseCCX(ctls[6], ctls[7], temps[3]);
+                    PhaseCCX(temps[0], temps[1], temps[4]);
+                    PhaseCCX(temps[2], temps[3], temps[5]);
+                    PhaseCCX(temps[4], temps[5], temps[6]);
+                }
+                apply {
+                    CRz(temps[6], theta, qubit);
+                }
             }
             else {
-                ApplyWithLessControlsA(Controlled Rz, (ctls, (theta, qubit)));
+                fail "Too many control qubits specified to Rz gate.";
+
+                // Eventually, we can use recursion via callables with the below utility:
+                // ApplyWithLessControlsA(Controlled Rz, (ctls, qubit));
             }
         }
         adjoint (...) {
             Rz(-theta, qubit);
         }
+    }
+
+    internal operation CRz(control : Qubit, theta : Double, target : Qubit) : Unit is Adj {
+        Rz(theta / 2.0, target);
+        CNOT(control, target);
+        Rz(-theta / 2.0, target);
+        CNOT(control, target);
     }
 }

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <QscVerbosity>detailed</QscVerbosity>
     <!-- we will provide our own -->
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
@@ -33,10 +34,8 @@
     <QSharpCompile Include="..\Decompositions\CYFromCNOT.qs" />
     <QSharpCompile Include="..\Decompositions\CZFromSinglyControlled.qs" />
     <QsharpCompile Include="..\Decompositions\HFromSinglyControlled.qs" />
-    <QsharpCompile Include="..\Decompositions\R.qs" />
-    <QsharpCompile Include="..\Decompositions\R1.qs" />
-    <QsharpCompile Include="..\Decompositions\R1Frac.qs" />
-    <QsharpCompile Include="..\Decompositions\RFrac.qs" />
+    <QsharpCompile Include="..\Decompositions\RFromSinglyControlledR1.qs" />
+    <QsharpCompile Include="..\Decompositions\R1FromSinglyControlled.qs" />
     <QsharpCompile Include="..\Decompositions\RxFromSinglyControlled.qs" />
     <QsharpCompile Include="..\Decompositions\RyFromSinglyControlled.qs" />
     <QsharpCompile Include="..\Decompositions\RzFromSinglyControlled.qs" />
