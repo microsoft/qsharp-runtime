@@ -15,27 +15,27 @@ extern "C"
         return Microsoft::Quantum::Simulator::create();
     }
 
-    MICROSOFT_QUANTUM_DECL void destroy(_In_ unsigned id)
+    MICROSOFT_QUANTUM_DECL void destroy( unsigned id)
     {
         Microsoft::Quantum::Simulator::destroy(id);
     }
 
-    MICROSOFT_QUANTUM_DECL void seed(_In_ unsigned id, _In_ unsigned s)
+    MICROSOFT_QUANTUM_DECL void seed( unsigned id,  unsigned s)
     {
         Microsoft::Quantum::Simulator::get(id)->seed(s);
     }
 
     // non-quantum
-    MICROSOFT_QUANTUM_DECL std::size_t random_choice(_In_ unsigned id, _In_ std::size_t n, _In_reads_(n) double* p)
+    MICROSOFT_QUANTUM_DECL std::size_t random_choice( unsigned id,  std::size_t n, double* p)
     {
         return Microsoft::Quantum::Simulator::get(id)->random(n, p);
     }
 
     MICROSOFT_QUANTUM_DECL double JointEnsembleProbability(
-        _In_ unsigned id,
-        _In_ unsigned n,
-        _In_reads_(n) int* b,
-        _In_reads_(n) unsigned* q)
+        unsigned id,
+        unsigned n,
+        int* b,
+        unsigned* q)
     {
         std::vector<Gates::Basis> bv;
         bv.reserve(n);
@@ -46,11 +46,11 @@ extern "C"
     }
 
     MICROSOFT_QUANTUM_DECL bool InjectState(
-        _In_ unsigned sid,
-        _In_ unsigned n,
-        _In_reads_(n) unsigned* q,
-        _In_ double* re,
-        _In_ double* im)
+        unsigned sid,
+        unsigned n,
+        unsigned* q,
+        double* re,
+        double* im)
     {
         const size_t N = (static_cast<size_t>(1) << n);
         std::vector<ComplexType> amplitudes;
@@ -64,30 +64,30 @@ extern "C"
         return Microsoft::Quantum::Simulator::get(sid)->InjectState(qubits, amplitudes);
     }
 
-    MICROSOFT_QUANTUM_DECL void allocateQubit(_In_ unsigned id, _In_ unsigned q)
+    MICROSOFT_QUANTUM_DECL void allocateQubit( unsigned id,  unsigned q)
     {
         Microsoft::Quantum::Simulator::get(id)->allocateQubit(q);
     }
 
-    MICROSOFT_QUANTUM_DECL bool release(_In_ unsigned id, _In_ unsigned q)
+    MICROSOFT_QUANTUM_DECL bool release( unsigned id,  unsigned q)
     {
         // The underlying simulator function will return True if and only if the qubit being released
         // was in the ground state prior to release.
         return Microsoft::Quantum::Simulator::get(id)->release(q);
     }
 
-    MICROSOFT_QUANTUM_DECL unsigned num_qubits(_In_ unsigned id)
+    MICROSOFT_QUANTUM_DECL unsigned num_qubits( unsigned id)
     {
         return Microsoft::Quantum::Simulator::get(id)->num_qubits();
     }
 
 #define FWDGATE1(G)                                                                                                    \
-    MICROSOFT_QUANTUM_DECL void G(_In_ unsigned id, _In_ unsigned q)                                                   \
+    MICROSOFT_QUANTUM_DECL void G( unsigned id,  unsigned q)                                                   \
     {                                                                                                                  \
         Microsoft::Quantum::Simulator::get(id)->G(q);                                                                  \
     }
 #define FWDCSGATE1(G)                                                                                                  \
-    MICROSOFT_QUANTUM_DECL void MC##G(_In_ unsigned id, _In_ unsigned n, _In_reads_(n) unsigned* c, _In_ unsigned q)   \
+    MICROSOFT_QUANTUM_DECL void MC##G( unsigned id,  unsigned n, unsigned* c,  unsigned q)   \
     {                                                                                                                  \
         std::vector<unsigned> vc(c, c + n);                                                                            \
         Microsoft::Quantum::Simulator::get(id)->C##G(vc, q);                                                           \
@@ -112,19 +112,19 @@ extern "C"
 
     // rotations
 
-    MICROSOFT_QUANTUM_DECL void R(_In_ unsigned id, _In_ unsigned b, _In_ double phi, _In_ unsigned q)
+    MICROSOFT_QUANTUM_DECL void R( unsigned id,  unsigned b,  double phi,  unsigned q)
     {
         Microsoft::Quantum::Simulator::get(id)->R(static_cast<Gates::Basis>(b), phi, q);
     }
 
     // multi-controlled rotations
     MICROSOFT_QUANTUM_DECL void MCR(
-        _In_ unsigned id,
-        _In_ unsigned b,
-        _In_ double phi,
-        _In_ unsigned nc,
-        _In_reads_(nc) unsigned* c,
-        _In_ unsigned q)
+        unsigned id,
+        unsigned b,
+        double phi,
+        unsigned nc,
+        unsigned* c,
+        unsigned q)
     {
         std::vector<unsigned> cv(c, c + nc);
         Microsoft::Quantum::Simulator::get(id)->CR(static_cast<Gates::Basis>(b), phi, cv, q);
@@ -132,11 +132,11 @@ extern "C"
 
     // Exponential of Pauli operators
     MICROSOFT_QUANTUM_DECL void Exp(
-        _In_ unsigned id,
-        _In_ unsigned n,
-        _In_reads_(n) unsigned* b,
-        _In_ double phi,
-        _In_reads_(n) unsigned* q)
+        unsigned id,
+        unsigned n,
+        unsigned* b,
+        double phi,
+        unsigned* q)
     {
         std::vector<Gates::Basis> bv;
         for (unsigned i = 0; i < n; ++i)
@@ -145,13 +145,13 @@ extern "C"
         Microsoft::Quantum::Simulator::get(id)->Exp(bv, phi, qv);
     }
     MICROSOFT_QUANTUM_DECL void MCExp(
-        _In_ unsigned id,
-        _In_ unsigned n,
-        _In_reads_(n) unsigned* b,
-        _In_ double phi,
-        _In_ unsigned nc,
-        _In_reads_(nc) unsigned* c,
-        _In_reads_(n) unsigned* q)
+        unsigned id,
+        unsigned n,
+        unsigned* b,
+        double phi,
+        unsigned nc,
+        unsigned* c,
+        unsigned* q)
     {
         std::vector<Gates::Basis> bv;
         for (unsigned i = 0; i < n; ++i)
@@ -162,15 +162,15 @@ extern "C"
     }
 
     // measurements
-    MICROSOFT_QUANTUM_DECL unsigned M(_In_ unsigned id, _In_ unsigned q)
+    MICROSOFT_QUANTUM_DECL unsigned M( unsigned id,  unsigned q)
     {
         return (unsigned)Microsoft::Quantum::Simulator::get(id)->M(q);
     }
     MICROSOFT_QUANTUM_DECL unsigned Measure(
-        _In_ unsigned id,
-        _In_ unsigned n,
-        _In_reads_(n) unsigned* b,
-        _In_reads_(n) unsigned* q)
+        unsigned id,
+        unsigned n,
+        unsigned* b,
+        unsigned* q)
     {
         std::vector<Gates::Basis> bv;
         for (unsigned i = 0; i < n; ++i)
@@ -181,54 +181,54 @@ extern "C"
 
     // apply permutation of basis states to the wave function
     MICROSOFT_QUANTUM_DECL void PermuteBasis(
-        _In_ unsigned id,
-        _In_ unsigned n,
-        _In_reads_(n) unsigned* q,
-        _In_ std::size_t table_size,
-        _In_reads_(table_size) std::size_t* permutation_table)
+        unsigned id,
+        unsigned n,
+        unsigned* q,
+        std::size_t table_size,
+        std::size_t* permutation_table)
     {
         const std::vector<unsigned> qs(q, q + n);
         Microsoft::Quantum::Simulator::get(id)->permuteBasis(qs, table_size, permutation_table, false);
     }
     MICROSOFT_QUANTUM_DECL void AdjPermuteBasis(
-        _In_ unsigned id,
-        _In_ unsigned n,
-        _In_reads_(n) unsigned* q,
-        _In_ std::size_t table_size,
-        _In_reads_(table_size) std::size_t* permutation_table)
+        unsigned id,
+        unsigned n,
+        unsigned* q,
+        std::size_t table_size,
+        std::size_t* permutation_table)
     {
         const std::vector<unsigned> qs(q, q + n);
         Microsoft::Quantum::Simulator::get(id)->permuteBasis(qs, table_size, permutation_table, true);
     }
 
     // dump wavefunction to given callback until callback returns false
-    MICROSOFT_QUANTUM_DECL void Dump(_In_ unsigned id, _In_ bool (*callback)(const char*, double, double))
+    MICROSOFT_QUANTUM_DECL void Dump( unsigned id,  bool (*callback)(const char*, double, double))
     {
         Microsoft::Quantum::Simulator::get(id)->dump(callback);
     }
 
-    MICROSOFT_QUANTUM_DECL void DumpToLocation(_In_ unsigned id, _In_ TDumpToLocationCallback callback, _In_ TDumpLocation location)
+    MICROSOFT_QUANTUM_DECL void DumpToLocation( unsigned id,  TDumpToLocationCallback callback,  TDumpLocation location)
     {
         Microsoft::Quantum::Simulator::get(id)->dump(callback, location);
     }
 
     // dump the wavefunction of the subset of qubits to the given callback returns false
     MICROSOFT_QUANTUM_DECL bool DumpQubits(
-        _In_ unsigned id,
-        _In_ unsigned n,
-        _In_reads_(n) unsigned* q,
-        _In_ bool (*callback)(const char*, double, double))
+        unsigned id,
+        unsigned n,
+        unsigned* q,
+        bool (*callback)(const char*, double, double))
     {
         std::vector<unsigned> qs(q, q + n);
         return Microsoft::Quantum::Simulator::get(id)->dumpQubits(qs, callback);
     }
 
     MICROSOFT_QUANTUM_DECL bool DumpQubitsToLocation(
-        _In_ unsigned id,
-        _In_ unsigned n,
-        _In_reads_(n) unsigned* q,
-        _In_ TDumpToLocationCallback callback, 
-        _In_ TDumpLocation location)
+        unsigned id,
+        unsigned n,
+        unsigned* q,
+        TDumpToLocationCallback callback, 
+        TDumpLocation location)
     {
         std::vector<unsigned> qs(q, q + n);
         return Microsoft::Quantum::Simulator::get(id)->dumpQubits(qs, callback, location);
@@ -236,7 +236,7 @@ extern "C"
 
 
     // dump the list of logical qubit ids to given callback
-    MICROSOFT_QUANTUM_DECL void DumpIds(_In_ unsigned id, _In_ void (*callback)(unsigned))
+    MICROSOFT_QUANTUM_DECL void DumpIds( unsigned id,  void (*callback)(unsigned))
     {
         Microsoft::Quantum::Simulator::get(id)->dumpIds(callback);
     }
