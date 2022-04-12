@@ -15,18 +15,18 @@ extern "C"
         return Microsoft::Quantum::Simulator::create();
     }
 
-    MICROSOFT_QUANTUM_DECL void destroy( unsigned id)
+    MICROSOFT_QUANTUM_DECL void destroy(unsigned id)
     {
         Microsoft::Quantum::Simulator::destroy(id);
     }
 
-    MICROSOFT_QUANTUM_DECL void seed( unsigned id,  unsigned s)
+    MICROSOFT_QUANTUM_DECL void seed(unsigned id, unsigned s)
     {
         Microsoft::Quantum::Simulator::get(id)->seed(s);
     }
 
     // non-quantum
-    MICROSOFT_QUANTUM_DECL std::size_t random_choice( unsigned id,  std::size_t n, double* p)
+    MICROSOFT_QUANTUM_DECL std::size_t random_choice(unsigned id, std::size_t n, double* p)
     {
         return Microsoft::Quantum::Simulator::get(id)->random(n, p);
     }
@@ -64,30 +64,30 @@ extern "C"
         return Microsoft::Quantum::Simulator::get(sid)->InjectState(qubits, amplitudes);
     }
 
-    MICROSOFT_QUANTUM_DECL void allocateQubit( unsigned id,  unsigned q)
+    MICROSOFT_QUANTUM_DECL void allocateQubit(unsigned id, unsigned q)
     {
         Microsoft::Quantum::Simulator::get(id)->allocateQubit(q);
     }
 
-    MICROSOFT_QUANTUM_DECL bool release( unsigned id,  unsigned q)
+    MICROSOFT_QUANTUM_DECL bool release(unsigned id, unsigned q)
     {
         // The underlying simulator function will return True if and only if the qubit being released
         // was in the ground state prior to release.
         return Microsoft::Quantum::Simulator::get(id)->release(q);
     }
 
-    MICROSOFT_QUANTUM_DECL unsigned num_qubits( unsigned id)
+    MICROSOFT_QUANTUM_DECL unsigned num_qubits(unsigned id)
     {
         return Microsoft::Quantum::Simulator::get(id)->num_qubits();
     }
 
 #define FWDGATE1(G)                                                                                                    \
-    MICROSOFT_QUANTUM_DECL void G( unsigned id,  unsigned q)                                                   \
+    MICROSOFT_QUANTUM_DECL void G(unsigned id, unsigned q)                                                   \
     {                                                                                                                  \
         Microsoft::Quantum::Simulator::get(id)->G(q);                                                                  \
     }
 #define FWDCSGATE1(G)                                                                                                  \
-    MICROSOFT_QUANTUM_DECL void MC##G( unsigned id,  unsigned n, unsigned* c,  unsigned q)   \
+    MICROSOFT_QUANTUM_DECL void MC##G(unsigned id, unsigned n, unsigned* c, unsigned q)   \
     {                                                                                                                  \
         std::vector<unsigned> vc(c, c + n);                                                                            \
         Microsoft::Quantum::Simulator::get(id)->C##G(vc, q);                                                           \
@@ -112,7 +112,7 @@ extern "C"
 
     // rotations
 
-    MICROSOFT_QUANTUM_DECL void R( unsigned id,  unsigned b,  double phi,  unsigned q)
+    MICROSOFT_QUANTUM_DECL void R(unsigned id, unsigned b, double phi, unsigned q)
     {
         Microsoft::Quantum::Simulator::get(id)->R(static_cast<Gates::Basis>(b), phi, q);
     }
@@ -162,7 +162,7 @@ extern "C"
     }
 
     // measurements
-    MICROSOFT_QUANTUM_DECL unsigned M( unsigned id,  unsigned q)
+    MICROSOFT_QUANTUM_DECL unsigned M(unsigned id, unsigned q)
     {
         return (unsigned)Microsoft::Quantum::Simulator::get(id)->M(q);
     }
@@ -202,12 +202,12 @@ extern "C"
     }
 
     // dump wavefunction to given callback until callback returns false
-    MICROSOFT_QUANTUM_DECL void Dump( unsigned id,  bool (*callback)(const char*, double, double))
+    MICROSOFT_QUANTUM_DECL void Dump(unsigned id, bool (*callback)(const char*, double, double))
     {
         Microsoft::Quantum::Simulator::get(id)->dump(callback);
     }
 
-    MICROSOFT_QUANTUM_DECL void DumpToLocation( unsigned id,  TDumpToLocationCallback callback,  TDumpLocation location)
+    MICROSOFT_QUANTUM_DECL void DumpToLocation(unsigned id, TDumpToLocationCallback callback, TDumpLocation location)
     {
         Microsoft::Quantum::Simulator::get(id)->dump(callback, location);
     }
@@ -236,7 +236,7 @@ extern "C"
 
 
     // dump the list of logical qubit ids to given callback
-    MICROSOFT_QUANTUM_DECL void DumpIds( unsigned id,  void (*callback)(unsigned))
+    MICROSOFT_QUANTUM_DECL void DumpIds(unsigned id, void (*callback)(unsigned))
     {
         Microsoft::Quantum::Simulator::get(id)->dumpIds(callback);
     }
