@@ -58,50 +58,50 @@ extern "C"
    // multi-controlled rotations
     MICROSOFT_QUANTUM_DECL void MCR_cpp(
         simulator_id_type sim_id,
-         int b,
-         double phi,
-         logical_qubit_id n,
+        int b,
+        double phi,
+        logical_qubit_id n,
         logical_qubit_id* c,
-         logical_qubit_id q);
+        logical_qubit_id q);
 
      MICROSOFT_QUANTUM_DECL void MCRFrac_cpp(
         simulator_id_type sim_id,
-         int b,
-         std::int64_t numerator, 
-         std::int64_t power,
-         logical_qubit_id nc,
-         logical_qubit_id* c,
-         logical_qubit_id q);
+        int b,
+        std::int64_t numerator, 
+        std::int64_t power,
+        logical_qubit_id nc,
+        logical_qubit_id* c,
+        logical_qubit_id q);
 
      MICROSOFT_QUANTUM_DECL void MCR1_cpp(
         simulator_id_type sim_id,
-         double phi,
-         int n,
+        double phi,
+        int n,
         logical_qubit_id* c,
-         logical_qubit_id q);
+        logical_qubit_id q);
 
      MICROSOFT_QUANTUM_DECL void MCR1Frac_cpp(
         simulator_id_type sim_id,
-         std::int64_t numerator, 
-         std::int64_t power,
-         int nc,
-         logical_qubit_id* c,
-         logical_qubit_id q);
+        std::int64_t numerator, 
+        std::int64_t power,
+        int nc,
+        logical_qubit_id* c,
+        logical_qubit_id q);
 
     // Exponential of Pauli operators
     MICROSOFT_QUANTUM_DECL void Exp_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         int* b,
-         double phi,
+        double phi,
         logical_qubit_id* q);
     MICROSOFT_QUANTUM_DECL void MCExp_cpp(
         simulator_id_type sim_id,
-         int nc,
-         int n,
-         logical_qubit_id* c,
+        int nc,
+        int n,
+        logical_qubit_id* c,
         int* b,
-         double phi,
+        double phi,
         logical_qubit_id* q);
 
     // measurements
@@ -109,14 +109,14 @@ extern "C"
     MICROSOFT_QUANTUM_DECL void Reset_cpp(simulator_id_type sim_id,  logical_qubit_id q);
     MICROSOFT_QUANTUM_DECL unsigned Measure_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         int* b,
         logical_qubit_id* q);
 
    
     MICROSOFT_QUANTUM_DECL double JointEnsembleProbability_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         int* b,
         logical_qubit_id* q);
 
@@ -124,15 +124,15 @@ extern "C"
     MICROSOFT_QUANTUM_DECL void ExtendedDump_cpp(simulator_id_type sim_id,  bool (*callback)(const char*, double, double, void*), void*);
     MICROSOFT_QUANTUM_DECL bool DumpQubits_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         logical_qubit_id* q,
-         bool (*callback)(const char*, double, double));
+        bool (*callback)(const char*, double, double));
     MICROSOFT_QUANTUM_DECL bool ExtendedDumpQubits_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         logical_qubit_id* q,
-         bool (*callback)(const char*, double, double, void*),
-         void*);
+        bool (*callback)(const char*, double, double, void*),
+        void*);
     MICROSOFT_QUANTUM_DECL void QubitIds_cpp(simulator_id_type sim_id, void (*callback)(logical_qubit_id));
 
     MICROSOFT_QUANTUM_DECL bool Assert_cpp(simulator_id_type sim_id,  int n, int* b, logical_qubit_id* q, bool result);

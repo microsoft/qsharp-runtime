@@ -130,11 +130,11 @@ extern "C"
     // multi-controlled rotations
     MICROSOFT_QUANTUM_DECL void MCR_cpp(
         simulator_id_type sim_id,
-         int b,
-         double phi,
-         logical_qubit_id nc,
-         logical_qubit_id* c,
-         logical_qubit_id q)
+        int b,
+        double phi,
+        logical_qubit_id nc,
+        logical_qubit_id* c,
+        logical_qubit_id q)
     {
         std::vector<logical_qubit_id> cv(c, c + nc);
         getSimulator(sim_id)->MCR(cv, static_cast<Gates::Basis>(b), phi, q);
@@ -142,12 +142,12 @@ extern "C"
 
     MICROSOFT_QUANTUM_DECL void MCRFrac_cpp(
         simulator_id_type sim_id,
-         int b,
-         std::int64_t numerator, 
-         std::int64_t power,
-         logical_qubit_id nc,
-         logical_qubit_id* c,
-         logical_qubit_id q)
+        int b,
+        std::int64_t numerator, 
+        std::int64_t power,
+        logical_qubit_id nc,
+        logical_qubit_id* c,
+        logical_qubit_id q)
     {
         std::vector<logical_qubit_id> cv(c, c + nc);
         getSimulator(sim_id)->MCRFrac(cv, static_cast<Gates::Basis>(b), numerator, power, q);
@@ -155,10 +155,10 @@ extern "C"
 
     MICROSOFT_QUANTUM_DECL void MCR1_cpp(
         simulator_id_type sim_id,
-         double phi,
-         int nc,
-         logical_qubit_id* c,
-         logical_qubit_id q)
+        double phi,
+        int nc,
+        logical_qubit_id* c,
+        logical_qubit_id q)
     {
         std::vector<logical_qubit_id> cv(c, c + nc);
         getSimulator(sim_id)->MCR1(cv, phi, q);
@@ -166,11 +166,11 @@ extern "C"
 
     MICROSOFT_QUANTUM_DECL void MCR1Frac_cpp(
         simulator_id_type sim_id,
-         std::int64_t numerator, 
-         std::int64_t power,
-         int nc,
-         logical_qubit_id* c,
-         logical_qubit_id q)
+        std::int64_t numerator, 
+        std::int64_t power,
+        int nc,
+        logical_qubit_id* c,
+        logical_qubit_id q)
     {
         std::vector<logical_qubit_id> cv(c, c + nc);
         getSimulator(sim_id)->MCR1Frac(cv, numerator, power, q);
@@ -179,9 +179,9 @@ extern "C"
     // Exponential of Pauli operators
     MICROSOFT_QUANTUM_DECL void Exp_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         int* b,
-         double phi,
+        double phi,
         logical_qubit_id* q)
     {
         std::vector<Gates::Basis> bv;
@@ -194,11 +194,11 @@ extern "C"
 
    MICROSOFT_QUANTUM_DECL void MCExp_cpp(
         simulator_id_type sim_id,
-         int nc,
-         int n,
-         logical_qubit_id* c,
+        int nc,
+        int n,
+        logical_qubit_id* c,
         int* b,
-         double phi,
+        double phi,
         logical_qubit_id* q)
     {
         std::vector<Gates::Basis> bv;
@@ -222,7 +222,7 @@ extern "C"
 
     MICROSOFT_QUANTUM_DECL unsigned Measure_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         int* b,
         logical_qubit_id* q)
     {
@@ -237,7 +237,7 @@ extern "C"
     // Extracts the probability of measuring a One result on qubits q with basis b
     MICROSOFT_QUANTUM_DECL double JointEnsembleProbability_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         int* b,
         logical_qubit_id* q)
     {
@@ -264,9 +264,9 @@ extern "C"
     // Same as Dump_cpp, but only dumps the wavefunction on the qubits in `q`, ensuring they are separable from the rest of the state first
     MICROSOFT_QUANTUM_DECL bool DumpQubits_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         logical_qubit_id* q,
-         bool (*callback)(const char*, double, double))
+        bool (*callback)(const char*, double, double))
     {
         std::vector<logical_qubit_id> qs(q, q + n);
         return getSimulator(sim_id)->dump_qubits(qs, callback);
@@ -274,10 +274,10 @@ extern "C"
 
     MICROSOFT_QUANTUM_DECL bool ExtendedDumpQubits_cpp(
         simulator_id_type sim_id,
-         int n,
+        int n,
         logical_qubit_id* q,
-         bool (*callback)(const char*, double, double, void*),
-         void* arg)
+        bool (*callback)(const char*, double, double, void*),
+        void* arg)
     {
         std::vector<logical_qubit_id> qs(q, q + n);
         return getSimulator(sim_id)->dump_qubits_ext(qs, callback, arg);

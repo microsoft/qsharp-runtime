@@ -17,7 +17,7 @@ extern "C"
     MICROSOFT_QUANTUM_DECL bool DumpQubits(
          unsigned sid,
          unsigned n,
-        unsigned* q,
+         unsigned* q,
          bool (*callback)(const char*, double, double));
 
     typedef void* TDumpLocation;
@@ -38,7 +38,7 @@ extern "C"
     MICROSOFT_QUANTUM_DECL bool DumpQubitsToLocation(
          unsigned sid,
          unsigned n,
-        unsigned* q,
+         unsigned* q,
          TDumpToLocationCallback callback, 
          TDumpLocation location);
 
@@ -49,13 +49,13 @@ extern "C"
     MICROSOFT_QUANTUM_DECL double JointEnsembleProbability(
          unsigned sid,
          unsigned n,
-        int* b,
-        unsigned* q);
+         int* b,
+         unsigned* q);
 
     MICROSOFT_QUANTUM_DECL bool InjectState(
          unsigned sid,
          unsigned n,
-        unsigned* q, // The listed qubits must be unentangled and in state |0>
+         unsigned* q, // The listed qubits must be unentangled and in state |0>
          double* re, // 2^n real parts of the amplitudes of the superposition the listed qubits should be put into
          double* im  // 2^n imaginary parts of the amplitudes
     );
@@ -95,44 +95,44 @@ extern "C"
          unsigned b,
          double phi,
          unsigned n,
-        unsigned* c,
+         unsigned* c,
          unsigned q);
 
     // Exponential of Pauli operators
     MICROSOFT_QUANTUM_DECL void Exp(
          unsigned sid,
          unsigned n,
-        unsigned* b,
+         unsigned* b,
          double phi,
         unsigned* q);
     MICROSOFT_QUANTUM_DECL void MCExp(
          unsigned sid,
          unsigned n,
-        unsigned* b,
+         unsigned* b,
          double phi,
          unsigned nc,
          unsigned* cs,
-        unsigned* q);
+         unsigned* q);
 
     // measurements
     MICROSOFT_QUANTUM_DECL unsigned M( unsigned sid,  unsigned q);
     MICROSOFT_QUANTUM_DECL unsigned Measure(
          unsigned sid,
          unsigned n,
-        unsigned* b,
-        unsigned* q);
+         unsigned* b,
+         unsigned* q);
 
     // permutation oracle emulation
     MICROSOFT_QUANTUM_DECL void PermuteBasis(
          unsigned sid,
          unsigned n,
-        unsigned* q,
+         unsigned* q,
          std::size_t table_size, // NOLINT
          std::size_t* permutation_table); // NOLINT
     MICROSOFT_QUANTUM_DECL void AdjPermuteBasis(
          unsigned sid,
          unsigned n,
-        unsigned* q,
+         unsigned* q,
          std::size_t table_size, // NOLINT
          std::size_t* permutation_table); // NOLINT
 
