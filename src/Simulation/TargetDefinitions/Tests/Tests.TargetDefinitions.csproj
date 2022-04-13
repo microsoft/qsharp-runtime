@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.Quantum.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <!-- we will provide our own -->
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
+    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <QsharpCompile Include="..\Intrinsic\ApplyControlledX.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyControlledZ.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledH.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledRx.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledRy.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledRz.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledS.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledSAdj.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledSWAP.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledT.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledTAdj.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledX.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledY.qs" />
+    <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledZ.qs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <QsharpCompile Include="..\Decompositions\CCNOTFromCCZ.qs" />
+    <QsharpCompile Include="..\Decompositions\CNOTFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\Decompositions\CX.qs" />
+    <QSharpCompile Include="..\Decompositions\CYFromCNOT.qs" />
+    <QSharpCompile Include="..\Decompositions\CZFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\HFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\R.qs" />
+    <QsharpCompile Include="..\Decompositions\R1.qs" />
+    <QsharpCompile Include="..\Decompositions\R1Frac.qs" />
+    <QsharpCompile Include="..\Decompositions\RFrac.qs" />
+    <QsharpCompile Include="..\Decompositions\RxFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\RyFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\RzFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\SFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\SWAPFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\TFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\XFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\YFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\ZFromSinglyControlled.qs" />
+
+    <QsharpCompile Include="..\Decompositions\Utils.qs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+
+</Project>
