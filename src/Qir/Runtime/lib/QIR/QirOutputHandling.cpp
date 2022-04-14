@@ -47,7 +47,7 @@ extern "C"
 
     void __quantum__rt__result_record_output(Result res) // NOLINT
     {
-        if (!res)
+        if (__quantum__rt__result_equal(res, __quantum__rt__result_get_zero()))
         {
             PrintCStr(RECORD_PREFIX "0");
         }
