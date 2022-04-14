@@ -81,16 +81,22 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
     @Test("QuantumSimulator")
     operation RepeatedValueIsEvaluatedOnceSize0() : Unit {
-        use q = Qubit();
-        let _ = [H(q), size = 0];
-        AssertMeasurement([PauliX], [q], Zero, "");
-        Reset(q);
+        RepeatedValueIsEvaluatedOnce(0);
+    }
+
+    @Test("QuantumSimulator")
+    operation RepeatedValueIsEvaluatedOnceSize1() : Unit {
+        RepeatedValueIsEvaluatedOnce(1);
     }
 
     @Test("QuantumSimulator")
     operation RepeatedValueIsEvaluatedOnceSize2() : Unit {
+        RepeatedValueIsEvaluatedOnce(2);
+    }
+
+    operation RepeatedValueIsEvaluatedOnce(size : Int) : Unit {
         use q = Qubit();
-        let _ = [H(q), size = 2];
+        let _ = [H(q), size = size];
         AssertMeasurement([PauliX], [q], Zero, "");
         Reset(q);
     }
