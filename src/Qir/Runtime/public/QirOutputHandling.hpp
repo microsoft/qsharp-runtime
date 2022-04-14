@@ -1,7 +1,12 @@
 #ifndef QIROUTPUTHANDLING_HPP
 #define QIROUTPUTHANDLING_HPP
 
+#ifdef __cplusplus
 #include <cstdint>
+#else
+#include <stdint.h>
+#endif
+
 #include "CoreDefines.h"
 #include "CoreTypes.hpp"
 
@@ -9,6 +14,7 @@
 extern "C"
 {
 #endif
+
     // Primitive Result Records
 
     /// Produces output records of exactly "RESULT\\t0" or "RESULT\\t1"
