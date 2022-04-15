@@ -1,5 +1,11 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 #ifndef QIROUTPUTHANDLING_HPP
 #define QIROUTPUTHANDLING_HPP
+
+// QOH      QIR Output Handling.
+// REC      Record.
 
 #ifdef __cplusplus
 #include <cstdint>
@@ -9,6 +15,32 @@
 
 #include "CoreDefines.h"
 #include "CoreTypes.hpp"
+
+// clang-format off
+#define QOH_REC_TYPE "RESULT"
+#define QOH_REC_COLUMN_DELIMITER "\t"
+#define QOH_REC_PREFIX QOH_REC_TYPE QOH_REC_COLUMN_DELIMITER /* "RESULT" "\t" (== "RESULT\t") */
+#define QOH_REC_DELIMITER "\n"
+
+#define QOH_REC_VAL_TUPLE_START "TUPLE_START"
+#define QOH_REC_VAL_TUPLE_END   "TUPLE_END"
+#define QOH_REC_VAL_ARRAY_START "ARRAY_START"
+#define QOH_REC_VAL_ARRAY_END   "ARRAY_END"
+#define QOH_REC_VAL_RESULT_ZERO "0"
+#define QOH_REC_VAL_RESULT_ONE  "1"
+#define QOH_REC_VAL_FALSE       "false"
+#define QOH_REC_VAL_TRUE        "true"
+
+#define QOH_REC_TUPLE_START QOH_REC_PREFIX QOH_REC_VAL_TUPLE_START   /* "RESULT" "\t" "TUPLE_START" (== "RESULT\tTUPLE_START") */
+#define QOH_REC_TUPLE_END   QOH_REC_PREFIX QOH_REC_VAL_TUPLE_END   
+#define QOH_REC_ARRAY_START QOH_REC_PREFIX QOH_REC_VAL_ARRAY_START 
+#define QOH_REC_ARRAY_END   QOH_REC_PREFIX QOH_REC_VAL_ARRAY_END   
+#define QOH_REC_RESULT_ZERO QOH_REC_PREFIX QOH_REC_VAL_RESULT_ZERO 
+#define QOH_REC_RESULT_ONE  QOH_REC_PREFIX QOH_REC_VAL_RESULT_ONE  
+#define QOH_REC_FALSE       QOH_REC_PREFIX QOH_REC_VAL_FALSE       
+#define QOH_REC_TRUE        QOH_REC_PREFIX QOH_REC_VAL_TRUE
+// clang-format on
+
 
 #ifdef __cplusplus
 extern "C"
