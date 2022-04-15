@@ -14,7 +14,7 @@ readme = "README.md"
 
 exclude = [
     # Exclude files specific to QDK build pipelines.
-    "*.template", "*.csx", "*.ps1", "NuGet.Config", "drop",
+    "*.template", "*.csx", "*.ps1", "NuGet.Config", "drop", "Cargo.toml.orig",
     # Don't include cbindgen configs and outputs.
     "include", "cbindgen.toml",
     # Don't include Python sources or build artifacts.
