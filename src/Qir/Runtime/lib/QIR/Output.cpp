@@ -6,13 +6,21 @@
 #include "OutputStream.hpp"
 #include "QirOutputHandling.hpp"
 
+void WriteToCurrentStream(QirString* qstr);
+
 // Public API:
 extern "C"
 {
     void __quantum__rt__message(QirString* qstr) // NOLINT
     {
-        std::ostream& currentOutputStream = Microsoft::Quantum::OutputStream::Get();
-        currentOutputStream << qstr->str << QOH_REC_DELIMITER;
-        currentOutputStream.flush();
+        WriteToCurrentStream(qstr);
     }
 } // extern "C"
+
+
+void WriteToCurrentStream(QirString* qstr)
+{
+    std::ostream& currentOutputStream = Microsoft::Quantum::OutputStream::Get();
+    currentOutputStream << qstr->str << QOH_REC_DELIMITER;
+    currentOutputStream.flush();
+}

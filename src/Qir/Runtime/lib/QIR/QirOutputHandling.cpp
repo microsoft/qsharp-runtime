@@ -7,10 +7,12 @@
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
 
+extern void WriteToCurrentStream(QirString*);
+
 static void PrintCStr(const char* cStr)
 {
     QirString msg(cStr);
-    __quantum__rt__message(&msg);
+    WriteToCurrentStream(&msg);
 }
 
 
