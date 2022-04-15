@@ -9,10 +9,12 @@
 #include "SimFactory.hpp"
 #include "QirContext.hpp"
 #include "QirOutputHandling.hpp"
+#include "OutputStream.hpp"
 
 using namespace std;
+using namespace Microsoft::Quantum;
 
-TEST_CASE("QIR: OutHandle", "[qir][tuple_record_output]")
+TEST_CASE("QIR: TupleOutHandle", "[qir][out_handl][tuple_record_output]")
 {
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
@@ -50,7 +52,7 @@ TEST_CASE("QIR: OutHandle", "[qir][tuple_record_output]")
     }
 }
 
-TEST_CASE("QIR: OutHandle", "[qir][array_record_output]")
+TEST_CASE("QIR: ArrayOutHandle", "[qir][out_handl][array_record_output]")
 {
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
@@ -88,7 +90,7 @@ TEST_CASE("QIR: OutHandle", "[qir][array_record_output]")
     }
 }
 
-TEST_CASE("QIR: OutHandle", "[qir][result_record_output]")
+TEST_CASE("QIR: ResultOutHandle", "[qir][out_handl][result_record_output]")
 {
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
@@ -112,7 +114,7 @@ TEST_CASE("QIR: OutHandle", "[qir][result_record_output]")
     }
 }
 
-TEST_CASE("QIR: OutHandle", "[qir][bool_record_output]")
+TEST_CASE("QIR: BoolOutHandle", "[qir][out_handl][bool_record_output]")
 {
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
@@ -138,13 +140,13 @@ TEST_CASE("QIR: OutHandle", "[qir][bool_record_output]")
     }
 }
 
-TEST_CASE("QIR: OutHandle", "[qir][i64_record_output]")
+TEST_CASE("QIR: i64OutHandle", "[qir][out_handl][i64_record_output]")
 {
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
 
     auto i64Value = GENERATE(42LL, -2LL, 0x7FFFFFFFFFFFFFFFLL, 0x8000000000000000LL, 0x3333333333333333LL);
-
+    //                                   9223372036854775807   -9223372036854775808  3689348814741910323
     {
         ostringstream actualStrStream;
         {
@@ -157,59 +159,15 @@ TEST_CASE("QIR: OutHandle", "[qir][i64_record_output]")
 
         REQUIRE(actualStrStream.str() == (string(QOH_REC_PREFIX) + expectedStrStream.str() + QOH_REC_DELIMITER));
     }
-
-    // {
-    //     ostringstream actualStrStream;
-    //     {
-    //         OutputStream::ScopedRedirector qOStreamRedirector(actualStrStream);
-
-    //         __quantum__rt__integer_record_output(-2);
-    //     }
-
-    //     REQUIRE(actualStrStream.str() == (string(QOH_REC_PREFIX) + "-2" + "QOH_REC_DELIMITER"));
-    // }
-
-    // {
-    //     ostringstream actualStrStream;
-    //     {
-    //         OutputStream::ScopedRedirector qOStreamRedirector(actualStrStream);
-
-    //         __quantum__rt__integer_record_output(0x7FFFFFFFFFFFFFFF);
-    //     }
-
-    //     REQUIRE(actualStrStream.str() == (string(QOH_REC_PREFIX) + "9223372036854775807" + QOH_REC_DELIMITER));
-    // }
-
-    // {
-    //     ostringstream actualStrStream;
-    //     {
-    //         OutputStream::ScopedRedirector qOStreamRedirector(actualStrStream);
-
-    //         __quantum__rt__integer_record_output(0x8000000000000000);
-    //     }
-
-    //     REQUIRE(actualStrStream.str() == (string(QOH_REC_PREFIX) + "-9223372036854775808" + QOH_REC_DELIMITER));
-    // }
-
-    // {
-    //     ostringstream actualStrStream;
-    //     {
-    //         OutputStream::ScopedRedirector qOStreamRedirector(actualStrStream);
-
-    //         __quantum__rt__integer_record_output(0x3333333333333333);
-    //     }
-
-    //     REQUIRE(actualStrStream.str() == (string(QOH_REC_PREFIX) + "3689348814741910323" + QOH_REC_DELIMITER));
-    // }
 }
 
-TEST_CASE("QIR: OutHandle", "[qir][double_record_output]")
+TEST_CASE("QIR: doubleOutHandle", "[qir][out_handl][double_record_output]")
 {
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
 
     auto value = GENERATE(0.0, 1.0, -2.0, 3.14159, -6.28, 6.67E+23, NAN, INFINITY);
-
+    //                                                    6.67e+23  nan  inf
     {
         ostringstream actualStrStream;
         {
@@ -226,7 +184,7 @@ TEST_CASE("QIR: OutHandle", "[qir][double_record_output]")
 
 
 // Group/mixed.
-TEST_CASE("QIR: OutHandle", "[qir][tuple_record_output]")
+TEST_CASE("QIR: MixedOutHandle", "[qir][out_handl][tuple_record_output]")
 {
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
@@ -257,29 +215,24 @@ TEST_CASE("QIR: OutHandle", "[qir][tuple_record_output]")
         expectedStrStream << 
             QOH_REC_ARRAY_START << QOH_REC_DELIMITER <<
                 QOH_REC_TUPLE_START << QOH_REC_DELIMITER <<
-                    //__quantum__rt__double_record_output(6.67E+23);
                     QOH_REC_PREFIX << (double)6.67E+23 << QOH_REC_DELIMITER <<
-                    //__quantum__rt__integer_record_output(42LL);
                     QOH_REC_PREFIX << 42LL << QOH_REC_DELIMITER <<
-                    //__quantum__rt__bool_record_output(true);
                     QOH_REC_TRUE << QOH_REC_DELIMITER <<
-                    //__quantum__rt__result_record_output(__quantum__rt__result_get_one());
                     QOH_REC_RESULT_ONE << QOH_REC_DELIMITER <<
                 QOH_REC_TUPLE_END << QOH_REC_DELIMITER <<
 
                 QOH_REC_TUPLE_START << QOH_REC_DELIMITER <<
-                    // __quantum__rt__double_record_output(-10.123);
                     QOH_REC_PREFIX << (double)-10.123 << QOH_REC_DELIMITER <<
-                    // __quantum__rt__integer_record_output(-2049LL);
                     QOH_REC_PREFIX << -2049LL << QOH_REC_DELIMITER <<
-                    // __quantum__rt__bool_record_output(false);
                     QOH_REC_FALSE << QOH_REC_DELIMITER <<
-                    // __quantum__rt__result_record_output(__quantum__rt__result_get_zero());
                     QOH_REC_RESULT_ZERO << QOH_REC_DELIMITER <<
                 QOH_REC_TUPLE_END << QOH_REC_DELIMITER <<
             QOH_REC_ARRAY_END << QOH_REC_DELIMITER;
 
         REQUIRE(actualStrStream.str() == expectedStrStream.str());
+        // actual: "RESULT\tARRAY_START\nRESULT\tTUPLE_START\nRESULT\t6.67e+23\nRESULT\t42\nRESULT\ttrue\nRESULT\t1\nRESULT\tTUPLE_END\n"
+        //                              "RESULT\tTUPLE_START\nRESULT\t-10.123\nRESULT\t-2049\nRESULT\tfalse\nRESULT\t0\nRESULT\tTUPLE_END\n"
+        //         "RESULT\tARRAY_END\n\xcd\xcd\xcd\xcd\xcd..\xee\xfe\xee\xfe"
     }
     // clang-format on
 }
