@@ -416,7 +416,7 @@ class Simulator : public Microsoft::Quantum::Simulator::SimulatorInterface
     void changebasis(std::vector<Gates::Basis> const& bs, std::vector<logical_qubit_id> const& qs, bool back)
     {
         assert(bs.size() == qs.size());
-        for (unsigned i = 0; i < bs.size(); ++i)
+        for (std::size_t i = 0; i < bs.size(); ++i)
             changebasis(bs[i], qs[i], back);
     }
 

@@ -23,10 +23,6 @@ steps:
   displayName: "Build QIR Runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
-- pwsh: src/Qir/Runtime/test-qir-runtime.ps1
-  displayName: "Test QIR Runtime"
-  workingDirectory: $(System.DefaultWorkingDirectory)
-
   # Native Simulator (needed to build and run the QIR tests):
 - pwsh: src/Simulation/Native/prerequisites.ps1
   displayName: "Install Native Simulator Prerequisites"
@@ -36,6 +32,11 @@ steps:
     .\build-native-simulator.ps1
   displayName: "Build Native Simulator"
   workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
+
+- # QIR Runtime Tests:
+- pwsh: src/Qir/Runtime/test-qir-runtime.ps1
+  displayName: "Test QIR Runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)
 
   # QIR Tests:
 - pwsh: src/Qir/Tests/build-qir-tests.ps1
