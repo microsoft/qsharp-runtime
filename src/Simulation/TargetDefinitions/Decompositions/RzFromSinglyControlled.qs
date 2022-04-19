@@ -32,7 +32,7 @@ namespace Microsoft.Quantum.Intrinsic {
             ApplyUncontrolledRz(theta, qubit);
         }
         controlled (ctls, ...) {
-            if (Length(ctls) == 0) {
+            if Length(ctls) == 0 {
                 ApplyUncontrolledRz(theta, qubit);
             }
             elif Length(ctls) == 1 {

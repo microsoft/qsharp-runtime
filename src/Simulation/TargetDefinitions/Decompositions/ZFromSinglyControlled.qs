@@ -24,13 +24,13 @@ namespace Microsoft.Quantum.Intrinsic {
             ApplyUncontrolledZ(qubit);
         }
         controlled (ctls, ...) {
-            if (Length(ctls) == 0) {
+            if Length(ctls) == 0 {
                 ApplyUncontrolledZ(qubit);
             }
-            elif (Length(ctls) == 1) {
+            elif Length(ctls) == 1 {
                 ApplyControlledZ(ctls[0], qubit);
             }
-            elif (Length(ctls) == 2) {
+            elif Length(ctls) == 2 {
                 CCZ(ctls[0], ctls[1], qubit);
             }
             elif Length(ctls) == 3 {
