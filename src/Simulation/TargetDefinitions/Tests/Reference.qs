@@ -49,6 +49,12 @@ namespace Reference {
         Controlled X([qubit1], qubit2);
     }
 
+    // Use the trivial decomposition of R1 to emulate intrinsic R1 on the simulator.
+    operation R1 (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
+        R(PauliZ, theta, qubit);
+        R(PauliI, -theta, qubit);
+    }
+
     // The following operations are reproduced here to ensure that `AssertOperationsEqualReferenced`
     // uses these reference implementations for preparation and evaluation instead of the decompositions
     // under test.

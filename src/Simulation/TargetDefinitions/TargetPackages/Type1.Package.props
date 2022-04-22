@@ -40,8 +40,8 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetZExplicit.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MWithPostPrep.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\PreparePostM.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\R.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\R1.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RFromSinglyControlledR1.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\R1FromSinglyControlled.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\R1Frac.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ResetAll.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RFrac.qs" />

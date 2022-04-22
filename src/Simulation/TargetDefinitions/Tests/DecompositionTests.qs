@@ -95,108 +95,79 @@ namespace DecompositionTests {
     }
 
     @Test("SparseSimulator")
+    operation VerifyR1() : Unit {
+        // Use an angle that doesn't have any symmetries as a stand-in for broader validation.
+        let angle = PI() / 7.0;
+        VerifyUnitaryAndFunctors(q => R1(angle, q), q => Reference.R1(angle, q));
+    }
+
+    @Test("SparseSimulator")
     operation VerifySWAP() : Unit {
         VerifyUnitaryAndFunctors2(SWAP, Reference.SWAP);
     }
 
     internal operation VerifyUnitaryAndFunctors(unitary : Qubit => Unit is Adj + Ctl, reference : Qubit => Unit is Adj + Ctl) : Unit {
-        VerifyUnitary(unitary, reference);
-        VerifyUnitary(Adjoint unitary, Adjoint reference);
-        VerifyUnitary2((q0, q1) => Controlled unitary([q0], q1), (q0, q1) => Controlled reference([q0], q1));
-        VerifyUnitary2((q0, q1) => Controlled Adjoint unitary([q0], q1), (q0, q1) => Controlled Adjoint reference([q0], q1));
+        VerifyUnitary(unitary, reference, 8);
+        VerifyUnitary(Adjoint unitary, Adjoint reference, 8);
+        VerifyUnitary2((q0, q1) => Controlled unitary([q0], q1), (q0, q1) => Controlled reference([q0], q1), 7);
+        VerifyUnitary2((q0, q1) => Controlled Adjoint unitary([q0], q1), (q0, q1) => Controlled Adjoint reference([q0], q1), 7);
     }
 
     internal operation VerifyUnitaryAndFunctors2(unitary : (Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit) => Unit is Adj + Ctl) : Unit {
-        VerifyUnitary2(unitary, reference);
-        VerifyUnitary2(Adjoint unitary, Adjoint reference);
-        VerifyUnitary3((q0, q1, q2) => Controlled unitary([q0], (q1, q2)), (q0, q1, q2) => Controlled reference([q0], (q1, q2)));
-        VerifyUnitary3((q0, q1, q2) => Controlled Adjoint unitary([q0], (q1, q2)), (q0, q1, q2) => Controlled Adjoint reference([q0], (q1, q2)));
+        VerifyUnitary2(unitary, reference, 8);
+        VerifyUnitary2(Adjoint unitary, Adjoint reference, 8);
+        VerifyUnitary3((q0, q1, q2) => Controlled unitary([q0], (q1, q2)), (q0, q1, q2) => Controlled reference([q0], (q1, q2)), 7);
+        VerifyUnitary3((q0, q1, q2) => Controlled Adjoint unitary([q0], (q1, q2)), (q0, q1, q2) => Controlled Adjoint reference([q0], (q1, q2)), 7);
     }
 
     internal operation VerifyUnitaryAndFunctors3(unitary : (Qubit, Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit, Qubit) => Unit is Adj + Ctl) : Unit {
-        VerifyUnitary3(unitary, reference);
-        VerifyUnitary3(Adjoint unitary, Adjoint reference);
-        VerifyUnitary4((q0, q1, q2, q3) => Controlled unitary([q0], (q1, q2, q3)), (q0, q1, q2, q3) => Controlled reference([q0], (q1, q2, q3)));
-        VerifyUnitary4((q0, q1, q2, q3) => Controlled Adjoint unitary([q0], (q1, q2, q3)), (q0, q1, q2, q3) => Controlled Adjoint reference([q0], (q1, q2, q3)));
+        VerifyUnitary3(unitary, reference, 8);
+        VerifyUnitary3(Adjoint unitary, Adjoint reference, 8);
+        VerifyUnitary4((q0, q1, q2, q3) => Controlled unitary([q0], (q1, q2, q3)), (q0, q1, q2, q3) => Controlled reference([q0], (q1, q2, q3)), 7);
+        VerifyUnitary4((q0, q1, q2, q3) => Controlled Adjoint unitary([q0], (q1, q2, q3)), (q0, q1, q2, q3) => Controlled Adjoint reference([q0], (q1, q2, q3)), 7);
     }
 
-    internal operation VerifyUnitary(unitary : Qubit => Unit is Adj + Ctl, reference : Qubit => Unit is Adj + Ctl) : Unit {
+    internal operation VerifyUnitary(unitary : Qubit => Unit is Adj + Ctl, reference : Qubit => Unit is Adj + Ctl, limit : Int) : Unit {
         // Verify equality up to 8 controls.
         Reference.AssertOperationsEqualReferenced(1, qs => unitary(qs[0]),
             qs => reference(qs[0]));
-        Reference.AssertOperationsEqualReferenced(2, qs => Controlled unitary([qs[0]], qs[1]),
-            qs => Controlled reference([qs[0]], qs[1]));
-        Reference.AssertOperationsEqualReferenced(3, (qs => Controlled unitary([qs[0], qs[1]], qs[2])),
-            qs => Controlled reference([qs[0], qs[1]], qs[2]));
-        Reference.AssertOperationsEqualReferenced(4, qs => Controlled unitary([qs[0], qs[1], qs[2]], qs[3]),
-            qs => Controlled reference([qs[0], qs[1], qs[2]], qs[3]));
-        Reference.AssertOperationsEqualReferenced(5, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3]], qs[4]),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3]], qs[4]));
-        Reference.AssertOperationsEqualReferenced(6, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4]], qs[5]),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4]], qs[5]));
-        Reference.AssertOperationsEqualReferenced(7, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5]], qs[6]),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5]], qs[6]));
-        Reference.AssertOperationsEqualReferenced(8, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5], qs[6]], qs[7]),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5], qs[6]], qs[7]));
+
+        for numControls in 0..limit {
+            Reference.AssertOperationsEqualReferenced(1 + numControls, qs => Controlled unitary(qs[1..numControls], qs[0]),
+                qs => Controlled reference(qs[1..numControls], qs[0]));
+        }
     }
 
-    internal operation VerifyUnitary2(unitary : (Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit) => Unit is Adj + Ctl) : Unit {
+    internal operation VerifyUnitary2(unitary : (Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit) => Unit is Adj + Ctl, limit : Int) : Unit {
         // Verify equality up to 8 controls.
         Reference.AssertOperationsEqualReferenced(2, qs => unitary(qs[0], qs[1]),
             qs => reference(qs[0], qs[1]));
-        Reference.AssertOperationsEqualReferenced(3, qs => Controlled unitary([qs[0]], (qs[1], qs[2])),
-            qs => Controlled reference([qs[0]], (qs[1], qs[2])));
-        Reference.AssertOperationsEqualReferenced(4, qs => Controlled unitary([qs[0], qs[1]], (qs[2], qs[3])),
-            qs => Controlled reference([qs[0], qs[1]], (qs[2], qs[3])));
-        Reference.AssertOperationsEqualReferenced(5, qs => Controlled unitary([qs[0], qs[1], qs[2]], (qs[3], qs[4])),
-            qs => Controlled reference([qs[0], qs[1], qs[2]], (qs[3], qs[4])));
-        Reference.AssertOperationsEqualReferenced(6, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3]], (qs[4], qs[5])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3]], (qs[4], qs[5])));
-        Reference.AssertOperationsEqualReferenced(7, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4]], (qs[5], qs[6])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4]], (qs[5], qs[6])));
-        Reference.AssertOperationsEqualReferenced(8, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5]], (qs[6], qs[7])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5]], (qs[6], qs[7])));
-        Reference.AssertOperationsEqualReferenced(9, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5], qs[6]], (qs[7], qs[8])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5], qs[6]], (qs[7], qs[8])));
+
+        for numControls in 0..limit {
+            Reference.AssertOperationsEqualReferenced(2 + numControls, qs => Controlled unitary(qs[2..(numControls + 1)], (qs[0], qs[1])),
+                qs => Controlled reference(qs[2..(numControls + 1)], (qs[0], qs[1])));
+        }
     }
 
-    internal operation VerifyUnitary3(unitary : (Qubit, Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit, Qubit) => Unit is Adj + Ctl) : Unit {
+    internal operation VerifyUnitary3(unitary : (Qubit, Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit, Qubit) => Unit is Adj + Ctl, limit : Int) : Unit {
         // Verify equality up to 8 controls.
         Reference.AssertOperationsEqualReferenced(3, qs => unitary(qs[0], qs[1], qs[2]),
             qs => reference(qs[0], qs[1], qs[2]));
-        Reference.AssertOperationsEqualReferenced(4, qs => Controlled unitary([qs[0]], (qs[1], qs[2], qs[3])),
-            qs => Controlled reference([qs[0]], (qs[1], qs[2], qs[3])));
-        Reference.AssertOperationsEqualReferenced(5, qs => Controlled unitary([qs[0], qs[1]], (qs[2], qs[3], qs[4])),
-            qs => Controlled reference([qs[0], qs[1]], (qs[2], qs[3], qs[4])));
-        Reference.AssertOperationsEqualReferenced(6, qs => Controlled unitary([qs[0], qs[1], qs[2]], (qs[3], qs[4], qs[5])),
-            qs => Controlled reference([qs[0], qs[1], qs[2]], (qs[3], qs[4], qs[5])));
-        Reference.AssertOperationsEqualReferenced(7, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3]], (qs[4], qs[5], qs[6])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3]], (qs[4], qs[5], qs[6])));
-        Reference.AssertOperationsEqualReferenced(8, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4]], (qs[5], qs[6], qs[7])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4]], (qs[5], qs[6], qs[7])));
-        Reference.AssertOperationsEqualReferenced(9, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5]], (qs[6], qs[7], qs[8])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5]], (qs[6], qs[7], qs[8])));
-        Reference.AssertOperationsEqualReferenced(10, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5], qs[6]], (qs[7], qs[8], qs[9])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5], qs[6]], (qs[7], qs[8], qs[9])));
+
+        for numControls in 0..limit {
+            Reference.AssertOperationsEqualReferenced(3 + numControls, qs => Controlled unitary(qs[3..(numControls + 2)], (qs[0], qs[1], qs[2])),
+                qs => Controlled reference(qs[3..(numControls + 2)], (qs[0], qs[1], qs[2])));
+        }
     }
 
-    internal operation VerifyUnitary4(unitary : (Qubit, Qubit, Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit, Qubit, Qubit) => Unit is Adj + Ctl) : Unit {
+    internal operation VerifyUnitary4(unitary : (Qubit, Qubit, Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit, Qubit, Qubit) => Unit is Adj + Ctl, limit : Int) : Unit {
         // Verify equality up to 8 controls.
         Reference.AssertOperationsEqualReferenced(4, qs => unitary(qs[0], qs[1], qs[2], qs[3]),
             qs => reference(qs[0], qs[1], qs[2], qs[3]));
-        Reference.AssertOperationsEqualReferenced(5, qs => Controlled unitary([qs[0]], (qs[1], qs[2], qs[3], qs[4])),
-            qs => Controlled reference([qs[0]], (qs[1], qs[2], qs[3], qs[4])));
-        Reference.AssertOperationsEqualReferenced(6, qs => Controlled unitary([qs[0], qs[1]], (qs[2], qs[3], qs[4], qs[5])),
-            qs => Controlled reference([qs[0], qs[1]], (qs[2], qs[3], qs[4], qs[5])));
-        Reference.AssertOperationsEqualReferenced(7, qs => Controlled unitary([qs[0], qs[1], qs[2]], (qs[3], qs[4], qs[5], qs[6])),
-            qs => Controlled reference([qs[0], qs[1], qs[2]], (qs[3], qs[4], qs[5], qs[6])));
-        Reference.AssertOperationsEqualReferenced(8, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3]], (qs[4], qs[5], qs[6], qs[7])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3]], (qs[4], qs[5], qs[6], qs[7])));
-        Reference.AssertOperationsEqualReferenced(9, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4]], (qs[5], qs[6], qs[7], qs[8])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4]], (qs[5], qs[6], qs[7], qs[8])));
-        Reference.AssertOperationsEqualReferenced(10, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5]], (qs[6], qs[7], qs[8], qs[9])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5]], (qs[6], qs[7], qs[8], qs[9])));
-        Reference.AssertOperationsEqualReferenced(11, qs => Controlled unitary([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5], qs[6]], (qs[7], qs[8], qs[9], qs[10])),
-            qs => Controlled reference([qs[0], qs[1], qs[2], qs[3], qs[4], qs[5], qs[6]], (qs[7], qs[8], qs[9], qs[10])));
+
+        for numControls in 0..limit {
+            Reference.AssertOperationsEqualReferenced(4 + numControls, qs => Controlled unitary(qs[4..(numControls + 3)], (qs[0], qs[1], qs[2], qs[3])),
+                qs => Controlled reference(qs[4..(numControls + 3)], (qs[0], qs[1], qs[2], qs[3])));
+        }
     }
 }
