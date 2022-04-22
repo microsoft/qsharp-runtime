@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <QscVerbosity>detailed</QscVerbosity>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
     <!-- we will provide our own -->
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
