@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.Quantum.Sdk">
+
+  <Import Project="..\Common\Simulators.Test.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\Type4Core\Microsoft.Quantum.Type4.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Simulators.Tests\OperationsTestHelper.cs" />
+    <Compile Include="..\Simulators.Tests\QuantumSimulatorTests\BasicTests.cs" />
+    <Compile Include="..\Simulators.Tests\QuantumSimulatorTests\VerifyGates.cs" />
+    <Compile Include="..\Simulators.Tests\Circuits\AssertEqual.cs" />
+
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\AssertEqual.qs" />
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\JointMeasureTest.qs" />
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\VerifyUnitary.qs" />
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\ExpTest.qs" />
+  </ItemGroup>
+
+</Project>

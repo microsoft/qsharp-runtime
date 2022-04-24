@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.Quantum.Sdk">
+
+  <Import Project="..\TargetDefinitions\TargetPackages\Type4.Package.props" />
+
+  <PropertyGroup>
+    <Description>Type4 Targeting support for the Q# programming language.</Description>
+    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Microsoft.Quantum.Type4.Core.props" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>true</Pack>
+      <PackagePath>build/</PackagePath>
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+
+</Project>

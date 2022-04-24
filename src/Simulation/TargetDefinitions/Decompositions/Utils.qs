@@ -41,6 +41,18 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
+    internal operation JointMeasureHelper(basis : Pauli, aux : Qubit, qubit : Qubit) : Unit {
+        if basis == PauliX {
+            Controlled X([aux], qubit);
+        }
+        elif basis == PauliZ {
+            Controlled Z([aux], qubit);
+        }
+        elif basis == PauliY {
+            Controlled Y([aux], qubit);
+        }
+    }
+
     /// Given a multiply-controlled operation that requires k controls 
     /// applies it using ceiling(k/2) controls and using floor(k/2) temporary qubits
     internal operation ApplyWithLessControlsA<'T> (op : ((Qubit[],'T) => Unit is Adj), (controls : Qubit[], arg : 'T)) : Unit is Adj {

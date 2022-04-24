@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
-    open Microsoft.Quantum.Canon;
 
     /// # Summary
     /// Applies the Pauli $Z$ gate.
