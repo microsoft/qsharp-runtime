@@ -8,7 +8,7 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
         IIntrinsicIsingXX,
         IIntrinsicIsingYY,
         IIntrinsicIsingZZ,
-        IIntrinsicM,
+        IIntrinsicMZ,
         IIntrinsicRx,
         IIntrinsicRy,
         IIntrinsicRz,
