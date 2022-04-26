@@ -43,12 +43,35 @@ namespace Microsoft.Quantum.Intrinsic {
     internal operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
         body (...) {}
         controlled (ctls, (...)) {
-            if (Length(ctls) > 0) {
-                let qubit = ctls[0];
-                let rest = ctls[1...];
-                // Invoke Controlled R1, which will recursively call back into ApplyGlobalPhase.
-                // Each time the ctls array is one shorter, until it is empty and the recursion stops.
-                Controlled R1(rest, (theta, qubit));
+            if Length(ctls) == 0 {
+                // Noop
+            }
+            elif Length(ctls) == 1 {
+                Rz(theta, ctls[0]);
+            }
+            elif Length(ctls) == 2 {
+                Controlled R1([ctls[1]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 3 {
+                Controlled R1([ctls[1], ctls[2]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 4 {
+                Controlled R1([ctls[1], ctls[2], ctls[3]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 5 {
+                Controlled R1([ctls[1], ctls[2], ctls[3], ctls[4]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 6 {
+                Controlled R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 7 {
+                Controlled R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 8 {
+                Controlled R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6], ctls[7]], (theta, ctls[0]));
+            }
+            else {
+                fail "Too many controls specified to R gate.";
             }
         }
     }

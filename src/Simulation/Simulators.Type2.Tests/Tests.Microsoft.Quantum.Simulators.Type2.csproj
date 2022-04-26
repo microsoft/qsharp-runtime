@@ -16,6 +16,7 @@
     <QSharpCompile Include="..\Simulators.Tests\Circuits\AssertEqual.qs" />
     <QSharpCompile Include="..\Simulators.Tests\Circuits\JointMeasureTest.qs" />
     <QSharpCompile Include="..\Simulators.Tests\Circuits\VerifyUnitary.qs" />
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\ExpTest.qs" />
   </ItemGroup>
 
 </Project>

@@ -4,7 +4,8 @@
 namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
     
     open Microsoft.Quantum.Intrinsic;
-    
+    open Microsoft.Quantum.Diagnostics;
+    open Microsoft.Quantum.Math;
     
     // At some point, this was causing the simulator to crash.
     
@@ -26,7 +27,31 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             ResetAll(qubits);
         }
     }
-    
+
+    /// Verify that Exp behaves as expected by using it in two decompositions: SWAP and CNOT.
+    operation VerifyExpUsingDecompositions() : Unit {
+        AssertOperationsEqualReferenced(2, (qs => SwapFromExp(qs[0], qs[1])), (qs => SWAP(qs[0], qs[1])));
+        AssertOperationsEqualReferenced(2, (qs => CnotFromExp(qs[0], qs[1])), (qs => CNOT(qs[0], qs[1])));
+    }
+
+    /// This decomposition only holds if the magnitude of the angle used in the Exp rotation is correct.
+    operation SwapFromExp(q0 : Qubit, q1 : Qubit) : Unit is Adj {
+        let qs = [q0, q1];
+        let theta = PI() / 4.0;
+        Exp([PauliX, PauliX], theta, qs);
+        Exp([PauliY, PauliY], theta, qs);
+        Exp([PauliZ, PauliZ], theta, qs);
+    }
+
+    /// This decomposition only holds if the magnitude of the angle used in Exp is correct and if the
+    /// sign convention between Rx, Rz, and Exp is consistent.
+    operation CnotFromExp(q0 : Qubit, q1 : Qubit) : Unit is Adj {
+        let qs = [q0, q1];
+        let theta = PI() / 4.0;
+        Rx(-2.0 * theta, q1);
+        Rz(-2.0 * theta, q0);
+        Adjoint Exp([PauliZ, PauliX], theta, qs);
+    }
 }
 
 

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.Quantum.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <!-- we will provide our own -->
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>

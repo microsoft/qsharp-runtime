@@ -13,13 +13,7 @@
 #include <chrono>
 #include <cstdint>
 
-// clang-format off
-#pragma clang diagnostic push
-    // Ignore warnings for reserved macro names `_In_`, `_In_reads_(n)`:
-    #pragma clang diagnostic ignored "-Wreserved-id-macro"
-    #include "capi.hpp"
-#pragma clang diagnostic pop
-// clang-format on
+#include "capi.hpp"
 
 
 #include "FloatUtils.hpp"

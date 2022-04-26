@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <RootNamespace>Microsoft.Quantum.EntryPointDriver.Tests</RootNamespace>
     <PlatformTarget>x64</PlatformTarget>
@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Quantum.CSharpGeneration" Version="0.23.195983" />
+    <PackageReference Include="Microsoft.Quantum.CSharpGeneration" Version="0.24.205218-beta" />
   </ItemGroup>
 
   <ItemGroup>

@@ -32,19 +32,16 @@ namespace Microsoft.Quantum.Intrinsic {
             ApplyUncontrolledRy(theta, qubit);
         }
         controlled (ctls, ...) {
-            if (Length(ctls) == 0) {
+            if Length(ctls) == 0 {
                 ApplyUncontrolledRy(theta, qubit);
             }
-            elif (Length(ctls) == 1) {
+            else {
                 within {
                     MapPauli(qubit, PauliZ, PauliY);
                 }
                 apply {
                     Controlled Rz(ctls, (theta, qubit));
                 }
-            }
-            else {
-                ApplyWithLessControlsA(Controlled Ry, (ctls, (theta, qubit)));
             }
         }
         adjoint (...) {

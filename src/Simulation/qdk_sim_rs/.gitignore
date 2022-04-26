@@ -4,8 +4,6 @@ win10
 target
 drop
 
-# We inject version numbers into Cargo.toml, so don't want them stored in repo.
-Cargo.toml
 # In the future, it would be good to enable reproducible builds by committing
 # the lockfile and using --locked in calls to cargo.
 Cargo.lock
