@@ -32,14 +32,14 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         if (Get-Command sudo -ErrorAction SilentlyContinue) {
             if ($needClang) { 
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-                sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
+                sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
             }
             sudo apt update
             sudo apt-get install -y ninja-build clang-13 clang-tidy-13 clang-format-13
         } else {
             if ($needClang) {
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
-                add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
+                add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
             }
             apt update
             apt-get install -y ninja-build clang-13 clang-tidy-13 clang-format-13
