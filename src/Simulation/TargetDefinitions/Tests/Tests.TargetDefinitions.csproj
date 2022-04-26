@@ -26,6 +26,8 @@
     <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledX.qs" />
     <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledY.qs" />
     <QsharpCompile Include="..\Intrinsic\ApplyUncontrolledZ.qs" />
+    <QsharpCompile Include="..\Intrinsic\MZ.qs" />
+    <QsharpCompile Include="..\Intrinsic\Reset.qs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +37,7 @@
     <QSharpCompile Include="..\Decompositions\CYFromCNOT.qs" />
     <QSharpCompile Include="..\Decompositions\CZFromSinglyControlled.qs" />
     <QsharpCompile Include="..\Decompositions\HFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\Decompositions\MResetZExplicit.qs" />
     <QsharpCompile Include="..\Decompositions\RFromSinglyControlledR1.qs" />
     <QsharpCompile Include="..\Decompositions\R1FromSinglyControlled.qs" />
     <QsharpCompile Include="..\Decompositions\RxFromSinglyControlled.qs" />

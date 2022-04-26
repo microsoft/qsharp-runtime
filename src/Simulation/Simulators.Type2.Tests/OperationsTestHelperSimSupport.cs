@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
@@ -18,7 +18,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
         public static void RunWithMultipleSimulators(Action<SimulatorBase> test)
         {
-            var simulators = new SimulatorBase[] { 
+            var simulators = new SimulatorBase[]
+            { 
                 new QuantumSimulator(),
                 new SparseSimulator()
             };

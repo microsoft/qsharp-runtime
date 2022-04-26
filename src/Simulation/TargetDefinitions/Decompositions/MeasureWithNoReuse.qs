@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
@@ -40,120 +40,24 @@ namespace Microsoft.Quantum.Intrinsic {
     /// If the basis array and qubit array are different lengths, then the
     /// operation will fail.
     operation Measure (bases : Pauli[], qubits : Qubit[]) : Result {
-        if Length(bases) != Length(qubits) { fail "Arrays 'bases' and 'qubits' must be of the same length."; }
-        if Length(bases) == 0 {
-            return Zero;
+        if Length(bases) != Length(qubits) {
+            fail "Arrays 'bases' and 'qubits' must be of the same length.";
         }
-        elif Length(bases) == 1 {
+        if Length(bases) == 1 {
+            // Because this platform does not support reuse of qubits after measurement, we use 
+            // an auxiliary qubit and entanglement to get a measurement of the current state while
+            // still allowing the target qubit to be operated on afterwards.
             use q = Qubit();
             within {
                 H(q);
             }
             apply {
-                JointMeasureHelper(bases[0], q, qubits[0]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 2 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                JointMeasureHelper(bases[0], q, qubits[0]);
-                JointMeasureHelper(bases[1], q, qubits[1]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 3 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                JointMeasureHelper(bases[0], q, qubits[0]);
-                JointMeasureHelper(bases[1], q, qubits[1]);
-                JointMeasureHelper(bases[2], q, qubits[2]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 4 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                JointMeasureHelper(bases[0], q, qubits[0]);
-                JointMeasureHelper(bases[1], q, qubits[1]);
-                JointMeasureHelper(bases[2], q, qubits[2]);
-                JointMeasureHelper(bases[3], q, qubits[3]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 5 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                JointMeasureHelper(bases[0], q, qubits[0]);
-                JointMeasureHelper(bases[1], q, qubits[1]);
-                JointMeasureHelper(bases[2], q, qubits[2]);
-                JointMeasureHelper(bases[3], q, qubits[3]);
-                JointMeasureHelper(bases[4], q, qubits[4]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 6 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                JointMeasureHelper(bases[0], q, qubits[0]);
-                JointMeasureHelper(bases[1], q, qubits[1]);
-                JointMeasureHelper(bases[2], q, qubits[2]);
-                JointMeasureHelper(bases[3], q, qubits[3]);
-                JointMeasureHelper(bases[4], q, qubits[4]);
-                JointMeasureHelper(bases[5], q, qubits[5]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 7 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                JointMeasureHelper(bases[0], q, qubits[0]);
-                JointMeasureHelper(bases[1], q, qubits[1]);
-                JointMeasureHelper(bases[2], q, qubits[2]);
-                JointMeasureHelper(bases[3], q, qubits[3]);
-                JointMeasureHelper(bases[4], q, qubits[4]);
-                JointMeasureHelper(bases[5], q, qubits[5]);
-                JointMeasureHelper(bases[6], q, qubits[6]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 8 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                JointMeasureHelper(bases[0], q, qubits[0]);
-                JointMeasureHelper(bases[1], q, qubits[1]);
-                JointMeasureHelper(bases[2], q, qubits[2]);
-                JointMeasureHelper(bases[3], q, qubits[3]);
-                JointMeasureHelper(bases[4], q, qubits[4]);
-                JointMeasureHelper(bases[5], q, qubits[5]);
-                JointMeasureHelper(bases[6], q, qubits[6]);
-                JointMeasureHelper(bases[7], q, qubits[7]);
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
             }
             return MResetZ(q);
         }
         else {
-            fail "Too many qubits specified in call to Measure.";
+            return JointMeasure(bases, qubits);
         }
     }
 }
