@@ -1,7 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Measurement;
 
     internal operation SpreadZ (from : Qubit, to : Qubit[]) : Unit is Adj {
         if (Length(to) > 0) {
@@ -38,6 +39,130 @@ namespace Microsoft.Quantum.Intrinsic {
         }
         else {
             fail "Unsupported input";
+        }
+    }
+
+    internal operation JointMeasure(bases : Pauli[], qubits : Qubit[]) : Result {
+        if Length(bases) == 0 {
+            return Zero;
+        }
+        elif Length(bases) == 1 {
+            // This case should never get used in practice, and would only be hit if there was
+            // a bug in the decompositions that rely on this operation.
+            fail "Length 1 case should be handled by callers.";
+        }
+        elif Length(bases) == 2 {
+            use q = Qubit();
+            within {
+                H(q);
+            }
+            apply {
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
+                EntangleForJointMeasure(bases[1], q, qubits[1]);
+            }
+            return MResetZ(q);
+        }
+        elif Length(bases) == 3 {
+            use q = Qubit();
+            within {
+                H(q);
+            }
+            apply {
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
+                EntangleForJointMeasure(bases[1], q, qubits[1]);
+                EntangleForJointMeasure(bases[2], q, qubits[2]);
+            }
+            return MResetZ(q);
+        }
+        elif Length(bases) == 4 {
+            use q = Qubit();
+            within {
+                H(q);
+            }
+            apply {
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
+                EntangleForJointMeasure(bases[1], q, qubits[1]);
+                EntangleForJointMeasure(bases[2], q, qubits[2]);
+                EntangleForJointMeasure(bases[3], q, qubits[3]);
+            }
+            return MResetZ(q);
+        }
+        elif Length(bases) == 5 {
+            use q = Qubit();
+            within {
+                H(q);
+            }
+            apply {
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
+                EntangleForJointMeasure(bases[1], q, qubits[1]);
+                EntangleForJointMeasure(bases[2], q, qubits[2]);
+                EntangleForJointMeasure(bases[3], q, qubits[3]);
+                EntangleForJointMeasure(bases[4], q, qubits[4]);
+            }
+            return MResetZ(q);
+        }
+        elif Length(bases) == 6 {
+            use q = Qubit();
+            within {
+                H(q);
+            }
+            apply {
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
+                EntangleForJointMeasure(bases[1], q, qubits[1]);
+                EntangleForJointMeasure(bases[2], q, qubits[2]);
+                EntangleForJointMeasure(bases[3], q, qubits[3]);
+                EntangleForJointMeasure(bases[4], q, qubits[4]);
+                EntangleForJointMeasure(bases[5], q, qubits[5]);
+            }
+            return MResetZ(q);
+        }
+        elif Length(bases) == 7 {
+            use q = Qubit();
+            within {
+                H(q);
+            }
+            apply {
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
+                EntangleForJointMeasure(bases[1], q, qubits[1]);
+                EntangleForJointMeasure(bases[2], q, qubits[2]);
+                EntangleForJointMeasure(bases[3], q, qubits[3]);
+                EntangleForJointMeasure(bases[4], q, qubits[4]);
+                EntangleForJointMeasure(bases[5], q, qubits[5]);
+                EntangleForJointMeasure(bases[6], q, qubits[6]);
+            }
+            return MResetZ(q);
+        }
+        elif Length(bases) == 8 {
+            use q = Qubit();
+            within {
+                H(q);
+            }
+            apply {
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
+                EntangleForJointMeasure(bases[1], q, qubits[1]);
+                EntangleForJointMeasure(bases[2], q, qubits[2]);
+                EntangleForJointMeasure(bases[3], q, qubits[3]);
+                EntangleForJointMeasure(bases[4], q, qubits[4]);
+                EntangleForJointMeasure(bases[5], q, qubits[5]);
+                EntangleForJointMeasure(bases[6], q, qubits[6]);
+                EntangleForJointMeasure(bases[7], q, qubits[7]);
+            }
+            return MResetZ(q);
+        }
+        else {
+            fail "Too many qubits specified in call to Measure.";
+        }
+    }
+
+    internal operation EntangleForJointMeasure(basis : Pauli, aux : Qubit, qubit : Qubit) : Unit {
+        if basis == PauliX {
+            Controlled X([aux], qubit);
+        }
+        elif basis == PauliZ {
+            Controlled Z([aux], qubit);
+        }
+        elif basis == PauliY {
+            Controlled Y([aux], qubit);
         }
     }
 
