@@ -45,6 +45,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal string DefaultExecutionTarget { get; }
 
         /// <summary>
+        /// The default execution target capability to use when submitting the entry point to Azure Quantum.
+        /// </summary>
+        internal string DefaultTargetCapability { get; }
+
+        /// <summary>
         /// Creates an instance of the default simulator if it is a custom simulator.
         /// </summary>
         /// <returns>An instance of the default custom simulator.</returns>
@@ -63,6 +68,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="resourcesEstimatorName">The name of the resources estimator.</param>
         /// <param name="defaultSimulatorName">The name of the default simulator to use.</param>
         /// <param name="defaultExecutionTarget">The name of the default execution target to use.</param>
+        /// <param name="defaultTargetCapability">The name of the default execution target capability to use.</param>
         /// <param name="createDefaultCustomSimulator">The function for creating a new instance of the default simulator if it is a custom simulator.</param>
         public DriverSettings(
             ImmutableList<string> simulatorOptionAliases,
@@ -72,6 +78,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             string resourcesEstimatorName,
             string defaultSimulatorName,
             string defaultExecutionTarget,
+            string defaultTargetCapability,
             Func<IOperationFactory> createDefaultCustomSimulator)
         {
             SimulatorOptionAliases = simulatorOptionAliases;
@@ -81,6 +88,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             ResourcesEstimatorName = resourcesEstimatorName;
             DefaultSimulatorName = defaultSimulatorName;
             DefaultExecutionTarget = defaultExecutionTarget;
+            DefaultTargetCapability = defaultTargetCapability;
             CreateDefaultCustomSimulator = createDefaultCustomSimulator;
         }
     }
