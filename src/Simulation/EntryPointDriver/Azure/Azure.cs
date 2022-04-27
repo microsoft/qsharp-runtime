@@ -432,7 +432,8 @@ namespace Microsoft.Quantum.EntryPointDriver
             {
                 NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
                 NoOpSubmitter.Target => new NoOpSubmitter(),
-                _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
+                _ => (settings.TargetCapability != null) ? SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage) 
+                                                        : null
             };
         }
 
