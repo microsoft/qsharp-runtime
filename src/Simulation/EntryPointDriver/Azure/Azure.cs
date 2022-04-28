@@ -413,13 +413,17 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="settings">The Azure settings.</param>
         /// <returns>A QIR submitter.</returns>
-        private static IQirSubmitter? QirSubmitter(AzureSettings settings) => settings.Target switch
+        private static IQirSubmitter? QirSubmitter(AzureSettings settings)
         {
-            null => null,
-            NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
-            NoOpSubmitter.Target => new NoOpSubmitter(),
-            _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
-        };
+            // TODO: Implement here.
+            return settings.Target switch
+            {
+                null => null,
+                NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
+                NoOpSubmitter.Target => new NoOpSubmitter(),
+                _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
+            };
+        }
 
         /// <summary>
         /// The quantum machine submission context.

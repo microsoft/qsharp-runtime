@@ -8,6 +8,7 @@ namespace Microsoft.Azure.Quantum
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
@@ -23,8 +24,16 @@ namespace Microsoft.Azure.Quantum
         /// </summary>
         private static readonly ImmutableList<SubmitterInfo> QirSubmitters = ImmutableList.Create(
             new SubmitterInfo(
-                new Regex(@"\Amicrosoft\.simulator\.([\w]+\.)*[\w]+\z"),
+                new Regex(@"\Amicrosoft\.simulator\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
+                "QirSubmitter"),
+            new SubmitterInfo(
+                new Regex(@"\Aquantinuum\.([\w-_]+\.)*[\w-_]+\z"),
+                "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
+                "QirSubmitter"),
+            new SubmitterInfo(
+                new Regex(@"\Aqci\.([\w-_]+\.)*[\w-_]+\z"),
+                "Microsoft.Quantum.Providers.QCI.Targets.QCIQirSubmitter, Microsoft.Quantum.Providers.QCI",
                 "QirSubmitter"));
 
         private static readonly ImmutableList<SubmitterInfo> QirPayloadGenerators = ImmutableList.Create(
@@ -55,6 +64,13 @@ namespace Microsoft.Azure.Quantum
         /// <returns>A QIR submitter.</returns>
         public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection) =>
             Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection);
+
+        public static IQirSubmitter? QirSubmitterFromConfigFile(
+            FileInfo configFile, IWorkspace workspace, string? storageConnection)
+        {
+            // TODO: Implement.
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Returns a Q# submitter.
@@ -171,6 +187,8 @@ namespace Microsoft.Azure.Quantum
             /// The name of the static factory method.
             /// </summary>
             public string MethodName { get; }
+
+            // TODO: Extend this for Quantinuum.
         }
     }
 }
