@@ -68,7 +68,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The target capability.
         /// </summary>
-        public string? TargetCapability { get; set; }
+        public string TargetCapability { get; set; } = "";
 
         /// <summary>
         /// The storage account connection string.
