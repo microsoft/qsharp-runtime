@@ -110,6 +110,12 @@ namespace Microsoft.Quantum.EntryPointDriver
             ImmutableList.Create("--job-name"), Maybe.Just(string.Empty), "The name of the submitted job.");
 
         /// <summary>
+        /// The target capability option.
+        /// </summary>
+        private static readonly OptionInfo<string> TargetCapabilityOption = new OptionInfo<string>(
+            ImmutableList.Create("--target-capability"), Maybe.Just(string.Empty), "The name of the target capability.");
+
+        /// <summary>
         /// The job parameters option.
         /// </summary>
         private static readonly OptionInfo<ImmutableDictionary<string, string>> JobParamsOption =
@@ -166,10 +172,10 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         private readonly OptionInfo<string?> TargetOption;
 
-        /// <summary>
-        /// The target capability option.
-        /// </summary>
-        private readonly OptionInfo<string?> TargetCapabilityOption;
+        // /// <summary>
+        // /// The target capability option.
+        // /// </summary>
+        // private readonly OptionInfo<string?> TargetCapabilityOption;
 
         /// <summary>
         /// The simulator option.
@@ -215,12 +221,12 @@ namespace Microsoft.Quantum.EntryPointDriver
                     : Maybe.Just<string?>(this.settings.DefaultExecutionTarget),
                 "The target device ID.");
 
-            this.TargetCapabilityOption = new OptionInfo<string?>(
-                ImmutableList.Create("--target-capability"),
-                string.IsNullOrWhiteSpace(settings.DefaultTargetCapability)
-                    ? Maybe.Nothing<string?>()
-                    : Maybe.Just<string?>(this.settings.DefaultTargetCapability),
-                "The target capability.");
+            // this.TargetCapabilityOption = new OptionInfo<string?>(
+            //     ImmutableList.Create("--target-capability"),
+            //     string.IsNullOrWhiteSpace(settings.DefaultTargetCapability)
+            //         ? Maybe.Nothing<string?>()
+            //         : Maybe.Just<string?>(this.settings.DefaultTargetCapability),
+            //     "The target capability.");
 
             this.entryPoints = entryPoints;
         }
