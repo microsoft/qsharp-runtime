@@ -565,6 +565,7 @@ let ``Submit uses default values`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage:
                Base URI:
                Location: myLocation
@@ -590,6 +591,7 @@ let ``Submit uses default values with default target`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage:
                Base URI:
                Location: myLocation
@@ -629,6 +631,7 @@ let ``Submit allows overriding default values`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage: myStorage
                Base URI:
                Location: myLocation
@@ -669,6 +672,7 @@ let ``Submit allows a long user-agent`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage: myStorage
                Base URI:
                Location: myLocation
@@ -711,6 +715,7 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Resource Group: myResourceGroup
                 Workspace: myWorkspace
                 Target: test.machine.noop
+                TargetCapability:
                 Storage: myStorage
                 Base URI: https://westus.quantum.microsoft.com/
                 Location: westus
@@ -748,6 +753,7 @@ let ``Submit allows overriding default values with default target`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage: myStorage
                Base URI:
                Location: myLocation
@@ -788,6 +794,7 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage:
                Base URI: http://mybaseuri.foo.com/
                Location: mybaseuri
@@ -815,6 +822,7 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage:
                Base URI:
                Location: myLocation
@@ -846,6 +854,7 @@ let ``Submit allows spaces for the --location option`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage:
                Base URI:
                Location: My Location
@@ -952,6 +961,7 @@ let ``Submit supports Q# submitters`` () =
          Resource Group: myResourceGroup
          Workspace: myWorkspace
          Target: test.submitter.noop
+         TargetCapability:
          Storage:
          Base URI:
          Location: myLocation
@@ -979,6 +989,7 @@ let ``Submit supports job parameters`` () =
          Resource Group: myResourceGroup
          Workspace: myWorkspace
          Target: test.submitter.noop
+         TargetCapability:
          Storage:
          Base URI:
          Location: myLocation
@@ -1006,6 +1017,7 @@ let ``Extra equals symbols in a job parameter are parsed as part of the value`` 
          Resource Group: myResourceGroup
          Workspace: myWorkspace
          Target: test.submitter.noop
+         TargetCapability:
          Storage:
          Base URI:
          Location: myLocation
@@ -1072,6 +1084,7 @@ let ``Shows help text for generateazurepayload command`` () =
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --target <target> (REQUIRED)                        The target device ID.
+                      --target-capability <target-capability>             The name of the target capability.
                       --verbose                                           Show additional information about the submission.
                       -?, -h, --help                                      Show help and usage information"
     let given = test "Help"
@@ -1090,6 +1103,7 @@ let ``Shows help text for generateazurepayload command with default target`` () 
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --target <target>                                   The target device ID.
+                      --target-capability <target-capability>             The name of the target capability.
                       --verbose                                           Show additional information about the submission.
                       -?, -h, --help                                      Show help and usage information"
     let given = testWithTarget "foo.target" "Help"
@@ -1111,6 +1125,7 @@ let ``Shows help text for submit command`` () =
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --target <target> (REQUIRED)                        The target device ID.
+                      --target-capability <target-capability>             The name of the target capability.
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
@@ -1144,6 +1159,7 @@ let ``Shows help text for submit command with default target`` () =
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --target <target>                                   The target device ID.
+                      --target-capability <target-capability>             The name of the target capability.
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
