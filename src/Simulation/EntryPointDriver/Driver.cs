@@ -172,11 +172,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         private readonly OptionInfo<string?> TargetOption;
 
-        // /// <summary>
-        // /// The target capability option.
-        // /// </summary>
-        // private readonly OptionInfo<string?> TargetCapabilityOption;
-
         /// <summary>
         /// The simulator option.
         /// </summary>
@@ -220,13 +215,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                     ? Maybe.Nothing<string?>()
                     : Maybe.Just<string?>(this.settings.DefaultExecutionTarget),
                 "The target device ID.");
-
-            // this.TargetCapabilityOption = new OptionInfo<string?>(
-            //     ImmutableList.Create("--target-capability"),
-            //     string.IsNullOrWhiteSpace(settings.DefaultTargetCapability)
-            //         ? Maybe.Nothing<string?>()
-            //         : Maybe.Just<string?>(this.settings.DefaultTargetCapability),
-            //     "The target capability.");
 
             this.entryPoints = entryPoints;
         }
