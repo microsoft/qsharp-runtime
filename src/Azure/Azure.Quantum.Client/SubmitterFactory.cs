@@ -68,7 +68,8 @@ namespace Microsoft.Azure.Quantum
         public static IQirSubmitter? QirSubmitterFromConfigFile(
             string target, FileInfo configFile, IWorkspace workspace, string? storageConnection)
         {
-            var constructorType = QdkType("Microsoft.Quantum.Providers.Targets.GenericQirSubmitter");
+            var constructorType = QdkType(
+                "Microsoft.Quantum.Providers.Targets.GenericQirSubmitter, Microsoft.Quantum.Providers.Core");
             var constructorName = "QirSubmitter";
             var args = new object?[] { target, configFile, workspace, storageConnection };
             return (IQirSubmitter)constructorType.InvokeMember(
