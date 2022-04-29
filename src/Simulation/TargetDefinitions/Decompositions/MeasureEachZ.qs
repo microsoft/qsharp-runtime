@@ -21,9 +21,10 @@ namespace Microsoft.Quantum.Measurement {
         "MeasureEachZ is replaced by a supported implementation on all execution targets."
     )
     operation MeasureEachZ (targets : Qubit[]) : Result[] {
-        mutable results = [];
-        for target in targets {
-            set results += [M(target)];
+        let len = Length(targets);
+        mutable results = [Zero, size = len];
+        for i in 0..(len - 1) {
+            set results w/= i <- M(targets[i]);
         }
         return results;
     }
