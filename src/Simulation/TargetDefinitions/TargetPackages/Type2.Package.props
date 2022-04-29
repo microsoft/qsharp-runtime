@@ -9,6 +9,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\IsingYY.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\IsingZZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MeasureEachZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Rx.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Ry.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Rz.qs" />

@@ -18,6 +18,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MeasureEachZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
   </ItemGroup>
 

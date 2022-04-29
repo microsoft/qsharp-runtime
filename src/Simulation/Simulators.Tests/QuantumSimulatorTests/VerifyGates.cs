@@ -671,5 +671,19 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                 }
             }
         }
+
+        [Fact]
+        public void QSimMeasureEachZTest()
+        {
+            var simulators = new CommonNativeSimulator[] { 
+                new QuantumSimulator(),
+                new SparseSimulator()
+            };
+            
+            foreach (var sim in simulators)
+            {
+                MeasureEachZTest.Run(sim).Wait();
+            }
+        }
     }
 }
