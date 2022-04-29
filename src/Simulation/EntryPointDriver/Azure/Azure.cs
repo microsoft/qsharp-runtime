@@ -415,10 +415,21 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <returns>A QIR submitter.</returns>
         private static IQirSubmitter? QirSubmitter(AzureSettings settings)
         {
-            // TODO: Implement here.
+            if (settings.Target is null)
+            {
+                return null;
+            }
+
+            // If a configuration file is provided, create a submitter using it.
+            if (!(settings.SubmitConfigFile is null))
+            {
+                return SubmitterFactory.QirSubmitterFromConfigFile(
+                    settings.Target, settings.SubmitConfigFile, settings.CreateWorkspace(), settings.Storage);
+            }
+
+            // No configuration file was provided, create a submitter depending on the target.
             return settings.Target switch
             {
-                null => null,
                 NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
                 NoOpSubmitter.Target => new NoOpSubmitter(),
                 _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)

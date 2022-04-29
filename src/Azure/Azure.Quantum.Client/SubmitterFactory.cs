@@ -66,10 +66,13 @@ namespace Microsoft.Azure.Quantum
             Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection);
 
         public static IQirSubmitter? QirSubmitterFromConfigFile(
-            FileInfo configFile, IWorkspace workspace, string? storageConnection)
+            string target, FileInfo configFile, IWorkspace workspace, string? storageConnection)
         {
-            // TODO: Implement.
-            throw new NotImplementedException();
+            var constructorType = QdkType("Microsoft.Quantum.Providers.Targets.GenericQirSubmitter");
+            var constructorName = "QirSubmitter";
+            var args = new object?[] { target, configFile, workspace, storageConnection };
+            return (IQirSubmitter)constructorType.InvokeMember(
+                constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
         }
 
         /// <summary>
@@ -187,8 +190,6 @@ namespace Microsoft.Azure.Quantum
             /// The name of the static factory method.
             /// </summary>
             public string MethodName { get; }
-
-            // TODO: Extend this for Quantinuum.
         }
     }
 }
