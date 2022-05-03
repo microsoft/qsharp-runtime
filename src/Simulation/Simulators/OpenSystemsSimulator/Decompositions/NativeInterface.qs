@@ -41,6 +41,10 @@ namespace Microsoft.Quantum.Experimental.Native {
         adjoint self;
     }
 
+    operation Rx(theta : Double, target : Qubit) : Unit {
+        body intrinsic;
+    }
+
     operation M(target : Qubit) : Result {
         body intrinsic;
     }

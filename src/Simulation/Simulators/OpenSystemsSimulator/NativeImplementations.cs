@@ -109,6 +109,17 @@ namespace Microsoft.Quantum.Experimental
             };
         }
 
+        internal class Rx : Native.Rx
+        {
+            public Rx(IOperationFactory m) : base(m) { }
+
+            public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
+            {
+                NativeInterface.Rx((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
+                return QVoid.Instance;
+            };
+        }
+
         internal class M : Native.M
         {
             public M(IOperationFactory m) : base(m) { }

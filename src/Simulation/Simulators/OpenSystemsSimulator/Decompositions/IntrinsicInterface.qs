@@ -151,6 +151,24 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
+    operation Rx(theta : Double, target : Qubit) : Unit is Adj + Ctl {
+        body (...) {
+            Native.Rx(theta, target);
+        }
+
+        adjoint (...) {
+            Native.Rx(-theta, target);
+        }
+
+        controlled adjoint (controls, ...) {
+            Controlled Rx(controls, (-theta, target));
+        }
+
+        controlled (controls, ...) {
+            fail "TODO: implement controlled Rx decomposition.";
+        }
+    }
+
     // NB: We separate out this operation to avoid hardware targeting rewrite
     //     steps from trying to lift this operation and modifying the C#
     //     code gen in the process.

@@ -1,5 +1,5 @@
 use crate::chp_decompositions::ChpOperation;
-use crate::common_matrices;
+use crate::common_matrices::hx;
 use crate::error::QdkSimError;
 use crate::instrument::Instrument;
 use crate::linalg::HasDagger;
@@ -13,6 +13,7 @@ use crate::states::StateData::Mixed;
 use crate::StateData;
 use crate::Tableau;
 use crate::C64;
+use crate::{common_matrices, Generator, GeneratorCoset};
 use num_traits::{One, Zero};
 
 use serde::{Deserialize, Serialize};
@@ -63,6 +64,10 @@ pub struct NoiseModel {
     /// The process that applies to the state of a simulator
     /// when the `CNOT` operation is called.
     pub cnot: Process,
+
+    /// The generator coset used to define what channels act when the
+    /// `Rx` operation is called.
+    pub rx: GeneratorCoset,
 
     /// The instrument that is used to the measure the state of a simulator
     /// in the $Z$-basis.
@@ -165,6 +170,7 @@ impl NoiseModel {
                 n_qubits: 2,
                 data: Unitary(common_matrices::cnot()),
             },
+            rx: hx().into(),
             z_meas,
         }
     }
@@ -237,6 +243,7 @@ impl NoiseModel {
             z_meas: Instrument::ZMeasurement {
                 pr_readout_error: 0.0,
             },
+            rx: Generator::unsupported(1).into(),
         }
     }
 }

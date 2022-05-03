@@ -40,6 +40,11 @@ path = "src/lib.rs"
 [features]
 default = []
 
+## Enables experimental support for Padé approximants.
+## Currently disabled by default, but may be enabled by default in future
+## versions.
+pade = []
+
 # When Python bindings are enabled, we also need the pyo3 dependency.
 ## Enables Python bindings for this crate.
 python = ["pyo3", "numpy"]

@@ -1,7 +1,9 @@
+use std::ops::Mul;
+
 use cauchy::Scalar;
 use ndarray::{linalg::Dot, Array1, Array2, Data};
 
-use crate::{error::QdkSimError, linalg::HasDagger};
+use crate::{error::QdkSimError, linalg::HasDagger, C64};
 
 pub trait EigenvalueDecomposition<A>
 where
@@ -47,6 +49,21 @@ where
         let foo: Array2<A> = new_eigvals * &self.vectors;
         let bar = self.vectors.dag();
         Ok(foo.dot(&bar))
+    }
+}
+
+impl<A> Mul<ExplicitEigenvalueDecomposition<A>> for cauchy::c64
+where
+    A: Scalar,
+    cauchy::c64: Mul<Array1<A>, Output = Array1<A>>,
+{
+    type Output = ExplicitEigenvalueDecomposition<A>;
+
+    fn mul(self, rhs: ExplicitEigenvalueDecomposition<A>) -> Self::Output {
+        ExplicitEigenvalueDecomposition {
+            vectors: rhs.vectors,
+            values: self * rhs.values,
+        }
     }
 }
 

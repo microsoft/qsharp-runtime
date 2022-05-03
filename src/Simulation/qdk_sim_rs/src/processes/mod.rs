@@ -2,6 +2,10 @@
 // Licensed under the MIT License.
 
 mod apply;
+mod generators;
+
+use cauchy::c64;
+pub use generators::*;
 
 use crate::chp_decompositions::ChpOperation;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
@@ -42,8 +46,10 @@ pub enum ProcessData {
     ///
     /// The first index denotes each Kraus operator, with the second and third
     /// indices representing the indices of each operator.
-    KrausDecomposition(Array3<C64>), // TODO: Superoperator and Choi reps.
+    KrausDecomposition(Array3<C64>),
 
+    Superoperator(Array2<c64>),
+    // TODO: Superoperator and Choi reps.
     /// Representation of a process as a sequence of other processes.
     Sequence(Vec<Process>),
 
@@ -62,6 +68,7 @@ impl VariantName for Process {
             MixedPauli(_) => "MixedPauli",
             Unitary(_) => "Unitary",
             KrausDecomposition(_) => "KrausDecomposition",
+            ProcessData::Superoperator(_) => "Superoperator",
             ProcessData::Sequence(_) => "Sequence",
             ProcessData::ChpDecomposition(_) => "ChpDecomposition",
             ProcessData::Unsupported => "Unsupported",
@@ -126,6 +133,7 @@ impl Process {
                     processes.iter().map(|p| p.extend_one_to_n(idx_qubit, n_qubits)).collect()
                 ),
                 ProcessData::ChpDecomposition(_) => todo!(),
+                ProcessData::Superoperator(_) => todo!(),
             },
         }
     }
@@ -174,6 +182,7 @@ impl Process {
                     processes.iter().map(|p| p.extend_two_to_n(idx_qubit1, idx_qubit2, n_qubits)).collect()
                 ),
                 ProcessData::ChpDecomposition(_) => todo!(),
+                ProcessData::Superoperator(_) => todo!(),
             },
         }
     }
@@ -197,6 +206,7 @@ impl Mul<&Process> for C64 {
                 }),
                 KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks),
                 MixedPauli(paulis) => (self * promote_pauli_channel(paulis)).data,
+                ProcessData::Superoperator(rhs) => ProcessData::Superoperator(self * rhs),
                 ProcessData::Unsupported => ProcessData::Unsupported,
                 ProcessData::Sequence(processes) => {
                     ProcessData::Sequence(processes.iter().map(|p| self * p).collect())

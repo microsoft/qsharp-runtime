@@ -4,9 +4,10 @@
 #![cfg_attr(all(), doc = include_str!("../docs/c-api.md"))]
 
 use crate::error::{QdkSimError, QdkSimError::*};
-use crate::{built_info, NoiseModel, Process, State};
+use crate::{built_info, GeneratorCoset, NoiseModel, Process, State};
 use lazy_static::lazy_static;
 use serde_json::json;
+use std::cell::{Ref, RefCell};
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::ffi::CString;
@@ -39,27 +40,48 @@ fn as_capi_err<F: FnOnce() -> Result<(), QdkSimError>>(result_fn: F) -> i64 {
     }
 }
 
-fn apply<F: Fn(&NoiseModel) -> &Process>(
+fn with_api_state<T, F: FnOnce(&mut CApiState) -> Result<T, QdkSimError>>(
     sim_id: usize,
-    idxs: &[usize],
-    channel_fn: F,
-) -> Result<(), QdkSimError> {
+    action: F,
+) -> Result<T, QdkSimError> {
     let state = &mut *STATE.lock().unwrap();
     if let Some(sim_state) = state.get_mut(&sim_id) {
-        let channel = channel_fn(&sim_state.noise_model);
-        match channel.apply_to(idxs, &sim_state.register_state) {
-            Ok(new_state) => {
-                sim_state.register_state = new_state;
-                Ok(())
-            }
-            Err(err) => Err(err),
-        }
+        action(sim_state)
     } else {
         Err(NoSuchSimulator {
             invalid_id: sim_id,
             expected: state.keys().into_iter().cloned().collect(),
         })
     }
+}
+
+fn apply<F: Fn(&NoiseModel) -> Result<&Process, QdkSimError>>(
+    sim_id: usize,
+    idxs: &[usize],
+    channel_fn: F,
+) -> Result<(), QdkSimError> {
+    with_api_state(sim_id, |sim_state| {
+        let channel = channel_fn(&sim_state.noise_model)?;
+        let new_state = channel.apply_to(idxs, &sim_state.register_state)?;
+        sim_state.register_state = new_state;
+        Ok(())
+    })
+}
+
+fn apply_continuous<F: Fn(&NoiseModel) -> Result<&GeneratorCoset, QdkSimError>>(
+    sim_id: usize,
+    idxs: &[usize],
+    theta: f64,
+    channel_fn: F,
+) -> Result<(), QdkSimError> {
+    with_api_state(sim_id, |sim_state| {
+        let channel = channel_fn(&sim_state.noise_model)?;
+        let new_state = channel
+            .at(theta)?
+            .apply_to(idxs, &sim_state.register_state)?;
+        sim_state.register_state = new_state;
+        Ok(())
+    })
 }
 
 // C API FUNCTIONS //
@@ -173,63 +195,72 @@ pub extern "C" fn destroy(sim_id: usize) -> i64 {
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn x(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| &model.x))
+    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.x)))
 }
 
 /// Applies the `Y` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn y(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| &model.y))
+    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.y)))
 }
 
 /// Applies the `Z` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn z(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| &model.z))
+    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.z)))
 }
 
 /// Applies the `H` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn h(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| &model.h))
+    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.h)))
 }
 
 /// Applies the `S` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub fn s(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| &model.s))
+    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.s)))
 }
 
 /// Applies the `Adjoint S` operation acting on a given qubit to a given
 /// simulator, using the currently set noise model.
 #[no_mangle]
 pub fn s_adj(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| &model.s_adj))
+    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.s_adj)))
 }
 
 /// Applies the `T` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub fn t(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| &model.t))
+    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.t)))
 }
 
 /// Applies the `Adjoint T` operation acting on a given qubit to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub fn t_adj(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| &model.t_adj))
+    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.t_adj)))
 }
 
 /// Applies the `CNOT` operation acting on two given qubits to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
 pub fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx_control, idx_target], |model| &model.cnot))
+    as_capi_err(|| apply(sim_id, &[idx_control, idx_target], |model| Ok(&model.cnot)))
+}
+
+#[no_mangle]
+pub fn rx(sim_id: usize, theta: f64, idx_control: usize, idx_target: usize) -> i64 {
+    as_capi_err(|| {
+        apply_continuous(sim_id, &[idx_control, idx_target], theta, |model| {
+            Ok(&model.rx)
+        })
+    })
 }
 
 /// Measures a single qubit in the $Z$-basis, returning the result by setting

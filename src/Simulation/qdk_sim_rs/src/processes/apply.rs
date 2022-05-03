@@ -38,6 +38,10 @@ impl Process {
                 }
                 Ok(acc_state)
             }
+            // TODO: Support applying CHP decompositions and superoperators to
+            //       entire registers. Currently only supported acting on
+            //       subregisters via [`apply_to`].
+            Superoperator(_) => todo!(),
             ChpDecomposition(_operations) => todo!(),
             Unsupported => Err(QdkSimError::UnsupportedApply {
                 channel_variant: self.variant_name(),
@@ -107,6 +111,12 @@ impl Process {
                 return apply_chp_decomposition_to(operations, state.n_qubits, idx_qubits, tableau);
             }
         }
+
+        if let Superoperator(mtx) = &self.data {
+            todo!("Apply superoperator to subregister.");
+        }
+        // TODO: Add superoperator case here, since that will let us avoid
+        //       calling extend_k_to_n.
 
         // Having tried fast paths above, we now fall back to the most general
         // case.

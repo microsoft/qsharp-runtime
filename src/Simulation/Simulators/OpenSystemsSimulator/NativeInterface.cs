@@ -250,6 +250,14 @@ namespace Microsoft.Quantum.Experimental
             CheckCall(_CNOT(simId, (uint)control.Id, (uint)target.Id));
         }
 
+        [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="cnot")]
+        private static extern Int64 _Rx(ulong simId, double theta, uint idxTarget);
+        public static void Rx(ulong simId, double theta, Qubit target)
+        {
+            LogCall("rx");
+            CheckCall(_Rx(simId, theta, (uint)target.Id));
+        }
+
 
         [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="m")]
         private static extern Int64 _M(ulong simId, uint idx, out uint result);

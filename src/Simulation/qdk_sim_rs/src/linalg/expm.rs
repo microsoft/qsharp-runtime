@@ -1,7 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use std::{fmt::Error, ops::Neg, process::Output};
+use std::{
+    fmt::Error,
+    ops::{Mul, Neg},
+    process::Output,
+};
 
 use cauchy::Scalar;
 use ndarray::{
@@ -32,7 +36,10 @@ use super::{decompositions::ExplicitEigenvalueDecomposition, HasDagger};
 //         D_pq(A) ≔ Σ_j=0^q [(p + q - j)! p!] / [(p + q)! j! (q - j)!] (-A)^j.
 
 /// Types that support the matrix exponential $e^{A}$.
-pub trait Expm {
+pub trait Expm<A>
+where
+    A: Scalar,
+{
     /// Errors that can result from the [`expm`] method.
     ///
     /// [`expm`]: Expm::expm
@@ -44,11 +51,15 @@ pub trait Expm {
 
     /// Returns the matrix exponential $e^{A}$ of a matrix $A$.
     fn expm(&self) -> Result<Self::Output, Self::Error>;
+
+    /// Returns the matrix exponential $e^{\alpha A}$ of a matrix $A$,
+    /// and where $\alpha$ is a complex scalar.
+    fn expm_scale(&self, scale: A) -> Result<Self::Output, Self::Error>;
 }
 
-impl<A> Expm for ExplicitEigenvalueDecomposition<A>
+impl<A> Expm<A> for ExplicitEigenvalueDecomposition<A>
 where
-    A: Scalar,
+    A: Scalar + Mul<Output = A>,
     ExplicitEigenvalueDecomposition<A>: EigenvalueDecomposition<A>,
 {
     type Error = <Self as EigenvalueDecomposition<A>>::Error;
@@ -57,9 +68,14 @@ where
     fn expm(&self) -> Result<Self::Output, Self::Error> {
         self.apply_mtx_fn(|x| x.exp())
     }
+
+    fn expm_scale(&self, scale: A) -> Result<Self::Output, Self::Error> {
+        self.apply_mtx_fn(|x| (*x * scale).exp())
+    }
 }
 
-impl<A, S, E> Expm for ArrayBase<S, Ix2>
+#[cfg(feature = "pade")]
+impl<A, S, E> Expm<A> for ArrayBase<S, Ix2>
 where
     S: Data + RawData<Elem = A>,
     A: Scalar + ScalarOperand,
@@ -79,11 +95,16 @@ where
 
         Ok(d_inv.dot(&n))
     }
+
+    fn expm_scale(&self, scale: A) -> Result<Self::Output, Self::Error> {
+        Ok((self * scale).expm()?)
+    }
 }
 
 // TODO: Allow simpler type constraints.
 // fn pade_d<'a, T: Identity + MatrixPower<Error = E>, E>(mtx: &'a T, p: u32, q: u32) -> Result<T, E>
 // where &'a T: Neg<Output = T> {
+#[cfg(feature = "pade")]
 fn pade_d<A: Scalar + ScalarOperand, S: Data + RawData<Elem = A>, E>(
     mtx: &ArrayBase<S, Ix2>,
     p: u32,
@@ -111,6 +132,7 @@ where
     Ok(result)
 }
 
+#[cfg(feature = "pade")]
 fn pade_n<A: Scalar + ScalarOperand, S: Data + RawData<Elem = A>, E>(
     mtx: &ArrayBase<S, Ix2>,
     p: u32,
@@ -139,6 +161,7 @@ where
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_abs_diff_eq;
     use cauchy::c64;
     use ndarray::array;
     use num_traits::{One, Zero};
@@ -149,6 +172,7 @@ mod tests {
         linalg::{decompositions::ExplicitEigenvalueDecomposition, Expm},
     };
 
+    #[cfg(feature = "pade")]
     #[test]
     fn expm_works_for_rz() -> Result<(), QdkSimError> {
         let hz =
@@ -175,7 +199,14 @@ mod tests {
                 ],
             ],
         };
-        let actual = (c64!(1.0 i) * hy).expm();
-        todo!();
+        let actual = (c64!(1.0 i) * hy).expm()?;
+        let expected = array![
+            [c64!(0.54030231), c64!(0.84147098)],
+            [c64!(-0.84147098), c64!(0.54030231)]
+        ];
+        for (actual, expected) in actual.iter().zip(expected.iter()) {
+            assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
+        }
+        Ok(())
     }
 }
