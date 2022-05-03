@@ -39,7 +39,7 @@ steps:
   displayName: "Build Native Simulator"
   workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
 
-- # QIR Runtime Tests:
+  # QIR Runtime Tests:
 - pwsh: src/Qir/Runtime/test-qir-runtime.ps1
   displayName: "Test QIR Runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)
