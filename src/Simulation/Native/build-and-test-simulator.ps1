@@ -23,7 +23,7 @@ function Build-One {
     }
 }
 
-Build-One 'build' '../Simulation.sln'
+Build-One 'build' '../../../Simulation.sln'
 
 function Test-One {
     Param($project)
@@ -47,4 +47,4 @@ function Test-One {
     }
 }
 
-Test-One '../Simulation.sln'
+Test-One '../../../Simulation.sln'
