@@ -33,12 +33,6 @@ steps:
   displayName: "Build Native Simulator"
   workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
 
-  # Run all tests against sanitized native part of QuantumSimulator
-- powershell: |
-    .\build-and-test-simulator.ps1
-  displayName: "Build Native Simulator"
-  workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
-
   # QIR Runtime Tests:
 - pwsh: src/Qir/Runtime/test-qir-runtime.ps1
   displayName: "Test QIR Runtime"
@@ -61,3 +55,9 @@ steps:
 - pwsh: src/Qir/Samples/test-qir-samples.ps1
   displayName: "Run QIR Samples"
   workingDirectory: $(System.DefaultWorkingDirectory)
+
+  # Run all tests against sanitized native part of QuantumSimulator
+- powershell: |
+    .\build-and-test-simulator.ps1
+  displayName: "Build and test all for sanitized Native Simulator"
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
