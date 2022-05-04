@@ -2,30 +2,16 @@
 # Run all build steps.
 ##
 steps:
-- template: steps-init.yml
-
-
-- pwsh: ./build.ps1
-  displayName: "Building Q# runtime"
-  workingDirectory: $(System.DefaultWorkingDirectory)/build
-
-
-- pwsh: ./test.ps1
-  displayName: "Testing Q# runtime"
-  workingDirectory: $(System.DefaultWorkingDirectory)/build
-  condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
-
+- template: init-build-test.yml
 
 - pwsh: ./pack.ps1
   displayName: "Pack Q# runtime (Windows only)"
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
   workingDirectory: $(System.DefaultWorkingDirectory)/build
 
-
-- pwsh: .\manifest.ps1
+- pwsh: ./manifest.ps1
   displayName: "List built packages & assemblies"
   workingDirectory: '$(System.DefaultWorkingDirectory)/build'
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-
 
 - template: steps-wrap-up.yml

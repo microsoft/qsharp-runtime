@@ -1,0 +1,15 @@
+
+##
+# Run all build steps.
+##
+steps:
+- template: steps-init.yml
+
+- pwsh: ./build.ps1
+  displayName: "Building Q# runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
+
+- pwsh: ./test.ps1
+  displayName: "Testing Q# runtime"
+  workingDirectory: $(System.DefaultWorkingDirectory)/build
+  condition: and(succeeded(), ne(variables['Skip.Tests'], 'true'))
