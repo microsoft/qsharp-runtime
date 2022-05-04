@@ -44,18 +44,21 @@ mod tests {
         assert_abs_diff_eq!(approximate_factorial::<f64, f64>(0.0), 1.0, epsilon = 1e-4);
         assert_abs_diff_eq!(approximate_factorial::<f64, f64>(3.0), 6.0, epsilon = 1e-4);
 
-        let actual = 3628800.0;
+        // We expect approximate_factorial(10.0) to return 10! ≈ 3628800.0.
+        let expected = 3628800.0;
         assert_abs_diff_eq!(
             approximate_factorial::<f64, f64>(10.0),
-            actual,
-            epsilon = actual * 1e-8
+            expected,
+            epsilon = expected * 1e-8
         );
 
-        let actual = 1.214630436702533e+205;
+        // We expect approximate_factorial(123.0) to return 123! ≈ 1.214 × 10²⁰⁵.
+        // https://www.wolframalpha.com/input?i=123%21
+        let expected = 1.214630436702533e+205;
         assert_abs_diff_eq!(
             approximate_factorial::<f64, f64>(123.0),
             1.214630436702533e+205,
-            epsilon = actual * 1e-8
+            epsilon = expected * 1e-8
         );
     }
 }

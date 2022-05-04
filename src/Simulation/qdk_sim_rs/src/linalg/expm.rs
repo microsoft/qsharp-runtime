@@ -117,8 +117,6 @@ where
     // D_pq(A) ≔ Σ_j=0^q [(p + q - j)! p!] / [(p + q)! j! (q - j)!] (-A)^j
     let mut result = mtx.eye_like().to_owned();
     for j in 0..q + 1 {
-        let arr: [i64; 0] = [];
-        assert!(arr.len() == 0);
         let coeff = (approximate_factorial::<_, f64>(p + q - j)
             * approximate_factorial::<_, f64>(p))
             / (approximate_factorial::<_, f64>(p + q)
@@ -161,10 +159,11 @@ where
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::FRAC_1_SQRT_2;
+
     use approx::assert_abs_diff_eq;
     use cauchy::c64;
     use ndarray::array;
-    use num_traits::{One, Zero};
 
     use crate::{
         c64,
@@ -189,17 +188,20 @@ mod tests {
         let hy = ExplicitEigenvalueDecomposition {
             values: array![c64!(1.0), c64!(-1.0)],
             vectors: array![
-                [
-                    c64::new(-0.0, -0.7071067811865474),
-                    c64::new(0.7071067811865475, 0.0)
-                ],
-                [
-                    c64::new(0.7071067811865476, 0.0),
-                    c64::new(0.0, -0.7071067811865475)
-                ],
+                [c64::new(-0.0, -FRAC_1_SQRT_2), c64::new(FRAC_1_SQRT_2, 0.0)],
+                [c64::new(FRAC_1_SQRT_2, 0.0), c64::new(0.0, -FRAC_1_SQRT_2)],
             ],
         };
         let actual = (c64!(1.0 i) * hy).expm()?;
+        // We can compute the expected output below by using QuTiP in Python:
+        //
+        // >>> import qutip as qt
+        // >>> Y = qt.sigmay()
+        // >>> (1j * Y).expm()
+        // Quantum object: dims = [[2], [2]], shape = (2, 2), type = oper, isherm = False
+        // Qobj data =
+        // [[ 0.54030231  0.84147098]
+        //  [-0.84147098  0.54030231]]
         let expected = array![
             [c64!(0.54030231), c64!(0.84147098)],
             [c64!(-0.84147098), c64!(0.54030231)]

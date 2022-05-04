@@ -1,0 +1,26 @@
+{
+    "ignoreWords": [
+        // General terminology
+        "stdlib",
+
+        // QuTiP terminology.
+        "Qobj",
+        "qutip",
+        "isherm",
+        "oper",
+        "sigmay",
+
+        // General math terminology
+        "coeff",
+        "pade",
+        "Expm",
+
+        // Rust stdlib terminology
+        "consts",
+
+        // ndarray terminology
+        "linalg",
+        "ndarray",
+        "Repr"
+    ]
+}
