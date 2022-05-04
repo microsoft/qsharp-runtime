@@ -10,48 +10,47 @@ using Microsoft.Quantum.Simulation.Core;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Microsoft.Quantum.Simulation.Simulators.Tests
+namespace Microsoft.Quantum.Simulation.Simulators.Tests;
+
+public class NoiseModelSerializationTests
 {
-    public class NoiseModelSerializationTests
+    private const string idealJson = @"{""cnot"":{""data"":{""Unitary"":{""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0],[0.0,0.0]],""dim"":[4,4],""v"":1}},""n_qubits"":2},""h"":{""data"":{""Unitary"":{""data"":[[0.7071067811865476,0.0],[0.7071067811865476,0.0],[0.7071067811865476,0.0],[-0.7071067811865476,-0.0]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""i"":{""data"":{""Unitary"":{""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""initial_state"":{""data"":{""Mixed"":{""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""rx"":{""generator"":{""data"":{""ExplicitEigenvalueDecomposition"":{""values"":{""data"":[[-0.5,0.0],[0.5,-0.0]],""dim"":[2],""v"":1},""vectors"":{""data"":[[0.7071067811865476,0.0],[0.7071067811865476,0.0],[0.7071067811865476,0.0],[-0.7071067811865476,0.0]],""dim"":[2,2],""v"":1}}},""n_qubits"":1}},""s"":{""data"":{""Unitary"":{""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,1.0]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""s_adj"":{""data"":{""Unitary"":{""data"":[[1.0,-0.0],[0.0,-0.0],[0.0,-0.0],[0.0,-1.0]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""t"":{""data"":{""Unitary"":{""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.7071067811865476,0.7071067811865476]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""t_adj"":{""data"":{""Unitary"":{""data"":[[1.0,-0.0],[0.0,-0.0],[0.0,-0.0],[0.7071067811865476,-0.7071067811865476]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""x"":{""data"":{""Unitary"":{""data"":[[0.0,0.0],[1.0,0.0],[1.0,0.0],[0.0,0.0]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""y"":{""data"":{""Unitary"":{""data"":[[0.0,0.0],[-0.0,-1.0],[0.0,1.0],[0.0,0.0]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""z"":{""data"":{""Unitary"":{""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[-1.0,-0.0]],""dim"":[2,2],""v"":1}},""n_qubits"":1},""z_meas"":{""Effects"":[{""data"":{""KrausDecomposition"":{""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0]],""dim"":[1,2,2],""v"":1}},""n_qubits"":1},{""data"":{""KrausDecomposition"":{""data"":[[0.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0]],""dim"":[1,2,2],""v"":1}},""n_qubits"":1}]}}";
+
+    [Fact]
+    public void IdealNoiseModelDeserializes()
     {
-        private const string idealJson = @"{""initial_state"":{""n_qubits"":1,""data"":{""Mixed"":{""v"":1,""dim"":[2,2],""data"":[[1,0],[0,0],[0,0],[0,0]]}}},""i"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[1,0],[0,0],[0,0],[1,0]]}}},""x"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[0,0],[1,0],[1,0],[0,0]]}}},""y"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[0,0],[0,1],[0,-1],[0,0]]}}},""z"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[1,0],[0,0],[0,0],[-1,0]]}}},""h"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[0.7071067811865476,0],[0.7071067811865476,0],[0.7071067811865476,0],[-0.7071067811865476,0]]}}},""s"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,1.0]]}}},""s_adj"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[1.0,-0.0],[0.0,-0.0],[0.0,-0.0],[0.0,-1.0]]}}},""t"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.7071067811865476,0.7071067811865476]]}}},""t_adj"":{""n_qubits"":1,""data"":{""Unitary"":{""v"":1,""dim"":[2,2],""data"":[[1.0,-0.0],[0.0,-0.0],[0.0,-0.0],[0.7071067811865476,-0.7071067811865476]]}}},""cnot"":{""n_qubits"":2,""data"":{""Unitary"":{""v"":1,""dim"":[4,4],""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0],[0.0,0.0]]}}},""z_meas"":{""Effects"":[{""n_qubits"":1,""data"":{""KrausDecomposition"":{""v"":1,""dim"":[1,2,2],""data"":[[1.0,0.0],[0.0,0.0],[0.0,0.0],[0.0,0.0]]}}},{""n_qubits"":1,""data"":{""KrausDecomposition"":{""v"":1,""dim"":[1,2,2],""data"":[[0.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0]]}}}]}}";
+        var idealNoiseModel = JsonSerializer.Deserialize<NoiseModel>(idealJson);
 
-        [Fact]
-        public void IdealNoiseModelDeserializes()
+        // Assert some stuff about the ideal noise model to make sure we got it right.
+        idealNoiseModel.ZMeas.AssertTypeAnd<EffectsInstrument>(instrument =>
         {
-            var idealNoiseModel = JsonSerializer.Deserialize<NoiseModel>(idealJson);
-
-            // Assert some stuff about the ideal noise model to make sure we got it right.
-            idealNoiseModel.ZMeas.AssertTypeAnd<EffectsInstrument>(instrument =>
-            {
-                Assert.Equal(2, instrument.Effects.Count);
-            });
-            idealNoiseModel.Z.AssertTypeAnd<UnitaryProcess>(process =>
-            {
-                Assert.Equal(1, process.NQubits);
-            });
-        }
-
-        [Fact]
-        public void IdealNoiseModelRoundTrips()
+            Assert.Equal(2, instrument.Effects.Count);
+        });
+        idealNoiseModel.Z.AssertTypeAnd<UnitaryProcess>(process =>
         {
-            var idealNoiseModel = (
-                NoiseModel.TryGetByName("ideal", out var model)
-                ? model
-                : throw new Exception("Failed to get noise model by name.")
-            );
-            idealNoiseModel.AssertSerializationRoundTrips();
-        }
+            Assert.Equal(1, process.NQubits);
+        });
+    }
 
-        [Fact]
-        public void IdealStabilizerNoiseModelRoundTrips()
-        {
-            var idealStabilizerModel = (
-                NoiseModel.TryGetByName("ideal_stabilizer", out var model)
-                ? model
-                : throw new Exception("Could not get noise model by name.")
-            );
-            idealStabilizerModel.AssertSerializationRoundTrips();
-        }
+    [Fact]
+    public void IdealNoiseModelRoundTrips()
+    {
+        var idealNoiseModel = (
+            NoiseModel.TryGetByName("ideal", out var model)
+            ? model
+            : throw new Exception("Failed to get noise model by name.")
+        );
+        idealNoiseModel.AssertSerializationRoundTrips();
+    }
+
+    [Fact]
+    public void IdealStabilizerNoiseModelRoundTrips()
+    {
+        var idealStabilizerModel = (
+            NoiseModel.TryGetByName("ideal_stabilizer", out var model)
+            ? model
+            : throw new Exception("Could not get noise model by name.")
+        );
+        idealStabilizerModel.AssertSerializationRoundTrips();
     }
 }

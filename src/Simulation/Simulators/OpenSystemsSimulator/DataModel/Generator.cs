@@ -52,7 +52,6 @@ public class GeneratorConverter : JsonConverter<Generator>
                     return (int nQubits) => new UnsupportedGenerator(nQubits);
 
                 case "ExplicitEigenvalueDecomposition":
-                    reader.Require(JsonTokenType.StartObject, read: true);
                     NDArray? eigenvectors = null;
                     NDArray? eigenvalues = null;
 
@@ -73,6 +72,7 @@ public class GeneratorConverter : JsonConverter<Generator>
                         }
 
                         var propertyName = reader.GetString();
+                        reader.Read();
 
                         switch (propertyName)
                         {
@@ -98,13 +98,13 @@ public class GeneratorConverter : JsonConverter<Generator>
                     {
                         throw new JsonException($"Generator kind was ExplicitEigenvalueDecomposition, but no eigenvalues were provided.");
                     }
-                    Debug.Assert(eigenvalues != null);
+                    Debug.Assert(eigenvalues is not null);
 
                     if (eigenvectors == null)
                     {
                         throw new JsonException($"Generator kind was ExplicitEigenvalueDecomposition, but no eigenvectors were provided.");
                     }
-                    Debug.Assert(eigenvectors != null);
+                    Debug.Assert(eigenvectors is not null);
 
                     return (int nQubits) => new ExplicitEigenvalueDecomposition(nQubits, eigenvalues, eigenvectors);
 
