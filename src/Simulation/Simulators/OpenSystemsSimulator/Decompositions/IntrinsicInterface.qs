@@ -151,21 +151,43 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    operation Rx(theta : Double, target : Qubit) : Unit is Adj + Ctl {
+    operation R(pauli : Pauli, theta : Double, target : Qubit) : Unit is Adj + Ctl {
         body (...) {
-            Native.Rx(theta, target);
+            if pauli == PauliI {
+                // Do nothing; global phases are insignficant in density operator representations.
+            } elif pauli == PauliX {
+                Native.Rx(theta, target);
+            } elif pauli == PauliY {
+                Native.Ry(theta, target);
+            } elif pauli == PauliZ {
+                Native.Rz(theta, target);
+            }
         }
 
         adjoint (...) {
-            Native.Rx(-theta, target);
+            R(pauli, -theta, target);
         }
 
         controlled adjoint (controls, ...) {
-            Controlled Rx(controls, (-theta, target));
+            Controlled R(controls, (pauli, -theta, target));
         }
 
         controlled (controls, ...) {
-            fail "TODO: implement controlled Rx decomposition.";
+            if Length(controls) == 0 {
+                R(pauli, theta, target);
+            } elif Length(controls) == 1 {
+                within {
+                    MapPauli(target, PauliZ, pauli);
+                }
+                apply {                
+                    R(PauliZ, theta / 2.0, target);
+                    CNOT(controls[0], qubit);
+                    R(PauliZ, -theta / 2.0, qubit);
+                    CNOT(controls[0], qubit);
+                }
+            } else {
+                ApplyWithLessControlsA(Controlled R, (controls, (pauli, theta, target)));
+            }            
         }
     }
 

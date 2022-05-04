@@ -2,23 +2,25 @@
 // Licensed under the MIT License.
 
 use std::{
-    fmt::Error,
-    ops::{Mul, Neg},
-    process::Output,
+    ops::Mul,
 };
 
 use cauchy::Scalar;
+
+#[cfg(feature = "pade")]
 use ndarray::{
-    linalg::Dot, Array2, ArrayBase, Data, Ix2, OwnedRepr, RawArrayView, RawData, ScalarOperand,
+    ArrayBase, Data, Ix2, OwnedRepr, RawData, ScalarOperand,
 };
 
 use crate::{
-    error::QdkSimError,
-    linalg::{decompositions::EigenvalueDecomposition, Identity, Inv, MatrixPower},
-    math::approximate_factorial,
+    linalg::decompositions::{EigenvalueDecomposition, ExplicitEigenvalueDecomposition},
 };
 
-use super::{decompositions::ExplicitEigenvalueDecomposition, HasDagger};
+#[cfg(feature = "pade")]
+use crate::{
+    error::QdkSimError, linalg::{Identity, Inv, MatrixPower},
+    math::approximate_factorial
+};
 
 // NB: We use the notation of
 //     https://www.cs.jhu.edu/~misha/ReadingSeminar/Papers/Moler03.pdf.

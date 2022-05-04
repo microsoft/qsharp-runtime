@@ -4,9 +4,9 @@
 use std::ops::Mul;
 
 use cauchy::Scalar;
-use ndarray::{linalg::Dot, Array1, Array2, Data};
+use ndarray::{linalg::Dot, Array1, Array2};
 
-use crate::{error::QdkSimError, linalg::HasDagger, C64};
+use crate::{error::QdkSimError, linalg::HasDagger};
 
 pub trait EigenvalueDecomposition<A>
 where

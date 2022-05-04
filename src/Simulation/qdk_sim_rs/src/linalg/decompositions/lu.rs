@@ -155,7 +155,7 @@ where
     type VectorSolution = ArrayBase<OwnedRepr<A>, Ix1>;
     type MatrixSolution = ArrayBase<OwnedRepr<A>, Ix2>;
 
-    fn solve_vector(&self, rhs: &ArrayBase<S, Ix1>) -> Result<Self::VectorSolution, Self::Error> {
+    fn solve_vector(&self, _rhs: &ArrayBase<S, Ix1>) -> Result<Self::VectorSolution, Self::Error> {
         todo!()
     }
 

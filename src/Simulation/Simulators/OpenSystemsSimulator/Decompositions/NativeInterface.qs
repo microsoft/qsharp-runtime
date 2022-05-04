@@ -44,6 +44,15 @@ namespace Microsoft.Quantum.Experimental.Native {
     operation Rx(theta : Double, target : Qubit) : Unit {
         body intrinsic;
     }
+    
+
+    operation Ry(theta : Double, target : Qubit) : Unit {
+        body intrinsic;
+    }
+    
+    operation Rz(theta : Double, target : Qubit) : Unit {
+        body intrinsic;
+    }
 
     operation M(target : Qubit) : Result {
         body intrinsic;
