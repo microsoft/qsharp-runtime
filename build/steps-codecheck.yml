@@ -58,6 +58,6 @@ steps:
 
   # Run all tests against sanitized native part of QuantumSimulator
 - powershell: |
-    ..\src\Simulation\Native\build-and-test-simulator.ps1
+    .\build-and-test-simulator.ps1
   displayName: "Build and test all for sanitized Native Simulator"
   workingDirectory: $(System.DefaultWorkingDirectory)/build
