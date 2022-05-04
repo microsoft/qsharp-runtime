@@ -181,9 +181,9 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                 }
                 apply {                
                     R(PauliZ, theta / 2.0, target);
-                    CNOT(controls[0], qubit);
-                    R(PauliZ, -theta / 2.0, qubit);
-                    CNOT(controls[0], qubit);
+                    Controlled X(controls, target);
+                    R(PauliZ, -theta / 2.0, target);
+                    Controlled X(controls, target);
                 }
             } else {
                 ApplyWithLessControlsA(Controlled R, (controls, (pauli, theta, target)));

@@ -3,6 +3,7 @@
 
 namespace Microsoft.Quantum.Experimental.Decompositions {
     open Microsoft.Quantum.Experimental.Native as Native;
+    open Microsoft.Quantum.Experimental.Intrinsic as Intrinsic;
 
     internal function IsAnyPauliI(bases : Pauli[]) : Bool {
         for basis in bases {
@@ -17,23 +18,23 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
         if (from == to) {
         }
         elif ((from == PauliZ and to == PauliX) or (from == PauliX and to == PauliZ)) {
-            H(qubit);
+            Intrinsic.H(qubit);
         }
         elif (from == PauliZ and to == PauliY) {
-            H(qubit);
-            S(qubit);
-            H(qubit);
+            Intrinsic.H(qubit);
+            Intrinsic.S(qubit);
+            Intrinsic.H(qubit);
         }
         elif (from == PauliY and to == PauliZ) {
-            H(qubit);
-            Adjoint S(qubit);
-            H(qubit);
+            Intrinsic.H(qubit);
+            Adjoint Intrinsic.S(qubit);
+            Intrinsic.H(qubit);
         }
         elif (from == PauliY and to == PauliX) {
-            S(qubit);
+            Intrinsic.S(qubit);
         }
         elif (from == PauliX and to == PauliY) {
-            Adjoint S(qubit);
+            Adjoint Intrinsic.S(qubit);
         }
         else {
             fail "Unsupported input";
