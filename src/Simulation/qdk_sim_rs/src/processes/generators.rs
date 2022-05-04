@@ -56,8 +56,14 @@ impl Generator {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GeneratorCoset {
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub pre: Option<Process>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub post: Option<Process>,
+
     pub generator: Generator,
 }
 

@@ -56,6 +56,9 @@ public class NoiseModel
     [JsonPropertyName("z_meas")]
     public Instrument? ZMeas { get; set; }
 
+    [JsonPropertyName("rx")]
+    public GeneratorCoset? Rx { get; set; }
+
     public static bool TryGetByName(string name, [NotNullWhen(true)] out NoiseModel? model)
     {
         try
