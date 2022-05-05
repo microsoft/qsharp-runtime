@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NumSharp;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.Quantum.Experimental
 {
@@ -132,6 +133,11 @@ namespace Microsoft.Quantum.Experimental
                         {
                             reader.Require(JsonTokenType.PropertyName);
                             var kind = reader.GetString();
+                            // reader.GetString returns null when TokenType is
+                            // Null, but we've checked that condition above
+                            // by calling Require such that we can guarantee
+                            // kind is not null.
+                            Debug.Assert(kind is not null);
 
                             reader.Read();
                             completion = readData(ref reader, kind);
@@ -142,6 +148,8 @@ namespace Microsoft.Quantum.Experimental
                         else if (reader.TokenType == JsonTokenType.String)
                         {
                             var kind = reader.GetString();
+                            // The same logic follows here as well.
+                            Debug.Assert(kind is not null);
                             completion = readData(ref reader, kind);
                         }
                         else
