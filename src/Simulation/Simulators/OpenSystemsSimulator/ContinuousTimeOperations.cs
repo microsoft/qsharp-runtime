@@ -43,16 +43,7 @@ public partial class OpenSystemsSimulator
     }
     void IIntrinsicR.Body(Pauli pauli, double angle, Qubit target)
     {
-        if (pauli == Pauli.PauliI)
-        {
-            // Don't apply global phases on uncontrolled operations.
-            return;
-        }
-        else if (pauli == Pauli.PauliX)
-        {
-            Get<ExpIntrin.Rx, ExpIntrin.Rx>().__Body__((angle, target));
-        }
-        throw new NotImplementedException("Arbitrary rotation with noise is not yet supported.");
+        Get<ExpIntrin.R, ExpIntrin.R>().__Body__((pauli, angle, target));
     }
 
     void IIntrinsicR.AdjointBody(Pauli pauli, double angle, Qubit target)
@@ -62,18 +53,7 @@ public partial class OpenSystemsSimulator
 
     void IIntrinsicR.ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
     {
-        if (controls is { Count: 0 })
-        {
-            (this as IIntrinsicR).Body(pauli, angle, target);
-        }
-        else if (pauli == Pauli.PauliX)
-        {
-            Get<ExpIntrin.Rx, ExpIntrin.Rx>().__ControlledBody__((controls, (angle, target)));
-        }
-        else
-        {
-            throw new NotImplementedException("Arbitrary controlled rotation with noise is not yet supported.");
-        }
+        Get<ExpIntrin.R, ExpIntrin.R>().__ControlledBody__((controls, (pauli, angle, target)));
     }
 
     void IIntrinsicR.ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)

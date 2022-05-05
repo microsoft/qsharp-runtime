@@ -1,5 +1,5 @@
 use crate::chp_decompositions::ChpOperation;
-use crate::common_matrices::hx;
+use crate::common_matrices::{hx, hy, hz};
 use crate::error::QdkSimError;
 use crate::instrument::Instrument;
 use crate::linalg::HasDagger;
@@ -68,6 +68,15 @@ pub struct NoiseModel {
     /// The generator coset used to define what channels act when the
     /// `Rx` operation is called.
     pub rx: GeneratorCoset,
+
+    
+    /// The generator coset used to define what channels act when the
+    /// `Ry` operation is called.
+    pub ry: GeneratorCoset,
+    
+    /// The generator coset used to define what channels act when the
+    /// `Rz` operation is called.
+    pub rz: GeneratorCoset,
 
     /// The instrument that is used to the measure the state of a simulator
     /// in the $Z$-basis.
@@ -171,6 +180,8 @@ impl NoiseModel {
                 data: Unitary(common_matrices::cnot()),
             },
             rx: hx().into(),
+            ry: hy().into(),
+            rz: hz().into(),
             z_meas,
         }
     }
@@ -244,6 +255,8 @@ impl NoiseModel {
                 pr_readout_error: 0.0,
             },
             rx: Generator::unsupported(1).into(),
+            ry: Generator::unsupported(1).into(),
+            rz: Generator::unsupported(1).into(),
         }
     }
 }

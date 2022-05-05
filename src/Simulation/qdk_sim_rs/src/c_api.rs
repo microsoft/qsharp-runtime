@@ -7,7 +7,6 @@ use crate::error::{QdkSimError, QdkSimError::*};
 use crate::{built_info, GeneratorCoset, NoiseModel, Process, State};
 use lazy_static::lazy_static;
 use serde_json::json;
-use std::cell::{Ref, RefCell};
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::ffi::CString;
@@ -189,79 +188,107 @@ pub extern "C" fn destroy(sim_id: usize) -> i64 {
     })
 }
 
-// TODO[code quality]: refactor the following several functions into a macro.
 
-/// Applies the `X` operation acting on a given qubit to a given simulator,
-/// using the currently set noise model.
-#[no_mangle]
-pub extern "C" fn x(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.x)))
+macro_rules! declare_single_qubit_gate { 
+    (
+        $(#[$meta:meta])*
+        $gate_name:ident
+    ) => {
+        $(#[$meta])*
+        #[no_mangle]
+        pub fn $gate_name(sim_id: usize, idx: usize) -> i64 {
+            as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.$gate_name)))
+        }
+    };
 }
 
-/// Applies the `Y` operation acting on a given qubit to a given simulator,
-/// using the currently set noise model.
-#[no_mangle]
-pub extern "C" fn y(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.y)))
+macro_rules! declare_continuous_gate {
+    (
+        $(#[$meta:meta])*
+        $gate_name:ident
+    ) => {
+        $(#[$meta])*
+        #[no_mangle]
+        pub fn $gate_name(sim_id: usize, theta: f64, idx_control: usize, idx_target: usize) -> i64 {
+            as_capi_err(|| {
+                apply_continuous(sim_id, &[idx_control, idx_target], theta, |model| {
+                    Ok(&model.$gate_name)
+                })
+            })
+        }
+    };
 }
 
-/// Applies the `Z` operation acting on a given qubit to a given simulator,
-/// using the currently set noise model.
-#[no_mangle]
-pub extern "C" fn z(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.z)))
-}
+declare_single_qubit_gate!(
+    /// Applies the `X` operation acting on a given qubit to a given simulator,
+    /// using the currently set noise model.
+    x
+);
 
-/// Applies the `H` operation acting on a given qubit to a given simulator,
-/// using the currently set noise model.
-#[no_mangle]
-pub extern "C" fn h(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.h)))
-}
+declare_single_qubit_gate!(
+    /// Applies the `Y` operation acting on a given qubit to a given simulator,
+    /// using the currently set noise model.
+    y
+);
 
-/// Applies the `S` operation acting on a given qubit to a given simulator,
-/// using the currently set noise model.
-#[no_mangle]
-pub fn s(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.s)))
-}
+declare_single_qubit_gate!(
+    /// Applies the `Z` operation acting on a given qubit to a given simulator,
+    /// using the currently set noise model.
+    z
+);
 
-/// Applies the `Adjoint S` operation acting on a given qubit to a given
-/// simulator, using the currently set noise model.
-#[no_mangle]
-pub fn s_adj(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.s_adj)))
-}
+declare_single_qubit_gate!(
+    /// Applies the `H` operation acting on a given qubit to a given simulator,
+    /// using the currently set noise model.
+    h
+);
 
-/// Applies the `T` operation acting on a given qubit to a given simulator,
-/// using the currently set noise model.
-#[no_mangle]
-pub fn t(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.t)))
-}
+declare_single_qubit_gate!(
+    /// Applies the `S` operation acting on a given qubit to a given simulator,
+    /// using the currently set noise model.
+    s
+);
 
-/// Applies the `Adjoint T` operation acting on a given qubit to a given simulator,
-/// using the currently set noise model.
-#[no_mangle]
-pub fn t_adj(sim_id: usize, idx: usize) -> i64 {
-    as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.t_adj)))
-}
+declare_single_qubit_gate!(
+    /// Applies the `Adjoint S` operation acting on a given qubit to a given
+    /// simulator, using the currently set noise model.
+    s_adj
+);
+
+declare_single_qubit_gate!(
+    /// Applies the `T` operation acting on a given qubit to a given simulator,
+    /// using the currently set noise model.
+    t
+);
+
+declare_single_qubit_gate!(
+    /// Applies the `Adjoint T` operation acting on a given qubit to a given simulator,
+    /// using the currently set noise model.
+    t_adj
+);
 
 /// Applies the `CNOT` operation acting on two given qubits to a given simulator,
 /// using the currently set noise model.
 #[no_mangle]
-pub fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
+pub extern "C" fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
     as_capi_err(|| apply(sim_id, &[idx_control, idx_target], |model| Ok(&model.cnot)))
 }
 
-#[no_mangle]
-pub fn rx(sim_id: usize, theta: f64, idx_control: usize, idx_target: usize) -> i64 {
-    as_capi_err(|| {
-        apply_continuous(sim_id, &[idx_control, idx_target], theta, |model| {
-            Ok(&model.rx)
-        })
-    })
-}
+declare_continuous_gate!(
+    /// Applies the `Rx` operation acting on two given qubits to a given simulator,
+    /// using the currently set noise model.
+    rx
+);
+declare_continuous_gate!(
+    /// Applies the `Ry` operation acting on two given qubits to a given simulator,
+    /// using the currently set noise model.
+    ry
+);
+declare_continuous_gate!(
+    /// Applies the `Rz` operation acting on two given qubits to a given simulator,
+    /// using the currently set noise model.
+    rz
+);
 
 /// Measures a single qubit in the $Z$-basis, returning the result by setting
 /// the value at a given pointer.

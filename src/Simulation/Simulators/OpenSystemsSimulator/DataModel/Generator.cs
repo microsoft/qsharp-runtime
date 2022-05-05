@@ -116,6 +116,27 @@ public class GeneratorConverter : JsonConverter<Generator>
 
     public override void Write(Utf8JsonWriter writer, Generator value, JsonSerializerOptions options)
     {
-        throw new NotImplementedException();
+        var arrayConverter = new ComplexArrayConverter();
+
+        using (writer.WriteObject())
+        {
+            writer.WriteNumber("n_qubits", value.NQubits);
+
+            writer.WritePropertyName("data");
+            if (value is ExplicitEigenvalueDecomposition eig)
+            {
+                using (writer.WriteObject())
+                {
+                    writer.WritePropertyName("values");
+                    arrayConverter.Write(writer, eig.Eigenvalues, options);
+                    writer.WritePropertyName("vectors");
+                    arrayConverter.Write(writer, eig.Eigenvectors, options);
+                }
+            }
+            else if (value is UnsupportedGenerator _)
+            {
+                writer.WriteStringValue("Unsupported");
+            }
+        }
     }
 }

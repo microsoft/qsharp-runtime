@@ -57,7 +57,7 @@ mod tests {
         let expected = 1.214630436702533e+205;
         assert_abs_diff_eq!(
             approximate_factorial::<f64, f64>(123.0),
-            1.214630436702533e+205,
+            expected,
             epsilon = expected * 1e-8
         );
     }

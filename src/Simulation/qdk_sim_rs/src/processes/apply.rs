@@ -112,7 +112,7 @@ impl Process {
             }
         }
 
-        if let Superoperator(mtx) = &self.data {
+        if let Superoperator(_mtx) = &self.data {
             todo!("Apply superoperator to subregister.");
         }
         // TODO: Add superoperator case here, since that will let us avoid
