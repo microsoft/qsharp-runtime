@@ -89,27 +89,27 @@ public class GeneratorConverter : JsonConverter<Generator>
                                 break;
 
                             default:
-                                throw new JsonException($"Unknown property {propertyName}.");
+                                throw reader.CurrentState.Exception($"Unknown property {propertyName}.");
                         }
 
                     }
 
                     if (eigenvalues == null)
                     {
-                        throw new JsonException($"Generator kind was ExplicitEigenvalueDecomposition, but no eigenvalues were provided.");
+                        throw reader.CurrentState.Exception($"Generator kind was ExplicitEigenvalueDecomposition, but no eigenvalues were provided.");
                     }
                     Debug.Assert(eigenvalues is not null);
 
                     if (eigenvectors == null)
                     {
-                        throw new JsonException($"Generator kind was ExplicitEigenvalueDecomposition, but no eigenvectors were provided.");
+                        throw reader.CurrentState.Exception($"Generator kind was ExplicitEigenvalueDecomposition, but no eigenvectors were provided.");
                     }
                     Debug.Assert(eigenvectors is not null);
 
                     return (int nQubits) => new ExplicitEigenvalueDecomposition(nQubits, eigenvalues, eigenvectors);
 
                 default:
-                    throw new JsonException($"Unknown generator kind {kind}.");
+                    throw reader.CurrentState.Exception($"Unknown generator kind {kind}.");
             }
         });
     }

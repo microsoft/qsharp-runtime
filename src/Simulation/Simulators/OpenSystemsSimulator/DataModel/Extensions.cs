@@ -182,4 +182,23 @@ internal static class Extensions
         writer.WriteStartObject();
         return new ObjectEnder(writer);
     }
+
+    internal static long? LineNumber(this JsonReaderState state)
+    {
+        var field = typeof(JsonReaderState)
+            .GetField("_lineNumber", System.Reflection.BindingFlags.NonPublic)
+            ?.GetValue(state);
+        return field is null ? null : (long)field;
+    }
+
+    internal static long? BytePositionInLine(this JsonReaderState state)
+    {
+        var field = typeof(JsonReaderState)
+            .GetField("_bytePositionInLine", System.Reflection.BindingFlags.NonPublic)
+            ?.GetValue(state);
+        return field is null ? null : (long)field;
+    }
+
+    internal static JsonException Exception(this JsonReaderState state, string message, Exception? innerException = null) =>
+        new JsonException(message, null, state.LineNumber(), state.BytePositionInLine(), innerException);
 }
