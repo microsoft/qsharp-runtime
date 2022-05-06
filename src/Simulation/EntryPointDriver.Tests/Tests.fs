@@ -1123,6 +1123,7 @@ let ``Shows help text for submit command`` () =
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
                       --verbose                                           Show additional information about the submission.
+                      --submit-config-file <submit-config-file>           Configuration file to use custom submit properties.
                       -?, -h, --help                                      Show help and usage information"
     let given = test "Help"
     given ["submit"; "--help"] |> yields message
@@ -1155,6 +1156,7 @@ let ``Shows help text for submit command with default target`` () =
                       --output <FriendlyUri|Id>                           The information to show in the output after the job is submitted.
                       --dry-run                                           Validate the program and options, but do not submit to Azure Quantum.
                       --verbose                                           Show additional information about the submission.
+                      --submit-config-file <submit-config-file>           Configuration file to use custom submit properties.
                       -?, -h, --help                                      Show help and usage information"
     let given = testWithTarget "foo.target" "Help"
     given ["submit"; "--help"] |> yields message
