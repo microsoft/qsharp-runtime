@@ -127,10 +127,14 @@ public class GeneratorConverter : JsonConverter<Generator>
             {
                 using (writer.WriteObject())
                 {
-                    writer.WritePropertyName("values");
-                    arrayConverter.Write(writer, eig.Eigenvalues, options);
-                    writer.WritePropertyName("vectors");
-                    arrayConverter.Write(writer, eig.Eigenvectors, options);
+                    writer.WritePropertyName("ExplicitEigenvalueDecomposition");
+                    using (writer.WriteObject())
+                    {
+                        writer.WritePropertyName("values");
+                        arrayConverter.Write(writer, eig.Eigenvalues, options);
+                        writer.WritePropertyName("vectors");
+                        arrayConverter.Write(writer, eig.Eigenvectors, options);
+                    }
                 }
             }
             else if (value is UnsupportedGenerator _)
