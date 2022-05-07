@@ -1,7 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+#nullable enable
+
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -9,6 +12,7 @@ using Microsoft.Quantum.Experimental;
 using Microsoft.Quantum.Simulation.Core;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests
 {
@@ -35,10 +39,38 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             return Encoding.UTF8.GetString(stream.ToArray());
         }
 
-        internal static void AssertSerializationRoundTrips<T>(this T obj)
+        internal static void AssertSerializationRoundTrips<T>(this T obj, ITestOutputHelper? output = null)
         {
-            var expected = JsonSerializer.Serialize<T>(obj);
-            var actual = JsonSerializer.Serialize<T>(JsonSerializer.Deserialize<T>(expected));
+            string expected;
+            try
+            {
+                expected = JsonSerializer.Serialize<T>(obj);
+            }
+            catch (Exception ex)
+            {
+                output?.WriteLine($"Serialization of {typeof(T)} failed to round-trip: initial serialization failed.");
+                throw ex;
+            }
+
+            T roundTripObj;
+            try
+            {
+                var deserialized = JsonSerializer.Deserialize<T>(expected);
+                Debug.Assert(deserialized is not null);
+                roundTripObj = deserialized;
+            }
+            catch (JsonException ex)
+            {
+                output?.WriteLine(
+                    $"Serialization of {typeof(T)} failed to round-trip: JSON exception deserializing.\n" +
+                    $"Line {ex.LineNumber}, offset {ex.BytePositionInLine}.\n" +
+                    "Source:\n" +
+                    $"{expected}"
+                );
+                throw ex;
+            }
+
+            var actual = JsonSerializer.Serialize<T>(roundTripObj);
             expected.AssertJsonIsEqualTo(actual);
         }
 
