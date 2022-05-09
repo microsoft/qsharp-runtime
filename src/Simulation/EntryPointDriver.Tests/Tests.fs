@@ -626,12 +626,14 @@ let ``Submit allows overriding default values`` () =
         "myUserAgent"
         "--credential"
         "cli"
+        "--target-capability"
+        "myTargetCapability"
     ])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
+               TargetCapability: myTargetCapabilityFail
                Storage: myStorage
                Base URI:
                Location: myLocation
