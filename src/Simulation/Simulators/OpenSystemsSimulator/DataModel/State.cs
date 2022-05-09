@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Numerics;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using NumSharp;
 using static System.Math;
