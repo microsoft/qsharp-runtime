@@ -59,6 +59,12 @@ public class NoiseModel
     [JsonPropertyName("rx")]
     public GeneratorCoset? Rx { get; set; }
 
+    [JsonPropertyName("ry")]
+    public GeneratorCoset? Ry { get; set; }
+
+    [JsonPropertyName("rz")]
+    public GeneratorCoset? Rz { get; set; }
+
     public static bool TryGetByName(string name, [NotNullWhen(true)] out NoiseModel? model)
     {
         try
