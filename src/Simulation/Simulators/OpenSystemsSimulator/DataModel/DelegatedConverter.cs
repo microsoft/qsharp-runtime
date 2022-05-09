@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Experimental;
 
 public class DelegatedConverter<T> : Newtonsoft.Json.JsonConverter<T>
 {
-    public override T ReadJson(JsonReader reader, Type objectType, [AllowNull] T existingValue, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
+    public override T? ReadJson(JsonReader reader, Type objectType, [AllowNull] T existingValue, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
     {
         var serialized = JToken.ReadFrom(reader).ToString();
         return System.Text.Json.JsonSerializer.Deserialize<T>(serialized);

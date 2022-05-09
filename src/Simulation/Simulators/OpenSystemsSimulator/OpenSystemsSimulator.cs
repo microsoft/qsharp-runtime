@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Experimental;
 // NB: This class should not implement IQSharpCore, but does so temporarily
 //     to make the simulator available to IQ# (note that the I in IQSharpCore
 //     refers to interfaces, and not to IQ# itself...)
-public partial class OpenSystemsSimulator : SimulatorBase, IQSharpCore
+public partial class OpenSystemsSimulator : SimulatorBase, IQSharpCore, IDisposable
 {
     public static JToken BuildInfo => NativeInterface.SimulatorInfo;
 
@@ -131,7 +131,7 @@ public partial class OpenSystemsSimulator : SimulatorBase, IQSharpCore
         Get<ExpIntrin.Z, ExpIntrin.Z>().__ControlledBody__((controls, target));
     }
 
-    public void Dispose()
+    void IDisposable.Dispose()
     {
         NativeInterface.Destroy(this.Id);
     }

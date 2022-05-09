@@ -20,6 +20,10 @@ public class ChpOperationConverter : JsonConverter<ChpOperation>
         {
             case "Cnot":
                 var idxs = JsonSerializer.Deserialize<List<ulong>>(ref reader);
+                if (idxs is null)
+                {
+                    throw reader.CurrentState.Exception("Array of indices for CNOT step in CHP decomposition was null.");
+                }
                 operation = new ChpOperation.Cnot
                 {
                     IdxControl = idxs[0],

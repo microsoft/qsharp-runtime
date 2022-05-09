@@ -15,14 +15,13 @@ public class StateSerializationTests
         var state = new StabilizerState
         {
             NQubits = 2,
-            Table = new StabilizerState.TableArray
-            {
-                Data = new List<bool>
+            Table = new StabilizerState.TableArray(
+                Data: new List<bool>
                 {
                     true, false, false, false, true, false
                 },
-                Dimensions = new List<int> { 2, 3 }
-            }
+                Dimensions: new List<int> { 2, 3 }
+            )
         };
         var json = JsonSerializer.Serialize<Microsoft.Quantum.Experimental.State>(state);
         var expectedJson = @"{

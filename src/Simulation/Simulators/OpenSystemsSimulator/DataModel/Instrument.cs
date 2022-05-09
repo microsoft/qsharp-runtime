@@ -20,6 +20,10 @@ public class InstrumentConverter : JsonConverter<Instrument>
         reader.Require(JsonTokenType.PropertyName);
 
         var variant = reader.GetString();
+        if (variant is null)
+        {
+            throw reader.CurrentState.Exception("Instrument variant name was null.");
+        }
 
         Instrument result = variant switch
         {
@@ -29,8 +33,12 @@ public class InstrumentConverter : JsonConverter<Instrument>
                     .Deserialize<List<Process>>(ref reader)
                     .ToImmutableList()
             },
-            "ZMeasurement" => JsonSerializer.Deserialize<ZMeasurementInstrument>(ref reader),
-            _ => throw new JsonException($"Enum variant {variant} not yet supported.")
+            "ZMeasurement" =>
+                JsonSerializer.Deserialize<ZMeasurementInstrument>(ref reader)
+                is {} zMeas
+                ? zMeas
+                : throw reader.CurrentState.Exception("Failed to deserialize Z measurement instrument."),
+            _ => throw reader.CurrentState.Exception($"Enum variant {variant} not yet supported.")
         };
 
         reader.Require(JsonTokenType.EndObject);

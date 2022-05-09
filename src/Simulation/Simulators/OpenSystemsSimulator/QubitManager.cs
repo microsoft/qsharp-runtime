@@ -1,17 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
-using System.Linq;
+#nullable enable
+
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Common;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Microsoft.Quantum.Simulation.Simulators.Exceptions;
 using Microsoft.Quantum.Intrinsic.Interfaces;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Quantum.Experimental
 {
@@ -46,7 +40,7 @@ namespace Microsoft.Quantum.Experimental
                 // Thus, our strategy will be to always allow the release to
                 // proceed, doing any resets needed to deal with case (1)
                 // above.
-                if (qubit != null && qubit.IsMeasured)
+                if (qubit.IsMeasured)
                 {
                     // Try to reset measured qubits.
                     // TODO: There are better ways to do this; increment on the

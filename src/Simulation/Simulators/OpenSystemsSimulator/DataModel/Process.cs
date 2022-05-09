@@ -74,10 +74,10 @@ namespace Microsoft.Quantum.Experimental
                         (int nQubits, IList<(double, IList<Pauli>)> data) => new MixedPauliProcess(nQubits, data)
                     ),
                     "Sequence" => JsonSerializer.Deserialize<IList<Process>>(ref reader).Bind(
-                        (int nQubits, IList<Process> processes) => new SequenceProcess(nQubits, processes)
+                        (int nQubits, IList<Process>? processes) => new SequenceProcess(nQubits, processes ?? new List<Process>())
                     ),
                     "ChpDecomposition" => JsonSerializer.Deserialize<IList<ChpOperation>>(ref reader).Bind(
-                        (int nQubits, IList<ChpOperation> operations) => new ChpDecompositionProcess(nQubits, operations)
+                        (int nQubits, IList<ChpOperation>? operations) => new ChpDecompositionProcess(nQubits, operations ?? new List<ChpOperation>())
                     ),
                     "Unsupported" => (null as object).Bind(
                         (int nQubits, object? _) => new UnsupportedProcess(nQubits)

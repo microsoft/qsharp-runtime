@@ -46,7 +46,7 @@ public class StateConverter : JsonConverter<State>
                     (int nQubits, NDArray data) => new MixedState(nQubits, data)
                 ),
                 "Stabilizer" => JsonSerializer.Deserialize<StabilizerState>(ref reader).Bind(
-                    (int nQubits, StabilizerState state) =>
+                    (int nQubits, StabilizerState? state) =>
                     {
                         System.Diagnostics.Debug.Assert((state?.Data as object) != null);
                         System.Diagnostics.Debug.Assert(nQubits == state.NQubits);
@@ -83,11 +83,10 @@ public class StateConverter : JsonConverter<State>
                 }
                 else if (value is StabilizerState stabilizerState)
                 {
-                    var array = new StabilizerState.TableArray
-                    {
-                        Data = stabilizerState.Data.flat.ToArray<bool>().ToList(),
-                        Dimensions = stabilizerState.Data.Shape.Dimensions.ToList()
-                    };
+                    var array = new StabilizerState.TableArray(
+                        Data: stabilizerState.Data.flat.ToArray<bool>().ToList(),
+                        Dimensions: stabilizerState.Data.Shape.Dimensions.ToList()
+                    );
                     writer.WriteStartObject();
                         writer.WritePropertyName("n_qubits");
                         writer.WriteNumberValue(stabilizerState.NQubits);
