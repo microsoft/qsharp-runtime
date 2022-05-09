@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests;
 
@@ -70,11 +71,8 @@ internal static class SerializationExtensions
 
     internal static void AssertJsonIsEqualTo(this string expectedJson, string actualJson)
     {
-        // To get a stable text representation, we first parse both strings to JsonDocument
-        // objects, then re-serialize them. This avoids numerical precision issues in
-        // JToken.DeepEquals, and allows for highlighting diffs more easily.
-        var expectedNormalized = JsonDocument.Parse(expectedJson).Serialize();
-        var actualNormalized = JsonDocument.Parse(actualJson).Serialize();
-        Assert.Equal(expectedNormalized, actualNormalized);
+        var expectedNormalized = Newtonsoft.Json.JsonConvert.DeserializeObject<JToken>(expectedJson);
+        var actualNormalized = Newtonsoft.Json.JsonConvert.DeserializeObject<JToken>(actualJson);
+        Assert.True(JToken.DeepEquals(expectedNormalized, actualNormalized));
     }
 }
