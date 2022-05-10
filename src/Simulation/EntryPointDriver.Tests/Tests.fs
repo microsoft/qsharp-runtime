@@ -631,6 +631,7 @@ let ``Submit allows overriding default values`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
+               TargetCapability:
                Storage: myStorage
                Base URI:
                Location: myLocation
