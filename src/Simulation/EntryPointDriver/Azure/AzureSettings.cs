@@ -168,7 +168,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The submission options corresponding to these settings.
         /// </summary>
-        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams);
+        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams, TargetCapability);
 
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.

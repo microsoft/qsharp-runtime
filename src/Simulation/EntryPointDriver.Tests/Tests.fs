@@ -626,14 +626,11 @@ let ``Submit allows overriding default values`` () =
         "myUserAgent"
         "--credential"
         "cli"
-        "--target-capability"
-        "myTargetCapability"
     ])
     |> yields "Subscription: mySubscription
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability: myTargetCapabilityFail
                Storage: myStorage
                Base URI:
                Location: myLocation
@@ -1086,7 +1083,6 @@ let ``Shows help text for generateazurepayload command`` () =
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --target <target> (REQUIRED)                        The target device ID.
-                      --target-capability <target-capability>             The name of the target capability.
                       --verbose                                           Show additional information about the submission.
                       -?, -h, --help                                      Show help and usage information"
     let given = test "Help"
@@ -1105,7 +1101,6 @@ let ``Shows help text for generateazurepayload command with default target`` () 
                       --pauli <PauliI|PauliX|PauliY|PauliZ> (REQUIRED)    The name of a Pauli matrix.
                       --my-cool-bool (REQUIRED)                           A neat bit.
                       --target <target>                                   The target device ID.
-                      --target-capability <target-capability>             The name of the target capability.
                       --verbose                                           Show additional information about the submission.
                       -?, -h, --help                                      Show help and usage information"
     let given = testWithTarget "foo.target" "Help"
@@ -1127,7 +1122,6 @@ let ``Shows help text for submit command`` () =
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --target <target> (REQUIRED)                        The target device ID.
-                      --target-capability <target-capability>             The name of the target capability.
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
@@ -1161,7 +1155,6 @@ let ``Shows help text for submit command with default target`` () =
                       --resource-group <resource-group> (REQUIRED)        The resource group name.
                       --workspace <workspace> (REQUIRED)                  The workspace name.
                       --target <target>                                   The target device ID.
-                      --target-capability <target-capability>             The name of the target capability.
                       --credential <credential>                           The type of credential to use to authenticate with Azure.
                       --storage <storage>                                 The storage account connection string.
                       --aad-token <aad-token>                             The Azure Active Directory authentication token.
