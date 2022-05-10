@@ -62,8 +62,8 @@ namespace Microsoft.Azure.Quantum
         /// <param name="workspace">The workspace used to manage jobs.</param>
         /// <param name="storageConnection">The connection string for the storage account.</param>
         /// <returns>A QIR submitter.</returns>
-        public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection) =>
-            Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection);
+        public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection, string targetCapability) =>
+            Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection, targetCapability);
 
         public static IQirSubmitter? QirSubmitterFromConfigFile(
             string target, FileInfo configFile, IWorkspace workspace, string? storageConnection)
@@ -117,7 +117,7 @@ namespace Microsoft.Azure.Quantum
         /// <typeparam name="T">The type of the submitter interface.</typeparam>
         /// <returns>The submitter instance.</returns>
         private static T? Submitter<T>(
-            IEnumerable<SubmitterInfo> submitters, string target, IWorkspace workspace, string? storageConnection)
+            IEnumerable<SubmitterInfo> submitters, string target, IWorkspace workspace, string? storageConnection, string targetCapability = "")
             where T : class
         {
             var constructorInfo = ConstructorInfo(submitters, target);
@@ -127,7 +127,7 @@ namespace Microsoft.Azure.Quantum
             }
 
             (var constructorName, var constructorType) = constructorInfo.Value;
-            var args = new object?[] { target, workspace, storageConnection };
+            var args = new object?[] { target, workspace, targetCapability, storageConnection };
             return (T)constructorType.InvokeMember(
                 constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
         }
