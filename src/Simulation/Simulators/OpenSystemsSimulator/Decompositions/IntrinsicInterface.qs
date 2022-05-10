@@ -151,10 +151,11 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
+    // FIXME: Need to support `Controlled R(PauliI, _, _)` here.
     operation R(pauli : Pauli, theta : Double, target : Qubit) : Unit is Adj + Ctl {
         body (...) {
             if pauli == PauliI {
-                // Do nothing; global phases are insignficant in density operator representations.
+                // Do nothing; global phases are insignificant in density operator representations.
             } elif pauli == PauliX {
                 Native.Rx(theta, target);
             } elif pauli == PauliY {
@@ -179,7 +180,7 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
                 within {
                     MapPauli(target, PauliZ, pauli);
                 }
-                apply {                
+                apply {
                     R(PauliZ, theta / 2.0, target);
                     Controlled X(controls, target);
                     R(PauliZ, -theta / 2.0, target);
@@ -191,27 +192,9 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    // NB: We separate out this operation to avoid hardware targeting rewrite
-    //     steps from trying to lift this operation and modifying the C#
-    //     code gen in the process.
-    //     See https://github.com/microsoft/qsharp-compiler/issues/768.
-    internal operation MeasureWithoutPauliI(bases : Pauli[], register : Qubit[]) : Result {
-        mutable newBases = [];
-        mutable newQubits = [];
-        // NB: using Zipped would be nice here, but this is built before
-        //     M.Q.Standard...
-        for idxBasis in 0..Length(bases) - 1 {
-            if bases[idxBasis] != PauliI {
-                set newBases += [bases[idxBasis]];
-                set newQubits += [register[idxBasis]];
-            }
-        }
-
-        if Length(newBases) == 0 {
-            return Zero;
-        } else {
-            return Measure(newBases, newQubits);
-        }
+    operation R1 (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
+        R(PauliZ, theta, qubit);
+        R(PauliI, -theta, qubit);
     }
 
     operation Measure(bases : Pauli[], register : Qubit[]) : Result {
@@ -246,6 +229,42 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         } else {
             // TODO
             fail "Multi-qubit measurement is not yet implemented.";
+        }
+    }
+
+    /// # Summary
+    /// Applies the exponential of a multi-qubit Pauli operator.
+    ///
+    /// # Description
+    /// \begin{align}
+    ///     e^{i \theta [P_0 \otimes P_1 \cdots P_{N-1}]},
+    /// \end{align}
+    /// where $P_i$ is the $i$th element of `paulis`, and where
+    /// $N = $`Length(paulis)`.
+    ///
+    /// # Input
+    /// ## paulis
+    /// Array of single-qubit Pauli values indicating the tensor product
+    /// factors on each qubit.
+    /// ## theta
+    /// Angle about the given multi-qubit Pauli operator by which the
+    /// target register is to be rotated.
+    /// ## qubits
+    /// Register to apply the given rotation to.
+    operation Exp (paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Adj + Ctl {
+        body (...) {
+            if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'qubits' must have the same length"; }
+            let (newPaulis, newQubits) = RemovePauliI(paulis, qubits);
+
+            if (Length(newPaulis) != 0) {
+                ExpUtil(newPaulis, theta , newQubits, R(_, -2.0 * theta, _));
+            }
+            else {
+                ApplyGlobalPhase(theta);
+            }
+        }
+        adjoint(...) {
+            Exp(paulis, -theta, qubits);
         }
     }
 

@@ -24,22 +24,22 @@ public partial class OpenSystemsSimulator
 
     void IIntrinsicExp.Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
     {
-        throw new NotImplementedException();
+        Get<ExpIntrin.Exp, ExpIntrin.Exp>().__Body__((paulis, angle, targets));
     }
 
     void IIntrinsicExp.AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
     {
-        throw new NotImplementedException();
+        Get<ExpIntrin.Exp, ExpIntrin.Exp>().__Body__((paulis, -angle, targets));
     }
 
     void IIntrinsicExp.ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
     {
-        throw new NotImplementedException();
+        Get<ExpIntrin.Exp, ExpIntrin.Exp>().__ControlledBody__((controls, (paulis, angle, targets)));
     }
 
     void IIntrinsicExp.ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
     {
-        throw new NotImplementedException();
+        Get<ExpIntrin.Exp, ExpIntrin.Exp>().__ControlledBody__((controls, (paulis, -angle, targets)));
     }
     void IIntrinsicR.Body(Pauli pauli, double angle, Qubit target)
     {
