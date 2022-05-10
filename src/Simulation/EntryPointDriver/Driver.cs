@@ -109,11 +109,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         private static readonly OptionInfo<string> JobNameOption = new OptionInfo<string>(
             ImmutableList.Create("--job-name"), Maybe.Just(string.Empty), "The name of the submitted job.");
 
-        /// <summary>
-        /// The target capability option.
-        /// </summary>
-        private static readonly OptionInfo<string> TargetCapabilityOption = new OptionInfo<string>(
-            ImmutableList.Create("--target-capability"), Maybe.Just(string.Empty), "The name of the target capability.");
+        // /// <summary>
+        // /// The target capability option.
+        // /// </summary>
+        // private static readonly OptionInfo<string> TargetCapabilityOption = new OptionInfo<string>(
+        //     ImmutableList.Create("--target-capability"), Maybe.Just(string.Empty), "The name of the target capability.");
 
         /// <summary>
         /// The job parameters option.
@@ -451,7 +451,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
 
             var validators = AddOptionIfAvailable(command, TargetOption)
-                .Concat(AddOptionIfAvailable(command, TargetCapabilityOption))
+                // .Concat(AddOptionIfAvailable(command, TargetCapabilityOption))
                 .Concat(AddOptionIfAvailable(command, VerboseOption));
 
             return new CommandWithValidators(command, validators.ToImmutableList());
@@ -496,7 +496,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 .Concat(AddOptionIfAvailable(command, ResourceGroupOption))
                 .Concat(AddOptionIfAvailable(command, WorkspaceOption))
                 .Concat(AddOptionIfAvailable(command, TargetOption))
-                .Concat(AddOptionIfAvailable(command, TargetCapabilityOption))
+                // .Concat(AddOptionIfAvailable(command, TargetCapabilityOption))
                 .Concat(AddOptionIfAvailable(command, CredentialOption))
                 .Concat(AddOptionIfAvailable(command, StorageOption))
                 .Concat(AddOptionIfAvailable(command, AadTokenOption))
@@ -552,7 +552,8 @@ namespace Microsoft.Quantum.EntryPointDriver
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
                 Target = DefaultIfShadowed(entryPoint, TargetOption, azureSettings.Target),
-                TargetCapability = DefaultIfShadowed(entryPoint, TargetCapabilityOption, azureSettings.TargetCapability),
+                //TargetCapability = DefaultIfShadowed(entryPoint, new OptionInfo<string>( /*settings.DefaultTargetCapability/*TargetCapabilityOption*/, azureSettings.TargetCapability),
+                TargetCapability = settings.TargetCapability,
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
                 UserAgent = DefaultIfShadowed(entryPoint, UserAgentOption, azureSettings.UserAgent),
