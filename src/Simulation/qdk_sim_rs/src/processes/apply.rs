@@ -228,7 +228,7 @@ pub(crate) fn apply_pauli_channel(
         data: match &state.data {
             Pure(_) | Mixed(_) => {
                 // Promote and recurse.
-                let promoted = promote_pauli_channel(paulis);
+                let promoted = promote_pauli_channel(paulis)?;
                 return promoted.apply(state);
             }
             Stabilizer(tableau) => {

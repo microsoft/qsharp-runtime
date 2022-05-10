@@ -8,6 +8,7 @@ use cauchy::c64;
 pub use generators::*;
 
 use crate::chp_decompositions::ChpOperation;
+use crate::error::QdkSimError;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
 use crate::processes::ProcessData::{KrausDecomposition, MixedPauli, Unitary};
 use crate::QubitSized;
@@ -49,7 +50,7 @@ pub enum ProcessData {
     KrausDecomposition(Array3<C64>),
 
     Superoperator(Array2<c64>),
-    // TODO: Superoperator and Choi reps.
+    // TODO: Choi representation.
     /// Representation of a process as a sequence of other processes.
     Sequence(Vec<Process>),
 
@@ -205,7 +206,7 @@ impl Mul<&Process> for C64 {
                     ks
                 }),
                 KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks),
-                MixedPauli(paulis) => (self * promote_pauli_channel(paulis)).data,
+                MixedPauli(paulis) => (self * promote_pauli_channel(paulis).unwrap()).data,
                 ProcessData::Superoperator(rhs) => ProcessData::Superoperator(self * rhs),
                 ProcessData::Unsupported => ProcessData::Unsupported,
                 ProcessData::Sequence(processes) => {
@@ -404,17 +405,24 @@ impl IntoPauliMixture for Pauli {
 ///
 /// This function is a private utility mainly used in handling the case where
 /// a mixed Pauli channel is applied to a pure or mixed state.
-fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
-    // TODO: Check that there's at least one Pauli... empty vectors aren't
-    //       supported here.
-    if paulis.len() == 1 {
+fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Result<Process, QdkSimError> {
+    if paulis.len() == 0 {
+        Err(QdkSimError::MiscError(
+            "Cannot promote Pauli channel with no outcomes to a process.".to_string(),
+        ))?
+    } else if paulis.len() == 1 {
         // Just one Pauli, so can box it up into a unitary.
-        let (_, pauli) = &paulis[0];
-        // TODO[testing]: check that pr is 1.0.
-        Process {
+        let (pr, pauli) = &paulis[0];
+        if (pr - 1.0).abs() >= 1e-8 {
+            Err(QdkSimError::MiscError(format!(
+                "Cannot promote Pauli channel with probability {} to quantum process.",
+                pr
+            )))?;
+        }
+        Ok(Process {
             n_qubits: pauli.len(),
             data: Unitary(pauli.as_unitary()),
-        }
+        })
     } else {
         // To turn a mixed Pauli channel into a Kraus decomposition, we need
         // to take the square root of each probability.
@@ -432,7 +440,7 @@ fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
                 x.to_owned()
             })
             .collect_vec();
-        Process {
+        Ok(Process {
             n_qubits: paulis[0].1.len(),
             data: KrausDecomposition(
                 ndarray::concatenate(
@@ -441,6 +449,6 @@ fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
                 )
                 .unwrap(),
             ),
-        }
+        })
     }
 }
