@@ -62,15 +62,53 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
 
     internal operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
         body (...) {}
-        controlled (controls, (...)) {
-            if (Length(controls) > 0) {
-                let qubit = controls[0];
-                let rest = controls[1...];
-                // Invoke Controlled R1, which will recursively call back into ApplyGlobalPhase.
-                // Each time the controls is one shorter, until it is empty and the recursion stops.
-                Controlled Intrinsic.R1(rest, (theta, qubit));
+        controlled (ctls, (...)) {
+            if Length(ctls) == 0 {
+                // Noop
+            }
+            elif Length(ctls) == 1 {
+                Intrinsic.R(PauliZ, theta, ctls[0]);
+            }
+            elif Length(ctls) == 2 {
+                Controlled Intrinsic.R1([ctls[1]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 3 {
+                Controlled Intrinsic.R1([ctls[1], ctls[2]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 4 {
+                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 5 {
+                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3], ctls[4]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 6 {
+                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 7 {
+                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6]], (theta, ctls[0]));
+            }
+            elif Length(ctls) == 8 {
+                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6], ctls[7]], (theta, ctls[0]));
+            }
+            else {
+                fail "Too many controls specified to R gate.";
             }
         }
+    }
+
+    internal operation CRz(control : Qubit, theta : Double, target : Qubit) : Unit is Adj {
+        Intrinsic.Rz(theta / 2.0, target);
+        Controlled Intrinsic.X([control], target);
+        Intrinsic.Rz(-theta / 2.0, target);
+        Controlled Intrinsic.X([control], target);
+    }
+
+    internal operation CR1(theta : Double, control : Qubit, target : Qubit) : Unit is Adj {
+        Intrinsic.R(PauliZ, theta/2.0, target);
+        Intrinsic.R(PauliZ, theta/2.0, control);
+        Controlled Intrinsic.X([control], target);
+        Intrinsic.R(PauliZ, -theta/2.0, target);
+        Controlled Intrinsic.X([control], target);
     }
 
     internal operation ExpUtil (paulis : Pauli[], theta : Double, qubits : Qubit[], rotation : ((Pauli, Qubit) => Unit is Adj + Ctl)) : Unit is Ctl {
