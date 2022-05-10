@@ -188,8 +188,7 @@ pub extern "C" fn destroy(sim_id: usize) -> i64 {
     })
 }
 
-
-macro_rules! declare_single_qubit_gate { 
+macro_rules! declare_single_qubit_gate {
     (
         $(#[$meta:meta])*
         $gate_name:ident

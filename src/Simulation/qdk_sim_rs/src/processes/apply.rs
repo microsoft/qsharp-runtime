@@ -238,7 +238,7 @@ pub(crate) fn apply_pauli_channel(
                 // Sample a Pauli and apply it.
                 let weighted = WeightedIndex::new(paulis.iter().map(|(pr, _)| pr)).unwrap();
                 let idx = weighted.sample(&mut thread_rng());
-                let pauli = &(&paulis)[idx].1;
+                let pauli = &paulis[idx].1;
                 // TODO: Consider moving the following to a method
                 //       on Tableau itself.
                 for (idx_qubit, p) in pauli.iter().enumerate() {

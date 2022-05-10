@@ -1,25 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use std::{
-    ops::Mul,
-};
+use std::ops::Mul;
 
 use cauchy::Scalar;
 
 #[cfg(feature = "pade")]
-use ndarray::{
-    ArrayBase, Data, Ix2, OwnedRepr, RawData, ScalarOperand,
-};
+use ndarray::{ArrayBase, Data, Ix2, OwnedRepr, RawData, ScalarOperand};
 
-use crate::{
-    linalg::decompositions::{EigenvalueDecomposition, ExplicitEigenvalueDecomposition},
-};
+use crate::linalg::decompositions::{EigenvalueDecomposition, ExplicitEigenvalueDecomposition};
 
 #[cfg(feature = "pade")]
 use crate::{
-    error::QdkSimError, linalg::{Identity, Inv, MatrixPower},
-    math::approximate_factorial
+    error::QdkSimError,
+    linalg::{Identity, Inv, MatrixPower},
+    math::approximate_factorial,
 };
 
 // NB: We use the notation of

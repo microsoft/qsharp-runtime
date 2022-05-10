@@ -68,10 +68,7 @@ pub fn hz() -> Generator {
         n_qubits: 1,
         data: crate::GeneratorData::ExplicitEigenvalueDecomposition {
             values: c64!(-0.5) * array![c64!(1.0), c64!(-1.0)],
-            vectors: array![
-                [c64!(1.0), c64!(0.0)],
-                [c64!(0.0), c64!(1.0)],
-            ],
+            vectors: array![[c64!(1.0), c64!(0.0)], [c64!(0.0), c64!(1.0)],],
         },
     }
 }

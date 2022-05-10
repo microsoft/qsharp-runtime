@@ -69,11 +69,10 @@ pub struct NoiseModel {
     /// `Rx` operation is called.
     pub rx: GeneratorCoset,
 
-    
     /// The generator coset used to define what channels act when the
     /// `Ry` operation is called.
     pub ry: GeneratorCoset,
-    
+
     /// The generator coset used to define what channels act when the
     /// `Rz` operation is called.
     pub rz: GeneratorCoset,

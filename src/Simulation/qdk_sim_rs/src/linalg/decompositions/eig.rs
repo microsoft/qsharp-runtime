@@ -49,9 +49,8 @@ where
         func: F,
     ) -> Result<Self::MatrixSolution, Self::Error> {
         let new_eigvals = self.values.map(func);
-        let foo: Array2<A> = new_eigvals * &self.vectors;
-        let bar = self.vectors.dag();
-        Ok(foo.dot(&bar))
+        let new_eigvecs: Array2<A> = new_eigvals * &self.vectors;
+        Ok(new_eigvecs.dot(&self.vectors.dag()))
     }
 }
 
