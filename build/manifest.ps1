@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 <#
@@ -26,6 +26,7 @@ $artifacts = @{
         "Microsoft.Quantum.Type1.Core",
         "Microsoft.Quantum.Type2.Core",
         "Microsoft.Quantum.Type3.Core",
+        "Microsoft.Quantum.Type4.Core",
         "Microsoft.Quantum.Qir.Runtime",
         "Microsoft.Quantum.QSharp.Foundation"
         "Microsoft.Quantum.Runtime.Core",
@@ -43,6 +44,7 @@ $artifacts = @{
         ".\src\Simulation\Type1Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type1.Core.dll",
         ".\src\Simulation\Type2Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type2.Core.dll",
         ".\src\Simulation\Type3Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type3.Core.dll",
+        ".\src\Simulation\Type4Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type4.Core.dll",
         ".\src\Simulation\QSharpFoundation\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Foundation.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.Common.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",

@@ -1,17 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.IO;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
 using Azure.Core;
 using Azure.Quantum;
 
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Quantum.Runtime.Submitters;
-using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
@@ -57,6 +59,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The target device ID.
         /// </summary>
         public string? Target { get; set; }
+
+        /// <summary>
+        /// A configuration file to customize submission.
+        /// </summary>
+        public FileInfo? SubmitConfigFile { get; set; }
 
         /// <summary>
         /// The storage account connection string.

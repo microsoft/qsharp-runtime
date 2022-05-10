@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 $ErrorActionPreference = 'Stop'
@@ -179,6 +179,7 @@ Pack-Dotnet '../src/Simulation/QSharpCore/Microsoft.Quantum.QSharp.Core.csproj'
 Pack-Dotnet '../src/Simulation/Type1Core/Microsoft.Quantum.Type1.Core.csproj'
 Pack-Dotnet '../src/Simulation/Type2Core/Microsoft.Quantum.Type2.Core.csproj'
 Pack-Dotnet '../src/Simulation/Type3Core/Microsoft.Quantum.Type3.Core.csproj'
+Pack-Dotnet '../src/Simulation/Type4Core/Microsoft.Quantum.Type4.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
 Pack-Crate -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:CRATE_OUTDIR;
