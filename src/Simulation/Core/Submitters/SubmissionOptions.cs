@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Runtime.Submitters
         /// <summary>
         /// The target capability.
         /// </summary>
-        public string TargetCapability { get; }
+        public string TargetCapability { get; set; }
 
         /// <summary>
         /// The default submission options.
