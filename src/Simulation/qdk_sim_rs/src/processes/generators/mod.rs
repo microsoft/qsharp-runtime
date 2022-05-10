@@ -1,4 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+mod common;
+
 use cauchy::c64;
+pub use common::*;
 use ndarray::{Array1, Array2};
 use serde::{Deserialize, Serialize};
 
@@ -12,8 +18,17 @@ pub type Generator = QubitSized<GeneratorData>;
 
 /// Data used to represent a single-parameter monoid whose elements
 /// are quantum processes.
+///
+/// # Dimensions
+/// Generators are expected to represent $4^n \times 4^n$ matrices of the form
+/// $G = -\mathrm{i}L + D$, where $L$ is a Liouvillian operator in
+/// column-stacking representation (that is, $L = 𝟙 \otimes H - H \otimes 𝟙$),
+/// where $H$ is the Hamiltonian, and where $D$ is a dissipator.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum GeneratorData {
+    /// # Remarks
+    /// The null space (eigenvectors corresponding to zero eigenvalues) can be
+    /// omitted, as they do not contribute to exponentials of generators.
     ExplicitEigenvalueDecomposition {
         values: Array1<c64>,
         vectors: Array2<c64>,
@@ -54,6 +69,9 @@ impl Generator {
     }
 }
 
+/// Data used to represent a single-parameter monoid whose elements
+/// are quantum processes, possibly preceded or followed by a time-independent
+/// quantum process.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GeneratorCoset {
     #[serde(default)]

@@ -7,12 +7,10 @@
 use core::f64::consts::FRAC_1_SQRT_2;
 use std::convert::TryInto;
 
-use crate::c64;
-use cauchy::c64;
 use ndarray::{Array, Array1, Array2};
 use num_traits::{One, Zero};
 
-use crate::{utils::*, Generator};
+use crate::utils::*;
 
 /// Returns a copy of the single-qubit identity matrix.
 pub fn i() -> Array2<C64> {
@@ -24,53 +22,14 @@ pub fn x() -> Array2<C64> {
     array![[ZERO_C, ONE_C], [ONE_C, ZERO_C]]
 }
 
-// NB: Uses the spin convention 𝐻 = −½𝑋.
-pub fn hx() -> Generator {
-    Generator {
-        n_qubits: 1,
-        data: crate::GeneratorData::ExplicitEigenvalueDecomposition {
-            values: c64!(-0.5) * array![c64!(1.0), c64!(-1.0)],
-            vectors: array![
-                [c64::new(FRAC_1_SQRT_2, 0.0), c64::new(FRAC_1_SQRT_2, 0.0)],
-                [c64::new(FRAC_1_SQRT_2, 0.0), c64::new(-FRAC_1_SQRT_2, 0.0)],
-            ],
-        },
-    }
-}
-
 /// Returns a unitary matrix representing the `Y` operation.
 pub fn y() -> Array2<C64> {
     array![[ZERO_C, -I_C], [I_C, ZERO_C]]
 }
 
-// NB: Uses the spin convention 𝐻 = −½𝑌.
-pub fn hy() -> Generator {
-    Generator {
-        n_qubits: 1,
-        data: crate::GeneratorData::ExplicitEigenvalueDecomposition {
-            values: c64!(-0.5) * array![c64!(1.0), c64!(-1.0)],
-            vectors: array![
-                [c64::new(FRAC_1_SQRT_2, 0.0), c64::new(0.0, FRAC_1_SQRT_2)],
-                [c64::new(FRAC_1_SQRT_2, 0.0), c64::new(0.0, -FRAC_1_SQRT_2)],
-            ],
-        },
-    }
-}
-
 /// Returns a unitary matrix representing the `Z` operation.
 pub fn z() -> Array2<C64> {
     array![[ONE_C, ZERO_C], [ZERO_C, -ONE_C]]
-}
-
-// NB: Uses the spin convention 𝐻 = −½𝑍.
-pub fn hz() -> Generator {
-    Generator {
-        n_qubits: 1,
-        data: crate::GeneratorData::ExplicitEigenvalueDecomposition {
-            values: c64!(-0.5) * array![c64!(1.0), c64!(-1.0)],
-            vectors: array![[c64!(1.0), c64!(0.0)], [c64!(0.0), c64!(1.0)],],
-        },
-    }
 }
 
 /// Returns a unitary matrix representing the single-qubit Hadamard transformation.

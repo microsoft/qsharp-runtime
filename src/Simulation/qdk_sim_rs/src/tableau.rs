@@ -65,9 +65,9 @@ impl Tableau {
         idx_col + self.n_qubits
     }
 
-    /// Returns the determinstic result that would be obtained from measuring
+    /// Returns the deterministic result that would be obtained from measuring
     /// the given qubit in the 𝑍 basis, or `None` if the result is random.
-    fn determinstic_result(&self, idx_target: usize) -> Option<bool> {
+    fn deterministic_result(&self, idx_target: usize) -> Option<bool> {
         let determined = !self
             .table
             .slice(s![self.n_qubits.., idx_target])
@@ -95,7 +95,7 @@ impl Tableau {
     /// If the assertion would pass, `Ok(())` is returned, otherwise an [`Err`]
     /// describing the assertion failure is returned.
     pub fn assert_meas(&self, idx_target: usize, expected: bool) -> Result<(), QdkSimError> {
-        let actual = self.determinstic_result(idx_target).ok_or_else(|| {
+        let actual = self.deterministic_result(idx_target).ok_or_else(|| {
             QdkSimError::MiscError(format!(
                 "Expected {}, but measurement result would be random.",
                 expected
@@ -211,7 +211,7 @@ impl Tableau {
     /// Measures a single qubit in the Pauli $Z$-basis, returning the result,
     /// and updating the stabilizer tableau in-place.
     pub fn meas_mut(&mut self, idx_target: usize) -> bool {
-        if let Some(result) = self.determinstic_result(idx_target) {
+        if let Some(result) = self.deterministic_result(idx_target) {
             return result;
         }
 

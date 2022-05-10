@@ -1,5 +1,4 @@
 use crate::chp_decompositions::ChpOperation;
-use crate::common_matrices::{hx, hy, hz};
 use crate::error::QdkSimError;
 use crate::instrument::Instrument;
 use crate::linalg::HasDagger;
@@ -178,9 +177,9 @@ impl NoiseModel {
                 n_qubits: 2,
                 data: Unitary(common_matrices::cnot()),
             },
-            rx: hx().into(),
-            ry: hy().into(),
-            rz: hz().into(),
+            rx: Generator::hx().into(),
+            ry: Generator::hy().into(),
+            rz: Generator::hz().into(),
             z_meas,
         }
     }

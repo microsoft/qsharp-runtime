@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use qdk_sim::{error::QdkSimError, Pauli, Process, State, Tableau};
+use qdk_sim::{error::QdkSimError, Pauli, Process, State};
 
 #[test]
 fn pauli_channel_applies_correctly() -> Result<(), QdkSimError> {

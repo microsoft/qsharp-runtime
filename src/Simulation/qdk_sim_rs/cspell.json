@@ -1,7 +1,35 @@
 {
     "ignoreWords": [
         // General terminology
+        "renormalize",
         "stdlib",
+        "subtheories",
+        "vals",
+        "vecs",
+
+        // Quantum terminology.
+        "qubit",
+        "qubits",
+        "Hadamard",
+        "paulis",
+        "subregister",
+        "subregisters",
+
+        // Open quantum systems terminology.
+        "CPTP",
+        "CPTNI",
+        "Kraus",
+        "Liouvillian",
+        "superoperator",
+        "superoperators",
+
+        // QEC terminology.
+        "destabilizer",
+
+        // NumPy terminology.
+        "numpy",
+        "isclose",
+        "dtype",
 
         // QuTiP terminology.
         "Qobj",
@@ -9,11 +37,16 @@
         "isherm",
         "oper",
         "sigmay",
+        "eigenstates",
+        "qeye",
+        "sigmax",
 
         // General math terminology
         "coeff",
         "pade",
         "Expm",
+        "monoid",
+        "exponentials",
 
         // Rust stdlib terminology
         "consts",
@@ -21,6 +54,16 @@
         // ndarray terminology
         "linalg",
         "ndarray",
-        "Repr"
+        "Repr",
+        "idxs",
+
+        // PyO3 terminology.
+        "pymethods",
+
+        // Itertools terminology.
+        "itertools",
+
+        // LaTeX commands.
+        "mathrm"
     ]
 }
