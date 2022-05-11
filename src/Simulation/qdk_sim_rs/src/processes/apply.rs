@@ -251,7 +251,7 @@ fn apply_chp_decomposition_to(
     })
 }
 
-pub(crate) fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, QdkSimError> {
+fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, QdkSimError> {
     Ok(State {
         n_qubits: state.n_qubits,
         data: match &state.data {
@@ -266,10 +266,7 @@ pub(crate) fn apply_unitary(u: &Array2<C64>, state: &State) -> Result<State, Qdk
     })
 }
 
-pub(crate) fn apply_kraus_decomposition(
-    ks: &Array3<C64>,
-    state: &State,
-) -> Result<State, QdkSimError> {
+fn apply_kraus_decomposition(ks: &Array3<C64>, state: &State) -> Result<State, QdkSimError> {
     Ok(State {
         n_qubits: state.n_qubits,
         data: match &state.data {
@@ -302,10 +299,7 @@ pub(crate) fn apply_kraus_decomposition(
     })
 }
 
-pub(crate) fn apply_pauli_channel(
-    paulis: &[(f64, Vec<Pauli>)],
-    state: &State,
-) -> Result<State, QdkSimError> {
+fn apply_pauli_channel(paulis: &[(f64, Vec<Pauli>)], state: &State) -> Result<State, QdkSimError> {
     Ok(State {
         n_qubits: state.n_qubits,
         data: match &state.data {
