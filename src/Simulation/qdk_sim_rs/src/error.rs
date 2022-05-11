@@ -6,6 +6,7 @@
 use std::str::Utf8Error;
 
 use miette::Diagnostic;
+use ndarray::ShapeError;
 use thiserror::Error;
 
 /// Represents errors that can occur during linear algebra operations.
@@ -53,6 +54,11 @@ pub enum QdkSimError {
         /// Actual determinant of the matrix which caused this error.
         det: f64,
     },
+
+    /// Raised when a shape error occurs internally to [`qdk_sim`].
+    #[error(transparent)]
+    #[diagnostic(code(qdk_sim::linalg::internal_shape))]
+    InternalShapeError(ShapeError),
 
     /// Raised when an algorithm requires a matrix to be square, but a
     /// rectangular matrix was passed instead.

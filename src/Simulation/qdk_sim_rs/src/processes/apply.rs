@@ -4,13 +4,20 @@
 //! Public implementations and crate-private functions for applying processes
 //! in each different representation.
 
+use cauchy::c64;
 use itertools::Itertools;
 use ndarray::{Array, Array2, Array3, ArrayView2, Axis};
 use rand::{distributions::WeightedIndex, prelude::Distribution, thread_rng};
 
 use crate::{
-    chp_decompositions::ChpOperation, error::QdkSimError, linalg::ConjBy, log, log_as_err, Pauli,
-    Process, ProcessData::*, State, StateData::*, Tableau, VariantName, C64,
+    chp_decompositions::ChpOperation,
+    error::QdkSimError,
+    linalg::ConjBy,
+    log, log_as_err, Pauli, Process,
+    ProcessData::*,
+    State,
+    StateData::{self, *},
+    Tableau, VariantName, C64,
 };
 
 use super::promote_pauli_channel;
@@ -112,8 +119,22 @@ impl Process {
             }
         }
 
-        if let Superoperator(_mtx) = &self.data {
-            todo!("Apply superoperator to subregister.");
+        if let Superoperator(mtx) = &self.data {
+            return match &state.data {
+                StateData::Mixed(rho) => Ok(State {
+                    n_qubits: state.n_qubits,
+                    data: StateData::Mixed(apply_superoperator_to_density_matrix(
+                        state.n_qubits,
+                        idx_qubits,
+                        mtx.view(),
+                        rho.view(),
+                    )?),
+                }),
+                _ => Err(QdkSimError::UnsupportedApply {
+                    channel_variant: self.variant_name(),
+                    state_variant: state.variant_name(),
+                }),
+            };
         }
         // TODO: Add superoperator case here, since that will let us avoid
         //       calling extend_k_to_n.
@@ -142,6 +163,68 @@ impl Process {
                 unimplemented!("");
             }
         }
+    }
+}
+
+fn apply_superoperator_to_density_matrix<'a, O, M>(
+    n_qubits: usize,
+    idx_qubits: &[usize],
+    superop: O,
+    state: M,
+) -> Result<Array2<c64>, QdkSimError>
+where
+    O: Into<ArrayView2<'a, c64>>,
+    M: Into<ArrayView2<'a, c64>>,
+{
+    let superop: ArrayView2<c64> = superop.into();
+    let state: ArrayView2<c64> = state.into();
+    match idx_qubits.len() {
+        1 => {
+            let idx_qubit = idx_qubits[0];
+            if superop.shape() != &[4, 4] {
+                Err(QdkSimError::MiscError(format!(
+                    "Expected 4x4 superoperator but got {:?}.",
+                    superop.shape()
+                )))?;
+            }
+            let superop = superop.into_shape((2, 2, 2, 2)).unwrap();
+            // In the column-stacking basis, `superop` is indexed as
+            // `rho_out[i, j] = sum_{k, l} S[j, i, l, k] rho_in[k, l]`.
+            // For applying to multiple qubits, we'll represent this by
+            // reshaping such that:
+            // `rho_out[:, i, :, :, j, :] = sum_{k, l} S[j, i, l, k] rho_in[:, k, :, :, l, :]`.
+            let n_left = idx_qubit;
+            let n_right = n_qubits - idx_qubit - 1;
+            let rho_in = state
+                .into_shape((
+                    2usize.pow(n_left as u32),
+                    2,
+                    2usize.pow(n_right as u32),
+                    2usize.pow(n_left as u32),
+                    2,
+                    2usize.pow(n_right as u32),
+                ))
+                .map_err(|e| QdkSimError::InternalShapeError(e))?;
+            let mut rho_out = rho_in.to_owned();
+            for i in 0..2usize {
+                for j in 0..2usize {
+                    for k in 0..2usize {
+                        for l in 0..2usize {
+                            rho_out.slice_mut(s![.., i, .., .., j, ..]).assign(
+                                &(superop[(j, i, k, l)] * &rho_in.slice(s![.., k, .., .., l, ..])),
+                            );
+                        }
+                    }
+                }
+            }
+            let shape = state.shape();
+            let rho_out = rho_out.into_shape((shape[0], shape[1])).unwrap();
+            Ok(rho_out)
+        }
+        _ => Err(QdkSimError::NotYetImplemented(
+            "Superoperators can currently only be applied to one-qubit density operators."
+                .to_string(),
+        )),
     }
 }
 
