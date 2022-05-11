@@ -134,8 +134,6 @@ impl Process {
                 }),
             };
         }
-        // TODO: Add superoperator case here, since that will let us avoid
-        //       calling extend_k_to_n.
 
         // Having tried fast paths above, we now fall back to the most general
         // case.
