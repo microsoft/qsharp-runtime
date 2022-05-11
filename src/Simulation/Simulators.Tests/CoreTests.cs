@@ -105,7 +105,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "Resource Group: bar",
                     "Workspace: baz",
                     "Target: test.submitter.noop",
-                    "TargetCapability: ",
+                    "TargetCapability: MyTargetCapability",
                     "Storage: ",
                     "Base URI: ",
                     "Location: myLocation",
