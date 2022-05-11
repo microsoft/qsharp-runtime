@@ -7,10 +7,10 @@
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <ExecutionTarget>microsoft.simulator.fullstate</ExecutionTarget>
     <TargetCapability>MyTargetCapability</TargetCapability>
-   </PropertyGroup>  
+  </PropertyGroup>  
  
-   <ItemGroup>
-     <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
-     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
+    <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+  </ItemGroup>
 </Project>
