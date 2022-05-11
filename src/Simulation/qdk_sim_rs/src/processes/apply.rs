@@ -48,9 +48,7 @@ impl Process {
             // TODO: Support applying CHP decompositions and superoperators to
             //       entire registers. Currently only supported acting on
             //       subregisters via [`apply_to`].
-            Superoperator(_) => todo!(),
-            ChpDecomposition(_operations) => todo!(),
-            Unsupported => Err(QdkSimError::UnsupportedApply {
+            _ => Err(QdkSimError::UnsupportedApply {
                 channel_variant: self.variant_name(),
                 state_variant: state.variant_name(),
             }),
