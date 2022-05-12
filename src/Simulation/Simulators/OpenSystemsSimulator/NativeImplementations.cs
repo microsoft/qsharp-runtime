@@ -120,6 +120,28 @@ namespace Microsoft.Quantum.Experimental
             };
         }
 
+        internal class Ry : Native.Ry
+        {
+            public Ry(IOperationFactory m) : base(m) { }
+
+            public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
+            {
+                NativeInterface.Ry((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
+                return QVoid.Instance;
+            };
+        }
+
+        internal class Rz : Native.Rz
+        {
+            public Rz(IOperationFactory m) : base(m) { }
+
+            public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
+            {
+                NativeInterface.Rz((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
+                return QVoid.Instance;
+            };
+        }
+
         internal class M : Native.M
         {
             public M(IOperationFactory m) : base(m) { }
