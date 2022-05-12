@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use std::{ops::Mul, ptr::null};
+use std::ops::Mul;
 
 use cauchy::Scalar;
 use ndarray::{linalg::Dot, Array1, Array2, NewAxis};
@@ -68,10 +68,11 @@ where
             } else {
                 None
             }
-        } else { None };
+        } else {
+            None
+        };
 
-        let new_eigvals = self
-            .values.map(func);
+        let new_eigvals = self.values.map(func);
         let shape = (dim, dim);
         let mut res: Self::MatrixSolution = Array2::zeros(shape);
         // TODO[perf]: Write this out as dot products.
@@ -79,12 +80,17 @@ where
             for j in 0..dim {
                 let mut element = A::zero();
                 for idx_eig in 0..n_eigvals {
-                    element += self.vectors[(idx_eig, i)] * new_eigvals[(idx_eig)] * self.vectors[(idx_eig, j)].conj();
+                    element += self.vectors[(idx_eig, i)]
+                        * new_eigvals[(idx_eig)]
+                        * self.vectors[(idx_eig, j)].conj();
                 }
                 res[(i, j)] = element;
             }
         }
-        Ok(match null_mtx { Some(null_mtx) => res + null_mtx, None => res })
+        Ok(match null_mtx {
+            Some(null_mtx) => res + null_mtx,
+            None => res,
+        })
     }
 }
 
@@ -118,16 +124,7 @@ mod tests {
             vectors: c64!(0.70710678) * array![[c64!(1.0), c64!(-1.0)], [c64!(1.0), c64!(1.0)],],
         };
         let actual = eigs.apply_mtx_fn(|x| *x)?;
-        let expected = array![
-            [
-                c64!(0.0),
-                c64!(1.0)
-            ],
-            [
-                c64!(1.0),
-                c64!(0.0),
-            ],
-        ];
+        let expected = array![[c64!(0.0), c64!(1.0)], [c64!(1.0), c64!(0.0),],];
         for (actual, expected) in actual.iter().zip(expected.iter()) {
             assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
         }

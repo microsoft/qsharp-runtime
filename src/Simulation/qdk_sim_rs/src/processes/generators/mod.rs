@@ -56,7 +56,6 @@ impl Generator {
                     values: values.clone(),
                     vectors: vectors.clone(),
                 };
-                let at_zero = eig.expm().unwrap();
                 let mtx = eig.expm_scale(c64::new(time, 0.0));
                 Ok(Process {
                     n_qubits: self.n_qubits,
@@ -114,11 +113,89 @@ impl From<Generator> for GeneratorCoset {
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_abs_diff_eq;
+
+    use crate::{c64, ProcessData, VariantName};
+
     use super::*;
 
     #[test]
+    fn superoperator_at_rx_is_correct() -> Result<(), QdkSimError> {
+        let actual = Generator::hx().at(0.123)?;
+        let expected = array![
+            [
+                c64!(0.9962225160675967),
+                c64!(-0.06134504501215767 i),
+                c64!(0.06134504501215767 i),
+                c64!(0.003777483932403215)
+            ],
+            [
+                c64!(-0.06134504501215767 i),
+                c64!(0.9962225160675967),
+                c64!(0.003777483932403215),
+                c64!(0.06134504501215767 i)
+            ],
+            [
+                c64!(0.06134504501215767 i),
+                c64!(0.003777483932403215),
+                c64!(0.9962225160675967),
+                c64!(-0.06134504501215767 i)
+            ],
+            [
+                c64!(0.003777483932403215),
+                c64!(0.06134504501215767 i),
+                c64!(-0.06134504501215767 i),
+                c64!(0.9962225160675967)
+            ]
+        ];
+
+        if let ProcessData::Superoperator(actual) = actual.data {
+            for (actual, expected) in actual.iter().zip(expected.iter()) {
+                assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
+            }
+            Ok(())
+        } else {
+            panic!("Expected superoperator, got {}.", actual.variant_name())
+        }
+    }
+
+    #[test]
     fn superoperator_at_ry_is_correct() -> Result<(), QdkSimError> {
-        let superop = Generator::hy().at(0.123)?;
-        todo!()
+        let actual = Generator::hy().at(0.123)?;
+        let expected = array![
+            [
+                c64!(0.9962225160675967),
+                c64!(-0.06134504501215767),
+                c64!(-0.06134504501215767),
+                c64!(0.003777483932403215)
+            ],
+            [
+                c64!(0.06134504501215767),
+                c64!(0.9962225160675967),
+                c64!(-0.003777483932403215),
+                c64!(-0.06134504501215767)
+            ],
+            [
+                c64!(0.06134504501215767),
+                c64!(-0.003777483932403215),
+                c64!(0.9962225160675967),
+                c64!(-0.06134504501215767)
+            ],
+            [
+                c64!(0.003777483932403215),
+                c64!(0.06134504501215767),
+                c64!(0.06134504501215767),
+                c64!(0.9962225160675967)
+            ]
+        ];
+
+        if let ProcessData::Superoperator(actual) = actual.data {
+            for (actual, expected) in actual.iter().zip(expected.iter()) {
+                assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
+            }
+            Ok(())
+        } else {
+            panic!("Expected superoperator, got {}.", actual.variant_name())
+        }
     }
 }

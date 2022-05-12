@@ -3,7 +3,7 @@
 
 //! Provides common linear algebra functions and traits.
 
-use ndarray::{Array, Array2, ArrayView2, ArrayView};
+use ndarray::{Array, Array2, ArrayView, ArrayView2};
 use num_traits::Zero;
 use std::convert::TryInto;
 
@@ -199,7 +199,9 @@ pub fn permute_mtx(data: &Array2<C64>, new_order: &[usize]) -> Array2<C64> {
 /// Returns a new array of the same type and shape as a given array, but
 /// containing only zeros.
 pub fn zeros_like<'a, A, T: 'a + Clone + Zero, Ix: ndarray::Dimension>(data: A) -> Array<T, Ix>
-where A: Into<ArrayView<'a, T, Ix>> {
+where
+    A: Into<ArrayView<'a, T, Ix>>,
+{
     let data = data.into();
     Array::zeros(data.dim())
 }

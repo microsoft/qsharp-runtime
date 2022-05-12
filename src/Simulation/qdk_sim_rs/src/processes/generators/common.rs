@@ -12,7 +12,7 @@ use crate::processes::generators::*;
 // >>> import qutip as qt
 // >>> eye = qt.qeye(2)
 // >>> def to_liouvillian(h):
-// ...     return qt.tensor(eye, h) - qt.tensor(h, eye)
+// ...     return qt.tensor(eye, h.trans()) - qt.tensor(h, eye)
 // >>> def to_generator(h):
 // ...     l = to_liouvillian(h)
 // ...     g = -1j * l
@@ -48,10 +48,10 @@ impl Generator {
         Generator {
             n_qubits: 1,
             data: crate::GeneratorData::ExplicitEigenvalueDecomposition {
-                values: array![c64!(1.0 i), c64!(-1.0 i)],
+                values: array![c64!(-1.0 i), c64!(1.0 i)],
                 vectors: array![
-                    [c64!(0.5 i), c64!(-0.5), c64!(0.5), c64!(0.5 i)],
-                    [c64!(0.5), c64!(-0.5 i), c64!(0.5 i), c64!(0.5)],
+                    [c64!(0.5), c64!(0.5), c64!(-0.5), c64!(-0.5)],
+                    [c64!(0.5), c64!(-0.5), c64!(0.5), c64!(-0.5)],
                 ],
             },
         }
@@ -64,10 +64,10 @@ impl Generator {
         Generator {
             n_qubits: 1,
             data: crate::GeneratorData::ExplicitEigenvalueDecomposition {
-                values: array![c64!(-1.0 i), c64!(1.0 i)],
+                values: array![c64!(1.0 i), c64!(-1.0 i)],
                 vectors: array![
-                    [c64!(-0.5 i), c64!(-0.5), c64!(0.5), c64!(-0.5 i)],
-                    [c64!(0.5), c64!(0.5 i), c64!(-0.5 i), c64!(0.5)],
+                    [c64!(0.5 i), c64!(0.5), c64!(0.5), c64!(-0.5 i)],
+                    [c64!(0.5), c64!(0.5 i), c64!(0.5 i), c64!(-0.5)],
                 ],
             },
         }
