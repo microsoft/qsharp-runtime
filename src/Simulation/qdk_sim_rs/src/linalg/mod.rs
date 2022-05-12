@@ -151,6 +151,24 @@ pub fn extend_two_to_n(
             data.shape()
         )));
     }
+    if idx_qubit1 >= n_qubits {
+        return Err(QdkSimError::MiscError(format!(
+            "{} is not a valid index for a {}-qubit register",
+            idx_qubit1, n_qubits
+        )));
+    }
+    if idx_qubit2 >= n_qubits {
+        return Err(QdkSimError::MiscError(format!(
+            "{} is not a valid index for a {}-qubit register",
+            idx_qubit2, n_qubits
+        )));
+    }
+    if idx_qubit1 == idx_qubit2 {
+        return Err(QdkSimError::MiscError(format!(
+            "Indices {} and {} must be distinct.",
+            idx_qubit1, idx_qubit2
+        )));
+    }
     let mut permutation = Array::from((0..n_qubits).collect::<Vec<usize>>());
     match (idx_qubit1, idx_qubit2) {
         (1, 0) => permutation.swap(0, 1),
