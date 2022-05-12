@@ -220,14 +220,14 @@ pub fn permute_mtx<'a, A: Into<ArrayView2<'a, c64>>>(
         .take(2 * n_qubits)
         .copied()
         .collect();
-    // FIXME: make this a result and propagate the result out to the return.
     let tensor = data.into_shape(new_dims)?;
     let mut permutation = new_order.to_vec();
     permutation.extend(new_order.to_vec().iter().map(|idx| idx + n_qubits));
     let permuted = tensor.permuted_axes(permutation);
 
     // Finish by collapsing back down.
-    Ok(permuted.into_shape([n_rows, n_rows])?.into_owned())
+    let data_out = permuted.to_shape([n_rows, n_rows])?;
+    Ok(data_out.into_owned())
 }
 
 /// Returns a new array of the same type and shape as a given array, but

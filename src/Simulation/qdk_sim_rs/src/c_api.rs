@@ -516,3 +516,92 @@ pub extern "C" fn get_current_state(sim_id: usize) -> *const c_char {
         ptr::null()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::ffi::CString;
+
+    use backtrace::Backtrace;
+
+    use crate::c_api::{self, LAST_ERROR};
+
+    fn as_result(c_api_code: i64) -> Result<(), (String, i64)> {
+        if c_api_code == 0 {
+            Ok(())
+        } else {
+            let msg = LAST_ERROR
+                .lock()
+                .ok()
+                .map(|l| l.as_ref().map(|s| s.to_owned()).unwrap_or_default())
+                .unwrap_or_default();
+            let backtrace = Backtrace::new();
+            println!("C API error during tests: {}\n{:?}", msg, backtrace);
+            let err = unsafe { c_api::lasterr().as_ref() }.unwrap().to_string();
+            Err((err, c_api_code))
+        }
+    }
+
+    #[test]
+    fn ry_runs_without_error_or_panic() -> Result<(), (String, i64)> {
+        unsafe {
+            let mut sim_id: usize = 0;
+            let mixed = CString::new("mixed").unwrap();
+            as_result(c_api::init(3, mixed.as_ptr(), &mut sim_id))?;
+            as_result(c_api::ry(sim_id, 1.234, 1))?;
+            as_result(c_api::destroy(sim_id))?;
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn teleport() -> Result<(), (String, i64)> {
+        unsafe {
+            let mut sim_id: usize = 0;
+            let mixed = CString::new("mixed").unwrap();
+            let ideal = CString::new("ideal").unwrap();
+            as_result(c_api::init(3, mixed.as_ptr(), &mut sim_id))?;
+            as_result(c_api::set_noise_model_by_name(sim_id, ideal.as_ptr()))?;
+
+            let idx_msg = 0;
+            let idx_here = 1;
+            let idx_there = 2;
+
+            // Prepare Bell pair.
+            as_result(c_api::h(sim_id, idx_here))?;
+            as_result(c_api::cnot(sim_id, idx_here, idx_there))?;
+
+            // Prepare state to be teleported.
+            as_result(c_api::h(sim_id, idx_msg))?;
+            as_result(c_api::rz(sim_id, 1.1, idx_msg))?;
+
+            // Perform the actual teleportation.
+            as_result(c_api::cnot(sim_id, idx_msg, idx_here))?;
+            as_result(c_api::h(sim_id, idx_msg))?;
+
+            // Perform correction steps.
+            let mut corr_x = 0;
+            as_result(c_api::m(sim_id, idx_here, &mut corr_x))?;
+            let mut corr_z = 0;
+            as_result(c_api::m(sim_id, idx_msg, &mut corr_z))?;
+
+            if corr_x == 1 {
+                as_result(c_api::x(sim_id, idx_there))?;
+            }
+            if corr_z == 1 {
+                as_result(c_api::z(sim_id, idx_there))?;
+            }
+
+            // Unprepare message state.
+            as_result(c_api::rz(sim_id, -1.1, idx_there))?;
+            as_result(c_api::h(sim_id, idx_there))?;
+
+            // Make sure we get zero.
+            let mut result = 0;
+            as_result(c_api::m(sim_id, idx_there, &mut result))?;
+            assert_eq!(result, 0, "Unexpected result from teleportation.");
+
+            as_result(c_api::destroy(sim_id))?;
+            Ok(())
+        }
+    }
+}
