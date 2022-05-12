@@ -903,7 +903,7 @@ let ``Submit requires a positive number of shots`` () =
 [<Fact>]
 let ``Submit fails with unknown target`` () =
     let given = test "Returns Unit"
-    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "No submitters were found for the target foo."
+    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "No submitters were found for the target \"foo\" and target capability \"\"."
 
 [<Fact>]
 let ``Submit supports dry run option`` () =
