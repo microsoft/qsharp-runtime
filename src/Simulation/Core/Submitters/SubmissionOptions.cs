@@ -38,8 +38,8 @@ namespace Microsoft.Quantum.Runtime.Submitters
         public static SubmissionOptions Default { get; } =
             new SubmissionOptions("", 500, ImmutableDictionary<string, string>.Empty, "");
 
-        private SubmissionOptions(string friendlyName, int shots, ImmutableDictionary<string, string> inputParams,
-                                  string targetCapability)
+        private SubmissionOptions(
+            string friendlyName, int shots, ImmutableDictionary<string, string> inputParams, string targetCapability)
         {
             FriendlyName = friendlyName;
             Shots = shots;
@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.Runtime.Submitters
             int? shots = null,
             ImmutableDictionary<string, string>? inputParams = null,
             string? targetCapability = null) =>
-            new SubmissionOptions(friendlyName ?? FriendlyName, shots ?? Shots, inputParams ?? InputParams, 
-                                  targetCapability ?? TargetCapability);
+            new SubmissionOptions(
+                friendlyName ?? FriendlyName, shots ?? Shots, inputParams ?? InputParams, targetCapability ?? TargetCapability);
     }
 }
