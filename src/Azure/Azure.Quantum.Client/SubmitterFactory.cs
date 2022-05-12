@@ -62,6 +62,7 @@ namespace Microsoft.Azure.Quantum
         /// <param name="target">The name of the execution target.</param>
         /// <param name="workspace">The workspace used to manage jobs.</param>
         /// <param name="storageConnection">The connection string for the storage account.</param>
+        /// <param name="targetCapability">The target capability.</param>
         /// <returns>A QIR submitter.</returns>
         public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection, string targetCapability) =>
             Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection, targetCapability);
@@ -145,7 +146,6 @@ namespace Microsoft.Azure.Quantum
         /// Returns the name and the type of a constructor that matches the target.
         /// </summary>
         /// <param name="submitter">Information about the submitter.</param>
-        /// <param name="target">The name of the execution target.</param>
         /// <returns>A name and type tuple.</returns>
         private static (string Name, Type Type) ConstructorInfo(SubmitterInfo submitter)
         {
