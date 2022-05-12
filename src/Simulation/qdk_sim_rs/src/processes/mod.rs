@@ -146,12 +146,12 @@ impl Process {
         idx_qubit1: usize,
         idx_qubit2: usize,
         n_qubits: usize,
-    ) -> Process {
+    ) -> Result<Process, QdkSimError> {
         assert_eq!(self.n_qubits, 2);
-        Process {
+        Ok(Process {
             n_qubits,
             data: match &self.data {
-                Unitary(u) => Unitary(extend_two_to_n(u.view(), idx_qubit1, idx_qubit2, n_qubits)),
+                Unitary(u) => Unitary(extend_two_to_n(u.view(), idx_qubit1, idx_qubit2, n_qubits)?),
                 KrausDecomposition(ks) => {
                     // TODO: consolidate with extend_one_to_n, above.
                     let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
@@ -160,7 +160,7 @@ impl Process {
                     for (idx_kraus, kraus) in ks.axis_iter(Axis(0)).enumerate() {
                         let mut target = extended.index_axis_mut(Axis(0), idx_kraus);
                         let big_kraus = extend_two_to_n(kraus, idx_qubit1, idx_qubit2, n_qubits);
-                        target.assign(&big_kraus);
+                        target.assign(&big_kraus?);
                     }
                     KrausDecomposition(extended)
                 },
@@ -180,12 +180,12 @@ impl Process {
                 ),
                 ProcessData::Unsupported => ProcessData::Unsupported,
                 ProcessData::Sequence(processes) => ProcessData::Sequence(
-                    processes.iter().map(|p| p.extend_two_to_n(idx_qubit1, idx_qubit2, n_qubits)).collect()
+                    processes.iter().map(|p| p.extend_two_to_n(idx_qubit1, idx_qubit2, n_qubits)).try_collect()?
                 ),
                 ProcessData::ChpDecomposition(_) => todo!(),
                 ProcessData::Superoperator(_) => todo!(),
             },
-        }
+        })
     }
 }
 

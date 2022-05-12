@@ -55,7 +55,7 @@ fn linalg(c: &mut Criterion) {
                 // Create some test data.
                 let data = common_matrices::cnot();
                 b.iter(|| {
-                    let _extended = extend_two_to_n(data.view(), *i, 3, 4);
+                    let _extended = extend_two_to_n(data.view(), *i, 3, 4).unwrap();
                 })
             },
         );

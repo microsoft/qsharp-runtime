@@ -58,7 +58,7 @@ pub enum QdkSimError {
     /// Raised when a shape error occurs internally to [`qdk_sim`].
     #[error(transparent)]
     #[diagnostic(code(qdk_sim::linalg::internal_shape))]
-    InternalShapeError(ShapeError),
+    InternalShapeError(#[from] ShapeError),
 
     /// Raised when an algorithm requires a matrix to be square, but a
     /// rectangular matrix was passed instead.

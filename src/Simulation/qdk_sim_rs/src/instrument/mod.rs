@@ -1,16 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+use crate::Process;
 use crate::{states::StateData::Mixed, StateData};
-use crate::{Process, ProcessData, C64};
-use num_traits::{One, Zero};
+
 use rand::Rng;
 use std::iter::Iterator;
 
 use crate::linalg::Trace;
 use crate::State;
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+
+mod common;
+pub use common::*;
+
+static IDEAL_Z_MEAS: Lazy<Instrument> = Lazy::new(Instrument::ideal_z_meas);
 
 // TODO[design]: Instrument works pretty differently from State and Process; should
 //               likely refactor for consistency.
@@ -50,23 +56,7 @@ impl Instrument {
                     StateData::Pure(_) | StateData::Mixed(_) => {
                         // Get the ideal Z measurement instrument, apply it,
                         // and then assign a readout error.
-                        // TODO[perf]: Cache this instrument as a lazy static.
-                        let ideal_z_meas = Instrument::Effects(vec![
-                            Process {
-                                n_qubits: 1,
-                                data: ProcessData::KrausDecomposition(array![[
-                                    [C64::one(), C64::zero()],
-                                    [C64::zero(), C64::zero()]
-                                ]]),
-                            },
-                            Process {
-                                n_qubits: 1,
-                                data: ProcessData::KrausDecomposition(array![[
-                                    [C64::zero(), C64::zero()],
-                                    [C64::zero(), C64::one()]
-                                ]]),
-                            },
-                        ]);
+                        let ideal_z_meas = &*IDEAL_Z_MEAS;
                         let (result, new_state) = ideal_z_meas.sample(idx_qubits, state);
                         let result = (result == 1) ^ rand::thread_rng().gen_bool(*pr_readout_error);
                         (if result { 1 } else { 0 }, new_state)
@@ -89,8 +79,6 @@ impl Instrument {
             }
         }
     }
-
-    // TODO: Add more methods for making new instruments in convenient ways.
 
     /// Returns a serialization of this instrument as a JSON object.
     pub fn as_json(&self) -> String {

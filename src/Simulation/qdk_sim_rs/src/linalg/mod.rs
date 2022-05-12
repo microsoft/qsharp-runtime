@@ -3,11 +3,12 @@
 
 //! Provides common linear algebra functions and traits.
 
+use cauchy::c64;
 use ndarray::{Array, Array2, ArrayView, ArrayView2};
 use num_traits::Zero;
 use std::convert::TryInto;
 
-use crate::{common_matrices::nq_eye, C64};
+use crate::{common_matrices::nq_eye, error::QdkSimError, C64};
 
 // Define the public API surface for submodules.
 
@@ -83,7 +84,14 @@ pub trait Trace {
     ///
     /// # Example
     /// ```
-    /// // TODO
+    /// # use ndarray::{Array2, array};
+    /// # use num_traits::Zero;
+    /// # use qdk_sim::linalg::Trace;
+    /// let arr = array![
+    ///     [1.0, 2.0],
+    ///     [3.0, 4.0]
+    /// ];
+    /// assert_eq!(arr.trace(), 5.0);
     /// ```
     fn trace(self) -> Self::Output;
 }
@@ -136,8 +144,13 @@ pub fn extend_two_to_n(
     idx_qubit1: usize,
     idx_qubit2: usize,
     n_qubits: usize,
-) -> Array2<C64> {
-    // TODO: double check that data is 4x4.
+) -> Result<Array2<C64>, QdkSimError> {
+    if data.shape() != [4, 4] {
+        return Err(QdkSimError::MiscError(format!(
+            "expected 4x4 matrix, but got shape {:?}",
+            data.shape()
+        )));
+    }
     let mut permutation = Array::from((0..n_qubits).collect::<Vec<usize>>());
     match (idx_qubit1, idx_qubit2) {
         (1, 0) => permutation.swap(0, 1),
@@ -153,8 +166,7 @@ pub fn extend_two_to_n(
 
     // TODO: there is almost definitely a more elegant way to write this.
     if n_qubits == 2 {
-        // TODO[perf]: Eliminate the to_owned here by weakening permute_mtx.
-        permute_mtx(&data.to_owned(), &permutation.to_vec()[..])
+        permute_mtx(&data, &permutation.to_vec()[..])
     } else {
         permute_mtx(
             &data.view().tensor(&nq_eye(n_qubits - 2)),
@@ -166,7 +178,11 @@ pub fn extend_two_to_n(
 /// Given a two-index array (i.e.: a matrix) of dimensions 2^n × 2^n for some
 /// n, permutes the left and right indices of the matrix.
 /// Used to represent, for example, swapping qubits in a register.
-pub fn permute_mtx(data: &Array2<C64>, new_order: &[usize]) -> Array2<C64> {
+pub fn permute_mtx<'a, A: Into<ArrayView2<'a, c64>>>(
+    data: A,
+    new_order: &[usize],
+) -> Result<Array2<C64>, QdkSimError> {
+    let data: ArrayView2<c64> = data.into();
     // Check that data is square.
     let (n_rows, n_cols) = (data.shape()[0], data.shape()[1]);
     assert_eq!(n_rows, n_cols);
@@ -187,13 +203,13 @@ pub fn permute_mtx(data: &Array2<C64>, new_order: &[usize]) -> Array2<C64> {
         .copied()
         .collect();
     // FIXME: make this a result and propagate the result out to the return.
-    let tensor = data.clone().into_shared().reshape(new_dims);
+    let tensor = data.into_shape(new_dims)?;
     let mut permutation = new_order.to_vec();
     permutation.extend(new_order.to_vec().iter().map(|idx| idx + n_qubits));
     let permuted = tensor.permuted_axes(permutation);
 
     // Finish by collapsing back down.
-    permuted.reshape([n_rows, n_rows]).into_owned()
+    Ok(permuted.into_shape([n_rows, n_rows])?.into_owned())
 }
 
 /// Returns a new array of the same type and shape as a given array, but

@@ -22,7 +22,6 @@ impl<M, A, E> Inv for M
 where
     M: LUDecomposable<Elem = A, OwnedRepr = OwnedRepr<A>, Error = E>,
     A: Scalar,
-    // TODO: Allow decomposables and decompositions to have different errors.
     <M as LUDecomposable>::Output: LUDecomposition<A, OwnedRepr<A>, Error = E>,
 {
     type Error = M::Error;
@@ -42,7 +41,7 @@ where
 mod tests {
     use approx::assert_abs_diff_eq;
     use cauchy::c64;
-    use ndarray::array;
+    use ndarray::{array, Array2};
     use num_traits::Zero;
 
     use crate::{c64, error::QdkSimError, linalg::Inv};
@@ -50,9 +49,13 @@ mod tests {
     #[test]
     fn inv_works_f64() -> Result<(), QdkSimError> {
         let mtx = array![[6.0, 18.0, 3.0], [2.0, 12.0, 1.0], [4.0, 15.0, 3.0]];
-        // TODO: Actually write the test!
-        let inv = mtx.inv()?;
-        println!("{:?}", inv);
+        let expected = array![
+            [0.5833333333333334, -0.25, -0.5],
+            [-0.05555555555555555, 0.16666666666666666, 0.0],
+            [-0.5, -0.5, 1.0]
+        ];
+        let actual: Array2<f64> = mtx.inv()?;
+        assert!(actual.abs_diff_eq(&expected, 1e-8));
         Ok(())
     }
 

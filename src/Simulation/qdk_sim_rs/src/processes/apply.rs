@@ -151,7 +151,7 @@ impl Process {
             // TODO[perf]: If the size of the register matches the size of the
             //             channel, permute rather than expanding.
             2 => self
-                .extend_two_to_n(idx_qubits[0], idx_qubits[1], state.n_qubits)
+                .extend_two_to_n(idx_qubits[0], idx_qubits[1], state.n_qubits)?
                 .apply(state),
             _ => {
                 log(&format!(
