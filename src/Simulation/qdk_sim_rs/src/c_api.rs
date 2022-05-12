@@ -208,9 +208,9 @@ macro_rules! declare_continuous_gate {
     ) => {
         $(#[$meta])*
         #[no_mangle]
-        pub fn $gate_name(sim_id: usize, theta: f64, idx_control: usize, idx_target: usize) -> i64 {
+        pub fn $gate_name(sim_id: usize, theta: f64, idx: usize) -> i64 {
             as_capi_err(|| {
-                apply_continuous(sim_id, &[idx_control, idx_target], theta, |model| {
+                apply_continuous(sim_id, &[idx], theta, |model| {
                     Ok(&model.$gate_name)
                 })
             })

@@ -27,6 +27,11 @@ fn with_test_suite<T: criterion::measurement::Measurement>(
             c_api::z(sim_id, 0);
         })
     });
+    group.bench_function("apply ry", |b| {
+        b.iter(|| {
+            c_api::ry(sim_id, 1.234, 1);
+        })
+    });
     group.bench_function("apply cnot", |b| {
         b.iter(|| {
             c_api::cnot(sim_id, 0, 1);
