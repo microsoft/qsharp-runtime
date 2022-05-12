@@ -179,11 +179,11 @@ where
     match idx_qubits.len() {
         1 => {
             let idx_qubit = idx_qubits[0];
-            if superop.shape() != &[4, 4] {
-                Err(QdkSimError::MiscError(format!(
+            if superop.shape() != [4, 4] {
+                return Err(QdkSimError::MiscError(format!(
                     "Expected 4x4 superoperator but got {:?}.",
                     superop.shape()
-                )))?;
+                )));
             }
             let superop = superop.into_shape((2, 2, 2, 2)).unwrap();
             // In the column-stacking basis, `superop` is indexed as
@@ -202,7 +202,7 @@ where
                     2,
                     2usize.pow(n_right as u32),
                 ))
-                .map_err(|e| QdkSimError::InternalShapeError(e))?;
+                .map_err(QdkSimError::InternalShapeError)?;
             let mut rho_out = zeros_like(&rho_in);
             for i in 0..2usize {
                 for j in 0..2usize {
