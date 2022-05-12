@@ -7,17 +7,11 @@
          $ cargo doc --features python,document-features --open
 -->
 
-# Quantum Development Kit Preview Simulators
-
-> ## **📝** NOTE
->
-> This crate is in **preview**, and may undergo breaking API changes with no notice.
->
-> As a preview feature, this crate may be buggy or incomplete. Please check the tracking issue at [microsoft/qsharp-runtime#714](https://github.com/microsoft/qsharp-runtime/issues/714) for more information.
+# Rust-based Quantum Development Kit Simulators
 
 > ## **ⓘ** TIP
 >
-> This crate provides low-level APIs for interacting with experimental simulators. If you're interested in using the experimental simulators to run your Q# programs, please see the installation instructions at <https://github.com/microsoft/qsharp-runtime/blob/main/documentation/preview-simulators.md>.
+> This crate provides low-level APIs for interacting with the Rust-base simulators included in the Quantum Development Kit. If you're interested in using these simulators to run your Q# programs, please see the installation instructions at <https://github.com/microsoft/qsharp-runtime/blob/main/documentation/preview-simulators.md>.
 
 This crate implements simulation functionality for the Quantum Development Kit, including:
 
@@ -140,9 +134,7 @@ TODO
 - Some gaps in different conversion functions and methods.
 - Stabilizer states cannot yet be measured through [`Instrument`] struct, only through underlying [`Tableau`].
 - Many parts of the crate do not yet have Python bindings.
-- Stabilizer simulation not yet exposed via C API.
 - Test and microbenchmark coverage still incomplete.
-- Too many APIs `panic!` or `unwrap`, and need replaced with `Result` returns instead.
 
 # Crate features
 <!-- Note that this section is filled in automatically by document-features. -->

@@ -6,7 +6,6 @@
         "subtheories",
         "vals",
         "vecs",
-
         // Quantum terminology.
         "qubit",
         "qubits",
@@ -14,7 +13,6 @@
         "paulis",
         "subregister",
         "subregisters",
-
         // Open quantum systems terminology.
         "CPTP",
         "CPTNI",
@@ -22,15 +20,12 @@
         "Liouvillian",
         "superoperator",
         "superoperators",
-
         // QEC terminology.
         "destabilizer",
-
         // NumPy terminology.
         "numpy",
         "isclose",
         "dtype",
-
         // QuTiP terminology.
         "Qobj",
         "qutip",
@@ -40,30 +35,29 @@
         "eigenstates",
         "qeye",
         "sigmax",
-
         // General math terminology
         "coeff",
         "pade",
         "Expm",
         "monoid",
         "exponentials",
-
         // Rust stdlib terminology
         "consts",
-
         // ndarray terminology
         "linalg",
         "ndarray",
         "Repr",
         "idxs",
-
         // PyO3 terminology.
         "pymethods",
-
         // Itertools terminology.
         "itertools",
-
         // LaTeX commands.
         "mathrm"
+    ],
+    "words": [
+        "cnot",
+        "struct",
+        "structs"
     ]
 }
