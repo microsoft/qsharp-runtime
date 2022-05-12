@@ -4,6 +4,9 @@
 & "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
+# Provide more error information when crashing during tests.
+$Env:RUST_BACKTRACE = "1";
+
 if ($Env:ENABLE_NATIVE -ne "false") {
     ( & (Join-Path $PSScriptRoot .. src Simulation NativeSparseSimulator test.ps1 ) ) || ( $script:all_ok = $False )
 
