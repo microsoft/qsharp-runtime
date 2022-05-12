@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal string DefaultExecutionTarget { get; }
 
         /// <summary>
-        /// The default execution target capability to use when submitting the entry point to Azure Quantum.
+        /// The execution target capability to use when submitting the entry point to Azure Quantum.
         /// </summary>
         internal string TargetCapability { get; }
 
