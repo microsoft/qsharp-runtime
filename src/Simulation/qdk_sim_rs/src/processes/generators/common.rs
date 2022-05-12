@@ -48,10 +48,10 @@ impl Generator {
         Generator {
             n_qubits: 1,
             data: crate::GeneratorData::ExplicitEigenvalueDecomposition {
-                values: array![c64!(-1.0 i), c64!(1.0 i)],
+                values: array![c64!(1.0 i), c64!(-1.0 i)],
                 vectors: array![
-                    [c64!(0.5), c64!(-0.5), c64!(0.5), c64!(-0.5)],
-                    [c64!(0.5), c64!(0.5), c64!(-0.5), c64!(-0.5)],
+                    [c64!(0.5 i), c64!(-0.5), c64!(0.5), c64!(0.5 i)],
+                    [c64!(0.5), c64!(-0.5 i), c64!(0.5 i), c64!(0.5)],
                 ],
             },
         }

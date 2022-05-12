@@ -56,6 +56,7 @@ impl Generator {
                     values: values.clone(),
                     vectors: vectors.clone(),
                 };
+                let at_zero = eig.expm().unwrap();
                 let mtx = eig.expm_scale(c64::new(time, 0.0));
                 Ok(Process {
                     n_qubits: self.n_qubits,
@@ -108,5 +109,16 @@ impl From<Generator> for GeneratorCoset {
             post: None,
             generator,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn superoperator_at_ry_is_correct() -> Result<(), QdkSimError> {
+        let superop = Generator::hy().at(0.123)?;
+        todo!()
     }
 }

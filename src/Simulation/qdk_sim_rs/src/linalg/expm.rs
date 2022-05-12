@@ -181,6 +181,29 @@ mod tests {
     }
 
     #[test]
+    fn explicit_eig_works_for_sparse_diag_h() -> Result<(), QdkSimError> {
+        let h = ExplicitEigenvalueDecomposition {
+            values: array![c64!(1.0), c64!(-1.0)],
+            vectors: array![
+                [c64!(1.0), c64!(0.0), c64!(0.0), c64!(0.0)],
+                [c64!(0.0), c64!(0.0), c64!(0.0), c64!(-1.0)],
+            ],
+        };
+        let actual = (c64!(1.0 i) * h).expm()?;
+        // We can compute the expected output below by using QuTiP in Python.
+        let expected = array![
+            [c64!(0.54030231 + 0.84147098 i), c64!(0.0), c64!(0.0), c64!(0.0)],
+            [c64!(0.0), c64!(1.0), c64!(0.0), c64!(0.0)],
+            [c64!(0.0), c64!(0.0), c64!(1.0), c64!(0.0)],
+            [c64!(0.0), c64!(0.0), c64!(0.0), c64!(0.54030231 - 0.84147098 i)],
+        ];
+        for (actual, expected) in actual.iter().zip(expected.iter()) {
+            assert_abs_diff_eq!(actual, expected, epsilon = 1e-8);
+        }
+        Ok(())
+    }
+
+    #[test]
     fn explicit_eig_works_for_ry() -> Result<(), QdkSimError> {
         let hy = ExplicitEigenvalueDecomposition {
             values: array![c64!(1.0), c64!(-1.0)],
@@ -203,6 +226,42 @@ mod tests {
             [c64!(0.54030231), c64!(0.84147098)],
             [c64!(-0.84147098), c64!(0.54030231)]
         ];
+        for (actual, expected) in actual.iter().zip(expected.iter()) {
+            assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn explicit_eig_works_for_gy() -> Result<(), QdkSimError> {
+        let gy = ExplicitEigenvalueDecomposition {
+            values: array![c64!(1.0 i), c64!(-1.0 i)],
+            vectors: array![
+                [c64!(0.5 i), c64!(-0.5), c64!(0.5), c64!(0.5 i)],
+                [c64!(0.5), c64!(-0.5 i), c64!(0.5 i), c64!(0.5)],
+            ],
+        };
+        let actual = gy.expm()?;
+        // We can compute the expected output below by using QuTiP in Python.
+        let expected = array![
+            [c64!(0.77015115293407),
+            c64!(0.4207354924039481),
+            c64!(-0.42073549240394814),
+            c64!(-0.22984884706592998)],
+            [c64!(-0.42073549240394803),
+            c64!(0.77015115293407),
+            c64!(0.22984884706593),
+            c64!(-0.4207354924039482)],
+            [c64!(0.42073549240394814),
+            c64!(0.22984884706592998),
+            c64!(0.7701511529340699),
+            c64!(0.4207354924039481)],
+            [c64!(-0.22984884706593),
+            c64!(0.42073549240394803),
+            c64!(-0.4207354924039482),
+            c64!(0.77015115293407)]
+        ];
+        
         for (actual, expected) in actual.iter().zip(expected.iter()) {
             assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
         }
