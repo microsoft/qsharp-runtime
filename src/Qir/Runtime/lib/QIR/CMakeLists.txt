@@ -9,6 +9,7 @@
 # create qir-rt-support lib from the C++ sources
 #
 set(rt_sup_source_files
+  QirOutputHandling.cpp
   OutputStream.cpp
   Output.cpp
   allocationsTracker.cpp

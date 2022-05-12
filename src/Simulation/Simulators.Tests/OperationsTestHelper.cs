@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
@@ -139,7 +139,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         {
             var allocate = sim.Get<Intrinsic.Allocate>();
             var release = sim.Get<Intrinsic.Release>();
-            var set = sim.Get<Measurement.SetToBasisState>();
+            var reset = sim.Get<Intrinsic.Reset>();
+            var x = sim.Get<Intrinsic.X>();
 
             // Number of control bits to use
             for (int n = 0; n < 4; n++)
@@ -156,11 +157,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     // set control bits to match i:
                     for (int j = 0; j < n; j++)
                     {
-                        var value = (i & (1 << j)) == 0
-                            ? Result.Zero
-                            : Result.One;
-
-                        set.Apply((value, ctrls[j]));
+                        reset.__Body__(ctrls[j]);
+                        if ((i & (1 << j)) != 0)
+                        {
+                            x.__Body__(ctrls[j]);
+                        }
                     }
 
                     // controlled is enabled only when all ctrls are 1 (e.g. last one):

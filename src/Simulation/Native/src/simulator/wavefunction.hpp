@@ -35,7 +35,7 @@ namespace detail
 inline size_t get_register(const std::vector<positional_qubit_id>& ps, size_t basis_vector)
 {
     size_t result = 0;
-    for (unsigned i = 0; i < ps.size(); ++i)
+    for (size_t i = 0; i < ps.size(); ++i)
     {
         result |= ((basis_vector >> ps[i]) & 1) << i;
     }
@@ -56,7 +56,7 @@ inline size_t set_register(
     assert(basis_vector_in_ps < (1ull << ps.size()));
 
     size_t result = basis_vector_target & ~qmask;
-    for (unsigned i = 0; i < ps.size(); ++i)
+    for (size_t i = 0; i < ps.size(); ++i)
     {
         result |= ((basis_vector_in_ps >> i) & 1) << ps[i];
     }
@@ -431,7 +431,7 @@ class Wavefunction
     std::vector<logical_qubit_id> get_qubit_ids() const
     {
         std::vector<logical_qubit_id> qs;
-        for (unsigned i = 0; i < qubitmap_.size(); i++)
+        for (size_t i = 0; i < qubitmap_.size(); i++)
         {
             if (qubitmap_[i] != invalid_qubit_position())
             {
@@ -533,7 +533,7 @@ class Wavefunction
         positional_qubit_id p = get_qubit_position(q);
         flush();
         kernels::collapse(wfn_, p, getvalue(q), true);
-        for (int i = 0; i < qubitmap_.size(); ++i)
+        for (size_t i = 0; i < qubitmap_.size(); ++i)
             if (qubitmap_[i] > p && qubitmap_[i] != invalid_qubit_position()) qubitmap_[i]--;
         qubitmap_[q] = invalid_qubit_position();
         --num_qubits_;
@@ -589,7 +589,7 @@ class Wavefunction
 
             // For full state injection we can copy the user's wave function into our store and reorder the
             // positions map without doing any math.
-            for (unsigned i = 0; i < qubits.size(); i++)
+            for (size_t i = 0; i < qubits.size(); i++)
             {
                 qubitmap_[qubits[i]] = i;
             }

@@ -8,7 +8,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\IsingXX.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\IsingYY.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\IsingZZ.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\M.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Rx.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Ry.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Rz.qs" />
@@ -18,6 +18,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />
+    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,15 +30,15 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpFromExpUtil.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtilFromIsing.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\M.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MeasureWithNoReuse.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetXWithNoReuse.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetYWithNoReuse.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetZWithNoReuse.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetXExplicit.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetYExplicit.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetZExplicit.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\R.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\R1.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\R1Frac.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ResetAll.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ResetWithoutReuse.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RFrac.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\SetToBasisState.qs" />
 

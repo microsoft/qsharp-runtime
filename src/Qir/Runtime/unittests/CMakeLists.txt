@@ -5,6 +5,7 @@ include(unit_test_include)
 #
 add_executable(qir-runtime-unittests
   driver.cpp
+  QirOutputHandlingTests.cpp
   QirRuntimeTests.cpp
   ToffoliTests.cpp
   TracerTests.cpp

@@ -154,6 +154,14 @@ namespace Microsoft.Quantum.EntryPointDriver
             ImmutableList.Create("--verbose"), Maybe.Just(false), "Show additional information about the submission.");
 
         /// <summary>
+        /// The base URI option.
+        /// </summary>
+        private static readonly OptionInfo<FileInfo?> SubmitConfigFileOption = new OptionInfo<FileInfo?>(
+            ImmutableList.Create("--submit-config-file"),
+            Maybe.Just<FileInfo?>(null),
+            "Configuration file to use custom submit properties.");
+
+        /// <summary>
         /// The target option.
         /// </summary>
         private readonly OptionInfo<string?> TargetOption;
@@ -493,6 +501,7 @@ namespace Microsoft.Quantum.EntryPointDriver
                 .Concat(AddOptionIfAvailable(command, OutputOption))
                 .Concat(AddOptionIfAvailable(command, DryRunOption))
                 .Concat(AddOptionIfAvailable(command, VerboseOption))
+                .Concat(AddOptionIfAvailable(command, SubmitConfigFileOption))
                 .Concat(MarkOptionsAsMutuallyExclusive(
                     command,
                     new[] { BaseUriOption.Aliases.First(), LocationOption.Aliases.First() }));
@@ -546,7 +555,8 @@ namespace Microsoft.Quantum.EntryPointDriver
                 Shots = DefaultIfShadowed(entryPoint, ShotsOption, azureSettings.Shots),
                 Output = DefaultIfShadowed(entryPoint, OutputOption, azureSettings.Output),
                 DryRun = DefaultIfShadowed(entryPoint, DryRunOption, azureSettings.DryRun),
-                Verbose = DefaultIfShadowed(entryPoint, VerboseOption, azureSettings.Verbose)
+                Verbose = DefaultIfShadowed(entryPoint, VerboseOption, azureSettings.Verbose),
+                SubmitConfigFile = DefaultIfShadowed(entryPoint, SubmitConfigFileOption, azureSettings.SubmitConfigFile)
             });
 
         /// <summary>

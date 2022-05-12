@@ -1,7 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
+    open Microsoft.Quantum.Measurement;
 
     /// # Summary
     /// Performs a joint measurement of one or more qubits in the
@@ -39,27 +40,24 @@ namespace Microsoft.Quantum.Intrinsic {
     /// If the basis array and qubit array are different lengths, then the
     /// operation will fail.
     operation Measure (bases : Pauli[], qubits : Qubit[]) : Result {
-        if (Length(bases) != Length(qubits)) { fail "Arrays 'bases' and 'qubits' must be of the same length."; }
-        if (Length(bases) == 1) {
-            // Because the qubit cannot be reused after measurement, there is no
-            // need to unprepare the Pauli mapping.
-            MapPauli(qubits[0], PauliZ, bases[0]);
-            return M(qubits[0]);
+        if Length(bases) != Length(qubits) {
+            fail "Arrays 'bases' and 'qubits' must be of the same length.";
+        }
+        if Length(bases) == 1 {
+            // Because this platform does not support reuse of qubits after measurement, we use 
+            // an auxiliary qubit and entanglement to get a measurement of the current state while
+            // still allowing the target qubit to be operated on afterwards.
+            use q = Qubit();
+            within {
+                H(q);
+            }
+            apply {
+                EntangleForJointMeasure(bases[0], q, qubits[0]);
+            }
+            return MResetZ(q);
         }
         else {
-            use q = Qubit() {
-                within {
-                    H(q);
-                }
-                apply {
-                    for k in 0 .. Length(bases) - 1 {
-                        if( bases[k] == PauliX ) { Controlled X ([q], qubits[k]); }
-                        if( bases[k] == PauliZ ) { Controlled Z ([q], qubits[k]); }
-                        if( bases[k] == PauliY ) { Controlled Y ([q], qubits[k]); }
-                    }
-                }
-                return M(q);
-            }
+            return JointMeasure(bases, qubits);
         }
     }
 }

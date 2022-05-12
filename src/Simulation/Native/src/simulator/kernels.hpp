@@ -241,7 +241,7 @@ void apply_controlled_exp(
         std::size_t xy_bits = 0;
         std::size_t yz_bits = 0;
         int y_count = 0;
-        for (unsigned i = 0; i < b.size(); ++i)
+        for (std::size_t i = 0; i < b.size(); ++i)
         {
             switch (b[i])
             {
@@ -514,11 +514,11 @@ bool subsytemwavefunction(
     }
 
     // put back to original sorting:
-    for (unsigned i = 0; i < qs.size(); ++i)
+    for (std::size_t i = 0; i < qs.size(); ++i)
     {
         if (sorted[i] != qs[i])
         {
-            for (unsigned p = i + 1; p < qs.size(); ++p)
+            for (std::size_t p = i + 1; p < qs.size(); ++p)
             {
                 if (sorted[p] == qs[i])
                 {
