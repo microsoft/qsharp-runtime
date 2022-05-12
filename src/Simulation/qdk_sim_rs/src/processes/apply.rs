@@ -629,12 +629,6 @@ mod tests {
                     ]
                 ];
 
-                let residual = (&actual - &expected).map(|e| e.abs());
-                println!(
-                    "actual = {}\nexpected = {}\nresidual = {}",
-                    actual, expected, residual
-                );
-
                 for (actual, expected) in actual.iter().zip(expected.iter()) {
                     assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
                 }
@@ -712,12 +706,6 @@ mod tests {
                         c64!(0.3860251827747754)
                     ]
                 ];
-
-                let residual = (&actual - &expected).map(|e| e.abs());
-                println!(
-                    "actual = {}\nexpected = {}\nresidual = {}",
-                    actual, expected, residual
-                );
 
                 for (actual, expected) in actual.iter().zip(expected.iter()) {
                     assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
@@ -941,8 +929,6 @@ mod tests {
                         c64!(0.017373442929624686)
                     ]
                 ];
-                let residual = (&actual - &expected).map(|e| e.abs());
-                println!("residual = {}", residual);
                 for (actual, expected) in actual.iter().zip(expected.iter()) {
                     assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
                 }
