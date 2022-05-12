@@ -11,8 +11,8 @@ use std::collections::HashMap;
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::c_char;
-use std::ptr;
 use std::sync::Mutex;
+use std::{panic, ptr};
 
 struct CApiState {
     register_state: State,
@@ -28,12 +28,16 @@ lazy_static! {
 
 /// Exposes a result to C callers by setting LAST_ERROR in the Error
 /// case, and generating an appropriate error code.
-fn as_capi_err<F: FnOnce() -> Result<(), QdkSimError>>(result_fn: F) -> i64 {
-    let result = result_fn();
+fn as_capi_err<F: FnOnce() -> Result<(), QdkSimError> + panic::UnwindSafe>(result_fn: F) -> i64 {
+    let result = panic::catch_unwind(result_fn);
     match result {
-        Ok(_) => 0,
-        Err(err) => {
-            *LAST_ERROR.lock().unwrap() = Some(err.to_string());
+        Ok(Ok(_)) => 0,
+        Err(panic_err) => {
+            *LAST_ERROR.lock().unwrap() = Some(format!("Panic internal to C API: {:?}", panic_err));
+            -1
+        }
+        Ok(Err(api_err)) => {
+            *LAST_ERROR.lock().unwrap() = Some(api_err.to_string());
             -1
         }
     }
