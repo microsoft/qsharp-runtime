@@ -271,6 +271,7 @@ namespace Microsoft.Quantum.Experimental
         public static void Rz(ulong simId, double theta, Qubit target)
         {
             LogCall("rz");
+            System.Console.WriteLine($"calling rz({simId}, {theta}, {target})");
             CheckCall(_Rz(simId, theta, (uint)target.Id));
         }
 
