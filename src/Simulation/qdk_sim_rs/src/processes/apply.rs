@@ -346,7 +346,6 @@ mod tests {
     use core::panic;
 
     use approx::assert_abs_diff_eq;
-    use cauchy::Scalar;
 
     use super::*;
     use crate::{c64, common_matrices, Generator, ProcessData};
