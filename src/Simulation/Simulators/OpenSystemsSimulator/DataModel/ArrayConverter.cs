@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Experimental;
 ///     three properties:
 ///   </para>
 ///   <list type="bullet">
-///     <item><c>"v"</c>: Indicates the <c>ndarray</c> format version being
+///     <item><c>"v"</c>: Indicates the <c>ndarray</c> format version
 ///       being used. Always <c>1</c> for this implementation.</item>
 ///     <item><c>"dim"</c>: Lists the dimensions of the array being
 ///       serialized. Will always contain one less dimension than the
