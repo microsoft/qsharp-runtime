@@ -9,7 +9,7 @@ public partial class NativeInterfaceTests
     public void GetIdealNoiseModelByNameWorks()
     {
         var ideal = NativeInterface.GetNoiseModelByName("ideal");
-        // TODO: Add assertions here to check properties of the above noise model.
+        // TODO(cgranade): Add assertions here to check properties of the above noise model.
     }
 
     [Fact]
