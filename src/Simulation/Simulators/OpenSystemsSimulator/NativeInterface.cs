@@ -37,7 +37,7 @@ public class SimulationException : Exception
          ? ""
          : $"\nNative backtrace:\n{NativeBacktrace}");
 
-    internal SimulationException(string message, string? backtrace, string? source) : base(this.Message)
+    internal SimulationException(string message, string? backtrace, string? source) : base(message)
     {
         this.message = message;
         this.backtrace = backtrace;
