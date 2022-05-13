@@ -121,6 +121,8 @@ pub extern "C" fn lasterr() -> *const c_char {
     }
 }
 
+/// Returns the traceback for the most recent error raised by a call to a C
+/// function, or returns a null pointer if no traceback is available.
 #[no_mangle]
 pub extern "C" fn lastbacktrace() -> *const c_char {
     match &*BACKTRACE.lock().unwrap() {

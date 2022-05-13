@@ -9,6 +9,7 @@ use ndarray::{linalg::Dot, Array1, Array2, NewAxis};
 use crate::{error::QdkSimError, linalg::HasDagger};
 use num_traits::FromPrimitive;
 
+/// Represents the decomposition of a matrix into eigenvalues and eigenvectors.
 pub trait EigenvalueDecomposition<A>
 where
     A: Scalar,
@@ -17,6 +18,7 @@ where
     /// matrix equations.
     type Error: std::error::Error;
 
+    /// The type of the matrix reconstructed from this decomposition.
     type MatrixSolution;
 
     /// Given a function from eigenvalues to eigenvalues, uses this

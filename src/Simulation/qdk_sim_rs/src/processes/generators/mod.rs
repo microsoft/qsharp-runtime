@@ -14,29 +14,49 @@ use crate::{
     Process, QubitSized,
 };
 
-pub type Generator = QubitSized<GeneratorData>;
-
-/// Data used to represent a single-parameter monoid whose elements
-/// are quantum processes.
+/// Representation of a single-parameter monoid whose elements
+/// are quantum processes; that is, the generator of a quantum dynamical
+/// monoid.
+/// 
+/// Typically, such representations will be derived from Hamiltonian
+/// evolution together with some dissipative evolution, as per Lindblad form.
 ///
 /// # Dimensions
 /// Generators are expected to represent $4^n \times 4^n$ matrices of the form
 /// $G = -\mathrm{i}L + D$, where $L$ is a Liouvillian operator in
 /// column-stacking representation (that is, $L = 𝟙 \otimes H - H \otimes 𝟙$),
 /// where $H$ is the Hamiltonian, and where $D$ is a dissipator.
+pub type Generator = QubitSized<GeneratorData>;
+
+/// Data used to represent a single-parameter monoid whose elements
+/// are quantum processes.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum GeneratorData {
+    /// A representation of a quantum dynamical monoid in terms of the
+    /// eigenvalue decomposition of its generator.
+    /// 
     /// # Remarks
     /// The null space (eigenvectors corresponding to zero eigenvalues) can be
     /// omitted, as they do not contribute to exponentials of generators.
     ExplicitEigenvalueDecomposition {
+        /// The eigenvalues of the generator.
         values: Array1<c64>,
+        /// The eigenvectors of the generator.
+        ///
+        /// # Dimensions
+        /// This field should have shape `[n_eig, dim]`, where the length of
+        /// [`values`] is `n_eig`, and where `dim` is the dimension of the
+        /// Liouville space on which this generator acts.
         vectors: Array2<c64>,
     },
+
+    /// Represents that dynamical evolution is not supported in the given noise
+    /// model (e.g.: a stabilizer model).
     Unsupported,
 }
 
 impl Generator {
+    /// Returns an unsupported generator on a specified number of qubits.
     pub fn unsupported(n_qubits: usize) -> Self {
         Self {
             n_qubits,
@@ -44,6 +64,8 @@ impl Generator {
         }
     }
 
+    /// Evaluates a generator at a specific time, returning the process at that
+    /// point.
     pub fn at(&self, time: f64) -> Result<Process, QdkSimError> {
         match &self.data {
             GeneratorData::ExplicitEigenvalueDecomposition { values, vectors } => {
@@ -74,18 +96,26 @@ impl Generator {
 /// quantum process.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GeneratorCoset {
+    /// The quantum process which occurs before dynamical evolution, or
+    /// [`Option::None`] if no such process occurs or is identity.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pre: Option<Process>,
 
+    /// The quantum process which occurs following dynamical evolution, or
+    /// [`Option::None`] if no such process occurs or is identity.
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post: Option<Process>,
 
+    /// The generator whose coset this struct represents.
     pub generator: Generator,
 }
 
 impl GeneratorCoset {
+    /// Evaluates a generator at a specific time, returning the process at that
+    /// point. By contrast with [`Generator::at`], this method includes the
+    /// effect of any pre- or post-evolution quantum processes.
     pub fn at(&self, time: f64) -> Result<Process, QdkSimError> {
         let mut seq = vec![self.generator.at(time)?];
         if let Some(pre) = &self.pre {

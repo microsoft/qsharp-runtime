@@ -5,6 +5,7 @@ use std::f64::consts::PI;
 
 use num_traits::{abs, Float, FromPrimitive, Signed};
 
+/// Returns the approximate factorial of a given number.
 pub fn approximate_factorial<T: Into<F>, F: Float + Signed + FromPrimitive>(x: T) -> F {
     let x: F = x.into();
     let abs_x = abs(x);

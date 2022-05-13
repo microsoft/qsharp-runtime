@@ -49,7 +49,16 @@ pub enum ProcessData {
     /// indices representing the indices of each operator.
     KrausDecomposition(Array3<C64>),
 
+    /// Representation of a process by a superoperator acting on
+    /// column-stacked vectorizations of density operators (that is, the
+    /// convention in which Roth's lemma is expressed as
+    /// $|ABC⟫ = C^{\mathrm{T}} \otimes A |B⟫$).
+    /// 
+    /// # Dimensions
+    /// This array should have shape $4^n \times 4^n$, where $n$ is the number
+    /// of qubits that the superoperator acts on.
     Superoperator(Array2<c64>),
+
     // TODO: Choi representation.
     /// Representation of a process as a sequence of other processes.
     Sequence(Vec<Process>),

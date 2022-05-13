@@ -18,7 +18,10 @@ pub enum QdkSimError {
     #[error("{msg}")]
     #[diagnostic(code(qdk_sim::other))]
     MiscError {
+        /// The message associated with this error.
         msg: String,
+
+        /// A backtrace from where this error was originally raised.
         #[backtrace]
         backtrace: std::backtrace::Backtrace,
     },
