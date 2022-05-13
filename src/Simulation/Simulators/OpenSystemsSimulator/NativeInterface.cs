@@ -17,6 +17,8 @@ namespace Microsoft.Quantum.Experimental;
 public class SimulationException : Exception
 {
     private readonly string? source;
+    private readonly string? backtrace;
+    private readonly string message;
 
     /// <summary>
     ///     The name of the native shared library which raised this
@@ -24,8 +26,21 @@ public class SimulationException : Exception
     /// </summary>
     public string? SourceLibrary => source;
 
-    internal SimulationException(string message, string? source) : base(message)
+    /// <summary>
+    ///      The native backtrace, if any, associated with this exception.
+    /// </summary>
+    public string? NativeBacktrace => backtrace;
+
+    public override string Message =>
+        $"Exception in native open systems simulator runtime {(source is null ? "" : $"({source})")}: {this.message}" +
+        backtrace is null
+        ? ""
+        : $"\nNative backtrace:\n{NativeBacktrace}";
+
+    internal SimulationException(string message, string? backtrace, string? source) : base()
     {
+        this.message = message;
+        this.backtrace = backtrace;
         this.source = source;
     }
 }
@@ -45,15 +60,9 @@ internal static class NativeInterface
         {
             var error = _LastError();
             var bt = _LastBackTrace();
-            var msg = $"Exception in native open systems simulator runtime: {error}";
-            if (bt is not null)
-            {
-                msg += $"\nNative backtrace:\t{bt}";
-            }
-            throw new SimulationException(msg, DLL_NAME);
+            throw new SimulationException(error, bt, DLL_NAME);
         }
     }
-
 
     public const string DLL_NAME = "Microsoft.Quantum.Experimental.Simulators.Runtime.dll";
 

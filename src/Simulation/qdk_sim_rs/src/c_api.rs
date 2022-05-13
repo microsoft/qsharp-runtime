@@ -5,6 +5,7 @@
 
 use crate::error::{QdkSimError, QdkSimError::*};
 use crate::{built_info, GeneratorCoset, NoiseModel, Process, State};
+use cfg_if::cfg_if;
 use lazy_static::lazy_static;
 use serde_json::json;
 use std::collections::HashMap;
@@ -213,6 +214,11 @@ macro_rules! declare_single_qubit_gate {
         $(#[$meta])*
         #[no_mangle]
         pub fn $gate_name(sim_id: usize, idx: usize) -> i64 {
+            cfg_if! {
+                if #[cfg(feature = "trace_c_api")] {
+                    println!("[c_api trace] {}({}, {})", stringify!($gate_name), sim_id, idx);
+                }
+            }
             as_capi_err(|| apply(sim_id, &[idx], |model| Ok(&model.$gate_name)))
         }
     };
@@ -226,6 +232,11 @@ macro_rules! declare_continuous_gate {
         $(#[$meta])*
         #[no_mangle]
         pub fn $gate_name(sim_id: usize, theta: f64, idx: usize) -> i64 {
+            cfg_if! {
+                if #[cfg(feature = "trace_c_api")] {
+                    println!("[c_api trace] {}({}, {}, {})", stringify!($gate_name), sim_id, theta, idx);
+                }
+            }
             as_capi_err(|| {
                 apply_continuous(sim_id, &[idx], theta, |model| {
                     Ok(&model.$gate_name)
@@ -287,6 +298,11 @@ declare_single_qubit_gate!(
 /// using the currently set noise model.
 #[no_mangle]
 pub extern "C" fn cnot(sim_id: usize, idx_control: usize, idx_target: usize) -> i64 {
+    cfg_if! {
+        if #[cfg(feature = "trace_c_api")] {
+            println!("[c_api trace] cnot({}, {}, {})", sim_id, idx_control, idx_target);
+        }
+    }
     as_capi_err(|| apply(sim_id, &[idx_control, idx_target], |model| Ok(&model.cnot)))
 }
 
@@ -315,6 +331,11 @@ declare_continuous_gate!(
 /// by `result_out` can be safely set.
 #[no_mangle]
 pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) -> i64 {
+    cfg_if! {
+        if #[cfg(feature = "trace_c_api")] {
+            println!("[c_api trace] m({}, {})", sim_id, idx);
+        }
+    }
     as_capi_err(|| {
         let state = &mut *STATE.lock().unwrap();
         if let Some(sim_state) = state.get_mut(&sim_id) {

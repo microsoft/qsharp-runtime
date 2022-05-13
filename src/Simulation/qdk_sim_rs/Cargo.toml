@@ -38,7 +38,7 @@ path = "src/lib.rs"
 
 # Optional build-time features: we use this to create Python and WASM bindings.
 [features]
-default = []
+default = ["trace_c_api"] # TODO: Disable before merging to main.
 
 ## Enables experimental support for Padé approximants.
 ## Currently disabled by default, but may be enabled by default in future
@@ -51,6 +51,10 @@ python = ["pyo3", "numpy"]
 
 ## Ensures that the crate is compatible with usage from WebAssembly.
 wasm = ["web-sys"]
+
+## When enabled, C API calls print trace information to stdout to help debug
+## how the simulator is called from interop code.
+trace_c_api = []
 
 
 [profile.release]
