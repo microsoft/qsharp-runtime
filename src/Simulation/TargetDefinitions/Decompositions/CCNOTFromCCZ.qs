@@ -30,7 +30,52 @@ namespace Microsoft.Quantum.Intrinsic {
             }
         }
         controlled (ctls, ...) {
-            Controlled X (ctls + [control1, control2], target);
+            if Length(ctls) == 0 {
+                CCNOT(control1, control2, target);
+            }
+            elif Length(ctls) == 1 {
+                Controlled X([ctls[0], control1, control2], target);
+            }
+            elif Length(ctls) == 2 {
+                Controlled X([ctls[0], ctls[1], control1, control2], target);
+            }
+            elif Length(ctls) == 3 {
+                Controlled X([ctls[0], ctls[1], ctls[2], control1, control2], target);
+            }
+            elif Length(ctls) == 4 {
+                Controlled X([ctls[0], ctls[1], ctls[2], ctls[3], control1, control2], target);
+            }
+            elif Length(ctls) == 5 {
+                Controlled X([ctls[0], ctls[1], ctls[2], ctls[3], ctls[4], control1, control2], target);
+            }
+            elif Length(ctls) == 6 {
+                Controlled X([ctls[0], ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], control1, control2], target);
+            }
+            elif Length(ctls) == 7 {
+                use temp = Qubit();
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temp);
+                }
+                apply {
+                    Controlled X([temp, ctls[2], ctls[3], ctls[4], ctls[5], ctls[6], control1, control2], target);
+                }
+            }
+            elif Length(ctls) == 8 {
+                use temps = Qubit[2];
+                within {
+                    PhaseCCX(ctls[0], ctls[1], temps[0]);
+                    PhaseCCX(ctls[2], ctls[3], temps[1]);
+                }
+                apply {
+                    Controlled X([temps[0], temps[1], ctls[4], ctls[5], ctls[6], ctls[7], control1, control2], target);
+                }
+            }
+            else {
+                fail "Too many control qubits specified to CCNOT gate.";
+
+                // Eventually, we can use recursion via callables with the below utility:
+                // ApplyWithLessControlsA(Controlled X, (ctls, qubit));
+            }
         }
         adjoint self;
     }

@@ -52,4 +52,17 @@ namespace Microsoft.Quantum.Intrinsic {
             ExpFrac(paulis, -numerator, power, qubits);
         }
     }
+
+    internal operation ApplyGlobalPhaseFracWithR1Frac (numerator : Int, power : Int) : Unit is Adj + Ctl {
+        body (...) {}
+        controlled (ctrls, ...) {
+            let numControls =  Length(ctrls);
+            if (numControls > 0 ) {
+                // Invoke Controlled R1Frac, which will recursively call back into ApplyGlobalPhase.
+                // Each time the controls is one shorter, until it is empty and the recursion stops.
+                Controlled R1Frac(ctrls[1 .. numControls - 1], (numerator, power, ctrls[0]));
+            }
+        }
+    }
+
 }

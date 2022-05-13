@@ -39,4 +39,18 @@ namespace Microsoft.Quantum.Intrinsic {
             ApplyGlobalPhase( - theta / 2.0 );
         }
     }
+
+    internal operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
+        body (...) {}
+        controlled (ctls, (...)) {
+            if (Length(ctls) > 0) {
+                let qubit = ctls[0];
+                let rest = ctls[1...];
+                // Invoke Controlled R1, which will recursively call back into ApplyGlobalPhase.
+                // Each time the ctls array is one shorter, until it is empty and the recursion stops.
+                Controlled R1(rest, (theta, qubit));
+            }
+        }
+    }
+
 }

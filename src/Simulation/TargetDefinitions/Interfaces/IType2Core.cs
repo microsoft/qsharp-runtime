@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic.Interfaces
@@ -8,7 +8,7 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
         IIntrinsicIsingXX,
         IIntrinsicIsingYY,
         IIntrinsicIsingZZ,
-        IIntrinsicM,
+        IIntrinsicMZ,
         IIntrinsicRx,
         IIntrinsicRy,
         IIntrinsicRz,
@@ -17,6 +17,7 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
         IIntrinsicT,
         IIntrinsicX,
         IIntrinsicY,
-        IIntrinsicZ
+        IIntrinsicZ,
+        IIntrinsicReset
     { }
 }
