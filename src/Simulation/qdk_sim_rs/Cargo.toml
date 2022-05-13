@@ -38,7 +38,7 @@ path = "src/lib.rs"
 
 # Optional build-time features: we use this to create Python and WASM bindings.
 [features]
-default = [""]
+default = []
 
 ## Enables experimental support for Padé approximants.
 ## Currently disabled by default, but may be enabled by default in future
