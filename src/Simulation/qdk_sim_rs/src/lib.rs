@@ -17,6 +17,7 @@
 // warnings when building docs, but ideally we should make sure to address
 // warnings going forward by adding relevant examples.
 #![cfg_attr(doc, warn(rustdoc::missing_doc_code_examples))]
+#![feature(backtrace)]
 
 #[macro_use(array, s)]
 extern crate ndarray;

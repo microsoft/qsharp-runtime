@@ -8,6 +8,7 @@ use crate::{built_info, GeneratorCoset, NoiseModel, Process, State};
 use lazy_static::lazy_static;
 use serde_json::json;
 use std::collections::HashMap;
+use std::error::Error;
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::c_char;
@@ -22,6 +23,7 @@ struct CApiState {
 lazy_static! {
     static ref STATE: Mutex<HashMap<usize, CApiState>> = Mutex::new(HashMap::new());
     static ref LAST_ERROR: Mutex<Option<String>> = Mutex::new(None);
+    static ref BACKTRACE: Mutex<Option<String>> = Mutex::new(None);
 }
 
 // UTILITY FUNCTIONS //
@@ -38,6 +40,9 @@ fn as_capi_err<F: FnOnce() -> Result<(), QdkSimError> + panic::UnwindSafe>(resul
         }
         Ok(Err(api_err)) => {
             *LAST_ERROR.lock().unwrap() = Some(api_err.to_string());
+            if let Ok(mut guard) = BACKTRACE.lock() {
+                *guard = api_err.backtrace().map(|bt| bt.to_string())
+            }
             -1
         }
     }
@@ -110,6 +115,14 @@ pub extern "C" fn get_simulator_info() -> *const c_char {
 #[no_mangle]
 pub extern "C" fn lasterr() -> *const c_char {
     match &*LAST_ERROR.lock().unwrap() {
+        None => ptr::null(),
+        Some(msg) => CString::new(msg.as_str()).unwrap().into_raw(),
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn lastbacktrace() -> *const c_char {
+    match &*BACKTRACE.lock().unwrap() {
         None => ptr::null(),
         Some(msg) => CString::new(msg.as_str()).unwrap().into_raw(),
     }

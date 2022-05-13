@@ -62,7 +62,7 @@ impl Generator {
                     data: crate::ProcessData::Superoperator(mtx?),
                 })
             }
-            GeneratorData::Unsupported => Err(QdkSimError::MiscError(
+            GeneratorData::Unsupported => Err(QdkSimError::misc(
                 "Cannot evaluate generator of kind Unsupported.".to_string(),
             )),
         }

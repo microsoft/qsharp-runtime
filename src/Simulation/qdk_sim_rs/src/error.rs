@@ -3,7 +3,7 @@
 
 //! Module defining common errors that can occur during quantum simulations.
 
-use std::str::Utf8Error;
+use std::{backtrace::Backtrace, str::Utf8Error};
 
 use miette::Diagnostic;
 use ndarray::ShapeError;
@@ -15,9 +15,13 @@ pub enum QdkSimError {
     // NB: As a design note, please consider if a more specific error is better
     //     suited for your usecase before returning `MiscError`.
     /// Raised on miscellaneous errors.
-    #[error("{0}")]
+    #[error("{msg}")]
     #[diagnostic(code(qdk_sim::other))]
-    MiscError(String),
+    MiscError {
+        msg: String,
+        #[backtrace]
+        backtrace: std::backtrace::Backtrace,
+    },
 
     /// Raised when functionality that has not yet been implemented is called.
     #[error("Not yet implemented: {0}")]
@@ -58,7 +62,11 @@ pub enum QdkSimError {
     /// Raised when a shape error occurs internally to [`qdk_sim`].
     #[error(transparent)]
     #[diagnostic(code(qdk_sim::linalg::internal_shape))]
-    InternalShapeError(#[from] ShapeError),
+    InternalShapeError(
+        #[from]
+        #[backtrace]
+        ShapeError,
+    ),
 
     /// Raised when an algorithm requires a matrix to be square, but a
     /// rectangular matrix was passed instead.
@@ -113,10 +121,28 @@ pub enum QdkSimError {
     /// Raised when a JSON serialization error occurs during a C API call.
     #[error(transparent)]
     #[diagnostic(code(qdk_sim::c_api::json_deser))]
-    JsonDeserializationError(#[from] serde_json::Error),
+    JsonDeserializationError(
+        #[from]
+        #[backtrace]
+        serde_json::Error,
+    ),
 
     /// Raised when an unanticipated error occurs during a C API call.
     #[error(transparent)]
     #[diagnostic(code(qdk_sim::c_api::unanticipated))]
-    UnanticipatedCApiError(#[from] anyhow::Error),
+    UnanticipatedCApiError(
+        #[from]
+        #[backtrace]
+        anyhow::Error,
+    ),
+}
+
+impl QdkSimError {
+    pub(crate) fn misc<T: Into<String>>(msg: T) -> Self {
+        let msg: String = msg.into();
+        QdkSimError::MiscError {
+            msg,
+            backtrace: Backtrace::force_capture(),
+        }
+    }
 }

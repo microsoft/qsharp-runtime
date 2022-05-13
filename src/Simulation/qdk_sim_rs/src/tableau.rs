@@ -96,13 +96,13 @@ impl Tableau {
     /// describing the assertion failure is returned.
     pub fn assert_meas(&self, idx_target: usize, expected: bool) -> Result<(), QdkSimError> {
         let actual = self.deterministic_result(idx_target).ok_or_else(|| {
-            QdkSimError::MiscError(format!(
+            QdkSimError::misc(format!(
                 "Expected {}, but measurement result would be random.",
                 expected
             ))
         })?;
         if actual != expected {
-            Err(QdkSimError::MiscError(format!(
+            Err(QdkSimError::misc(format!(
                 "Expected {}, but measurement result would actually be {}.",
                 expected, actual
             )))

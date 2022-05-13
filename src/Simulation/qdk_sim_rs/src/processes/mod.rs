@@ -407,14 +407,14 @@ impl IntoPauliMixture for Pauli {
 /// a mixed Pauli channel is applied to a pure or mixed state.
 fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Result<Process, QdkSimError> {
     if paulis.is_empty() {
-        Err(QdkSimError::MiscError(
+        Err(QdkSimError::misc(
             "Cannot promote Pauli channel with no outcomes to a process.".to_string(),
         ))
     } else if paulis.len() == 1 {
         // Just one Pauli, so can box it up into a unitary.
         let (pr, pauli) = &paulis[0];
         if (pr - 1.0).abs() >= 1e-8 {
-            return Err(QdkSimError::MiscError(format!(
+            return Err(QdkSimError::misc(format!(
                 "Cannot promote Pauli channel with probability {} to quantum process.",
                 pr
             )));

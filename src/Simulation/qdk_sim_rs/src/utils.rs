@@ -41,7 +41,7 @@ fn log_message(msg: &str) {
 /// Prints a message as an error, and returns it as a [`Result`].
 pub fn log_as_err<T>(msg: String) -> Result<T, QdkSimError> {
     log(&msg);
-    Err(QdkSimError::MiscError(msg))
+    Err(QdkSimError::misc(msg))
 }
 
 /// Prints a message as an error.

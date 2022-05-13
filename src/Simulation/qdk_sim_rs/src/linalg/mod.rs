@@ -146,25 +146,25 @@ pub fn extend_two_to_n(
     n_qubits: usize,
 ) -> Result<Array2<C64>, QdkSimError> {
     if data.shape() != [4, 4] {
-        return Err(QdkSimError::MiscError(format!(
+        return Err(QdkSimError::misc(format!(
             "expected 4x4 matrix, but got shape {:?}",
             data.shape()
         )));
     }
     if idx_qubit1 >= n_qubits {
-        return Err(QdkSimError::MiscError(format!(
+        return Err(QdkSimError::misc(format!(
             "{} is not a valid index for a {}-qubit register",
             idx_qubit1, n_qubits
         )));
     }
     if idx_qubit2 >= n_qubits {
-        return Err(QdkSimError::MiscError(format!(
+        return Err(QdkSimError::misc(format!(
             "{} is not a valid index for a {}-qubit register",
             idx_qubit2, n_qubits
         )));
     }
     if idx_qubit1 == idx_qubit2 {
-        return Err(QdkSimError::MiscError(format!(
+        return Err(QdkSimError::misc(format!(
             "Indices {} and {} must be distinct.",
             idx_qubit1, idx_qubit2
         )));

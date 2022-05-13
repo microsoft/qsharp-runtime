@@ -180,13 +180,13 @@ where
         1 => {
             let idx_qubit = idx_qubits[0];
             if idx_qubit >= n_qubits {
-                return Err(QdkSimError::MiscError(format!(
+                return Err(QdkSimError::misc(format!(
                     "Invalid qubit index {} for {} qubit register.",
                     idx_qubit, n_qubits
                 )));
             }
             if superop.shape() != [4, 4] {
-                return Err(QdkSimError::MiscError(format!(
+                return Err(QdkSimError::misc(format!(
                     "Expected 4x4 superoperator but got {:?}.",
                     superop.shape()
                 )));
