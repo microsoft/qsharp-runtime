@@ -33,11 +33,11 @@ public class SimulationException : Exception
 
     public override string Message =>
         $"Exception in native open systems simulator runtime {(source is null ? "" : $"({source})")}: {this.message}" +
-        backtrace is null
-        ? ""
-        : $"\nNative backtrace:\n{NativeBacktrace}";
+        (backtrace is null
+         ? ""
+         : $"\nNative backtrace:\n{NativeBacktrace}");
 
-    internal SimulationException(string message, string? backtrace, string? source) : base()
+    internal SimulationException(string message, string? backtrace, string? source) : base(this.Message)
     {
         this.message = message;
         this.backtrace = backtrace;
@@ -265,7 +265,7 @@ internal static class NativeInterface
         CheckCall(_CNOT(simId, (uint)control.Id, (uint)target.Id));
     }
 
-    [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="cnot")]
+    [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="rx")]
     private static extern Int64 _Rx(ulong simId, double theta, uint idxTarget);
     public static void Rx(ulong simId, double theta, Qubit target)
     {
@@ -273,20 +273,19 @@ internal static class NativeInterface
         CheckCall(_Rx(simId, theta, (uint)target.Id));
     }
 
-    [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="cnot")]
+    [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="ry")]
     private static extern Int64 _Ry(ulong simId, double theta, uint idxTarget);
     public static void Ry(ulong simId, double theta, Qubit target)
     {
         LogCall("ry");
         CheckCall(_Ry(simId, theta, (uint)target.Id));
     }
-    
-    [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="cnot")]
+
+    [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="rz")]
     private static extern Int64 _Rz(ulong simId, double theta, uint idxTarget);
     public static void Rz(ulong simId, double theta, Qubit target)
     {
         LogCall("rz");
-        System.Console.WriteLine($"calling rz({simId}, {theta}, {target})");
         CheckCall(_Rz(simId, theta, (uint)target.Id));
     }
 
