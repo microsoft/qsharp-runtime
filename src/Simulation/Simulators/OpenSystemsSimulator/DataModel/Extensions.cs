@@ -63,9 +63,25 @@ internal static class Extensions
                 )
         ) + rowSep + "]";
 
-    public static void Require(this ref Utf8JsonReader reader, JsonTokenType type, bool read = true)
+    /// <summary>
+    ///     Ensures that the current token is of a given token type, optionally reading
+    ///     the current token before checking.
+    /// </summary>
+    /// <param name="readCurrent">
+    ///     If <c>true</c>, reads and consumes the current token before checking.
+    /// </param>
+    /// <param name="reader">
+    ///     The JSON reader to read from.
+    /// </param>
+    /// <param name="type">
+    ///     The token type expected.
+    /// </param>
+    /// <exception cref="JsonException">
+    ///     Thrown when the current token does not match <paramref name="type" />.
+    /// </exception>
+    public static void Require(this ref Utf8JsonReader reader, JsonTokenType type, bool readCurrent = true)
     {
-        if (read) reader.Read();
+        if (readCurrent) reader.Read();
         if (reader.TokenType != type)
         {
             // Try to read what it actually was.
@@ -79,7 +95,9 @@ internal static class Extensions
                 JsonTokenType.PropertyName => reader.GetString(),
                 _ => null
             };
-            throw new JsonException($"Expected a JSON token of type {type}, got {reader.TokenType} instead.{(value == null ? "" : $"\nValue: {value}")}");
+            throw reader.CurrentState.Exception(
+                $"Expected a JSON token of type {type}, got {reader.TokenType} instead.{(value == null ? "" : $"\nValue: {value}")}"
+            );
         }
     }
     public static bool IsComplexLike(this NDArray array) =>
@@ -92,7 +110,7 @@ internal static class Extensions
     internal static TResult ReadQubitSizedData<TResult>(this ref Utf8JsonReader reader, ReaderContinuation<int, TResult> readData)
     {
         
-        reader.Require(JsonTokenType.StartObject, read: false);
+        reader.Require(JsonTokenType.StartObject, readCurrent: false);
 
         int? nQubits = null;
         Func<int, TResult>? completion = null;

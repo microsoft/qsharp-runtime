@@ -33,7 +33,7 @@ public class StateConverter : JsonConverter<State>
 
     public override State Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        reader.Require(JsonTokenType.StartObject, read: false);
+        reader.Require(JsonTokenType.StartObject, readCurrent: false);
 
         var arrayConverter = new ComplexArrayConverter();
         return reader.ReadQubitSizedData<State>((ref Utf8JsonReader reader, string kind) =>

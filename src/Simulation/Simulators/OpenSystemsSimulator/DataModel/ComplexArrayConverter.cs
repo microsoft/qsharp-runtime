@@ -41,17 +41,17 @@ public class ComplexArrayConverter : JsonConverter<NDArray>
 {
     public override NDArray Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        // By the end, we need to have read "v", "dim", and "data".
-        int? version = null;
-        List<int>? dims = null;
-        List<Complex>? data = null;
-
         // We require that the reader be in the right state to read an
         // object.
         if (reader.TokenType != JsonTokenType.StartObject)
         {
             throw new JsonException();
         }
+
+        // By the end, we need to have read "v", "dim", and "data".
+        int? version = null;
+        List<int>? dims = null;
+        List<Complex>? data = null;
 
         while (reader.Read())
         {
@@ -95,7 +95,7 @@ public class ComplexArrayConverter : JsonConverter<NDArray>
                     {
                         // We expect an inner array at this point, so
                         // go on and read the begin array token.
-                        reader.Require(JsonTokenType.StartArray, read: false);
+                        reader.Require(JsonTokenType.StartArray, readCurrent: false);
 
                         reader.Read();
                         var real = reader.GetDouble();
@@ -120,9 +120,12 @@ public class ComplexArrayConverter : JsonConverter<NDArray>
         if (data == null) throw new JsonException(nameof(data));
 
         // We now know we have everything we need to make the new array.
-        // In doing so, we allocate an ndarray with of shape (nElements, 2)
-        // where the last index represents real-vs-imag. We'll reshape
-        // it to the correct shape at the end.
+        // In doing so, we allocate an ndarray with shape (nElements, 2)
+        // where the last index represents real-vs-imag. That is,
+        // arr[i, 0] indicates the real part of the ith element, while
+        // arr[i, 1] indicates the imaginary part.
+        // 
+        // We'll reshape it to the correct shape at the end.
         var array = np.zeros((data.Count, 2));
         foreach (var idx in Enumerable.Range(0, data.Count))
         {

@@ -20,7 +20,7 @@ namespace Microsoft.Quantum.Experimental
         private static IList<(double, IList<Pauli>)> ReadMixedPauliData(ref Utf8JsonReader reader)
         {
             var results = new List<(double, IList<Pauli>)>();
-            reader.Require(JsonTokenType.StartArray, read: false);
+            reader.Require(JsonTokenType.StartArray, readCurrent: false);
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.EndArray)
@@ -28,7 +28,7 @@ namespace Microsoft.Quantum.Experimental
                     break;
                 }
 
-                reader.Require(JsonTokenType.StartArray, read: false);
+                reader.Require(JsonTokenType.StartArray, readCurrent: false);
                 reader.Read();
                 var p = reader.GetDouble();
                 var ops = new List<Pauli>();
@@ -58,7 +58,7 @@ namespace Microsoft.Quantum.Experimental
 
         public override Process Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            reader.Require(JsonTokenType.StartObject, read: false);
+            reader.Require(JsonTokenType.StartObject, readCurrent: false);
 
             var arrayConverter = new ComplexArrayConverter();
             return reader.ReadQubitSizedData<Process>((ref Utf8JsonReader reader, string kind) =>

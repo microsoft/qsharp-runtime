@@ -16,7 +16,7 @@ public class InstrumentConverter : JsonConverter<Instrument>
         // We use the technique at
         //     https://stackoverflow.com/questions/58074304/is-polymorphic-deserialization-possible-in-system-text-json/59744873#59744873
         // to implement polymorphic deserialization, based on the property name.
-        reader.Require(JsonTokenType.StartObject, read: false);
+        reader.Require(JsonTokenType.StartObject, readCurrent: false);
         reader.Require(JsonTokenType.PropertyName);
 
         var variant = reader.GetString();
