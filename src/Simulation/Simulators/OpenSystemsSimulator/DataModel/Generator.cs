@@ -42,7 +42,7 @@ public class GeneratorConverter : JsonConverter<Generator>
 {
     public override Generator Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        reader.Require(JsonTokenType.StartObject, read: false);
+        reader.Require(JsonTokenType.StartObject, readCurrent: false);
         var arrayConverter = new ComplexArrayConverter();
         return reader.ReadQubitSizedData<Generator>((ref Utf8JsonReader reader, string kind) =>
         {
