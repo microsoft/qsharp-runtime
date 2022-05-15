@@ -49,29 +49,8 @@ namespace Microsoft.Quantum.Intrinsic {
             elif Length(ctls) == 1 {
                 Rz(theta, ctls[0]);
             }
-            elif Length(ctls) == 2 {
-                Controlled R1([ctls[1]], (theta, ctls[0]));
-            }
-            elif Length(ctls) == 3 {
-                Controlled R1([ctls[1], ctls[2]], (theta, ctls[0]));
-            }
-            elif Length(ctls) == 4 {
-                Controlled R1([ctls[1], ctls[2], ctls[3]], (theta, ctls[0]));
-            }
-            elif Length(ctls) == 5 {
-                Controlled R1([ctls[1], ctls[2], ctls[3], ctls[4]], (theta, ctls[0]));
-            }
-            elif Length(ctls) == 6 {
-                Controlled R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5]], (theta, ctls[0]));
-            }
-            elif Length(ctls) == 7 {
-                Controlled R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6]], (theta, ctls[0]));
-            }
-            elif Length(ctls) == 8 {
-                Controlled R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6], ctls[7]], (theta, ctls[0]));
-            }
             else {
-                fail "Too many controls specified to R gate.";
+                Controlled R1(ctls[1..(Length(ctls) - 1)], (theta, ctls[0]));
             }
         }
     }

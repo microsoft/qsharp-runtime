@@ -43,21 +43,18 @@ namespace Microsoft.Quantum.Intrinsic {
         if Length(bases) != Length(qubits) {
             fail "Arrays 'bases' and 'qubits' must be of the same length.";
         }
-        if Length(bases) == 1 {
-            // Because this platform does not support reuse of qubits after measurement, we use 
-            // an auxiliary qubit and entanglement to get a measurement of the current state while
-            // still allowing the target qubit to be operated on afterwards.
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                EntangleForJointMeasure(bases[0], q, qubits[0]);
-            }
-            return MResetZ(q);
+        // Because this platform does not support reuse of qubits after measurement, we always use 
+        // an auxiliary qubit and entanglement to get a measurement of the current state while
+        // still allowing the target qubit to be operated on afterwards.
+        use aux = Qubit();
+        within {
+            H(aux);
         }
-        else {
-            return JointMeasure(bases, qubits);
+        apply {
+            for i in 0..Length(bases)-1 {
+                EntangleForJointMeasure(bases[i], aux, qubits[i]);
+            }
         }
+        return MResetZ(aux);
     }
 }
