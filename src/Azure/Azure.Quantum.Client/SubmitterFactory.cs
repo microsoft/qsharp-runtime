@@ -30,7 +30,8 @@ namespace Microsoft.Azure.Quantum
             new SubmitterInfo(
                 new Regex(@"\Aquantinuum\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
-                "QirSubmitter"),
+                "QirSubmitter",
+                true),
             new SubmitterInfo(
                 new Regex(@"\Aqci\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.QCI.Targets.QCIQirSubmitter, Microsoft.Quantum.Providers.QCI",
@@ -61,9 +62,10 @@ namespace Microsoft.Azure.Quantum
         /// <param name="target">The name of the execution target.</param>
         /// <param name="workspace">The workspace used to manage jobs.</param>
         /// <param name="storageConnection">The connection string for the storage account.</param>
+        /// <param name="targetCapability">The target capability.</param>
         /// <returns>A QIR submitter.</returns>
-        public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection) =>
-            Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection);
+        public static IQirSubmitter? QirSubmitter(string target, IWorkspace workspace, string? storageConnection, string targetCapability) =>
+            Submitter<IQirSubmitter>(QirSubmitters, target, workspace, storageConnection, targetCapability);
 
         public static IQirSubmitter? QirSubmitterFromConfigFile(
             string target, FileInfo configFile, IWorkspace workspace, string? storageConnection)
@@ -95,13 +97,14 @@ namespace Microsoft.Azure.Quantum
         /// <returns>The QIR submitter instance.</returns>
         private static IQirSubmitter? AzurePayloadGenerator(IEnumerable<SubmitterInfo> submitters, string target)
         {
-            var constructorInfo = ConstructorInfo(submitters, target);
-            if (constructorInfo is null)
+            var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
+            if (submitter is null)
             {
                 return null;
             }
 
-            (var constructorName, var constructorType) = constructorInfo.Value;
+            var constructorInfo = ConstructorInfo(submitter);
+            (var constructorName, var constructorType) = constructorInfo;
             var args = new object?[] { target };
             return (IQirSubmitter)constructorType.InvokeMember(
                 constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
@@ -114,19 +117,26 @@ namespace Microsoft.Azure.Quantum
         /// <param name="target">The name of the execution target.</param>
         /// <param name="workspace">The workspace used to manage jobs.</param>
         /// <param name="storageConnection">The connection string for the storage account.</param>
+        /// <param name="targetCapability">The target capability.</param>
         /// <typeparam name="T">The type of the submitter interface.</typeparam>
         /// <returns>The submitter instance.</returns>
         private static T? Submitter<T>(
-            IEnumerable<SubmitterInfo> submitters, string target, IWorkspace workspace, string? storageConnection)
+            IEnumerable<SubmitterInfo> submitters, string target, IWorkspace workspace, string? storageConnection, string targetCapability = "")
             where T : class
         {
-            var constructorInfo = ConstructorInfo(submitters, target);
-            if (constructorInfo is null)
+            var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
+            if (submitter is null)
             {
                 return null;
             }
 
-            (var constructorName, var constructorType) = constructorInfo.Value;
+            if (submitter.RequiresTargetCapability && string.IsNullOrWhiteSpace(targetCapability))
+            {
+                return null;
+            }
+
+            var constructorInfo = ConstructorInfo(submitter);
+            (var constructorName, var constructorType) = constructorInfo;
             var args = new object?[] { target, workspace, storageConnection };
             return (T)constructorType.InvokeMember(
                 constructorName, BindingFlags.InvokeMethod, Type.DefaultBinder, null, args);
@@ -135,17 +145,10 @@ namespace Microsoft.Azure.Quantum
         /// <summary>
         /// Returns the name and the type of a constructor that matches the target.
         /// </summary>
-        /// <param name="submitters">Information about each submitter.</param>
-        /// <param name="target">The name of the execution target.</param>
+        /// <param name="submitter">Information about the submitter.</param>
         /// <returns>A name and type tuple.</returns>
-        private static (string Name, Type Type)? ConstructorInfo(IEnumerable<SubmitterInfo> submitters, string target)
+        private static (string Name, Type Type) ConstructorInfo(SubmitterInfo submitter)
         {
-            var submitter = submitters.FirstOrDefault(s => s.TargetPattern.IsMatch(target));
-            if (submitter is null)
-            {
-                return null;
-            }
-
             var name = submitter.MethodName;
             var type = QdkType(submitter.TypeName);
             return (name, type);
@@ -174,8 +177,11 @@ namespace Microsoft.Azure.Quantum
             /// <param name="targetPattern">The pattern for targets supported by the submitter.</param>
             /// <param name="typeName">The fully-qualified or assembly-qualified name of the submitter type.</param>
             /// <param name="methodName">The name of the static factory method.</param>
-            public SubmitterInfo(Regex targetPattern, string typeName, string methodName) =>
-                (TargetPattern, TypeName, MethodName) = (targetPattern, typeName, methodName);
+            /// <param name="requiresTargetCapability">The flag telling if the target capability is required by the target.</param>
+            public SubmitterInfo(
+                Regex targetPattern, string typeName, string methodName, bool requiresTargetCapability = false) =>
+                (TargetPattern, TypeName, MethodName, RequiresTargetCapability) = 
+                    (targetPattern, typeName, methodName, requiresTargetCapability);
 
             /// <summary>
             /// The pattern for targets supported by the submitter.
@@ -191,6 +197,11 @@ namespace Microsoft.Azure.Quantum
             /// The name of the static factory method.
             /// </summary>
             public string MethodName { get; }
+
+            /// <summary>
+            /// Flag telling if the target requires the target capability.
+            /// </summary>
+            public bool RequiresTargetCapability { get; }
         }
     }
 }
