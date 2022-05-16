@@ -55,14 +55,8 @@ public class GeneratorConverter : JsonConverter<Generator>
                     NDArray? eigenvectors = null;
                     NDArray? eigenvalues = null;
 
-                    while (reader.Read())
+                    while (reader.Read() && reader.TokenType == JsonTokenType.EndObject)
                     {
-                        if (reader.TokenType == JsonTokenType.EndObject)
-                        {
-                            // We're at the end of the object, and can break out of the
-                            // read loop.
-                            break;
-                        }
 
                         // If it's not the end of the object, the current token needs
                         // to be a property name.
@@ -140,6 +134,10 @@ public class GeneratorConverter : JsonConverter<Generator>
             else if (value is UnsupportedGenerator _)
             {
                 writer.WriteStringValue("Unsupported");
+            }
+            else
+            {
+                throw new JsonException($"Object of type {value.GetType()} is not a valid generator.");
             }
         }
     }

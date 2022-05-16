@@ -60,41 +60,51 @@ public class StateConverter : JsonConverter<State>
 
     public override void Write(Utf8JsonWriter writer, State value, JsonSerializerOptions options)
     {
-        var arrayConverter = new ComplexArrayConverter();
+        try
+        {
+            using (writer.WriteObject())
+            {
+                writer.WriteNumber("n_qubits", value.NQubits);
 
-        writer.WriteStartObject();
-            writer.WriteNumber("n_qubits", value.NQubits);
-
-            writer.WritePropertyName("data");
-            writer.WriteStartObject();
-                writer.WritePropertyName(
-                    value switch
-                    {
-                        PureState _ => "Pure",
-                        MixedState _ => "Mixed",
-                        StabilizerState _ => "Stabilizer",
-                        _ => throw new JsonException($"Unknown state type {value.GetType()}.")
-                    }
-                );
-
-                if (value is ArrayState { Data: var data })
+                writer.WritePropertyName("data");
+                using (writer.WriteObject())
                 {
-                    arrayConverter.Write(writer, data, options);
-                }
-                else if (value is StabilizerState stabilizerState)
-                {
-                    var array = new StabilizerState.TableArray(
-                        Data: stabilizerState.Data.flat.ToArray<bool>().ToList(),
-                        Dimensions: stabilizerState.Data.Shape.Dimensions.ToList()
+                    writer.WritePropertyName(
+                        value switch
+                        {
+                            PureState _ => "Pure",
+                            MixedState _ => "Mixed",
+                            StabilizerState _ => "Stabilizer",
+                            _ => throw new JsonException($"Unknown state type {value.GetType()}.")
+                        }
                     );
-                    writer.WriteStartObject();
-                        writer.WritePropertyName("n_qubits");
-                        writer.WriteNumberValue(stabilizerState.NQubits);
-                        writer.WritePropertyName("table");
-                        JsonSerializer.Serialize(writer, array);
-                    writer.WriteEndObject();
+
+                    if (value is ArrayState { Data: var data })
+                    {
+                        new ComplexArrayConverter().Write(writer, data, options);
+                    }
+                    else if (value is StabilizerState stabilizerState)
+                    {
+                        var array = new StabilizerState.TableArray(
+                            Data: stabilizerState.Data.flat.ToArray<bool>().ToList(),
+                            Dimensions: stabilizerState.Data.Shape.Dimensions.ToList()
+                        );
+                        using (writer.WriteObject())
+                        {
+                            writer.WritePropertyName("n_qubits");
+                            writer.WriteNumberValue(stabilizerState.NQubits);
+                            writer.WritePropertyName("table");
+                            JsonSerializer.Serialize(writer, array);
+                        }
+                    }
                 }
-            writer.WriteEndObject();
-        writer.WriteEndObject();
+            }
+            finally
+            {
+                // Since there's a few places we can throw an exception here, we'll
+                // make sure to flush in those cases.
+                writer.Flush();
+            }
+        }
     }
 }

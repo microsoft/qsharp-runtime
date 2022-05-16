@@ -52,11 +52,13 @@ public class StateSerializationTests
             }
         ";
         var reader = new Utf8JsonReader(System.Text.Encoding.UTF8.GetBytes(expectedJson));
-        var array = JsonSerializer.Deserialize<StabilizerState.TableArray>(ref reader);
-        var state = new StabilizerState
-        {
-            NQubits = 2,
-            Table = array
-        };
+        var array = JsonSerializer.Deserialize<StabilizerState.TableArray>(ref reader).AsArray;
+        Assert.Equal(new[] { 2, 3 }, array.Shape.Dimensions);
+        Assert.Equal<bool>(true, array[0, 0]);
+        Assert.Equal<bool>(false, array[1, 0]);
+        Assert.Equal<bool>(false, array[0, 1]);
+        Assert.Equal<bool>(false, array[1, 1]);
+        Assert.Equal<bool>(true, array[0, 2]);
+        Assert.Equal<bool>(false, array[1, 2]);
     }
 }
