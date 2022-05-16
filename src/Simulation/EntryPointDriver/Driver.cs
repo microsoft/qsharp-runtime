@@ -544,7 +544,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                 ResourceGroup = azureSettings.ResourceGroup,
                 Workspace = azureSettings.Workspace,
                 Target = DefaultIfShadowed(entryPoint, TargetOption, azureSettings.Target),
-                TargetCapability = settings.TargetCapability,
                 Storage = DefaultIfShadowed(entryPoint, StorageOption, azureSettings.Storage),
                 AadToken = DefaultIfShadowed(entryPoint, AadTokenOption, azureSettings.AadToken),
                 UserAgent = DefaultIfShadowed(entryPoint, UserAgentOption, azureSettings.UserAgent),

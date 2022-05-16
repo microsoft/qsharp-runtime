@@ -565,7 +565,6 @@ let ``Submit uses default values`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
                Storage:
                Base URI:
                Location: myLocation
@@ -591,7 +590,6 @@ let ``Submit uses default values with default target`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
                Storage:
                Base URI:
                Location: myLocation
@@ -631,7 +629,6 @@ let ``Submit allows overriding default values`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
                Storage: myStorage
                Base URI:
                Location: myLocation
@@ -672,7 +669,6 @@ let ``Submit allows a long user-agent`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
                Storage: myStorage
                Base URI:
                Location: myLocation
@@ -715,7 +711,6 @@ let ``Submit extracts the location from a quantum endpoint`` () =
                 Resource Group: myResourceGroup
                 Workspace: myWorkspace
                 Target: test.machine.noop
-                TargetCapability:
                 Storage: myStorage
                 Base URI: https://westus.quantum.microsoft.com/
                 Location: westus
@@ -753,7 +748,6 @@ let ``Submit allows overriding default values with default target`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
                Storage: myStorage
                Base URI:
                Location: myLocation
@@ -794,7 +788,6 @@ let ``Submit allows to include --base-uri option when --location is not present`
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
                Storage:
                Base URI: http://mybaseuri.foo.com/
                Location: mybaseuri
@@ -822,7 +815,6 @@ let ``Submit allows to include --location option when --base-uri is not present`
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
                Storage:
                Base URI:
                Location: myLocation
@@ -854,7 +846,6 @@ let ``Submit allows spaces for the --location option`` () =
                Resource Group: myResourceGroup
                Workspace: myWorkspace
                Target: test.machine.noop
-               TargetCapability:
                Storage:
                Base URI:
                Location: My Location
@@ -903,7 +894,7 @@ let ``Submit requires a positive number of shots`` () =
 [<Fact>]
 let ``Submit fails with unknown target`` () =
     let given = test "Returns Unit"
-    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "No submitters were found for the target \"foo\" and target capability \"\"."
+    given (submitWithoutTarget @ ["--target"; "foo"]) |> failsWith "No submitters were found for the target foo."
 
 [<Fact>]
 let ``Submit supports dry run option`` () =
@@ -961,7 +952,6 @@ let ``Submit supports Q# submitters`` () =
          Resource Group: myResourceGroup
          Workspace: myWorkspace
          Target: test.submitter.noop
-         TargetCapability:
          Storage:
          Base URI:
          Location: myLocation
@@ -989,7 +979,6 @@ let ``Submit supports job parameters`` () =
          Resource Group: myResourceGroup
          Workspace: myWorkspace
          Target: test.submitter.noop
-         TargetCapability:
          Storage:
          Base URI:
          Location: myLocation
@@ -1017,7 +1006,6 @@ let ``Extra equals symbols in a job parameter are parsed as part of the value`` 
          Resource Group: myResourceGroup
          Workspace: myWorkspace
          Target: test.submitter.noop
-         TargetCapability:
          Storage:
          Base URI:
          Location: myLocation
