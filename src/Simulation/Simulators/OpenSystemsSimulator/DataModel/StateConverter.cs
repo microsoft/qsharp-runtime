@@ -99,12 +99,12 @@ public class StateConverter : JsonConverter<State>
                     }
                 }
             }
-            finally
-            {
-                // Since there's a few places we can throw an exception here, we'll
-                // make sure to flush in those cases.
-                writer.Flush();
-            }
+        }
+        finally
+        {
+            // Since there's a few places we can throw an exception here, we'll
+            // make sure to flush in those cases.
+            writer.Flush();
         }
     }
 }
