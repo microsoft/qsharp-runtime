@@ -6,8 +6,9 @@
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <ExecutionTarget>microsoft.simulator.fullstate</ExecutionTarget>
+    <TargetCapability>MyTargetCapability</TargetCapability>
   </PropertyGroup>
-
+ 
   <ItemGroup>
     <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
