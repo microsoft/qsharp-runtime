@@ -98,10 +98,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
             else
             {
-                DisplayError(
-                    $"No submitters were found for the target \"{settings.Target}\" " + 
-                    $"and target capability \"{settings.TargetCapability}\".",
-                    null);
+                DisplayError($"No submitters were found for the target {settings.Target}.", null);
             }
 
             return Task.FromResult(1);
@@ -435,8 +432,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             {
                 NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
                 NoOpSubmitter.Target => new NoOpSubmitter(),
-                _ => SubmitterFactory.QirSubmitter(
-                    settings.Target, settings.CreateWorkspace(), settings.Storage, settings.TargetCapability)
+                _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
             };
         }
 
