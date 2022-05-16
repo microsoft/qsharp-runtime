@@ -25,7 +25,7 @@ public abstract class State
 public class StabilizerState : State
 {
     // Design note:
-    // We could use the same array converter as used of complex-like arrays
+    // We could use the same array converter as used to convert complex-like arrays
     // of floats, but it's a bit easier in this case to directly
     // deserialize into a type that represents the underlying data that
     // we need.
