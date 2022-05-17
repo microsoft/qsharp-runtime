@@ -115,14 +115,8 @@ internal static class Extensions
         int? nQubits = null;
         Func<int, TResult>? completion = null;
 
-        while (reader.Read())
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
-            if (reader.TokenType == JsonTokenType.EndObject)
-            {
-                // We're at the end of the object, and can break out of the
-                // read loop.
-                break;
-            }
 
             // If it's not the end of the object, the current token needs
             // to be a property name.
@@ -181,8 +175,8 @@ internal static class Extensions
             }
         }
 
-        if (nQubits == null) throw new JsonException(nameof(nQubits));
-        if (completion == null) throw new JsonException();
+        if (nQubits == null) throw new JsonException($"{nameof(nQubits)} was null reading qubit-sized data.");
+        if (completion == null) throw new JsonException("Completion lambda for reading qubit-sized data returned null.");
 
         return completion(nQubits.Value);
     }
