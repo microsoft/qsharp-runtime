@@ -78,10 +78,10 @@ impl Generator {
                     values: values.clone(),
                     vectors: vectors.clone(),
                 };
-                let mtx = eig.expm_scale(c64::new(time, 0.0));
+                let mtx = eig.expm_scale(c64::new(time, 0.0))?;
                 Ok(Process {
                     n_qubits: self.n_qubits,
-                    data: crate::ProcessData::Superoperator(mtx?),
+                    data: crate::ProcessData::Superoperator(mtx),
                 })
             }
             GeneratorData::Unsupported => Err(QdkSimError::misc(
@@ -216,6 +216,131 @@ mod tests {
                 c64!(0.06134504501215767),
                 c64!(0.06134504501215767),
                 c64!(0.9962225160675967)
+            ]
+        ];
+
+        if let ProcessData::Superoperator(actual) = actual.data {
+            for (actual, expected) in actual.iter().zip(expected.iter()) {
+                assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
+            }
+            Ok(())
+        } else {
+            panic!("Expected superoperator, got {}.", actual.variant_name())
+        }
+    }
+
+    /// Tests that dissipative evolution under Rz results in a correct quantum
+    /// process.
+    ///
+    /// # Notes
+    /// To derive this channel using Python:
+    /// ```python
+    /// from qsharp import to_generator, t1_dissipation, t2_dissipation
+    /// g = to_generator(-0.48 * qt.sigmaz(), t1_dissipation(100.0), t2_dissipation(25.0)).generator
+    /// g.dims = [[[2]] * 2] * 2
+    /// superop = (1.234 * g).expm()
+    /// ```
+    #[test]
+    fn superoperator_at_dissipative_rz_is_correct() -> Result<(), QdkSimError> {
+        let actual = Generator {
+            n_qubits: 1,
+            data: GeneratorData::ExplicitEigenvalueDecomposition {
+                values: array![
+                    c64!(-8.50000000e-02 - 0.96 i),
+                    c64!(-8.50000000e-02+0.96 i),
+                    c64!(-1.00000000e-02),
+                    c64!(0.0)
+                ],
+                vectors: array![
+                    [c64!(0.0), c64!(1.0), c64!(0.0), c64!(0.0)],
+                    [c64!(0.0), c64!(0.0), c64!(1.0), c64!(0.0)],
+                    [c64!(-0.70710678), c64!(0.0), c64!(0.0), c64!(0.70710678)],
+                    [c64!(0.70710678), c64!(0.0), c64!(0.0), c64!(0.70710678)],
+                ],
+            },
+        }
+        .at(1.234)?;
+        let expected = array![
+            [
+                c64!(0.9938679127918151),
+                c64!(0.0),
+                c64!(0.0),
+                c64!(0.006132087208184747)
+            ],
+            [
+                c64!(0.0),
+                c64!(0.33912703761050034-0.8341195636618316 i),
+                c64!(0.0),
+                c64!(0.0)
+            ],
+            [
+                c64!(0.0),
+                c64!(0.0),
+                c64!(0.33912703761050034+0.8341195636618316 i),
+                c64!(0.0)
+            ],
+            [
+                c64!(0.006132087208184746),
+                c64!(0.0),
+                c64!(0.0),
+                c64!(0.9938679127918152)
+            ]
+        ];
+
+        if let ProcessData::Superoperator(actual) = actual.data {
+            for (actual, expected) in actual.iter().zip(expected.iter()) {
+                assert_abs_diff_eq!(actual, expected, epsilon = 1e-6);
+            }
+            Ok(())
+        } else {
+            panic!("Expected superoperator, got {}.", actual.variant_name())
+        }
+    }
+
+    /// Same as [`superoperator_at_dissipative_rz_is_correct`], but with near-zero
+    /// eigenvalues truncated.
+    #[test]
+    fn superoperator_at_sparse_dissipative_rz_is_correct() -> Result<(), QdkSimError> {
+        let actual = Generator {
+            n_qubits: 1,
+            data: GeneratorData::ExplicitEigenvalueDecomposition {
+                values: array![
+                    c64!(-8.50000000e-02 - 0.96 i),
+                    c64!(-8.50000000e-02+0.96 i),
+                    c64!(-1.00000000e-02)
+                ],
+                vectors: array![
+                    [c64!(0.0), c64!(1.0), c64!(0.0), c64!(0.0)],
+                    [c64!(0.0), c64!(0.0), c64!(1.0), c64!(0.0)],
+                    [c64!(-0.70710678), c64!(0.0), c64!(0.0), c64!(0.70710678)],
+                ],
+            },
+        }
+        .at(1.234)?;
+        let expected = array![
+            [
+                c64!(0.9938679127918151),
+                c64!(0.0),
+                c64!(0.0),
+                c64!(0.006132087208184747)
+            ],
+            [
+                c64!(0.0),
+                c64!(0.33912703761050034-0.8341195636618316 i),
+                c64!(0.0),
+                c64!(0.0)
+            ],
+            [
+                c64!(0.0),
+                c64!(0.0),
+                c64!(0.33912703761050034+0.8341195636618316 i),
+                c64!(0.0)
+            ],
+            [
+                c64!(0.006132087208184746),
+                c64!(0.0),
+                c64!(0.0),
+                c64!(0.9938679127918152)
             ]
         ];
 
