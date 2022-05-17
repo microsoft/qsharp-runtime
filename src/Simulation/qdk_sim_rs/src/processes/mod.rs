@@ -53,7 +53,7 @@ pub enum ProcessData {
     /// column-stacked vectorizations of density operators (that is, the
     /// convention in which Roth's lemma is expressed as
     /// $|ABC⟫ = C^{\mathrm{T}} \otimes A |B⟫$).
-    /// 
+    ///
     /// # Dimensions
     /// This array should have shape $4^n \times 4^n$, where $n$ is the number
     /// of qubits that the superoperator acts on.

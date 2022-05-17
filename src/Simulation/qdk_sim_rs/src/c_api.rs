@@ -342,7 +342,7 @@ pub unsafe extern "C" fn m(sim_id: usize, idx: usize, result_out: *mut usize) ->
         let state = &mut *STATE.lock().unwrap();
         if let Some(sim_state) = state.get_mut(&sim_id) {
             let instrument = &sim_state.noise_model.z_meas;
-            let (result, new_state) = instrument.sample(&[idx], &sim_state.register_state);
+            let (result, new_state) = instrument.sample(&[idx], &sim_state.register_state)?;
             sim_state.register_state = new_state;
             *result_out = result;
             Ok(())

@@ -17,7 +17,7 @@ use crate::{
 /// Representation of a single-parameter monoid whose elements
 /// are quantum processes; that is, the generator of a quantum dynamical
 /// monoid.
-/// 
+///
 /// Typically, such representations will be derived from Hamiltonian
 /// evolution together with some dissipative evolution, as per Lindblad form.
 ///
@@ -34,7 +34,7 @@ pub type Generator = QubitSized<GeneratorData>;
 pub enum GeneratorData {
     /// A representation of a quantum dynamical monoid in terms of the
     /// eigenvalue decomposition of its generator.
-    /// 
+    ///
     /// # Remarks
     /// The null space (eigenvectors corresponding to zero eigenvalues) can be
     /// omitted, as they do not contribute to exponentials of generators.
