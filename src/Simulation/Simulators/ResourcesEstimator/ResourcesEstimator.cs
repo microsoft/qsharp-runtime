@@ -133,7 +133,8 @@ namespace Microsoft.Quantum.Simulation.Simulators
                         Debug.Assert(results.keyColumnNames.Length > 2 && results.keyColumnNames[2] == "Caller");
 
                         var roots = results.rows.Where(r => r.KeyRow[2] == CallGraphEdge.CallGraphRootHashed);
-                        var s_idx = Array.FindIndex(results.statisticsNames, n => n == "Sum");
+                        var sum_idx = Array.FindIndex(results.statisticsNames, n => n == "Sum");
+                        var max_idx = Array.FindIndex(results.statisticsNames, n => n == "Max");
 
                         for (var m_idx = 0; m_idx < results.metricNames.Length; m_idx++)
                         {
@@ -143,17 +144,21 @@ namespace Microsoft.Quantum.Simulation.Simulators
                             DataRow row = table.NewRow();
                             row["Metric"] = label;
 
-                            if (m_idx >= 0 && s_idx >= 0)
+                            if (sum_idx >= 0)
                             {
                                 Double sum = 0;
-                                Double max = 0; // all our metrics are positive
                                 foreach (var r in roots)
                                 {
-                                    Double metric_value = r.DataRow[m_idx, s_idx];
-                                    sum += metric_value;
-                                    max = System.Math.Max(max, metric_value);
+                                    sum += r.DataRow[m_idx, sum_idx];
                                 }
                                 row["Sum"] = sum;
+                            }
+
+                            if (max_idx >= 0) {
+                                Double max = 0; // all our metrics are positive
+                                foreach (var r in roots) {
+                                    max = System.Math.Max(max, r.DataRow[m_idx, max_idx]);
+                                }
                                 row["Max"] = max;
                             }
 
