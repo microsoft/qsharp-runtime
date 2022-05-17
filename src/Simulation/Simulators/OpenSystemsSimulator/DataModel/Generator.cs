@@ -55,7 +55,7 @@ public class GeneratorConverter : JsonConverter<Generator>
                     NDArray? eigenvectors = null;
                     NDArray? eigenvalues = null;
 
-                    while (reader.Read() && reader.TokenType == JsonTokenType.EndObject)
+                    while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
                     {
 
                         // If it's not the end of the object, the current token needs

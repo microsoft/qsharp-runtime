@@ -115,7 +115,7 @@ internal static class Extensions
         int? nQubits = null;
         Func<int, TResult>? completion = null;
 
-        while (reader.Read() && reader.TokenType == JsonTokenType.EndObject)
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
 
             // If it's not the end of the object, the current token needs

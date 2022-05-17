@@ -53,7 +53,7 @@ public class ComplexArrayConverter : JsonConverter<NDArray>
         List<int>? dims = null;
         List<Complex>? data = null;
 
-        while (reader.Read() && reader.TokenType == JsonTokenType.EndObject)
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
             // If it's not the end of the object, the current token needs
             // to be a property name.
@@ -187,7 +187,7 @@ public class ComplexArrayConverter : JsonConverter<NDArray>
             throw new JsonException();
         }
 
-        while (reader.Read() && reader.TokenType == JsonTokenType.EndObject)
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
         {
             // If it's not the end of the object, the current token needs
             // to be a property name.
