@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Intrinsic {
             else {
                 use aux = Qubit[Length(ctls) - 1 - (Length(ctls) % 2)];
                 within {
-                    CollectControls(ctls, aux);
+                    CollectControls(ctls, aux, 0);
                 }
                 apply {
                     if Length(ctls) % 2 != 0 {

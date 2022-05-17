@@ -36,7 +36,7 @@ namespace Microsoft.Quantum.Intrinsic {
             else {
                 use aux = Qubit[Length(ctls) - 1];
                 within {
-                    CollectControls(ctls, aux);
+                    CollectControls(ctls, aux, 0);
                     AdjustForSingleControl(ctls, aux);
                 }
                 apply {
@@ -54,7 +54,7 @@ namespace Microsoft.Quantum.Intrinsic {
             else {
                 use aux = Qubit[Length(ctls) - 1];
                 within {
-                    CollectControls(ctls, aux);
+                    CollectControls(ctls, aux, 0);
                     AdjustForSingleControl(ctls, aux);
                 }
                 apply {
