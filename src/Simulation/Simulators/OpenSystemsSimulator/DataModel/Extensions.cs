@@ -175,8 +175,8 @@ internal static class Extensions
             }
         }
 
-        if (nQubits == null) throw new JsonException(nameof(nQubits));
-        if (completion == null) throw new JsonException();
+        if (nQubits == null) throw new JsonException($"{nameof(nQubits)} was null reading qubit-sized data.");
+        if (completion == null) throw new JsonException("Completion lambda for reading qubit-sized data returned null.");
 
         return completion(nQubits.Value);
     }
