@@ -66,6 +66,11 @@ namespace Microsoft.Quantum.EntryPointDriver
         public FileInfo? SubmitConfigFile { get; set; }
 
         /// <summary>
+        /// The target capability.
+        /// </summary>
+        public string TargetCapability { get; set; } = "";
+
+        /// <summary>
         /// The storage account connection string.
         /// </summary>
         public string? Storage { get; set; }
@@ -163,7 +168,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The submission options corresponding to these settings.
         /// </summary>
-        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams);
+        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams, TargetCapability);
 
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
@@ -190,6 +195,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             $"Resource Group: {ResourceGroup}",
             $"Workspace: {Workspace}",
             $"Target: {Target}",
+            $"TargetCapability: {TargetCapability}",
             $"Storage: {Storage}",
             $"Base URI: {BaseUri}",
             $"Location: {Location ?? ExtractLocation(BaseUri)}",
