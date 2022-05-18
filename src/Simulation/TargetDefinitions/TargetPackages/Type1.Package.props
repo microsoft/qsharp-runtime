@@ -18,7 +18,6 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MeasureEachZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
   </ItemGroup>
 
@@ -36,6 +35,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\HFromSinglyControlled.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\Measure.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MeasureEachZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetXExplicit.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetYExplicit.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetZExplicit.qs" />
