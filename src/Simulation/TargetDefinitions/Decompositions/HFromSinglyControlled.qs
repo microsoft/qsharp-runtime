@@ -33,80 +33,19 @@ namespace Microsoft.Quantum.Intrinsic {
             elif Length(ctls) == 2 {
                 CCH(ctls[0], ctls[1], qubit);
             }
-            elif Length(ctls) == 3 {
-                use temp = Qubit();
-                within {
-                    PhaseCCX(ctls[0], ctls[1], temp);
-                }
-                apply {
-                    CCH(temp, ctls[2], qubit);
-                }
-            }
-            elif Length(ctls) == 4 {
-                use temps = Qubit[2];
-                within {
-                    PhaseCCX(ctls[0], ctls[1], temps[0]);
-                    PhaseCCX(ctls[2], ctls[3], temps[1]);
-                }
-                apply {
-                    CCH(temps[0], temps[1], qubit);
-                }
-            }
-            elif Length(ctls) == 5 {
-                use temps = Qubit[3];
-                within {
-                    PhaseCCX(ctls[0], ctls[1], temps[0]);
-                    PhaseCCX(ctls[2], ctls[3], temps[1]);
-                    PhaseCCX(temps[0], temps[1], temps[2]);
-                }
-                apply {
-                    CCH(temps[2], ctls[4], qubit);
-                }
-            }
-            elif Length(ctls) == 6 {
-                use temps = Qubit[4];
-                within {
-                    PhaseCCX(ctls[0], ctls[1], temps[0]);
-                    PhaseCCX(ctls[2], ctls[3], temps[1]);
-                    PhaseCCX(ctls[4], ctls[5], temps[2]);
-                    PhaseCCX(temps[0], temps[1], temps[3]);
-                }
-                apply {
-                    CCH(temps[2], temps[3], qubit);
-                }
-            }
-            elif Length(ctls) == 7 {
-                use temps = Qubit[5];
-                within {
-                    PhaseCCX(ctls[0], ctls[1], temps[0]);
-                    PhaseCCX(ctls[2], ctls[3], temps[1]);
-                    PhaseCCX(ctls[4], ctls[5], temps[2]);
-                    PhaseCCX(temps[0], temps[1], temps[3]);
-                    PhaseCCX(temps[2], temps[3], temps[4]);
-                }
-                apply {
-                    CCH(temps[4], ctls[6], qubit);
-                }
-            }
-            elif Length(ctls) == 8 {
-                use temps = Qubit[6];
-                within {
-                    PhaseCCX(ctls[0], ctls[1], temps[0]);
-                    PhaseCCX(ctls[2], ctls[3], temps[1]);
-                    PhaseCCX(ctls[4], ctls[5], temps[2]);
-                    PhaseCCX(ctls[6], ctls[7], temps[3]);
-                    PhaseCCX(temps[0], temps[1], temps[4]);
-                    PhaseCCX(temps[2], temps[3], temps[5]);
-                }
-                apply {
-                    CCH(temps[4], temps[5], qubit);
-                }
-            }
             else {
-                fail "Too many control qubits specified to H gate.";
-
-                // Eventually, we can use recursion via callables with the below utility:
-                // ApplyWithLessControlsA(Controlled H, (ctls, qubit));
+                use aux = Qubit[Length(ctls) - 1 - (Length(ctls) % 2)];
+                within {
+                    CollectControls(ctls, aux, 0);
+                }
+                apply {
+                    if Length(ctls) % 2 != 0 {
+                        CCH(ctls[Length(ctls) - 1], aux[Length(ctls) - 3], qubit);
+                    }
+                    else {
+                        CCH(aux[Length(ctls) - 3], aux[Length(ctls) - 4], qubit);
+                    }
+                }
             }
         }
         adjoint self;

@@ -1,17 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.IO;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
 using Azure.Core;
 using Azure.Quantum;
 
 using Microsoft.Azure.Quantum;
 using Microsoft.Azure.Quantum.Authentication;
 using Microsoft.Quantum.Runtime.Submitters;
-using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.Quantum.EntryPointDriver
 {
@@ -57,6 +59,16 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// The target device ID.
         /// </summary>
         public string? Target { get; set; }
+
+        /// <summary>
+        /// A configuration file to customize submission.
+        /// </summary>
+        public FileInfo? SubmitConfigFile { get; set; }
+
+        /// <summary>
+        /// The target capability.
+        /// </summary>
+        public string TargetCapability { get; set; } = "";
 
         /// <summary>
         /// The storage account connection string.
@@ -156,7 +168,7 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <summary>
         /// The submission options corresponding to these settings.
         /// </summary>
-        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams);
+        internal SubmissionOptions SubmissionOptions => SubmissionOptions.Default.With(JobName, Shots, JobParams, TargetCapability);
 
         /// <summary>
         /// Creates a <see cref="Workspace"/> based on the settings.
@@ -183,6 +195,7 @@ namespace Microsoft.Quantum.EntryPointDriver
             $"Resource Group: {ResourceGroup}",
             $"Workspace: {Workspace}",
             $"Target: {Target}",
+            $"TargetCapability: {TargetCapability}",
             $"Storage: {Storage}",
             $"Base URI: {BaseUri}",
             $"Location: {Location ?? ExtractLocation(BaseUri)}",

@@ -98,7 +98,10 @@ namespace Microsoft.Quantum.EntryPointDriver
             }
             else
             {
-                DisplayError($"No submitters were found for the target {settings.Target}.", null);
+                DisplayError(
+                    $"No submitters were found for the target \"{settings.Target}\" " + 
+                    $"and target capability \"{settings.TargetCapability}\".",
+                    null);
             }
 
             return Task.FromResult(1);
@@ -413,13 +416,29 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// </summary>
         /// <param name="settings">The Azure settings.</param>
         /// <returns>A QIR submitter.</returns>
-        private static IQirSubmitter? QirSubmitter(AzureSettings settings) => settings.Target switch
+        private static IQirSubmitter? QirSubmitter(AzureSettings settings)
         {
-            null => null,
-            NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
-            NoOpSubmitter.Target => new NoOpSubmitter(),
-            _ => SubmitterFactory.QirSubmitter(settings.Target, settings.CreateWorkspace(), settings.Storage)
-        };
+            if (settings.Target is null)
+            {
+                return null;
+            }
+
+            // If a configuration file is provided, create a submitter using it.
+            if (!(settings.SubmitConfigFile is null))
+            {
+                return SubmitterFactory.QirSubmitterFromConfigFile(
+                    settings.Target, settings.SubmitConfigFile, settings.CreateWorkspace(), settings.Storage);
+            }
+
+            // No configuration file was provided, create a submitter depending on the target.
+            return settings.Target switch
+            {
+                NoOpQirSubmitter.Target => new NoOpQirSubmitter(),
+                NoOpSubmitter.Target => new NoOpSubmitter(),
+                _ => SubmitterFactory.QirSubmitter(
+                    settings.Target, settings.CreateWorkspace(), settings.Storage, settings.TargetCapability)
+            };
+        }
 
         /// <summary>
         /// The quantum machine submission context.

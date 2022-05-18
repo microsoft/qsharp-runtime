@@ -44,12 +44,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
 
-            // TODO(kuzminrobin): Uncomment the block below once the following issue is resolved:
-            // https://github.com/microsoft/qsharp-compiler/issues/1326
-            // ProcessRunner.Run("dotnet", $"{exe} --simulator SparseSimulator", out var _, out error, out exitCode, out ex);
-            // Assert.Null(ex);
-            // Assert.Equal(0, exitCode);
-            // Assert.Empty(error.ToString().Trim());
+            ProcessRunner.Run("dotnet", $"{exe} --simulator SparseSimulator", out var _, out error, out exitCode, out ex);
+            Assert.Null(ex);
+            Assert.Equal(0, exitCode);
+            Assert.Empty(error.ToString().Trim());
         }
 
         [Fact]
@@ -107,6 +105,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "Resource Group: bar",
                     "Workspace: baz",
                     "Target: test.submitter.noop",
+                    "TargetCapability: MyTargetCapability",
                     "Storage: ",
                     "Base URI: ",
                     "Location: myLocation",

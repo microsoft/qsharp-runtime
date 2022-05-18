@@ -40,17 +40,30 @@ namespace Microsoft.Quantum.Intrinsic {
     /// If the basis array and qubit array are different lengths, then the
     /// operation will fail.
     operation Measure (bases : Pauli[], qubits : Qubit[]) : Result {
+        mutable res = Zero;
         if Length(bases) != Length(qubits) {
             fail "Arrays 'bases' and 'qubits' must be of the same length.";
         }
         if Length(bases) == 1 {
-            MapPauli(qubits[0], PauliZ, bases[0]);
-            let res = MZ(qubits[0]);
-            Adjoint MapPauli(qubits[0], PauliZ, bases[0]);
-            return res;
+            within {
+                MapPauli(qubits[0], PauliZ, bases[0]);
+            }
+            apply {
+                set res = MZ(qubits[0]);
+            }
         }
         else {
-            return JointMeasure(bases, qubits);
+            use aux = Qubit();
+            within {
+                H(aux);
+            }
+            apply {
+                for i in 0..Length(bases)-1 {
+                    EntangleForJointMeasure(bases[i], aux, qubits[i]);
+                }
+            }
+            set res = MResetZ(aux);
         }
+        return res;
     }
 }
