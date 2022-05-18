@@ -108,9 +108,13 @@ impl Process {
 
     /// Returns a copy of this process that applies to registers of a given
     /// size.
-    pub fn extend_one_to_n(&self, idx_qubit: usize, n_qubits: usize) -> Process {
+    pub fn extend_one_to_n(
+        &self,
+        idx_qubit: usize,
+        n_qubits: usize,
+    ) -> Result<Process, QdkSimError> {
         assert_eq!(self.n_qubits, 1);
-        Process {
+        Ok(Process {
             n_qubits,
             data: match &self.data {
                 Unitary(u) => Unitary(extend_one_to_n(u.view(), idx_qubit, n_qubits)),
@@ -129,23 +133,23 @@ impl Process {
                     paulis.iter()
                         .map(|(pr, pauli)| {
                             if pauli.len() != 1 {
-                                panic!("Pauli channel acts on more than one qubit, cannot extend to 𝑛 qubits.");
+                                return Err(QdkSimError::misc(format!("Pauli channel acts on more than one qubit, cannot extend to {} qubits.", n_qubits)));
                             }
                             let p = pauli[0];
                             let mut extended = std::iter::repeat(Pauli::I).take(n_qubits).collect_vec();
                             extended[idx_qubit] = p;
-                            (*pr, extended)
+                            Ok((*pr, extended))
                         })
-                        .collect_vec()
+                        .try_collect()?
                 ),
                 ProcessData::Unsupported => ProcessData::Unsupported,
                 ProcessData::Sequence(processes) => ProcessData::Sequence(
-                    processes.iter().map(|p| p.extend_one_to_n(idx_qubit, n_qubits)).collect()
+                    processes.iter().map(|p| p.extend_one_to_n(idx_qubit, n_qubits)).try_collect()?
                 ),
                 ProcessData::ChpDecomposition(_) => todo!(),
                 ProcessData::Superoperator(_) => todo!(),
             },
-        }
+        })
     }
 
     /// Returns a copy of this process that applies to registers of a given

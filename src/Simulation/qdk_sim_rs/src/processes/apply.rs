@@ -144,7 +144,7 @@ impl Process {
                 if state.n_qubits == 1 {
                     self.apply(state)
                 } else {
-                    self.extend_one_to_n(idx_qubits[0], state.n_qubits)
+                    self.extend_one_to_n(idx_qubits[0], state.n_qubits)?
                         .apply(state)
                 }
             }
