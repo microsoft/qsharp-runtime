@@ -8,9 +8,10 @@ using NumSharp;
 using System;
 using System.Diagnostics;
 
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
 internal delegate Func<TCompletion, TResult> ReaderContinuation<TCompletion, TResult>(ref Utf8JsonReader reader, string variant);
-internal static class Extensions
+
+internal static class OpenSystemsSimlatorExtensions
 {
     internal static bool HasProperty(this JsonElement element, string propertyName) =>
         element.TryGetProperty(propertyName, out var _);

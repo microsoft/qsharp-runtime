@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using NumSharp;
 
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
 
 /// <summary>
 ///     Converts <see cref="NDArray" /> instances of dtype <c>double</c>

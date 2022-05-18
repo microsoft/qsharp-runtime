@@ -23,7 +23,7 @@
 // to help build confidence in shared decompositions, further improving test
 // coverage.
 
-namespace Microsoft.Quantum.Experimental.Tests {
+namespace Microsoft.Quantum.Simulation.Simulators.Tests {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Diagnostics;
 
@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
         return Measure([PauliX], [target]);
     }
 
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     operation CheckBellBasisParitiesWithSingleQubitMeasurements() : Unit {
         use (left, right) = (Qubit(), Qubit()) {
             H(left);
@@ -122,7 +122,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
         return (a or b) and ((not a) or (not b));
     }
 
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     @Test("QuantumSimulator") // validate against full-state simulator.
     @Test("SparseSimulator")
     operation CheckToffoliOnComputationalBasisStates() : Unit {
@@ -161,7 +161,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
         }
     }
 
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     @Test("QuantumSimulator") // validate against full-state simulator.
     @Test("SparseSimulator")
     operation CheckXHSZSHIsNoOp() : Unit {
@@ -178,7 +178,7 @@ namespace Microsoft.Quantum.Experimental.Tests {
         Fact(M(q) == Zero, "XHSZSH was not a no-op.");
     }
 
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     @Test("QuantumSimulator") // validate against full-state simulator.
     @Test("SparseSimulator")
     operation CheckControlledHWorks() : Unit {

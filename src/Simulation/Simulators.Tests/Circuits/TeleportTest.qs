@@ -7,7 +7,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
     @Test("QuantumSimulator")
     @Test("SparseSimulator")
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     operation TestTeleport() : Unit {
         use q1 = Qubit();
         use q2 = Qubit();

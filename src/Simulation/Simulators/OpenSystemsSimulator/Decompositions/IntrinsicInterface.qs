@@ -5,8 +5,8 @@
 // M.Q.Intrinsic, making it easier to forward intrinsic definitions from the
 // simulator.
 
-namespace Microsoft.Quantum.Experimental.Intrinsic {
-    open Microsoft.Quantum.Experimental.Native as Native;
+namespace Microsoft.Quantum.Simulation.Simulators.IntrinsicInterface {
+    open Microsoft.Quantum.Simulation.Simulators.NativeInterface as Native;
     open Microsoft.Quantum.Experimental.Decompositions;
 
     operation H(target : Qubit) : Unit is Adj + Ctl {

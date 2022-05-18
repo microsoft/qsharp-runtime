@@ -6,7 +6,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
 
 public class ChpOperationConverter : JsonConverter<ChpOperation>
 {

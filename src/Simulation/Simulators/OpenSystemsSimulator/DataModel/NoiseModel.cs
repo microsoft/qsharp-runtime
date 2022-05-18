@@ -12,7 +12,7 @@ using System.Text.Json.Serialization;
 using NumSharp;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
 
 // NB: To make this compatible with Newtonsoft.Json as well as
 //     System.Text.Json, we use a Newtonsoft converter that delegates to
@@ -69,7 +69,7 @@ public class NoiseModel
     {
         try
         {
-            model = NativeInterface.GetNoiseModelByName(name);
+            model = OpenSystemsSimulatorNativeInterface.GetNoiseModelByName(name);
             return true;
         }
         catch (SimulationException)

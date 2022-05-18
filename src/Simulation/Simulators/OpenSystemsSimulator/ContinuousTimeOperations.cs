@@ -4,9 +4,10 @@
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 
-using ExpIntrin = Microsoft.Quantum.Experimental.Intrinsic;
+using IntrinsicInterface = Microsoft.Quantum.Simulation.Simulators.IntrinsicInterface;
 
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
+
 public partial class OpenSystemsSimulator
 {
     // These gates are not yet supported, pending a design for how to extend
@@ -15,26 +16,26 @@ public partial class OpenSystemsSimulator
 
     void IIntrinsicExp.Body(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
     {
-        Get<ExpIntrin.Exp, ExpIntrin.Exp>().__Body__((paulis, angle, targets));
+        Get<IntrinsicInterface.Exp, IntrinsicInterface.Exp>().__Body__((paulis, angle, targets));
     }
 
     void IIntrinsicExp.AdjointBody(IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
     {
-        Get<ExpIntrin.Exp, ExpIntrin.Exp>().__Body__((paulis, -angle, targets));
+        Get<IntrinsicInterface.Exp, IntrinsicInterface.Exp>().__Body__((paulis, -angle, targets));
     }
 
     void IIntrinsicExp.ControlledBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
     {
-        Get<ExpIntrin.Exp, ExpIntrin.Exp>().__ControlledBody__((controls, (paulis, angle, targets)));
+        Get<IntrinsicInterface.Exp, IntrinsicInterface.Exp>().__ControlledBody__((controls, (paulis, angle, targets)));
     }
 
     void IIntrinsicExp.ControlledAdjointBody(IQArray<Qubit> controls, IQArray<Pauli> paulis, double angle, IQArray<Qubit> targets)
     {
-        Get<ExpIntrin.Exp, ExpIntrin.Exp>().__ControlledBody__((controls, (paulis, -angle, targets)));
+        Get<IntrinsicInterface.Exp, IntrinsicInterface.Exp>().__ControlledBody__((controls, (paulis, -angle, targets)));
     }
     void IIntrinsicR.Body(Pauli pauli, double angle, Qubit target)
     {
-        Get<ExpIntrin.R, ExpIntrin.R>().__Body__((pauli, angle, target));
+        Get<IntrinsicInterface.R, IntrinsicInterface.R>().__Body__((pauli, angle, target));
     }
 
     void IIntrinsicR.AdjointBody(Pauli pauli, double angle, Qubit target)
@@ -44,7 +45,7 @@ public partial class OpenSystemsSimulator
 
     void IIntrinsicR.ControlledBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)
     {
-        Get<ExpIntrin.R, ExpIntrin.R>().__ControlledBody__((controls, (pauli, angle, target)));
+        Get<IntrinsicInterface.R, IntrinsicInterface.R>().__ControlledBody__((controls, (pauli, angle, target)));
     }
 
     void IIntrinsicR.ControlledAdjointBody(IQArray<Qubit> controls, Pauli pauli, double angle, Qubit target)

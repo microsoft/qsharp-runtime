@@ -60,7 +60,7 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.drawrandomdouble" obeys ranges.
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     @Test("SparseSimulator")
     operation CheckDrawRandomDoubleObeysRanges() : Unit {
         for j in 0..10000 {
@@ -75,7 +75,7 @@ namespace Microsoft.Quantum.Tests {
     /// Checks that @"microsoft.quantum.random.drawrandomdint" obeys ranges.
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     @Test("SparseSimulator")
     operation CheckDrawRandomIntObeysRanges() : Unit {
         mutable randomInt = DrawRandomInt(0, 45);

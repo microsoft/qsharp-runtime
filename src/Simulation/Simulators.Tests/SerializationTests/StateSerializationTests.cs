@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Text.Json;
-using Microsoft.Quantum.Experimental;
+using Microsoft.Quantum.Simulation.Simulators;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests;
 
@@ -23,7 +23,7 @@ public class StateSerializationTests
                 Dimensions: new List<int> { 2, 3 }
             )
         };
-        var json = JsonSerializer.Serialize<Microsoft.Quantum.Experimental.State>(state);
+        var json = JsonSerializer.Serialize<Microsoft.Quantum.Simulation.Simulators.State>(state);
         var expectedJson = @"{
             ""n_qubits"": 2,
             ""data"": {

@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Experimental.Decompositions {
-    open Microsoft.Quantum.Experimental.Native as Native;
-    open Microsoft.Quantum.Experimental.Intrinsic as Intrinsic;
+    open Microsoft.Quantum.Simulation.Simulators.NativeInterface as Native;
+    open Microsoft.Quantum.Simulation.Simulators.IntrinsicInterface as Intrinsic;
 
     operation PauliZFlip(basis : Pauli, target : Qubit) : Unit
     is Adj {

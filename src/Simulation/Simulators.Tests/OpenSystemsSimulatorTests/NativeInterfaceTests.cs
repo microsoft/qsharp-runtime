@@ -1,21 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace Microsoft.Quantum.Experimental.Tests;
+namespace Microsoft.Quantum.Simulation.Simulators.Tests;
 
 public partial class NativeInterfaceTests
 {
     [Fact]
     public void GetIdealNoiseModelByNameWorks()
     {
-        var ideal = NativeInterface.GetNoiseModelByName("ideal");
+        var ideal = OpenSystemsSimulatorNativeInterface.GetNoiseModelByName("ideal");
         // TODO(cgranade): Add assertions here to check properties of the above noise model.
     }
 
     [Fact]
     public void GetIdealStabilizerNoiseModelByNameWorks()
     {
-        var idealStabilizer = NativeInterface.GetNoiseModelByName("ideal_stabilizer");
+        var idealStabilizer = OpenSystemsSimulatorNativeInterface.GetNoiseModelByName("ideal_stabilizer");
         // TODO: Add assertions here to check properties of each noise model.
     }
 
@@ -23,7 +23,7 @@ public partial class NativeInterfaceTests
     public void GetNoiseModelByNameThrowsExceptionForInvalidNames()
     {
         Assert.Throws<SimulationException>(() => {
-            NativeInterface.GetNoiseModelByName("invalid");
+            OpenSystemsSimulatorNativeInterface.GetNoiseModelByName("invalid");
         });
     }
 

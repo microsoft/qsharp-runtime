@@ -3,7 +3,7 @@
 
 using Microsoft.Quantum.Simulation.Core;
 
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
 
 public partial class OpenSystemsSimulator
 {

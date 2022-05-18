@@ -6,39 +6,39 @@ using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 using Newtonsoft.Json.Linq;
 
-using ExpIntrin = Microsoft.Quantum.Experimental.Intrinsic;
+using ExpIntrin = Microsoft.Quantum.Simulation.Simulators.IntrinsicInterface;
 
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
 
 // NB: This class should not implement IQSharpCore, but does so temporarily
 //     to make the simulator available to IQ# (note that the I in IQSharpCore
 //     refers to interfaces, and not to IQ# itself...)
 public partial class OpenSystemsSimulator : SimulatorBase, IQSharpCore, IDisposable
 {
-    public static JToken BuildInfo => NativeInterface.SimulatorInfo;
+    public static JToken BuildInfo => OpenSystemsSimulatorNativeInterface.SimulatorInfo;
 
     private readonly ulong Id;
 
-    public override string Name => NativeInterface.Name;
+    public override string Name => OpenSystemsSimulatorNativeInterface.Name;
 
     public NoiseModel NoiseModel
     {
         get
         {
-            return NativeInterface.GetNoiseModel(Id);
+            return OpenSystemsSimulatorNativeInterface.GetNoiseModel(Id);
         }
 
         set
         {
-            NativeInterface.SetNoiseModel(Id, value);
+            OpenSystemsSimulatorNativeInterface.SetNoiseModel(Id, value);
         }
     }
 
-    public State CurrentState => NativeInterface.GetCurrentState(this.Id);
+    public State CurrentState => OpenSystemsSimulatorNativeInterface.GetCurrentState(this.Id);
 
     public OpenSystemsSimulator(uint capacity = 4, string representation = "mixed") : base(new QubitManager((long)capacity))
     {
-        this.Id = NativeInterface.Init(capacity, representation);
+        this.Id = OpenSystemsSimulatorNativeInterface.Init(capacity, representation);
     }
 
     Result IIntrinsicMeasure.Body(IQArray<Pauli> paulis, IQArray<Qubit> targets) =>
@@ -126,7 +126,7 @@ public partial class OpenSystemsSimulator : SimulatorBase, IQSharpCore, IDisposa
 
     void IDisposable.Dispose()
     {
-        NativeInterface.Destroy(this.Id);
+        OpenSystemsSimulatorNativeInterface.Destroy(this.Id);
     }
 
 }

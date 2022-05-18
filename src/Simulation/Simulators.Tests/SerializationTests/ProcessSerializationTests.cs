@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Text.Json;
-using Microsoft.Quantum.Experimental;
 using Microsoft.Quantum.Simulation.Core;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests;

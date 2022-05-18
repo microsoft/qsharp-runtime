@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using NumSharp;
 using static System.Math;
 
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
 
 [JsonConverter(typeof(StateConverter))]
 public abstract class State

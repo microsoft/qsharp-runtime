@@ -4,7 +4,10 @@
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Common;
 
-namespace Microsoft.Quantum.Experimental;
+using Native = Microsoft.Quantum.Simulation.Simulators.NativeInterface;
+
+namespace Microsoft.Quantum.Simulation.Simulators;
+
 public partial class OpenSystemsSimulator : SimulatorBase
 {
     internal class H : Native.H
@@ -13,7 +16,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<Qubit, QVoid> __Body__ => (target) =>
         {
-            NativeInterface.H((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.H((this.__Factory__ as OpenSystemsSimulator).Id, target);
             return QVoid.Instance;
         };
     }
@@ -24,7 +27,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<Qubit, QVoid> __Body__ => (target) =>
         {
-            NativeInterface.X((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.X((this.__Factory__ as OpenSystemsSimulator).Id, target);
             return QVoid.Instance;
         };
     }
@@ -35,7 +38,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<Qubit, QVoid> __Body__ => (target) =>
         {
-            NativeInterface.Y((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.Y((this.__Factory__ as OpenSystemsSimulator).Id, target);
             return QVoid.Instance;
         };
     }
@@ -46,7 +49,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<Qubit, QVoid> __Body__ => (target) =>
         {
-            NativeInterface.Z((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.Z((this.__Factory__ as OpenSystemsSimulator).Id, target);
             return QVoid.Instance;
         };
     }
@@ -57,13 +60,13 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<Qubit, QVoid> __Body__ => (target) =>
         {
-            NativeInterface.S((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.S((this.__Factory__ as OpenSystemsSimulator).Id, target);
             return QVoid.Instance;
         };
 
         public override Func<Qubit, QVoid> __AdjointBody__ => (target) =>
         {
-            NativeInterface.SAdj((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.SAdj((this.__Factory__ as OpenSystemsSimulator).Id, target);
             return QVoid.Instance;
         };
     }
@@ -74,13 +77,13 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<Qubit, QVoid> __Body__ => (target) =>
         {
-            NativeInterface.T((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.T((this.__Factory__ as OpenSystemsSimulator).Id, target);
             return QVoid.Instance;
         };
 
         public override Func<Qubit, QVoid> __AdjointBody__ => (target) =>
         {
-            NativeInterface.TAdj((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.TAdj((this.__Factory__ as OpenSystemsSimulator).Id, target);
             return QVoid.Instance;
         };
     }
@@ -91,7 +94,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<(Qubit, Qubit), QVoid> __Body__ => (args) =>
         {
-            NativeInterface.CNOT((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
+            OpenSystemsSimulatorNativeInterface.CNOT((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
             return QVoid.Instance;
         };
     }
@@ -102,7 +105,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
         {
-            NativeInterface.Rx((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
+            OpenSystemsSimulatorNativeInterface.Rx((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
             return QVoid.Instance;
         };
     }
@@ -113,7 +116,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
         {
-            NativeInterface.Ry((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
+            OpenSystemsSimulatorNativeInterface.Ry((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
             return QVoid.Instance;
         };
     }
@@ -124,7 +127,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
 
         public override Func<(double, Qubit), QVoid> __Body__ => (args) =>
         {
-            NativeInterface.Rz((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
+            OpenSystemsSimulatorNativeInterface.Rz((this.__Factory__ as OpenSystemsSimulator).Id, args.Item1, args.Item2);
             return QVoid.Instance;
         };
     }
@@ -134,7 +137,7 @@ public partial class OpenSystemsSimulator : SimulatorBase
         public M(IOperationFactory m) : base(m) { }
 
         public override Func<Qubit, Result> __Body__ => (target) =>
-            NativeInterface.M((this.__Factory__ as OpenSystemsSimulator).Id, target);
+            OpenSystemsSimulatorNativeInterface.M((this.__Factory__ as OpenSystemsSimulator).Id, target);
     }
 
 }

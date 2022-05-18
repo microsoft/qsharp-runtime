@@ -100,7 +100,7 @@ fn apply_continuous<F: Fn(&NoiseModel) -> Result<&GeneratorCoset, QdkSimError>>(
 #[no_mangle]
 pub extern "C" fn get_simulator_info() -> *const c_char {
     let build_info = json!({
-        "name": "Microsoft.Quantum.Experimental.Simulators",
+        "name": "Microsoft.Quantum.QdkSimRs",
         "version": built_info::PKG_VERSION,
         "opt_level": built_info::OPT_LEVEL,
         "features": built_info::FEATURES,

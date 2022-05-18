@@ -7,8 +7,7 @@ using Microsoft.Quantum.Simulation.Core;
 using Newtonsoft.Json.Linq;
 
 #nullable enable
-
-namespace Microsoft.Quantum.Experimental;
+namespace Microsoft.Quantum.Simulation.Simulators;
 
 /// <summary>
 ///     Represents an exception that is raised by native simulator code.
@@ -48,7 +47,7 @@ public class SimulationException : Exception
 /// <summary>
 ///     Abstracts away calls to and from the experimental simulators DLL.
 /// </summary>
-internal static class NativeInterface
+internal static class OpenSystemsSimulatorNativeInterface
 {
     public static event Action<string>? OnVerbose = null;
     private static void LogCall(string callName) =>
@@ -64,7 +63,7 @@ internal static class NativeInterface
         }
     }
 
-    public const string DLL_NAME = "Microsoft.Quantum.Experimental.Simulators.Runtime.dll";
+    public const string DLL_NAME = "Microsoft.Quantum.QdkSimRs.Runtime.dll";
 
     [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="lasterr")]
     private static extern string _LastError();
@@ -78,7 +77,7 @@ internal static class NativeInterface
 
     internal static readonly JToken SimulatorInfo;
 
-    static NativeInterface()
+    static OpenSystemsSimulatorNativeInterface()
     {
         SimulatorInfo = JToken.Parse(_GetSimulatorInfo());
     }
