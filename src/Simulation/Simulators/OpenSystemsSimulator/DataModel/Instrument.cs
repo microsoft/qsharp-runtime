@@ -6,8 +6,9 @@
 using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Quantum.Simulation.Simulators;
 
-namespace Microsoft.Quantum.Simulation.Simulators;
+namespace Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 public class InstrumentConverter : JsonConverter<Instrument>
 {

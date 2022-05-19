@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Text.Json;
-using Microsoft.Quantum.Simulation.Simulators;
+using DataModel = Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests;
 
@@ -12,10 +12,10 @@ public class StateSerializationTests
     [Fact]
     public void StabilizerStateSerializesCorrectly()
     {
-        var state = new StabilizerState
+        var state = new DataModel.StabilizerState
         {
             NQubits = 2,
-            Table = new StabilizerState.TableArray(
+            Table = new DataModel.StabilizerState.TableArray(
                 Data: new List<bool>
                 {
                     true, false, false, false, true, false
@@ -23,7 +23,7 @@ public class StateSerializationTests
                 Dimensions: new List<int> { 2, 3 }
             )
         };
-        var json = JsonSerializer.Serialize<Microsoft.Quantum.Simulation.Simulators.State>(state);
+        var json = JsonSerializer.Serialize<DataModel.State>(state);
         var expectedJson = @"{
             ""n_qubits"": 2,
             ""data"": {
@@ -52,7 +52,7 @@ public class StateSerializationTests
             }
         ";
         var reader = new Utf8JsonReader(System.Text.Encoding.UTF8.GetBytes(expectedJson));
-        var array = JsonSerializer.Deserialize<StabilizerState.TableArray>(ref reader).AsArray;
+        var array = JsonSerializer.Deserialize<DataModel.StabilizerState.TableArray>(ref reader).AsArray;
         Assert.Equal(new[] { 2, 3 }, array.Shape.Dimensions);
         Assert.Equal<bool>(true, array[0, 0]);
         Assert.Equal<bool>(false, array[0, 1]);

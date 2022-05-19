@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.Quantum.Simulation.Core;
+using DataModel = Microsoft.Quantum.Simulation.OpenSystems.DataModel;
+
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests;
 
@@ -12,7 +14,7 @@ public class ProcessSerializationTests
     [Fact]
     public void MixedPauliSerializesCorrectly()
     {
-        var mixedPauli = new MixedPauliProcess(
+        var mixedPauli = new DataModel.MixedPauliProcess(
             1,
             new List<(double, IList<Pauli>)>
             {
@@ -20,7 +22,7 @@ public class ProcessSerializationTests
                 (0.1, new List<Pauli> { Pauli.PauliX }),
             }
         );
-        var actualJson = JsonSerializer.Serialize<Process>(mixedPauli);
+        var actualJson = JsonSerializer.Serialize<DataModel.Process>(mixedPauli);
         @"{
             ""n_qubits"": 1,
             ""data"": {
@@ -35,7 +37,7 @@ public class ProcessSerializationTests
     [Fact]
     public void MixedPauliRoundTripsCorrectly()
     {
-        var mixedPauli = new MixedPauliProcess(
+        var mixedPauli = new DataModel.MixedPauliProcess(
             1,
             new List<(double, IList<Pauli>)>
             {
@@ -43,8 +45,8 @@ public class ProcessSerializationTests
                 (0.1, new List<Pauli> { Pauli.PauliX }),
             }
         );
-        var expectedJson = JsonSerializer.Serialize<Process>(mixedPauli);
-        var actualJson = JsonSerializer.Serialize(JsonSerializer.Deserialize<Process>(expectedJson));
+        var expectedJson = JsonSerializer.Serialize<DataModel.Process>(mixedPauli);
+        var actualJson = JsonSerializer.Serialize(JsonSerializer.Deserialize<DataModel.Process>(expectedJson));
         expectedJson.AssertJsonIsEqualTo(actualJson);
     }
 

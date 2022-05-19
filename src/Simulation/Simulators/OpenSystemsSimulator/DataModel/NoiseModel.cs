@@ -3,16 +3,11 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using NumSharp;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Quantum.Simulation.Simulators;
 
-namespace Microsoft.Quantum.Simulation.Simulators;
+namespace Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 // NB: To make this compatible with Newtonsoft.Json as well as
 //     System.Text.Json, we use a Newtonsoft converter that delegates to

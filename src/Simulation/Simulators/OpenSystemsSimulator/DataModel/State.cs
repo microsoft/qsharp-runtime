@@ -3,9 +3,10 @@
 
 using System.Text.Json.Serialization;
 using NumSharp;
+using Microsoft.Quantum.Simulation.Simulators;
 using static System.Math;
 
-namespace Microsoft.Quantum.Simulation.Simulators;
+namespace Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 [JsonConverter(typeof(StateConverter))]
 public abstract class State

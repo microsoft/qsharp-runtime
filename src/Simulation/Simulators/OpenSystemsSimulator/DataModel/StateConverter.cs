@@ -4,7 +4,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using NumSharp;
-namespace Microsoft.Quantum.Simulation.Simulators;
+using Microsoft.Quantum.Simulation.Simulators;
+namespace Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 public class StateConverter : JsonConverter<State>
 {
 

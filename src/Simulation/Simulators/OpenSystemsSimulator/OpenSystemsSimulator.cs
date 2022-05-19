@@ -5,6 +5,7 @@ using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Common;
 using Microsoft.Quantum.Intrinsic.Interfaces;
 using Newtonsoft.Json.Linq;
+using Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 using ExpIntrin = Microsoft.Quantum.Simulation.Simulators.IntrinsicInterface;
 

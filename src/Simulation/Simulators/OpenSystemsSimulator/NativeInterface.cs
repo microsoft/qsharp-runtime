@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Runtime.InteropServices;
 using Microsoft.Quantum.Simulation.Core;
 using Newtonsoft.Json.Linq;
+using Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 #nullable enable
 namespace Microsoft.Quantum.Simulation.Simulators;

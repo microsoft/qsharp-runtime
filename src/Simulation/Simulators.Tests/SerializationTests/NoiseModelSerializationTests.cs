@@ -4,6 +4,7 @@
 using System.Text.Json;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests;
+using DataModel = Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 public record class NoiseModelSerializationTests(ITestOutputHelper Output)
 {
@@ -12,14 +13,14 @@ public record class NoiseModelSerializationTests(ITestOutputHelper Output)
     [Fact]
     public void IdealNoiseModelDeserializes()
     {
-        var idealNoiseModel = JsonSerializer.Deserialize<NoiseModel>(idealJson);
+        var idealNoiseModel = JsonSerializer.Deserialize<DataModel.NoiseModel>(idealJson);
 
         // Assert some stuff about the ideal noise model to make sure we got it right.
-        idealNoiseModel.ZMeas.AssertTypeAnd<EffectsInstrument>(instrument =>
+        idealNoiseModel.ZMeas.AssertTypeAnd<DataModel.EffectsInstrument>(instrument =>
         {
             Assert.Equal(2, instrument.Effects.Count);
         });
-        idealNoiseModel.Z.AssertTypeAnd<UnitaryProcess>(process =>
+        idealNoiseModel.Z.AssertTypeAnd<DataModel.UnitaryProcess>(process =>
         {
             Assert.Equal(1, process.NQubits);
         });
@@ -29,7 +30,7 @@ public record class NoiseModelSerializationTests(ITestOutputHelper Output)
     public void IdealNoiseModelRoundTrips()
     {
         var idealNoiseModel = (
-            NoiseModel.TryGetByName("ideal", out var model)
+            DataModel.NoiseModel.TryGetByName("ideal", out var model)
             ? model
             : throw new Exception("Failed to get noise model by name.")
         );
@@ -40,7 +41,7 @@ public record class NoiseModelSerializationTests(ITestOutputHelper Output)
     public void IdealStabilizerNoiseModelRoundTrips()
     {
         var idealStabilizerModel = (
-            NoiseModel.TryGetByName("ideal_stabilizer", out var model)
+            DataModel.NoiseModel.TryGetByName("ideal_stabilizer", out var model)
             ? model
             : throw new Exception("Could not get noise model by name.")
         );

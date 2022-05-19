@@ -3,17 +3,14 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Quantum.Simulation.Core;
 using NumSharp;
+using Microsoft.Quantum.Simulation.Simulators;
 using static System.Math;
 
-namespace Microsoft.Quantum.Simulation.Simulators;
+namespace Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 public class ProcessConverter : JsonConverter<Process>
 {
