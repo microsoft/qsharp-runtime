@@ -15,7 +15,7 @@ param(
 );
 
 
-& "$PSScriptRoot/set-env.ps1"
+$env_output = & "$PSScriptRoot/set-env.ps1"
 
 $artifacts = @{
     Packages = @(
