@@ -62,7 +62,6 @@ $artifacts = @{
 }
 
 if ($OutputFormat -eq 'FileInfo') {
-    Write-Host "OutputFormat is FileInfo"
     $artifacts.Packages = $artifacts.Packages | ForEach-Object { Get-Item $_ };
     $artifacts.Assemblies = $artifacts.Assemblies | ForEach-Object { Get-Item $_ };
     $artifacts.Native = $artifacts.Native | ForEach-Object { Get-Item $_ };
