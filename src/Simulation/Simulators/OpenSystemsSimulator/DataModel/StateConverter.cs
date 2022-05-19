@@ -86,6 +86,10 @@ public class StateConverter : JsonConverter<State>
                     }
                     else if (value is StabilizerState stabilizerState)
                     {
+                        if (stabilizerState.Data is null)
+                        {
+                            throw new JsonException("Failure serializing stabilizer state as JSON: did not expect Data to be null.");
+                        }
                         var array = new StabilizerState.TableArray(
                             Data: stabilizerState.Data.flat.ToArray<bool>().ToList(),
                             Dimensions: stabilizerState.Data.Shape.Dimensions.ToList()

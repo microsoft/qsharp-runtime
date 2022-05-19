@@ -64,6 +64,15 @@ internal static class OpenSystemsSimulatorNativeInterface
         }
     }
 
+    private static T EnsureNotNull<T>(this T? value)
+    {
+        if (value is null)
+        {
+            throw new Exception($"Expected a value of type {typeof(T).Name}, but native runtime returned a JSON value that deserialized to null.");
+        }
+        return value;
+    }
+
     public const string DLL_NAME = "Microsoft.Quantum.QdkSimRs.Runtime.dll";
 
     [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="lasterr")]
@@ -83,13 +92,8 @@ internal static class OpenSystemsSimulatorNativeInterface
         SimulatorInfo = JToken.Parse(_GetSimulatorInfo());
     }
 
-    public static string Name
-    {
-        get
-        {
-            return SimulatorInfo.Value<string>("name");
-        }
-    }
+    public static string Name =>
+        SimulatorInfo.Value<string>("name") ?? nameof(OpenSystemsSimulator);
 
     [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="init")]
     private static extern Int64 _Init(uint initialCapacity, string representation, out uint simulatorId);
@@ -125,7 +129,7 @@ internal static class OpenSystemsSimulatorNativeInterface
     public static State GetCurrentState(ulong simId)
     {
         LogCall("get_current_state");
-        return JsonSerializer.Deserialize<State>(_GetCurrentState(simId));
+        return JsonSerializer.Deserialize<State>(_GetCurrentState(simId)).EnsureNotNull();
     }
 
     [DllImport(DLL_NAME, ExactSpelling =true, CallingConvention =CallingConvention.Cdecl, EntryPoint="get_noise_model_by_name")]
@@ -135,7 +139,7 @@ internal static class OpenSystemsSimulatorNativeInterface
     {
         LogCall("get_noise_model_by_name");
         CheckCall(_GetNoiseModelByName(name, out var noiseModelJson));
-        return JsonSerializer.Deserialize<NoiseModel>(noiseModelJson);
+        return JsonSerializer.Deserialize<NoiseModel>(noiseModelJson).EnsureNotNull();
     }
 
     [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="get_noise_model")]
@@ -145,7 +149,7 @@ internal static class OpenSystemsSimulatorNativeInterface
     {
         LogCall("get_noise_model");
         CheckCall(_GetNoiseModel(simId, out var noiseModelJson));
-        return JsonSerializer.Deserialize<NoiseModel>(noiseModelJson);
+        return JsonSerializer.Deserialize<NoiseModel>(noiseModelJson).EnsureNotNull();
     }
 
     [DllImport(DLL_NAME, ExactSpelling=true, CallingConvention=CallingConvention.Cdecl, EntryPoint="set_noise_model")]
