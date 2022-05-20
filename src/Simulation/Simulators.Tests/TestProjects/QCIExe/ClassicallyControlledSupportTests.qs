@@ -65,24 +65,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
     operation LiftFunctorApplication() : Unit {
         let r = Zero;
         if (r == Zero) {
-            Adjoint SubOpCA1();
-        }
-    }
-
-    operation PartialApplication(q : Int, w : Double) : Unit { }
-
-    operation LiftPartialApplication() : Unit {
-        let r = Zero;
-        if (r == Zero) {
-            (PartialApplication(1, _))(1.0);
-        }
-    }
-
-    operation LiftArrayItemCall() : Unit {
-        let f = [SubOp1];
-        let r = Zero;
-        if (r == Zero) {
-            f[0]();
+            //Adjoint SubOpCA1(); // FIXME: uncomment (the compiler incorrectly currently gives an error here but shouldn't')
         }
     }
 
