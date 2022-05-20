@@ -151,9 +151,9 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
         return (newPaulis, newQubits);
     }
 
-    internal function Subarray(indices : Int[], array : Int[]) : Int[] {
+    internal function Subarray<'T> (indices : Int[], array : 'T[]) : 'T[] {
         let nSliced = Length(indices);
-        mutable sliced = [-1, size = nSliced];
+        mutable sliced = new 'T[nSliced];
 
         for idx in 0 .. nSliced - 1 {
             set sliced w/= idx <- array[indices[idx]];
