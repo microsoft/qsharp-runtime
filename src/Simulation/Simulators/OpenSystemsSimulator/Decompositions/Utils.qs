@@ -171,7 +171,7 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
             }
         }
 
-        mutable indices = [PauliI, size = nonIdPauliCount];
+        mutable indices = [-1, size = nonIdPauliCount];
         mutable index = 0;
 
         for i in 0 .. Length(paulis) - 1 {
