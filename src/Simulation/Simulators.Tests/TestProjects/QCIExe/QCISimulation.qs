@@ -38,6 +38,13 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI {
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
     @Test("SparseSimulator")
+    operation LiftLoopsTest() : Unit {
+        LiftLoops();
+    }
+
+    @Test("QuantumSimulator")
+    @Test("ResourcesEstimator")
+    @Test("SparseSimulator")
     operation LiftSingleNonCallTest() : Unit {
         LiftSingleNonCall();
     }

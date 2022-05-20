@@ -38,6 +38,15 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
         }
     }
 
+    operation LiftLoops() : Unit {
+        let r = Zero;
+        if (r == Zero) {
+            for (index in 0 .. 3) {
+                let temp = index;
+            }
+        }
+    }
+
     operation LiftSingleNonCall() : Unit {
         let r = Zero;
         if (r == Zero) {
