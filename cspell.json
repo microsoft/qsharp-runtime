@@ -1,11 +1,15 @@
+// Don't allow cspell to check this file, as it will fail on language-specific
+// configuration.
+// cspell: disable
 {
-    "ignoreWords": [
+    "words": [
         // General terminology
         "renormalize",
         "stdlib",
         "subtheories",
         "vals",
         "vecs",
+        "qsharp",
         // Quantum terminology.
         "qubit",
         "qubits",
@@ -13,6 +17,7 @@
         "paulis",
         "subregister",
         "subregisters",
+        "cnot",
         // Open quantum systems terminology.
         "CPTP",
         "CPTNI",
@@ -53,11 +58,23 @@
         // Itertools terminology.
         "itertools",
         // LaTeX commands.
-        "mathrm"
-    ],
-    "words": [
-        "cnot",
+        "mathrm",
+        "mathrel",
+        "operatorname",
+        // Other
         "struct",
-        "structs"
+        "structs",
+        "intrinsics"
+    ],
+    "languageSettings": [
+        {
+            "languageId": "qsharp",
+            "words": [
+                "elif",
+                "callable",
+                "callables",
+                "Subarray"
+            ]
+        }
     ]
 }

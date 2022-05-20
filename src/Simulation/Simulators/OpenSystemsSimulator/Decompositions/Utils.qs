@@ -62,33 +62,33 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
 
     internal operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
         body (...) {}
-        controlled (ctls, (...)) {
-            if Length(ctls) == 0 {
+        controlled (controls, (...)) {
+            if Length(controls) == 0 {
                 // Noop
             }
-            elif Length(ctls) == 1 {
-                Intrinsic.R(PauliZ, theta, ctls[0]);
+            elif Length(controls) == 1 {
+                Intrinsic.R(PauliZ, theta, controls[0]);
             }
-            elif Length(ctls) == 2 {
-                Controlled Intrinsic.R1([ctls[1]], (theta, ctls[0]));
+            elif Length(controls) == 2 {
+                Controlled Intrinsic.R1([controls[1]], (theta, controls[0]));
             }
-            elif Length(ctls) == 3 {
-                Controlled Intrinsic.R1([ctls[1], ctls[2]], (theta, ctls[0]));
+            elif Length(controls) == 3 {
+                Controlled Intrinsic.R1([controls[1], controls[2]], (theta, controls[0]));
             }
-            elif Length(ctls) == 4 {
-                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3]], (theta, ctls[0]));
+            elif Length(controls) == 4 {
+                Controlled Intrinsic.R1([controls[1], controls[2], controls[3]], (theta, controls[0]));
             }
-            elif Length(ctls) == 5 {
-                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3], ctls[4]], (theta, ctls[0]));
+            elif Length(controls) == 5 {
+                Controlled Intrinsic.R1([controls[1], controls[2], controls[3], controls[4]], (theta, controls[0]));
             }
-            elif Length(ctls) == 6 {
-                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5]], (theta, ctls[0]));
+            elif Length(controls) == 6 {
+                Controlled Intrinsic.R1([controls[1], controls[2], controls[3], controls[4], controls[5]], (theta, controls[0]));
             }
-            elif Length(ctls) == 7 {
-                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6]], (theta, ctls[0]));
+            elif Length(controls) == 7 {
+                Controlled Intrinsic.R1([controls[1], controls[2], controls[3], controls[4], controls[5], controls[6]], (theta, controls[0]));
             }
-            elif Length(ctls) == 8 {
-                Controlled Intrinsic.R1([ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6], ctls[7]], (theta, ctls[0]));
+            elif Length(controls) == 8 {
+                Controlled Intrinsic.R1([controls[1], controls[2], controls[3], controls[4], controls[5], controls[6], controls[7]], (theta, controls[0]));
             }
             else {
                 fail "Too many controls specified to R gate.";
@@ -151,7 +151,7 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
         return (newPaulis, newQubits);
     }
 
-        internal function Subarray<'T> (indices : Int[], array : 'T[]) : 'T[] {
+    internal function Subarray<'T> (indices : Int[], array : 'T[]) : 'T[] {
         let nSliced = Length(indices);
         mutable sliced = new 'T[nSliced];
 
@@ -164,16 +164,16 @@ namespace Microsoft.Quantum.Experimental.Decompositions {
 
     internal function IndicesOfNonIdentity (paulis : Pauli[]) : Int[] {
         mutable nonIdPauliCount = 0;
-        
+
         for i in 0 .. Length(paulis) - 1 {
             if paulis[i] != PauliI {
                 set nonIdPauliCount += 1;
             }
         }
-        
-        mutable indices = new Int[nonIdPauliCount];
+
+        mutable indices = [PauliI, size = nonIdPauliCount];
         mutable index = 0;
-        
+
         for i in 0 .. Length(paulis) - 1 {
             if paulis[i] != PauliI {
                 set indices w/= index <- i;
