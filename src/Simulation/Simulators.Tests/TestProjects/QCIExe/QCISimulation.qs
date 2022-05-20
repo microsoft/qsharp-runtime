@@ -66,20 +66,6 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI {
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
     @Test("SparseSimulator")
-    operation LiftPartialApplicationTest() : Unit {
-        LiftPartialApplication();
-    }
-
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
-    @Test("SparseSimulator")
-    operation LiftArrayItemCallTest() : Unit {
-        LiftArrayItemCall();
-    }
-
-    @Test("QuantumSimulator")
-    @Test("ResourcesEstimator")
-    @Test("SparseSimulator")
     operation LiftOneNotBothTest() : Unit {
         LiftOneNotBoth();
     }
