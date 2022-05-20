@@ -65,7 +65,7 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
     operation LiftFunctorApplication() : Unit {
         let r = Zero;
         if (r == Zero) {
-            //Adjoint SubOpCA1(); // FIXME: uncomment (the compiler incorrectly currently gives an error here but shouldn't')
+            Adjoint SubOpCA1();
         }
     }
 
