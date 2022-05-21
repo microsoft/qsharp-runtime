@@ -1,16 +1,16 @@
-﻿namespace Microsoft.Quantum.Testing.Honeywell.Monomorphization {
+﻿namespace Microsoft.Quantum.Testing {
 
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Measurement;
-    open Microsoft.Quantum.Canon;
     
     @EntryPoint()
     operation CallGenerics() : Int {
 
-        use qs = Qubit[2] {
-            Ignore(Measure([PauliX, PauliX], qs));
-            ResetAll(qs);
-            return 12345;
+        use qs = Qubit[2];
+        for q in qs {
+            H(q);        
         }
+
+        return 12345;
     }
 }
