@@ -5,13 +5,12 @@
     open Microsoft.Quantum.Canon;
     
     @EntryPoint()
-    operation CallGenerics() : String {
+    operation CallGenerics() : Int {
 
-        let arr = Default<Qubit[]>();
-        using (qs = Qubit[2])  {
+        use qs = Qubit[2] {
             Ignore(Measure([PauliX, PauliX], qs));
             ResetAll(qs);
-            return "TargetedExe";
+            return 12345;
         }
     }
 }

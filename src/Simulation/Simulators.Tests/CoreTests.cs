@@ -61,7 +61,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Null(ex);
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
-            Assert.Equal("TargetedExe", output.ToString().Trim());
+            Assert.Equal("12345", output.ToString().Trim());
         }
 
         [Fact]
