@@ -130,19 +130,11 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         public void SubmitsTargetedQir()
         {
             var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var assembly = Path.Combine(directory!, "TestProjects", "QCIExe", "QCIExe.dll");
+            var assembly = Path.Combine(directory!, "TestProjects", "TargetedExe", "TargetedExe.dll");
             var args = string.Join(
                 ' ',
                 assembly,
                 "submit",
-                "--xs",
-                "0",
-                "1",
-                "2",
-                "-y",
-                "3",
-                "-z",
-                "4",
                 "--subscription",
                 "foo",
                 "--resource-group",

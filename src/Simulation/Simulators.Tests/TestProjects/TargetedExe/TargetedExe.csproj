@@ -6,7 +6,8 @@
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
-    <ExecutionTarget>honeywell.qpu</ExecutionTarget>
+    <ExecutionTarget>quantinuum.qpu</ExecutionTarget>
+	<TargetCapability>AdaptiveExecution</TargetCapability>
   </PropertyGroup>
 
   <ItemGroup>

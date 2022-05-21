@@ -7,7 +7,7 @@
 	<IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
 	<IncludeCSharpRuntime>false</IncludeCSharpRuntime>
 	<IncludeProviderPackages>false</IncludeProviderPackages>
-	  <ExecutionTarget>microsoft.simulator</ExecutionTarget>
+	<ExecutionTarget>microsoft.simulator</ExecutionTarget>
   </PropertyGroup>
 
   <ItemGroup>
