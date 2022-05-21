@@ -7,7 +7,7 @@
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <ExecutionTarget>quantinuum.qpu</ExecutionTarget>
-	<TargetCapability>AdaptiveExecution</TargetCapability>
+    <TargetCapability>AdaptiveExecution</TargetCapability>
   </PropertyGroup>
 
   <ItemGroup>
