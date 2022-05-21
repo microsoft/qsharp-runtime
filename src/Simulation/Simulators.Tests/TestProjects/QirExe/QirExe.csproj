@@ -6,7 +6,7 @@
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <ExecutionTarget>microsoft.simulator.fullstate</ExecutionTarget>
-    <TargetCapability>MyTargetCapability</TargetCapability>
+    <TargetCapability>AdaptiveExecution</TargetCapability>
   </PropertyGroup>
  
   <ItemGroup>
