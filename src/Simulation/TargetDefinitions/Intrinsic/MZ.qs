@@ -30,7 +30,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Measure([PauliZ], [qubit]);
     /// ```
     @TargetInstruction("m__body")
-    internal operation MZ (qubit : Qubit) : Result {
+    operation MZ (qubit : Qubit) : Result {
         body intrinsic;
     }
 }

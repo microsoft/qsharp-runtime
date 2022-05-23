@@ -77,7 +77,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    internal operation CS(control : Qubit, target : Qubit) : Unit is Adj + Ctl {
+    operation CS(control : Qubit, target : Qubit) : Unit is Adj + Ctl {
         T(control);
         T(target);
         CNOT(control, target);

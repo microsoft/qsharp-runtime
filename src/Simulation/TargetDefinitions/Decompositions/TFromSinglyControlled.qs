@@ -64,7 +64,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    internal operation CT(control : Qubit, target : Qubit) : Unit is Adj {
+    operation CT(control : Qubit, target : Qubit) : Unit is Adj {
         let angle = PI() / 8.0;
         Rz(angle, control);
         Rz(angle, target);

@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Iterates a variable through a Cartesian product
     /// [ 0, bounds[0]-1 ] × [ 0, bounds[1]-1 ] × [ 0, bounds[Length(bounds)-1]-1 ]
     /// and calls op(arr) for every element of the Cartesian product
-    internal operation IterateThroughCartesianPower (length : Int, value : Int, op : (Int[] => Unit)) : Unit {
+    operation IterateThroughCartesianPower (length : Int, value : Int, op : (Int[] => Unit)) : Unit {
         mutable bounds = new Int[length];
 
         for i in 0 .. length - 1
@@ -67,7 +67,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// ## basis
     /// Array of single-qubit basis state IDs (0 <= id <= 3), one for each element of
     /// qubits.
-    internal operation FlipToBasis (basis : Int[], qubits : Qubit[]) : Unit is Adj + Ctl {
+    operation FlipToBasis (basis : Int[], qubits : Qubit[]) : Unit is Adj + Ctl {
         if (Length(qubits) != Length(basis))
         {
             fail "qubits and stateIds must have the same length";
@@ -117,7 +117,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// Operation on $n$ qubits to be checked.
     /// ## expectedU
     /// Reference operation on $n$ qubits that givenU is to be compared against.
-    internal operation AssertEqualOnBasisVector (basis : Int[], givenU : (Qubit[] => Unit), expectedU : (Qubit[] => Unit is Adj)) : Unit {
+    operation AssertEqualOnBasisVector (basis : Int[], givenU : (Qubit[] => Unit), expectedU : (Qubit[] => Unit is Adj)) : Unit {
         let tolerance = 1e-5;
 
         use qubits = Qubit[Length(basis)] {
