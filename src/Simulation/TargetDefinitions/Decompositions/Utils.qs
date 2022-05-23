@@ -42,118 +42,6 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    internal operation JointMeasure(bases : Pauli[], qubits : Qubit[]) : Result {
-        if Length(bases) == 0 {
-            return Zero;
-        }
-        elif Length(bases) == 1 {
-            // This case should never get used in practice, and would only be hit if there was
-            // a bug in the decompositions that rely on this operation.
-            fail "Length 1 case should be handled by callers.";
-        }
-        elif Length(bases) == 2 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                EntangleForJointMeasure(bases[0], q, qubits[0]);
-                EntangleForJointMeasure(bases[1], q, qubits[1]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 3 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                EntangleForJointMeasure(bases[0], q, qubits[0]);
-                EntangleForJointMeasure(bases[1], q, qubits[1]);
-                EntangleForJointMeasure(bases[2], q, qubits[2]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 4 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                EntangleForJointMeasure(bases[0], q, qubits[0]);
-                EntangleForJointMeasure(bases[1], q, qubits[1]);
-                EntangleForJointMeasure(bases[2], q, qubits[2]);
-                EntangleForJointMeasure(bases[3], q, qubits[3]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 5 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                EntangleForJointMeasure(bases[0], q, qubits[0]);
-                EntangleForJointMeasure(bases[1], q, qubits[1]);
-                EntangleForJointMeasure(bases[2], q, qubits[2]);
-                EntangleForJointMeasure(bases[3], q, qubits[3]);
-                EntangleForJointMeasure(bases[4], q, qubits[4]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 6 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                EntangleForJointMeasure(bases[0], q, qubits[0]);
-                EntangleForJointMeasure(bases[1], q, qubits[1]);
-                EntangleForJointMeasure(bases[2], q, qubits[2]);
-                EntangleForJointMeasure(bases[3], q, qubits[3]);
-                EntangleForJointMeasure(bases[4], q, qubits[4]);
-                EntangleForJointMeasure(bases[5], q, qubits[5]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 7 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                EntangleForJointMeasure(bases[0], q, qubits[0]);
-                EntangleForJointMeasure(bases[1], q, qubits[1]);
-                EntangleForJointMeasure(bases[2], q, qubits[2]);
-                EntangleForJointMeasure(bases[3], q, qubits[3]);
-                EntangleForJointMeasure(bases[4], q, qubits[4]);
-                EntangleForJointMeasure(bases[5], q, qubits[5]);
-                EntangleForJointMeasure(bases[6], q, qubits[6]);
-            }
-            return MResetZ(q);
-        }
-        elif Length(bases) == 8 {
-            use q = Qubit();
-            within {
-                H(q);
-            }
-            apply {
-                EntangleForJointMeasure(bases[0], q, qubits[0]);
-                EntangleForJointMeasure(bases[1], q, qubits[1]);
-                EntangleForJointMeasure(bases[2], q, qubits[2]);
-                EntangleForJointMeasure(bases[3], q, qubits[3]);
-                EntangleForJointMeasure(bases[4], q, qubits[4]);
-                EntangleForJointMeasure(bases[5], q, qubits[5]);
-                EntangleForJointMeasure(bases[6], q, qubits[6]);
-                EntangleForJointMeasure(bases[7], q, qubits[7]);
-            }
-            return MResetZ(q);
-        }
-        else {
-            fail "Too many qubits specified in call to Measure.";
-        }
-    }
-
     internal operation EntangleForJointMeasure(basis : Pauli, aux : Qubit, qubit : Qubit) : Unit {
         if basis == PauliX {
             Controlled X([aux], qubit);
@@ -166,21 +54,32 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    /// Given a multiply-controlled operation that requires k controls 
-    /// applies it using ceiling(k/2) controls and using floor(k/2) temporary qubits
-    internal operation ApplyWithLessControlsA<'T> (op : ((Qubit[],'T) => Unit is Adj), (controls : Qubit[], arg : 'T)) : Unit is Adj {
-        let numControls = Length(controls);
-        let numControlPairs = numControls / 2;
-        use temps = Qubit[numControlPairs] {
-            within {
-                for numPair in 0 .. numControlPairs - 1 { // constant depth
-                    PhaseCCX(controls[2*numPair], controls[2*numPair + 1], temps[numPair]);
-                }
-            }
-            apply {
-                let newControls = numControls % 2 == 0 ? temps | temps + [controls[numControls - 1]];
-                op(newControls, arg);
-            }
+    /// Collects the given list of control qubits into one or two of the given auxiliarly qubits, using
+    /// all but the last qubits in the auxiliary list as scratch qubits. The auxiliary list must be
+    /// big enough to accomodate the data, so it is usually smaller than controls list by number of 
+    /// qubits needed for the eventual controlled unitary application. The passed adjustment value is
+    /// used to ensure the right number of auxiliary qubits are processed.
+    ///
+    /// For example, if the controls list is 6 qubits, the auxiliary list must be 5 qubits, and the
+    /// state from the 6 control qubits will be collected into the last qubit of the auxiliary array.
+    internal operation CollectControls(ctls : Qubit[], aux : Qubit[], adjustment : Int) : Unit is Adj {
+        // First collect the controls into the first part of the auxiliary list.
+        for i in 0..2..(Length(ctls) - 2) {
+            PhaseCCX(ctls[i], ctls[i + 1], aux[i / 2]);
+        }
+        // Then collect the auxiliary qubits in the first part of the list forward into the last
+        // qubit of the auxiliary list. The adjustment is used to allow the caller to reduce or increase
+        // the number of times this is run based on the eventual number of control qubits needed.
+        for i in 0..((Length(ctls) / 2) - 2 - adjustment) {
+            PhaseCCX(aux[i * 2], aux[(i * 2) + 1], aux[i + Length(ctls) / 2]);
+        }
+    }
+
+    /// When collecting controls, if there is an uneven number of original control qubits then the
+    /// last control and the second to last auxiliary will be collected into the last auxiliary.
+    internal operation AdjustForSingleControl(ctls : Qubit[], aux : Qubit[]) : Unit is Adj {
+        if Length(ctls) % 2 != 0 {
+            PhaseCCX(ctls[Length(ctls) - 1], aux[Length(ctls) - 3], aux[Length(ctls) - 2]);
         }
     }
 

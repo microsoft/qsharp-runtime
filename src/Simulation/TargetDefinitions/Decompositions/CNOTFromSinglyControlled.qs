@@ -41,38 +41,15 @@ namespace Microsoft.Quantum.Intrinsic {
             elif Length(ctls) == 1 {
                 CCNOT(ctls[0], control, target);
             }
-            elif Length(ctls) == 2 {
-                Controlled X([ctls[0], ctls[1], control], target);
-            }
-            elif Length(ctls) == 3 {
-                Controlled X([ctls[0], ctls[1], ctls[2], control], target);
-            }
-            elif Length(ctls) == 4 {
-                Controlled X([ctls[0], ctls[1], ctls[2], ctls[3], control], target);
-            }
-            elif Length(ctls) == 5 {
-                Controlled X([ctls[0], ctls[1], ctls[2], ctls[3], ctls[4], control], target);
-            }
-            elif Length(ctls) == 6 {
-                Controlled X([ctls[0], ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], control], target);
-            }
-            elif Length(ctls) == 7 {
-                Controlled X([ctls[0], ctls[1], ctls[2], ctls[3], ctls[4], ctls[5], ctls[6], control], target);
-            }
-            elif Length(ctls) == 8 {
-                use temp = Qubit();
+            else {
+                use aux = Qubit[Length(ctls) - 1];
                 within {
-                    PhaseCCX(ctls[0], ctls[1], temp);
+                    CollectControls(ctls, aux, 0);
+                    AdjustForSingleControl(ctls, aux);
                 }
                 apply {
-                    Controlled X([temp, ctls[2], ctls[3], ctls[4], ctls[5], ctls[6], ctls[7], control], target);
+                    CCNOT(aux[Length(ctls) - 2], control, target);
                 }
-            }
-            else {
-                fail "Too many control qubits specified to CNOT gate.";
-
-                // Eventually, we can use recursion via callables with the below utility:
-                // ApplyWithLessControlsA(Controlled X, (ctls, qubit));
             }
         }
         adjoint self;

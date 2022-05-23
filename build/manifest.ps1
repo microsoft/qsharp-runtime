@@ -15,7 +15,7 @@ param(
 );
 
 
-& "$PSScriptRoot/set-env.ps1"
+& "$PSScriptRoot/set-env.ps1" | Out-Null
 
 $artifacts = @{
     Packages = @(
