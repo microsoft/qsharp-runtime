@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-	<QscVerbosity>detailed</QscVerbosity>
+    <QscVerbosity>detailed</QscVerbosity>
     <!-- we will provide our own -->
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
