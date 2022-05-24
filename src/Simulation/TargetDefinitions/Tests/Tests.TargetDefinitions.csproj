@@ -8,7 +8,7 @@
     <!-- we will provide our own -->
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
-    <UseIntrinsicsInterface>true</UseIntrinsicsInterface>
+    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
   </PropertyGroup>
 
   <ItemGroup>

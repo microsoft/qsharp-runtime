@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <Description>Core support for the Q# programming language.</Description>
-    <UseIntrinsicsInterface>true</UseIntrinsicsInterface>
+    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
   </PropertyGroup>
   
   <ItemGroup>

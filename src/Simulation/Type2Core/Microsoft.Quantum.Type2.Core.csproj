@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <Description>Type2 Targeting support for the Q# programming language.</Description>
-    <UseIntrinsicsInterface>true</UseIntrinsicsInterface>
+    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
   </PropertyGroup>
 
   <ItemGroup>
