@@ -158,6 +158,60 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(11.0, sim.Data.Rows.Find("Depth")["Sum"]);
         }
 
+        [Fact]
+        public void QubitNonRestrictedReuseTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = false;
+            config.EnableRestrictedReuse = true;
+            var sim = new ResourcesEstimator(config);
+            RestrictedTraceableQubitManager qubitManager = (RestrictedTraceableQubitManager)sim.QubitManager;
+
+            RestrictedUseSingle.Run(sim).Wait();
+            RestrictedUseSingle.Run(sim).Wait();
+
+            Assert.Equal(4.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(2.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(2.0, sim.Data.Rows.Find("Depth")["Max"]);
+        }
+
+        [Fact]
+        public void QubitRestrictedReuseTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = false;
+            config.EnableRestrictedReuse = true;
+            var sim = new ResourcesEstimator(config);
+            RestrictedTraceableQubitManager qubitManager = (RestrictedTraceableQubitManager)sim.QubitManager;
+
+            qubitManager.StartRestrictedReuseArea();
+            RestrictedUseSingle.Run(sim).Wait();
+            qubitManager.NextRestrictedReuseSegment();
+            RestrictedUseSingle.Run(sim).Wait();
+            qubitManager.EndRestrictedReuseArea();
+
+            Assert.Equal(4.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(4.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(1.0, sim.Data.Rows.Find("Depth")["Max"]);
+        }
+
+        [Fact]
+        public void QubitRestrictedReuseSequentialTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = false;
+            config.EnableRestrictedReuse = true;
+            var sim = new ResourcesEstimator(config);
+            RestrictedTraceableQubitManager qubitManager = (RestrictedTraceableQubitManager)sim.QubitManager;
+
+            qubitManager.StartRestrictedReuseArea();
+            RestrictedUseMultiple.Run(sim).Wait();
+            qubitManager.NextRestrictedReuseSegment();
+            RestrictedUseMultiple.Run(sim).Wait();
+            qubitManager.EndRestrictedReuseArea();
+
+            Assert.Equal(22.0, sim.Data.Rows.Find("QubitCount")["Sum"]);
+            Assert.Equal(22.0, sim.Data.Rows.Find("Width")["Sum"]);
+            Assert.Equal(1.0, sim.Data.Rows.Find("Depth")["Max"]);
+        }
+
 
         /// <summary>
         /// Documents that the QubitCount and Depth statistics reflect independent lower
