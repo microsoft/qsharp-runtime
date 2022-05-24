@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-	<ProjectReference Include="..\..\..\Type3Core\Microsoft.Quantum.Type3.Core.csproj" Aliases="TargetPackage" IsTargetPackage='true' />
+    <ProjectReference Include="..\..\..\Type3Core\Microsoft.Quantum.Type3.Core.csproj" Aliases="TargetPackage" IsTargetPackage='true' />
   </ItemGroup>
 
   <ItemGroup>
