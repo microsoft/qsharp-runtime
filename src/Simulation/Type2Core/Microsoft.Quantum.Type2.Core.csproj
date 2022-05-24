@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.Quantum.Sdk">
+﻿<Project Sdk="Microsoft.Quantum.Sdk">
 
   <Import Project="..\TargetDefinitions\TargetPackages\Type2.Package.props" />
 
   <PropertyGroup>
     <Description>Type2 Targeting support for the Q# programming language.</Description>
-    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
+    <UseIntrinsicsInterface>true</UseIntrinsicsInterface>
   </PropertyGroup>
 
   <ItemGroup>
