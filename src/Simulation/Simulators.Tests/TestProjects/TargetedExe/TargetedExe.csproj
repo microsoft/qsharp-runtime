@@ -14,7 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
-    <ProjectReference Include="..\..\..\Type1Core\Microsoft.Quantum.Type1.Core.csproj" IsTargetPackage='true' />
+    <ProjectReference Include="..\..\..\Type1Core\Microsoft.Quantum.Type1.Core.csproj" Aliases="TargetPackage" IsTargetPackage='true' />
 </ItemGroup>
 
 </Project>

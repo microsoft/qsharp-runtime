@@ -51,7 +51,7 @@ namespace Microsoft.Quantum.Intrinsic {
         adjoint self;
     }
 
-    internal operation CH(control : Qubit, target : Qubit) : Unit is Adj {
+    operation CH(control : Qubit, target : Qubit) : Unit is Adj {
         within {
             S(target);
             H(target);
@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    internal operation CCH(control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
+    operation CCH(control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
         within {
             S(target);
             H(target);

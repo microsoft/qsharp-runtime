@@ -7,6 +7,12 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI {
     open Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportTests;
     open Microsoft.Quantum.Simulation.Testing.QCI.MeasurementSupportTests;
 
+    // The resource estimator is not compatible with executables 
+    // that have been targeted for hardware backends, since it 
+    // does not implement the necessary interfaces.
+    // There are hence no test cases running on the resources estimator.
+
+
     @Test("QuantumSimulator")
     @Test("SparseSimulator")
     operation MeasureInMiddleTest() : Unit {
