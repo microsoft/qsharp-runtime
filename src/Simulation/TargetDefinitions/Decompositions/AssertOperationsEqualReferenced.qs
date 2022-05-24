@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// A qubit array in the $\ket{0\cdots 0}$ state
     /// ## right
     /// A qubit array in the $\ket{0\cdots 0}$ state
-    operation PrepareEntangledState (left : Qubit[], right : Qubit[]) : Unit
+    internal operation PrepareEntangledState (left : Qubit[], right : Qubit[]) : Unit
     is Adj + Ctl {
 
         for idxQubit in 0 .. Length(left) - 1
