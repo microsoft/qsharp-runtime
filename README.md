@@ -26,7 +26,7 @@ You may also visit our [Quantum](https://github.com/microsoft/quantum) repositor
 
 [![Build Status](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_apis/build/status/microsoft.qsharp-runtime?branchName=main)](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_build/latest?definitionId=15&branchName=main)
 
-Note that when building from source, this repository is configured so that .NET Core will automatically look at the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) in addition to any other feeds you may have configured.
+Note that when building from source, this repository is configured so that .NET will automatically look at the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) in addition to any other feeds you may have configured.
 
 Building **QIR Runtime** isn't enabled by default yet. Please see [its readme](./src/Qir/Runtime/README.md) for details.
 
@@ -35,12 +35,12 @@ Building **QIR Runtime** isn't enabled by default yet. Please see [its readme](.
 To build on Windows:
 
 1. Install the pre-reqs:
-    * Install [CMake](https://cmake.org/install/)
+    * Install [CMake](https://cmake.org/install/) 3.20 or newer.
     * Install [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
         * **Spectre-mitigated libraries that match your C++ build tools version. For that in the Visual Studio Installer, for the VS version of interest,
-          press "Modify" button, "Individual Components" tab, search for "spectre", select the latest version of "MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs", press "Modify" button.**
-        * **.NET Core 3 cross-platform development**
+          press "Modify" button, "Individual Components" tab, search for "spectre", select the latest version of "MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs", press "Modify" button**
+        * **.NET 6.0 Runtime**
 2. Run [bootstrap.ps1](bootstrap.ps1) from PowerShell
     * pre-req (in PowerShell): `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
     * The script might install additional tools (a specific compiler, build tools, etc)
@@ -56,11 +56,11 @@ The `Simulation.sln` solution does not include the full-state quantum simulator.
 To build on other platforms:
 
 1. Install the pre-reqs:
-    * Install [CMake](https://cmake.org/install/)
-    * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
+    * Install [CMake](https://cmake.org/install/) 3.20 or newer
+    * Install [.NET 6.0](https://dotnet.microsoft.com/download) (version lower than 6.0.300 is recommended)
     * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
       * Install [`libomp`](https://openmp.llvm.org) needed for the native (C++) full-state simulator.
-      * The build does not accept `dotnet-*-5.0` packages, install `dotnet-*-3.1`
+      * (TODO(kuzminrobin): Update this from .NET Core to .NET 6.0) The build does not accept `dotnet-*-5.0` packages, install `dotnet-*-3.1`
         (`sudo apt-get install dotnet-sdk-3.1`). The possible result can be:
 
 ```sh
