@@ -36,9 +36,10 @@ To build on Windows:
 
 1. Install the pre-reqs:
     * Install [CMake](https://cmake.org/install/)
-    * Install [Visual Studio 2019 (version 16.3 or later)](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
+    * Install [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
-        * **From the Individual Components tab in VS Installer add Spectre-mitigated libs that match your C++ build tools version**
+        * **Spectre-mitigated libraries that match your C++ build tools version. For that in the Visual Studio Installer, for the VS version of interest,
+          press "Modify" button, "Individual Components" tab, search for "spectre", select the latest version of "MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs", press "Modify" button.**
         * **.NET Core 3 cross-platform development**
 2. Run [bootstrap.ps1](bootstrap.ps1) from PowerShell
     * pre-req (in PowerShell): `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
