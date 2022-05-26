@@ -38,8 +38,8 @@ To build on Windows:
     * Install [CMake](https://cmake.org/install/) 3.20 or newer.
     * Install [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
-        * **Spectre-mitigated libraries. For that in the Visual Studio Installer, for the VS version of interest,
-          press "Modify" button, "Individual Components" tab, search for "spectre", select the latest version of "MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs", press "Modify" button**
+        * **Spectre-mitigated libraries. Once Visual Studio has been installed, using the installer for the VS version of interest,
+          click the"Modify" button, go to the "Individual Components" tab, search for "spectre", select the latest version of "MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs", and click the "Modify" button to install the selected components**
         * **.NET 6.0 Runtime**
 2. Run [bootstrap.ps1](bootstrap.ps1) from PowerShell
     * pre-req (in PowerShell): `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
