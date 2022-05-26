@@ -35,6 +35,10 @@ namespace Microsoft.Azure.Quantum
             new SubmitterInfo(
                 new Regex(@"\Aqci\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.QCI.Targets.QCIQirSubmitter, Microsoft.Quantum.Providers.QCI",
+                "QirSubmitter"),
+            new SubmitterInfo(
+                new Regex(@"\Aqci\.([\w-_]+\.)*[\w-_]+\z"),
+                "Microsoft.Quantum.Providers.Rigetti.Targets.RigettiQirSubmitter, Microsoft.Quantum.Providers.Rigetti",
                 "QirSubmitter"));
 
         private static readonly ImmutableList<SubmitterInfo> QirPayloadGenerators = ImmutableList.Create(
