@@ -37,7 +37,7 @@ namespace Microsoft.Azure.Quantum
                 "Microsoft.Quantum.Providers.QCI.Targets.QCIQirSubmitter, Microsoft.Quantum.Providers.QCI",
                 "QirSubmitter"),
             new SubmitterInfo(
-                new Regex(@"\Aqci\.([\w-_]+\.)*[\w-_]+\z"),
+                new Regex(@"\Arigetti\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.Rigetti.Targets.RigettiQirSubmitter, Microsoft.Quantum.Providers.Rigetti",
                 "QirSubmitter"));
 
