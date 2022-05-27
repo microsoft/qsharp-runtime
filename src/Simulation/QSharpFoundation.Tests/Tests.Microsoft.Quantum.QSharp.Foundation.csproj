@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.Quantum.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Quantum.Xunit" Version="0.24.210930" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
+  </ItemGroup>
+
+</Project>
