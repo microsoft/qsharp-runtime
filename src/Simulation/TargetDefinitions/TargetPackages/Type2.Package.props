@@ -31,6 +31,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpUtilFromIsing.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\M.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MeasureEachZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MeasureWithNoReuse.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetXExplicit.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetYExplicit.qs" />
