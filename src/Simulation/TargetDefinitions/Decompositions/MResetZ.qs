@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Measurement {
     /// # Output
     /// The result of measuring `target` in the Pauli $Z$ basis.
     @RequiresCapability(
-        "BasicQuantumFunctionality",
+        "BasicExecution",
         "MResetZ is replaced by a supported implementation on all execution targets."
     )
     operation MResetZ (target : Qubit) : Result {

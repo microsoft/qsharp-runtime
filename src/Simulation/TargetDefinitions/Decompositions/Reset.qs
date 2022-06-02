@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit
     /// The qubit whose state is to be reset to $\ket{0}$.
     @RequiresCapability(
-        "BasicQuantumFunctionality",
+        "BasicExecution",
         "Reset is replaced by a supported implementation on all execution targets."
     )
     operation Reset (qubit : Qubit) : Unit {
