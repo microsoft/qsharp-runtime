@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.2.32516.85
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32510.428
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Runtime.Core", "src\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj", "{E9123D45-C1B0-4462-8810-D26ED6D31944}"
 EndProject
@@ -228,6 +228,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageDefinitions", "Packa
 		src\Simulation\TargetDefinitions\TargetPackages\Type3.Package.props = src\Simulation\TargetDefinitions\TargetPackages\Type3.Package.props
 		src\Simulation\TargetDefinitions\TargetPackages\Type4.Package.props = src\Simulation\TargetDefinitions\TargetPackages\Type4.Package.props
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.QSharp.Foundation", "src\Simulation\QSharpFoundation.Tests\Tests.Microsoft.Quantum.QSharp.Foundation.csproj", "{B23962F1-E6DD-4A01-B304-1D5E596117F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -977,6 +979,22 @@ Global
 		{68E86360-B9E6-4282-A27B-2B1C2B0CC025}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{68E86360-B9E6-4282-A27B-2B1C2B0CC025}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{68E86360-B9E6-4282-A27B-2B1C2B0CC025}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Debug|x64.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Release|x64.ActiveCfg = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Release|x64.Build.0 = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1040,6 +1058,7 @@ Global
 		{AFB174AB-C5E1-411C-B5A8-4FA375B55600} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
 		{A3E68578-2DBE-4E32-84BC-9E416AF16B39} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
 		{FA7E8961-9F0E-4D9E-8D81-9B07E9DA29EE} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5} = {03736C2E-DB2A-46A9-B7B2-C1216BDECB4F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}
