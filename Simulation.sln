@@ -147,6 +147,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Decompositions", "Decomposi
 		src\Simulation\TargetDefinitions\Decompositions\I.qs = src\Simulation\TargetDefinitions\Decompositions\I.qs
 		src\Simulation\TargetDefinitions\Decompositions\M.qs = src\Simulation\TargetDefinitions\Decompositions\M.qs
 		src\Simulation\TargetDefinitions\Decompositions\Measure.qs = src\Simulation\TargetDefinitions\Decompositions\Measure.qs
+		src\Simulation\TargetDefinitions\Decompositions\MeasureEachZ.qs = src\Simulation\TargetDefinitions\Decompositions\MeasureEachZ.qs
 		src\Simulation\TargetDefinitions\Decompositions\MeasureWithNoReuse.qs = src\Simulation\TargetDefinitions\Decompositions\MeasureWithNoReuse.qs
 		src\Simulation\TargetDefinitions\Decompositions\MResetX.qs = src\Simulation\TargetDefinitions\Decompositions\MResetX.qs
 		src\Simulation\TargetDefinitions\Decompositions\MResetXExplicit.qs = src\Simulation\TargetDefinitions\Decompositions\MResetXExplicit.qs

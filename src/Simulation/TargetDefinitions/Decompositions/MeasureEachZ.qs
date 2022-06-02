@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Measurement {
     /// This operation does not reset the measured qubits to the |0⟩ state, 
     /// leaving them in the state that corresponds to the measurement results.
     @RequiresCapability(
-        "BasicQuantumFunctionality",
+        "BasicExecution",
         "MeasureEachZ is replaced by a supported implementation on all execution targets."
     )
     operation MeasureEachZ (targets : Qubit[]) : Result[] {
