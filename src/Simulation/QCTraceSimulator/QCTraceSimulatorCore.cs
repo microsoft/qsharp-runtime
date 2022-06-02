@@ -61,7 +61,7 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
     /// </summary>
     public class QCTraceSimulatorCore
     {
-        private readonly IQubitManager qubitManager;
+        private readonly IQubitManager qubitManager = null;
         private readonly bool tracingDataInQubitsIsNeeded = false;
         private readonly QCTraceSimulatorCoreConfiguration configuration;
 
@@ -88,7 +88,8 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
         private readonly uint callStackDepthLimit = uint.MaxValue;
 
         public QCTraceSimulatorCore(
-            QCTraceSimulatorCoreConfiguration config
+            QCTraceSimulatorCoreConfiguration config,
+            IQubitManager customQubitManager = null
             )
         {
             Utils.FillDictionaryForEnumNames<OperationFunctor, OperationFunctor>(functorNames);
@@ -108,7 +109,16 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 tracingDataInQubitsIsNeeded = listenerNeedsTracingData[i] || tracingDataInQubitsIsNeeded;
             }
 
-            qubitManager = (IQubitManager) new TraceableQubitManager(qubitDataInitializers, configuration.OptimizeDepth);
+            if (customQubitManager != null)
+            {
+                qubitManager = customQubitManager;
+            }
+            else
+            {
+                qubitManager = new TraceableQubitManager(configuration.OptimizeDepth);
+            }
+            ((ISetQubitFactory)qubitManager).SetQubitFactory(new TraceableQubitFactory(qubitDataInitializers));
+
             callStackDepthLimit = Math.Max( 1, configuration.CallStackDepthLimit );
         }
 

@@ -73,6 +73,28 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
     }
 
+    operation RestrictedUseSingle() : Unit {
+        body (...){
+            using ((q, aux) = (Qubit(), Qubit())) {
+                CNOT(q, aux);
+                T(q);
+                CNOT(q, aux);
+                ResetAll([q, aux]);
+            }
+        }
+    }
+
+    operation RestrictedUseMultiple() : Unit {
+        body (...){
+            using (register = Qubit[10]) {
+                for (idx in 0..9) {
+                    SomeOp(register[idx]);
+                }
+                ResetAll(register);
+            }
+        }
+    }
+
 
     operation SimultaneousUse() : Unit {
         body (...){

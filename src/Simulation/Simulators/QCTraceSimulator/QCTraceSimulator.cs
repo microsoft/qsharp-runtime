@@ -129,6 +129,12 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators
         /// of the call graph.
         /// </summary>
         public uint CallStackDepthLimit = uint.MaxValue;
+
+        /// <summary>
+        /// Specifies if a qubit manager with restricted reuse should be used to allocate qubits.
+        /// When <c>true</c>, a qubit manager derived from <c>QubitManagerRestrictedReuse</c> is used for tracing.
+        /// </summary>
+        public bool EnableRestrictedReuse = false;
     }
 
     /// <summary>
