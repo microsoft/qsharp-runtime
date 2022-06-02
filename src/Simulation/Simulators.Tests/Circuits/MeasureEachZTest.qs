@@ -23,6 +23,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             set expected w/= i <- One;
             EqualityFactResultArray(MeasureEachZ(qs), expected, $"Qubits state should be |{i + 1}⟩");
         }
+
+        ResetAll(qs);
     }
 
 }
