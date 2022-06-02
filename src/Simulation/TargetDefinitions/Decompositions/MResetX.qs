@@ -22,7 +22,8 @@ namespace Microsoft.Quantum.Measurement {
     /// # Output
     /// The result of measuring `target` in the Pauli $X$ basis.
     @RequiresCapability(
-        "BasicQuantumFunctionality",
+        "Opaque",
+        "Empty",
         "MResetX is replaced by a supported implementation on all execution targets."
     )
     operation MResetX (target : Qubit) : Result {
