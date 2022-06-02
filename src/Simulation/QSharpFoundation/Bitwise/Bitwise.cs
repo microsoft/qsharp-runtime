@@ -49,11 +49,13 @@ namespace Microsoft.Quantum.Bitwise
             static long ParityFunc(long val)
             {
                 // parity function using idea described at http://graphics.stanford.edu/~seander/bithacks.html#ParityMultiply
-                ulong v = System.Convert.ToUInt64(val);
+                ulong v = unchecked((ulong)val);
                 v ^= v >> 1;
                 v ^= v >> 2;
                 v = (v & 0x1111111111111111UL) * 0x1111111111111111UL;
-                return System.Convert.ToInt64((v >> 60) & 1);
+
+                var retVal = unchecked((long)((v >> 60) & 1));
+                return retVal;
             }
 
             public Native(IOperationFactory m) : base(m) { }

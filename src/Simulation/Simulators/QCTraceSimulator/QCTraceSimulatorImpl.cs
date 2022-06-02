@@ -65,7 +65,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
 
         public QCTraceSimulatorImpl() : this(new QCTraceSimulatorConfiguration()) { }
 
-        public QCTraceSimulatorImpl(QCTraceSimulatorConfiguration config, Assembly? coreAssembly = null)
+        public QCTraceSimulatorImpl(QCTraceSimulatorConfiguration config, Assembly? coreAssembly = null):
+            base(CreateQubitManager(config))
         {
             configuration = Utils.DeepClone(config);
             Utils.FillDictionaryForEnumNames<PrimitiveOperationsGroups, int>(primitiveOperationsIdToNames);
@@ -103,12 +104,24 @@ namespace Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators.Implementati
                 }
             }
 
-            tracingCore = new QCTraceSimulatorCore(tCoreConfig);
+            tracingCore = new QCTraceSimulatorCore(tCoreConfig, QubitManager);
 
             OnOperationStart += tracingCore.OnOperationStart;
             OnOperationEnd += tracingCore.OnOperationEnd;
 
             RegisterPrimitiveOperationsGivenAsCircuits(coreAssembly);
+        }
+
+        private static IQubitManager CreateQubitManager(QCTraceSimulatorConfiguration config)
+        {
+            if (config.EnableRestrictedReuse)
+            {
+                return new RestrictedTraceableQubitManager(config.OptimizeDepth);
+            }
+            else
+            {
+                return new TraceableQubitManager(config.OptimizeDepth);
+            }
         }
 
         /// <summary>
