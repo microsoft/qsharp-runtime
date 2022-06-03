@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Diagnostics;
 using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 using NumSharp;
 using static System.Math;
 
