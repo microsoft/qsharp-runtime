@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.Targeting {
     /// This attribute is used internally by the compiler and standard library. Its API is unstable
     /// and should not be used.
     @Attribute()
-    newtype RequiresCapability = (ResultOpacity : String, Classical : String, Reason : String);
+    newtype RequiresCapability = (ResultOpacity : String, ClassicalCompute : String, Reason : String);
 
     /// # Summary
     /// Compiler-recognized attribute for usage within target-specific packages 
