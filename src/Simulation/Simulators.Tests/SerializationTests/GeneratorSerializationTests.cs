@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Text.Json;
+using Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 using NumSharp;
 
 namespace Microsoft.Quantum.Simulation.Simulators.Tests;

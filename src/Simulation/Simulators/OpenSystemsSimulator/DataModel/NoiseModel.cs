@@ -13,7 +13,7 @@ namespace Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 //     System.Text.Json, we use a Newtonsoft converter that delegates to
 //     S.T.Json.
 [Newtonsoft.Json.JsonConverter(typeof(DelegatedConverter<NoiseModel>))]
-public class NoiseModel
+public record NoiseModel
 {
     [JsonPropertyName("initial_state")]
     public State? InitialState { get; set; }
