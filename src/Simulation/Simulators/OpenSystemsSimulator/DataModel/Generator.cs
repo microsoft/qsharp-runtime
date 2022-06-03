@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Quantum.Simulation.OpenSystems.DataModel;
+using Microsoft.Quantum.Simulation.Simulators;
 using NumSharp;
-using static System.Math;
 
-namespace Microsoft.Quantum.Simulation.Simulators;
+// Qualify this import so that Process does not collide with the DataModel
+// definition.
+using Debug = System.Diagnostics.Debug;
+
+namespace Microsoft.Quantum.Simulation.OpenSystems.DataModel;
 
 public record class GeneratorCoset(
     [property: JsonPropertyName("pre")]
