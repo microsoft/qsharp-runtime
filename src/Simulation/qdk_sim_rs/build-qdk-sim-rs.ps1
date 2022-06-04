@@ -26,12 +26,12 @@ Push-Location $PSScriptRoot
     $Env:RUSTFLAGS = "-C control-flow-guard";
 
     # Actually run the build.
-    cargo +nightly build -Z unstable-options @releaseFlag --out-dir "drop";
+    cargo build -Z unstable-options @releaseFlag --out-dir "drop";
 
     # Make sure docs are complete.
     $Env:RUSTDOCFLAGS = "--html-in-header $(Resolve-Path docs-includes/header.html) " + `
                         "--html-after-content $(Resolve-Path docs-includes/after.html)"
-    cargo +nightly doc;
+    cargo doc;
 
     # When building in CI, free disk space by cleaning up.
     # Note that this takes longer, but saves ~1 GB of space.

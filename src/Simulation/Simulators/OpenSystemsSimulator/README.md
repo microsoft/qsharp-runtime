@@ -20,7 +20,7 @@ The core interoperability boundary between the C# runtime for the Quantum Develo
 For example, to use the native API to create a new simulator with a mixed-state representation:
 
 ```csharp
-using static Microsoft.Quantum.Experimental.NativeInterface;
+using static Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulatorNativeInterface;
 
 var simId = Init(initialCapacity: 3, representation: "mixed");
 try

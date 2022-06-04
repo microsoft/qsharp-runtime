@@ -3,11 +3,32 @@
 
 //! Provides common linear algebra functions and traits.
 
-use ndarray::{Array, Array1, Array2, ArrayView1, ArrayView2};
+use cauchy::c64;
+use ndarray::{Array, Array2, ArrayView, ArrayView2};
 use num_traits::Zero;
-use std::{convert::TryInto, ops::Mul};
+use std::convert::TryInto;
 
-use crate::{common_matrices::nq_eye, C64};
+use crate::{common_matrices::nq_eye, error::QdkSimError, C64};
+
+// Define the public API surface for submodules.
+
+mod tensor;
+pub use tensor::*;
+
+mod inv;
+pub use inv::*;
+
+mod pow;
+pub use pow::*;
+
+mod expm;
+pub use expm::*;
+
+pub mod decompositions;
+
+// Define private modules as well.
+
+mod array_ext;
 
 /// Represents types that have hermitian conjugates (e.g.: $A^\dagger$ for
 /// a matrix $A$ is defined as the complex conjugate transpose of $A$,
@@ -53,73 +74,6 @@ impl ConjBy for Array2<C64> {
     }
 }
 
-/// The tensor product operator ($\otimes$).
-pub trait Tensor<Rhs = Self> {
-    /// The resulting type after applying the tensor product.
-    type Output;
-
-    /// Performs the tensor product.
-    ///
-    /// # Example
-    /// ```
-    /// // TODO
-    /// ```
-    fn tensor(self, rhs: Rhs) -> Self::Output;
-}
-
-impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView1<'_, T> {
-    type Output = Array1<T>;
-    fn tensor(self, other: Other) -> Self::Output {
-        let other: Self = other.into();
-        let unflat = Array::from_shape_fn((self.shape()[0], other.shape()[0]), |(i, j)| {
-            self[(i)] * other[(j)]
-        });
-        unflat
-            .into_shape(self.shape()[0] * other.shape()[0])
-            .unwrap()
-    }
-}
-
-impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array1<T> {
-    type Output = Array1<T>;
-
-    fn tensor(self, other: Other) -> Self::Output {
-        let other: Self = other.into();
-        self.view().tensor(other)
-    }
-}
-
-impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for ArrayView2<'_, T> {
-    type Output = Array2<T>;
-    fn tensor(self, other: Other) -> Self::Output {
-        let other: Self = other.into();
-        let unflat = Array::from_shape_fn(
-            (
-                self.shape()[0],
-                other.shape()[0],
-                self.shape()[1],
-                other.shape()[1],
-            ),
-            |(i, j, k, l)| self[(i, k)] * other[(j, l)],
-        );
-        unflat
-            .into_shape((
-                self.shape()[0] * other.shape()[0],
-                self.shape()[1] * other.shape()[1],
-            ))
-            .unwrap()
-    }
-}
-
-impl<Other: Into<Self>, T: Copy + Mul<Output = T>> Tensor<Other> for &Array2<T> {
-    type Output = Array2<T>;
-
-    fn tensor(self, other: Other) -> Self::Output {
-        let other: Self = other.into();
-        self.view().tensor(other).to_owned()
-    }
-}
-
 /// Represents types for which the trace can be computed.
 pub trait Trace {
     /// The type returned by the trace.
@@ -130,7 +84,14 @@ pub trait Trace {
     ///
     /// # Example
     /// ```
-    /// // TODO
+    /// # use ndarray::{Array2, array};
+    /// # use num_traits::Zero;
+    /// # use qdk_sim::linalg::Trace;
+    /// let arr = array![
+    ///     [1.0, 2.0],
+    ///     [3.0, 4.0]
+    /// ];
+    /// assert_eq!(arr.trace(), 5.0);
     /// ```
     fn trace(self) -> Self::Output;
 }
@@ -183,8 +144,31 @@ pub fn extend_two_to_n(
     idx_qubit1: usize,
     idx_qubit2: usize,
     n_qubits: usize,
-) -> Array2<C64> {
-    // TODO: double check that data is 4x4.
+) -> Result<Array2<C64>, QdkSimError> {
+    if data.shape() != [4, 4] {
+        return Err(QdkSimError::misc(format!(
+            "expected 4x4 matrix, but got shape {:?}",
+            data.shape()
+        )));
+    }
+    if idx_qubit1 >= n_qubits {
+        return Err(QdkSimError::misc(format!(
+            "{} is not a valid index for a {}-qubit register",
+            idx_qubit1, n_qubits
+        )));
+    }
+    if idx_qubit2 >= n_qubits {
+        return Err(QdkSimError::misc(format!(
+            "{} is not a valid index for a {}-qubit register",
+            idx_qubit2, n_qubits
+        )));
+    }
+    if idx_qubit1 == idx_qubit2 {
+        return Err(QdkSimError::misc(format!(
+            "Indices {} and {} must be distinct.",
+            idx_qubit1, idx_qubit2
+        )));
+    }
     let mut permutation = Array::from((0..n_qubits).collect::<Vec<usize>>());
     match (idx_qubit1, idx_qubit2) {
         (1, 0) => permutation.swap(0, 1),
@@ -200,8 +184,7 @@ pub fn extend_two_to_n(
 
     // TODO: there is almost definitely a more elegant way to write this.
     if n_qubits == 2 {
-        // TODO[perf]: Eliminate the to_owned here by weakening permute_mtx.
-        permute_mtx(&data.to_owned(), &permutation.to_vec()[..])
+        permute_mtx(&data, &permutation.to_vec()[..])
     } else {
         permute_mtx(
             &data.view().tensor(&nq_eye(n_qubits - 2)),
@@ -213,7 +196,11 @@ pub fn extend_two_to_n(
 /// Given a two-index array (i.e.: a matrix) of dimensions 2^n × 2^n for some
 /// n, permutes the left and right indices of the matrix.
 /// Used to represent, for example, swapping qubits in a register.
-pub fn permute_mtx(data: &Array2<C64>, new_order: &[usize]) -> Array2<C64> {
+pub fn permute_mtx<'a, A: Into<ArrayView2<'a, c64>>>(
+    data: A,
+    new_order: &[usize],
+) -> Result<Array2<C64>, QdkSimError> {
+    let data: ArrayView2<c64> = data.into();
     // Check that data is square.
     let (n_rows, n_cols) = (data.shape()[0], data.shape()[1]);
     assert_eq!(n_rows, n_cols);
@@ -233,18 +220,22 @@ pub fn permute_mtx(data: &Array2<C64>, new_order: &[usize]) -> Array2<C64> {
         .take(2 * n_qubits)
         .copied()
         .collect();
-    // FIXME: make this a result and propagate the result out to the return.
-    let tensor = data.clone().into_shared().reshape(new_dims);
+    let tensor = data.into_shape(new_dims)?;
     let mut permutation = new_order.to_vec();
     permutation.extend(new_order.to_vec().iter().map(|idx| idx + n_qubits));
     let permuted = tensor.permuted_axes(permutation);
 
     // Finish by collapsing back down.
-    permuted.reshape([n_rows, n_rows]).into_owned()
+    let data_out = permuted.to_shape([n_rows, n_rows])?;
+    Ok(data_out.into_owned())
 }
 
 /// Returns a new array of the same type and shape as a given array, but
 /// containing only zeros.
-pub fn zeros_like<T: Clone + Zero, Ix: ndarray::Dimension>(data: &Array<T, Ix>) -> Array<T, Ix> {
+pub fn zeros_like<'a, A, T: 'a + Clone + Zero, Ix: ndarray::Dimension>(data: A) -> Array<T, Ix>
+where
+    A: Into<ArrayView<'a, T, Ix>>,
+{
+    let data = data.into();
     Array::zeros(data.dim())
 }

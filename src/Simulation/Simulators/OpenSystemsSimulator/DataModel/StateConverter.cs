@@ -1,81 +1,75 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-#nullable enable
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using NumSharp;
-using static System.Math;
-
-namespace Microsoft.Quantum.Experimental
+using Microsoft.Quantum.Simulation.Simulators;
+namespace Microsoft.Quantum.Simulation.OpenSystems.DataModel;
+public class StateConverter : JsonConverter<State>
 {
-    public class StateConverter : JsonConverter<State>
-    {
 
-        /*
-         We expect JSON of the form:
+    /*
+        We expect JSON of the form:
 
-             {
-                 "n_qubits": 1,
-                 "data": {
-                     "Mixed": {
-                         "v": 1,
-                         "dim": [2, 2],
-                         "data": [
-                             [1, 0],
-                             [0, 0],
-                             [0, 0],
-                             [0, 0]
-                         ]
-                     }
-                 }
-             }
-
-        Here, the presence of either $.data.Mixed or $.data.Pure tells us how
-        to interpret data.
-        */
-
-        public override State Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            reader.Require(JsonTokenType.StartObject, read: false);
-
-            var arrayConverter = new ComplexArrayConverter();
-            return reader.ReadQubitSizedData<State>((ref Utf8JsonReader reader, string kind) =>
-                kind switch
-                {
-                    "Pure" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
-                        (int nQubits, NDArray data) => new PureState(nQubits, data)
-                    ),
-                    "Mixed" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
-                        (int nQubits, NDArray data) => new MixedState(nQubits, data)
-                    ),
-                    "Stabilizer" => JsonSerializer.Deserialize<StabilizerState>(ref reader).Bind(
-                        (int nQubits, StabilizerState state) =>
-                        {
-                            System.Diagnostics.Debug.Assert((state?.Data as object) != null);
-                            System.Diagnostics.Debug.Assert(nQubits == state.NQubits);
-                            return state;
-                        }
-                    ),
-                    _ => throw new JsonException($"Unknown state kind {kind}.")
+            {
+                "n_qubits": 1,
+                "data": {
+                    "Mixed": {
+                        "v": 1,
+                        "dim": [2, 2],
+                        "data": [
+                            [1, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0]
+                        ]
+                    }
                 }
-            );
-        }
+            }
 
-        public override void Write(Utf8JsonWriter writer, State value, JsonSerializerOptions options)
+    Here, the presence of either $.data.Mixed or $.data.Pure tells us how
+    to interpret data.
+    */
+
+    public override State Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        reader.Require(JsonTokenType.StartObject, readCurrent: false);
+
+        var arrayConverter = new ComplexArrayConverter();
+        return reader.ReadQubitSizedData<State>((ref Utf8JsonReader reader, string kind) =>
+            kind switch
+            {
+                "Pure" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
+                    (int nQubits, NDArray data) => new PureState(nQubits, data)
+                ),
+                "Mixed" => arrayConverter.Read(ref reader, typeof(NDArray), options).Bind(
+                    (int nQubits, NDArray data) => new MixedState(nQubits, data)
+                ),
+                "Stabilizer" => JsonSerializer.Deserialize<StabilizerState>(ref reader).Bind(
+                    (int nQubits, StabilizerState? state) =>
+                    {
+                        System.Diagnostics.Debug.Assert((state?.Data as object) != null);
+                        System.Diagnostics.Debug.Assert(nQubits == state.NQubits);
+                        return state;
+                    }
+                ),
+                _ => throw new JsonException($"Unknown state kind {kind}.")
+            }
+        );
+    }
+
+    public override void Write(Utf8JsonWriter writer, State value, JsonSerializerOptions options)
+    {
+        try
         {
-            var arrayConverter = new ComplexArrayConverter();
-
-            writer.WriteStartObject();
+            using (writer.WriteObject())
+            {
                 writer.WriteNumber("n_qubits", value.NQubits);
 
                 writer.WritePropertyName("data");
-                writer.WriteStartObject();
+                using (writer.WriteObject())
+                {
                     writer.WritePropertyName(
                         value switch
                         {
@@ -88,25 +82,34 @@ namespace Microsoft.Quantum.Experimental
 
                     if (value is ArrayState { Data: var data })
                     {
-                        arrayConverter.Write(writer, data, options);
+                        new ComplexArrayConverter().Write(writer, data, options);
                     }
                     else if (value is StabilizerState stabilizerState)
                     {
-                        var array = new StabilizerState.TableArray
+                        if (stabilizerState.Data is null)
                         {
-                            Data = stabilizerState.Data.flat.ToArray<bool>().ToList(),
-                            Dimensions = stabilizerState.Data.Shape.Dimensions.ToList()
-                        };
-                        writer.WriteStartObject();
+                            throw new JsonException("Failure serializing stabilizer state as JSON: did not expect Data to be null.");
+                        }
+                        var array = new StabilizerState.TableArray(
+                            Data: stabilizerState.Data.flat.ToArray<bool>().ToList(),
+                            Dimensions: stabilizerState.Data.Shape.Dimensions.ToList()
+                        );
+                        using (writer.WriteObject())
+                        {
                             writer.WritePropertyName("n_qubits");
                             writer.WriteNumberValue(stabilizerState.NQubits);
                             writer.WritePropertyName("table");
                             JsonSerializer.Serialize(writer, array);
-                        writer.WriteEndObject();
+                        }
                     }
-                writer.WriteEndObject();
-            writer.WriteEndObject();
+                }
+            }
+        }
+        finally
+        {
+            // Since there's a few places we can throw an exception here, we'll
+            // make sure to flush in those cases.
+            writer.Flush();
         }
     }
-
 }

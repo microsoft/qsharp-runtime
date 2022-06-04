@@ -461,7 +461,8 @@ namespace Microsoft.Quantum.Simulation.Common
                 throw new ArgumentException("Attempt to free qubit that has not been allocated.");
             }
 
-            if (EncourageReuse) { 
+            if (EncourageReuse)
+            { 
                 qubits[qubit.Id] = free;
                 free = qubit.Id;
             } 

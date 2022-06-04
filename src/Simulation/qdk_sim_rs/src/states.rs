@@ -7,6 +7,7 @@ use crate::linalg::Trace;
 use crate::states::StateData::{Mixed, Pure, Stabilizer};
 use crate::tableau::Tableau;
 use crate::QubitSized;
+use crate::VariantName;
 use crate::C64;
 use core::fmt::Display;
 use ndarray::{Array1, Array2, Axis};
@@ -46,6 +47,16 @@ impl Display for State {
             },
             self.data
         )
+    }
+}
+
+impl VariantName for State {
+    fn variant_name(&self) -> &'static str {
+        match self.data {
+            StateData::Pure(_) => "Pure",
+            StateData::Mixed(_) => "Mixed",
+            StateData::Stabilizer(_) => "Stabilizer",
+        }
     }
 }
 
