@@ -48,7 +48,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    operation CR1(theta : Double, control : Qubit, target : Qubit) : Unit is Adj {
+    internal operation CR1(theta : Double, control : Qubit, target : Qubit) : Unit is Adj {
         Rz(theta/2.0, target);
         Rz(theta/2.0, control);
         CNOT(control,target);

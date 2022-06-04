@@ -40,7 +40,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
+    internal operation ApplyGlobalPhase (theta : Double) : Unit is Ctl + Adj {
         body (...) {}
         controlled (ctls, (...)) {
             if Length(ctls) == 0 {

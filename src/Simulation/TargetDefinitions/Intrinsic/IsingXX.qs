@@ -25,7 +25,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// The first qubit input to the gate.
     /// ## qubit1
     /// The second qubit input to the gate.
-    operation IsingXX (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+    internal operation IsingXX (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
         body intrinsic;
     }
 }

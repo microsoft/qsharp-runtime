@@ -1,9 +1,8 @@
-<Project Sdk="Microsoft.Quantum.Sdk">
+﻿<Project Sdk="Microsoft.Quantum.Sdk">
   <Import Project="..\TargetDefinitions\TargetPackages\QSharpCore.Package.props" />
 
   <PropertyGroup>
     <Description>Core support for the Q# programming language.</Description>
-    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
   </PropertyGroup>
   
   <ItemGroup>

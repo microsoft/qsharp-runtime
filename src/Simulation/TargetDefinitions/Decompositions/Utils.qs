@@ -4,7 +4,7 @@
 namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Measurement;
 
-    operation SpreadZ (from : Qubit, to : Qubit[]) : Unit is Adj {
+    internal operation SpreadZ (from : Qubit, to : Qubit[]) : Unit is Adj {
         if (Length(to) > 0) {
             CNOT(to[0], from);
             if (Length(to) > 1) {
@@ -15,7 +15,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    operation MapPauli (qubit : Qubit, from : Pauli, to : Pauli) : Unit is Adj {
+    internal operation MapPauli (qubit : Qubit, from : Pauli, to : Pauli) : Unit is Adj {
         if (from == to) {
         }
         elif ((from == PauliZ and to == PauliX) or (from == PauliX and to == PauliZ)) {
@@ -42,7 +42,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    operation EntangleForJointMeasure(basis : Pauli, aux : Qubit, qubit : Qubit) : Unit {
+    internal operation EntangleForJointMeasure(basis : Pauli, aux : Qubit, qubit : Qubit) : Unit {
         if basis == PauliX {
             Controlled X([aux], qubit);
         }
@@ -62,7 +62,7 @@ namespace Microsoft.Quantum.Intrinsic {
     ///
     /// For example, if the controls list is 6 qubits, the auxiliary list must be 5 qubits, and the
     /// state from the 6 control qubits will be collected into the last qubit of the auxiliary array.
-    operation CollectControls(ctls : Qubit[], aux : Qubit[], adjustment : Int) : Unit is Adj {
+    internal operation CollectControls(ctls : Qubit[], aux : Qubit[], adjustment : Int) : Unit is Adj {
         // First collect the controls into the first part of the auxiliary list.
         for i in 0..2..(Length(ctls) - 2) {
             PhaseCCX(ctls[i], ctls[i + 1], aux[i / 2]);
@@ -77,13 +77,13 @@ namespace Microsoft.Quantum.Intrinsic {
 
     /// When collecting controls, if there is an uneven number of original control qubits then the
     /// last control and the second to last auxiliary will be collected into the last auxiliary.
-    operation AdjustForSingleControl(ctls : Qubit[], aux : Qubit[]) : Unit is Adj {
+    internal operation AdjustForSingleControl(ctls : Qubit[], aux : Qubit[]) : Unit is Adj {
         if Length(ctls) % 2 != 0 {
             PhaseCCX(ctls[Length(ctls) - 1], aux[Length(ctls) - 3], aux[Length(ctls) - 2]);
         }
     }
 
-    operation PhaseCCX (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
+    internal operation PhaseCCX (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
         // https://arxiv.org/pdf/1210.0974.pdf#page=2
         H(target);
         CNOT(target,control1);
@@ -98,7 +98,7 @@ namespace Microsoft.Quantum.Intrinsic {
         H(target);
     }
 
-    operation CCZ (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
+    internal operation CCZ (control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
         // [Page 15 of arXiv:1206.0758v3](https://arxiv.org/pdf/1206.0758v3.pdf#page=15)
         Adjoint T(control1);
         Adjoint T(control2);
@@ -115,7 +115,7 @@ namespace Microsoft.Quantum.Intrinsic {
         CNOT(control2, control1);
     }
 
-    function ReducedDyadicFraction (numerator : Int, denominatorPowerOfTwo : Int) : (Int, Int) {
+    internal function ReducedDyadicFraction (numerator : Int, denominatorPowerOfTwo : Int) : (Int, Int) {
         if (numerator == 0) { return (0,0); }
         mutable num = numerator;
         mutable denPow = denominatorPowerOfTwo;
@@ -126,7 +126,7 @@ namespace Microsoft.Quantum.Intrinsic {
         return (num,denPow);
     }
 
-    function ReducedDyadicFractionPeriodic (numerator : Int, denominatorPowerOfTwo : Int) : (Int, Int) {
+    internal function ReducedDyadicFractionPeriodic (numerator : Int, denominatorPowerOfTwo : Int) : (Int, Int) {
         let (k,n) = ReducedDyadicFraction(numerator,denominatorPowerOfTwo); // k is odd, or (k,n) are both 0
         let period = 2*2^n; // \pi k / 2^n is 2\pi periodic, therefore k is 2 * 2^n periodic
         let kMod = k % period; // if k was negative, we get kMod in a range [-period + 1, 0]
@@ -136,7 +136,7 @@ namespace Microsoft.Quantum.Intrinsic {
 
     // TODO(swernli): Consider removing this in favor of pulling Microsoft.Quantum.Arrays.Subarray
     // into the runtime.
-    function Subarray<'T> (indices : Int[], array : 'T[]) : 'T[] {
+    internal function Subarray<'T> (indices : Int[], array : 'T[]) : 'T[] {
         let nSliced = Length(indices);
         mutable sliced = new 'T[nSliced];
 
@@ -147,7 +147,7 @@ namespace Microsoft.Quantum.Intrinsic {
         return sliced;
     }
 
-    function IndicesOfNonIdentity (paulies : Pauli[]) : Int[] {
+    internal function IndicesOfNonIdentity (paulies : Pauli[]) : Int[] {
         mutable nonIdPauliCount = 0;
 
         for i in 0 .. Length(paulies) - 1 {
@@ -167,7 +167,7 @@ namespace Microsoft.Quantum.Intrinsic {
         return indices;
     }
 
-    function RemovePauliI (paulis : Pauli[], qubits : Qubit[]) : (Pauli[], Qubit[]) {
+    internal function RemovePauliI (paulis : Pauli[], qubits : Qubit[]) : (Pauli[], Qubit[]) {
         let indices = IndicesOfNonIdentity(paulis);
         let newPaulis = Subarray(indices, paulis);
         let newQubits = Subarray(indices, qubits);
