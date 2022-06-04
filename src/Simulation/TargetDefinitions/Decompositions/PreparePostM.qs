@@ -3,7 +3,7 @@
 
 namespace Microsoft.Quantum.Intrinsic {
 
-    operation PreparePostM(result : Result, qubit : Qubit) : Unit {
+    internal operation PreparePostM(result : Result, qubit : Qubit) : Unit {
         // This platform requires reset after measurement, and then must
         // re-prepare the measured state in the qubit.
         Reset(qubit);

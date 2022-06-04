@@ -51,7 +51,7 @@ namespace Microsoft.Quantum.Intrinsic {
         adjoint self;
     }
 
-    operation CCY(control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
+    internal operation CCY(control1 : Qubit, control2 : Qubit, target : Qubit) : Unit is Adj {
         within {
             MapPauli(target, PauliZ, PauliY);
         }

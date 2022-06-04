@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.Intrinsic {
         }
     }
 
-    operation ApplyGlobalPhaseFracWithR1Frac (numerator : Int, power : Int) : Unit is Adj + Ctl {
+    internal operation ApplyGlobalPhaseFracWithR1Frac (numerator : Int, power : Int) : Unit is Adj + Ctl {
         body (...) {}
         controlled (ctrls, ...) {
             let numControls =  Length(ctrls);

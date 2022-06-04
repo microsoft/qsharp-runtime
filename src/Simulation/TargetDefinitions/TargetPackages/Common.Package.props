@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <IsTargetPackage>true</IsTargetPackage>
     <PackageTags>Quantum Q# QSharp</PackageTags>
   </PropertyGroup>
 

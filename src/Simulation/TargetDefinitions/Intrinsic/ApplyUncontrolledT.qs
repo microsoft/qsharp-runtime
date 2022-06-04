@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit
     /// Qubit to which the gate should be applied.
     @TargetInstruction("t__body")
-    operation ApplyUncontrolledT (qubit : Qubit) : Unit {
+    internal operation ApplyUncontrolledT (qubit : Qubit) : Unit {
         body intrinsic;
     }
 }
