@@ -69,7 +69,7 @@ namespace Microsoft.Quantum.AutoSubstitution.Testing
 
         private QsCompilation CreateCompilation(params string[] fileNames)
         {
-            var mgr = new CompilationUnitManager();
+            var mgr = new CompilationUnitManager(ProjectProperties.Empty);
             var files = CreateFileManager(fileNames);
             mgr.AddOrUpdateSourceFilesAsync(files).Wait();
             return mgr.Build().BuiltCompilation;
