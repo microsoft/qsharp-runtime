@@ -8,37 +8,68 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
     using System.Diagnostics;
     using Microsoft.Quantum.Simulation.Common;
 
+    public interface ISetQubitFactory
+    {
+        public void SetQubitFactory(TraceableQubitFactory traceableQubitFactory);
+    }
+
+
     /// <summary>
     /// Qubit manager for TraceableQubit type. Ensures that all the traceable 
     /// qubits are configured as requested during qubit manage construction.
     /// </summary>
-    class TraceableQubitManager : QubitManager
-    {
-        const long NumQubits = 1024;
+    public class TraceableQubitManager : QubitManager, ISetQubitFactory {
+        new const long NumQubits = 1024;
 
-        private Func<long, object>[] qubitTraceDataInitializers; // call-backs to initialize tracer data for each of the tracing components
-        private readonly int traceDataSize;
+        TraceableQubitFactory qubitFactory = null;
 
         /// <summary>
         /// The qubit manager makes sure that trace data array for qubits 
         /// is initialized with objects created by qubitTraceDataInitializers callbacks
         /// </summary>
-        public TraceableQubitManager( Func<long,object>[] qubitTraceDataInitializers, bool optimizeDepth ) 
+        public TraceableQubitManager(bool optimizeDepth) 
             : base(NumQubits, mayExtendCapacity : true, disableBorrowing : false, encourageReuse: !optimizeDepth)
         {
-            this.qubitTraceDataInitializers = qubitTraceDataInitializers.Clone() as
-                Func<long, object>[];
-            traceDataSize = this.qubitTraceDataInitializers.Length;
+        }
+
+        public void SetQubitFactory(TraceableQubitFactory traceableQubitFactory) {
+            if (qubitFactory != null) {
+                throw new ApplicationException("Cannot replace existing qubit factory.");
+            }
+            qubitFactory = traceableQubitFactory;
         }
 
         public override Qubit CreateQubitObject(long id)
         {
-            TraceableQubit q = new TraceableQubit((int)id, traceDataSize);
-            for (int j = 0; j < traceDataSize; ++j)
-            {
-                q.TraceData[j] = qubitTraceDataInitializers[j](id);
-            }
-            return q;
+            return qubitFactory.CreateQubitObject(id);
         }
     }
+
+    public class RestrictedTraceableQubitManager : QubitManagerRestrictedReuse, ISetQubitFactory {
+        const long NumQubits = 1024;
+
+        TraceableQubitFactory qubitFactory = null;
+
+        /// <summary>
+        /// The qubit manager makes sure that trace data array for qubits 
+        /// is initialized with objects created by qubitTraceDataInitializers callbacks
+        /// </summary>
+        public RestrictedTraceableQubitManager(bool optimizeDepth)
+            : base(NumQubits, mayExtendCapacity: true, disableBorrowing: false, encourageReuse: !optimizeDepth)
+        {
+        }
+
+        public void SetQubitFactory(TraceableQubitFactory traceableQubitFactory) {
+            if (qubitFactory != null) {
+                throw new ApplicationException("Cannot replace existing qubit factory.");
+            }
+            qubitFactory = traceableQubitFactory;
+        }
+
+        public override Qubit CreateQubitObject(long id)
+        {
+            return qubitFactory.CreateQubitObject(id);
+        }
+    }
+
 }

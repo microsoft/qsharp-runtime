@@ -55,7 +55,8 @@ let private compileQSharp source =
     let fileManager name content =
         CompilationUnitManager.InitializeFileManager (uri name, content)
 
-    use compilationManager = new CompilationUnitManager (isExecutable = true)
+    let props = dict [ MSBuildProperties.ResolvedQsharpOutputType, AssemblyConstants.QsharpExe ] |> ProjectProperties
+    use compilationManager = new CompilationUnitManager (props)
     let fileManagers = ImmutableHashSet.Create (fileManager coreFile (File.ReadAllText coreFile),
                                                 fileManager intrinsicFile (File.ReadAllText intrinsicFile),
                                                 fileManager testFile source)

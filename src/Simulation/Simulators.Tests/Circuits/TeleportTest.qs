@@ -7,8 +7,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
 
     @Test("QuantumSimulator")
     @Test("SparseSimulator")
-    // TODO: Disabled until we have a noise model for Rz.
-    // @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     operation TestTeleport() : Unit {
         use q1 = Qubit();
         use q2 = Qubit();
@@ -39,7 +38,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
             fail "Expected Zero after teleportation, but got One.";
         }
 
-        // Make sure all allocated qubits are retrurned to zero before release
+        // Make sure all allocated qubits are returned to zero before release
         ResetAll([q1, q2, q3]);
     }
 

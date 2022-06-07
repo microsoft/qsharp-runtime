@@ -3,7 +3,7 @@
 
 // NB: Copied from Utils.qs.
 namespace Microsoft.Quantum.Experimental.Decompositions {
-    open Microsoft.Quantum.Experimental.Native as Native;
+    open Microsoft.Quantum.Simulation.Simulators.NativeInterface as Native;
 
     /// Given a multiply-controlled operation that requires k controls 
     /// applies it using ceiling(k/2) controls and using floor(k/2) temporary qubits

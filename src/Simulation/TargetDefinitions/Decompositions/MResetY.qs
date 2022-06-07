@@ -22,7 +22,8 @@ namespace Microsoft.Quantum.Measurement {
     /// # Output
     /// The result of measuring `target` in the Pauli $Y$ basis.
     @RequiresCapability(
-        "BasicQuantumFunctionality",
+        "Opaque",
+        "Empty",
         "MResetY is replaced by a supported implementation on all execution targets."
     )
     operation MResetY (target : Qubit) : Result {

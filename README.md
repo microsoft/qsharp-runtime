@@ -26,7 +26,7 @@ You may also visit our [Quantum](https://github.com/microsoft/quantum) repositor
 
 [![Build Status](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_apis/build/status/microsoft.qsharp-runtime?branchName=main)](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_build/latest?definitionId=15&branchName=main)
 
-Note that when building from source, this repository is configured so that .NET Core will automatically look at the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) in addition to any other feeds you may have configured.
+Note that when building from source, this repository is configured so that .NET will automatically look at the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) in addition to any other feeds you may have configured.
 
 Building **QIR Runtime** isn't enabled by default yet. Please see [its readme](./src/Qir/Runtime/README.md) for details.
 
@@ -35,11 +35,12 @@ Building **QIR Runtime** isn't enabled by default yet. Please see [its readme](.
 To build on Windows:
 
 1. Install the pre-reqs:
-    * Install [CMake](https://cmake.org/install/)
-    * Install [Visual Studio 2019 (version 16.3 or later)](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
+    * Install [CMake](https://cmake.org/install/) 3.20 or newer.
+    * Install [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
-        * **From the Individual Components tab in VS Installer add Spectre-mitigated libs that match your C++ build tools version**
-        * **.NET Core 3 cross-platform development**
+        * **Spectre-mitigated libraries. Once Visual Studio has been installed, using the installer for the VS version of interest,
+          click the"Modify" button, go to the "Individual Components" tab, search for "spectre", select the latest version of "MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs", and click the "Modify" button to install the selected components**
+        * **.NET 6.0 Runtime**
 2. Run [bootstrap.ps1](bootstrap.ps1) from PowerShell
     * pre-req (in PowerShell): `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
     * The script might install additional tools (a specific compiler, build tools, etc)
@@ -55,30 +56,56 @@ The `Simulation.sln` solution does not include the full-state quantum simulator.
 To build on other platforms:
 
 1. Install the pre-reqs:
-    * Install [CMake](https://cmake.org/install/)
-    * Install [.NET Core 3 SDK](https://dotnet.microsoft.com/download)
+    * Install [CMake](https://cmake.org/install/) 3.20 or newer
+    * Install [.NET 6.0](https://dotnet.microsoft.com/download) (version lower than 6.0.300 is recommended)
     * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
       * Install [`libomp`](https://openmp.llvm.org) needed for the native (C++) full-state simulator.
-      * The build does not accept `dotnet-*-5.0` packages, install `dotnet-*-3.1`
-        (`sudo apt-get install dotnet-sdk-3.1`). The possible result can be:
+        `sudo apt install libomp-13-dev`. The possible result can be as in listing A below.
+      * .NET 6.0: `sudo apt install dotnet-sdk-6.0 dotnet-runtime-6.0`. The possible result can be as in listing B below.
 
-```sh
-qsharp-runtime$ dpkg -l *dotnet*
-Desired=Unknown/Install/Remove/Purge/Hold
-| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
-|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
-||/ Name                      Version      Architecture Description
-+++-=========================-============-============-=================================================================
-un  dotnet                    <none>       <none>       (no description available)
-ii  dotnet-apphost-pack-3.1   3.1.13-1     amd64        Microsoft.NETCore.App.Host 3.1.13
-ii  dotnet-host               5.0.4-1      amd64        Microsoft .NET Host - 5.0.4
-ii  dotnet-hostfxr-3.1        3.1.13-1     amd64        Microsoft .NET Core Host FX Resolver - 3.1.13 3.1.13
-un  dotnet-nightly            <none>       <none>       (no description available)
-ii  dotnet-runtime-3.1        3.1.13-1     amd64        Microsoft .NET Core Runtime - 3.1.13 Microsoft.NETCore.App 3.1.13
-ii  dotnet-runtime-deps-3.1   3.1.13-1     amd64        dotnet-runtime-deps-3.1 3.1.13
-ii  dotnet-sdk-3.1            3.1.407-1    amd64        Microsoft .NET Core SDK 3.1.407
-ii  dotnet-targeting-pack-3.1 3.1.0-1      amd64        Microsoft.NETCore.App.Ref 3.1.0
+Listing A.
+
+```bash
+# In an empty directory:
+dpkg -l *libomp*
+
+# Desired=Unknown/Install/Remove/Purge/Hold
+# | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+# |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+# ||/ Name             Version                                                         Architecture Description
+# +++-================-===============================================================-============-=================================
+# un  libomp-11-dev    <none>                                                          <none>       (no description available)
+# ii  libomp-13-dev    1:13.0.1~++20220120110924+75e33f71c2da-1~exp1~20220120231001.58 amd64        LLVM OpenMP runtime - dev package
+# un  libomp-13-doc    <none>                                                          <none>       (no description available)
+# un  libomp-dev       <none>                                                          <none>       (no description available)
+# un  libomp-x.y       <none>                                                          <none>       (no description available)
+# un  libomp-x.y-dev   <none>                                                          <none>       (no description available)
+# un  libomp5          <none>                                                          <none>       (no description available)
+# ii  libomp5-13:amd64 1:13.0.1~++20220120110924+75e33f71c2da-1~exp1~20220120231001.58 amd64        LLVM OpenMP runtime
 ```
+
+Listing B.
+
+```bash
+# In an empty directory:
+dpkg -l *dotnet*
+
+# Desired=Unknown/Install/Remove/Purge/Hold
+# | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+# |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+# ||/ Name                      Version      Architecture Description
+# +++-=========================-============-============-=======================================
+# un  dotnet                    <none>       <none>       (no description available)
+# ii  dotnet-apphost-pack-6.0   6.0.5-1      amd64        Microsoft.NETCore.App.Host 6.0.5
+# ii  dotnet-host               6.0.5-1      amd64        Microsoft .NET Host - 6.0.5
+# ii  dotnet-hostfxr-6.0        6.0.5-1      amd64        Microsoft .NET Host FX Resolver - 6.0.5
+# un  dotnet-nightly            <none>       <none>       (no description available)
+# ii  dotnet-runtime-6.0        6.0.5-1      amd64        Microsoft.NETCore.App.Runtime 6.0.5
+# ii  dotnet-runtime-deps-6.0   6.0.5-1      amd64        dotnet-runtime-deps-debian 6.0.5
+# ii  dotnet-sdk-6.0            6.0.300-1    amd64        Microsoft .NET SDK 6.0.300
+# ii  dotnet-targeting-pack-6.0 6.0.5-1      amd64        Microsoft.NETCore.App.Ref 6.0.5
+```
+
 2. Run [bootstrap.ps1](./bootstrap.ps1)
     * The script might install additional tools (a specific compiler, build tools, etc)
     * Then it builds release flavor of the native (C++) full-state simulator and debug flavor of the Simulation solution.
