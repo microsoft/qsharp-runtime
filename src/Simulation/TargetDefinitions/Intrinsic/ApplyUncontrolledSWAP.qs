@@ -35,7 +35,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// CNOT(qubit1, qubit2);
     /// ```
     @TargetInstruction("swap__body")
-    operation ApplyUncontrolledSWAP (qubit1 : Qubit, qubit2 : Qubit) : Unit is Adj {
+    internal operation ApplyUncontrolledSWAP (qubit1 : Qubit, qubit2 : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;
     }

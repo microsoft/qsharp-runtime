@@ -5,7 +5,7 @@
   <Import Project="..\Common\Simulators.Dev.props" />
 
   <PropertyGroup>
-    <LanguageVersion>8.0</LanguageVersion>
+    <LanguageVersion>10.0</LanguageVersion>
     <Nullable>enable</Nullable>
     <TargetFramework>netstandard2.1</TargetFramework>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
@@ -24,8 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="4.7.2" />
+    <PackageReference Include="System.Text.Json" Version="6.0.3" />
     <PackageReference Include="NumSharp" Version="0.20.5" />
   </ItemGroup>
 

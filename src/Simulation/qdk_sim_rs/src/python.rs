@@ -26,7 +26,7 @@ fn _qdk_sim_rs(_py: Python, m: &PyModule) -> PyResult<()> {
         // TODO[code quality]: Deduplicate this with the
         // version in the c_api module.
         let build_info = json!({
-            "name": "Microsoft.Quantum.Experimental.Simulators",
+            "name": "Microsoft.Quantum.QdkSimRs",
             "version": built_info::PKG_VERSION,
             "opt_level": built_info::OPT_LEVEL,
             "features": built_info::FEATURES,

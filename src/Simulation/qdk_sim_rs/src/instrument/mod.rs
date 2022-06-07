@@ -1,16 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+use crate::error::QdkSimError;
 use crate::{states::StateData::Mixed, StateData};
-use crate::{Process, ProcessData, C64};
-use num_traits::{One, Zero};
+use crate::{Process, VariantName};
+
 use rand::Rng;
 use std::iter::Iterator;
 
 use crate::linalg::Trace;
 use crate::State;
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+
+mod common;
+pub use common::*;
+
+static IDEAL_Z_MEAS: Lazy<Instrument> = Lazy::new(Instrument::ideal_z_meas);
 
 // TODO[design]: Instrument works pretty differently from State and Process; should
 //               likely refactor for consistency.
@@ -38,38 +45,28 @@ pub enum Instrument {
 impl Instrument {
     /// Samples from this instrument, returning the measurement result and
     /// the new state of the system conditioned on that measurement result.
-    pub fn sample(&self, idx_qubits: &[usize], state: &State) -> (usize, State) {
+    pub fn sample(
+        &self,
+        idx_qubits: &[usize],
+        state: &State,
+    ) -> Result<(usize, State), QdkSimError> {
         match self {
             Instrument::Effects(ref effects) => sample_effects(effects, idx_qubits, state),
             Instrument::ZMeasurement { pr_readout_error } => {
                 if idx_qubits.len() != 1 {
-                    panic!("Z-basis measurement instruments only supported for single qubits.");
+                    return Err(QdkSimError::misc(
+                        "Z-basis measurement instruments only supported for single qubits.",
+                    ));
                 }
                 let idx_target = idx_qubits[0];
                 match state.data {
                     StateData::Pure(_) | StateData::Mixed(_) => {
                         // Get the ideal Z measurement instrument, apply it,
                         // and then assign a readout error.
-                        // TODO[perf]: Cache this instrument as a lazy static.
-                        let ideal_z_meas = Instrument::Effects(vec![
-                            Process {
-                                n_qubits: 1,
-                                data: ProcessData::KrausDecomposition(array![[
-                                    [C64::one(), C64::zero()],
-                                    [C64::zero(), C64::zero()]
-                                ]]),
-                            },
-                            Process {
-                                n_qubits: 1,
-                                data: ProcessData::KrausDecomposition(array![[
-                                    [C64::zero(), C64::zero()],
-                                    [C64::zero(), C64::one()]
-                                ]]),
-                            },
-                        ]);
-                        let (result, new_state) = ideal_z_meas.sample(idx_qubits, state);
+                        let ideal_z_meas = &*IDEAL_Z_MEAS;
+                        let (result, new_state) = ideal_z_meas.sample(idx_qubits, state)?;
                         let result = (result == 1) ^ rand::thread_rng().gen_bool(*pr_readout_error);
-                        (if result { 1 } else { 0 }, new_state)
+                        Ok((if result { 1 } else { 0 }, new_state))
                     }
                     StateData::Stabilizer(ref tableau) => {
                         // TODO[perf]: allow instruments to sample in-place,
@@ -77,20 +74,18 @@ impl Instrument {
                         let mut new_tableau = tableau.clone();
                         let result = new_tableau.meas_mut(idx_target)
                             ^ rand::thread_rng().gen_bool(*pr_readout_error);
-                        (
+                        Ok((
                             if result { 1 } else { 0 },
                             State {
                                 n_qubits: state.n_qubits,
                                 data: StateData::Stabilizer(new_tableau),
                             },
-                        )
+                        ))
                     }
                 }
             }
         }
     }
-
-    // TODO: Add more methods for making new instruments in convenient ways.
 
     /// Returns a serialization of this instrument as a JSON object.
     pub fn as_json(&self) -> String {
@@ -98,7 +93,11 @@ impl Instrument {
     }
 }
 
-fn sample_effects(effects: &[Process], idx_qubits: &[usize], state: &State) -> (usize, State) {
+fn sample_effects(
+    effects: &[Process],
+    idx_qubits: &[usize],
+    state: &State,
+) -> Result<(usize, State), QdkSimError> {
     let mut possible_outcomes = effects
         .iter()
         .enumerate()
@@ -137,16 +136,22 @@ fn sample_effects(effects: &[Process], idx_qubits: &[usize], state: &State) -> (
                 if let Mixed(ref rho) = output_state.data {
                     output_state.data = Mixed(rho * (1.0f64 / tr));
                 } else {
-                    panic!("Couldn't renormalize, expected mixed output from instrument.");
+                    return Err(QdkSimError::misc(format!(
+                        "Couldn't renormalize, expected mixed output from instrument, but got {}.",
+                        output_state.variant_name()
+                    )));
                 }
             }
-            assert!(
-                (output_state.trace() - 1.0).norm() <= 1e-10,
-                "Expected output of instrument to be trace 1."
-            );
-            return (idx, output_state);
+            return if (output_state.trace() - 1.0).norm() >= 1e-10 {
+                Err(QdkSimError::misc(format!(
+                    "Expected output of instrument to be trace 1, but got {}.",
+                    output_state.trace()
+                )))
+            } else {
+                Ok((idx, output_state))
+            };
         }
     }
     let (idx, output_state, _) = possible_outcomes.pop().unwrap();
-    (idx, output_state)
+    Ok((idx, output_state))
 }

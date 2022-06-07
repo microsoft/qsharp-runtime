@@ -2,18 +2,24 @@
 // Licensed under the MIT License.
 
 mod apply;
+mod generators;
+
+use cauchy::c64;
+pub use generators::*;
 
 use crate::chp_decompositions::ChpOperation;
+use crate::error::QdkSimError;
 use crate::linalg::{extend_one_to_n, extend_two_to_n, zeros_like};
 use crate::processes::ProcessData::{KrausDecomposition, MixedPauli, Unitary};
-use crate::NoiseModel;
 use crate::QubitSized;
 use crate::C64;
 use crate::{AsUnitary, Pauli};
+use crate::{NoiseModel, VariantName};
 use itertools::Itertools;
 use ndarray::{Array, Array2, Array3, Axis, NewAxis};
 use num_complex::Complex;
 use num_traits::{One, Zero};
+
 use serde::{Deserialize, Serialize};
 use std::convert::TryInto;
 use std::ops::Add;
@@ -41,8 +47,19 @@ pub enum ProcessData {
     ///
     /// The first index denotes each Kraus operator, with the second and third
     /// indices representing the indices of each operator.
-    KrausDecomposition(Array3<C64>), // TODO: Superoperator and Choi reps.
+    KrausDecomposition(Array3<C64>),
 
+    /// Representation of a process by a superoperator acting on
+    /// column-stacked vectorizations of density operators (that is, the
+    /// convention in which Roth's lemma is expressed as
+    /// $|ABC⟫ = C^{\mathrm{T}} \otimes A |B⟫$).
+    ///
+    /// # Dimensions
+    /// This array should have shape $4^n \times 4^n$, where $n$ is the number
+    /// of qubits that the superoperator acts on.
+    Superoperator(Array2<c64>),
+
+    // TODO: Choi representation.
     /// Representation of a process as a sequence of other processes.
     Sequence(Vec<Process>),
 
@@ -53,6 +70,20 @@ pub enum ProcessData {
     /// Represents a process that is not supported by a given noise model,
     /// and thus always fails when applied.
     Unsupported,
+}
+
+impl VariantName for Process {
+    fn variant_name(&self) -> &'static str {
+        match &self.data {
+            MixedPauli(_) => "MixedPauli",
+            Unitary(_) => "Unitary",
+            KrausDecomposition(_) => "KrausDecomposition",
+            ProcessData::Superoperator(_) => "Superoperator",
+            ProcessData::Sequence(_) => "Sequence",
+            ProcessData::ChpDecomposition(_) => "ChpDecomposition",
+            ProcessData::Unsupported => "Unsupported",
+        }
+    }
 }
 
 impl Process {
@@ -77,9 +108,13 @@ impl Process {
 
     /// Returns a copy of this process that applies to registers of a given
     /// size.
-    pub fn extend_one_to_n(&self, idx_qubit: usize, n_qubits: usize) -> Process {
+    pub fn extend_one_to_n(
+        &self,
+        idx_qubit: usize,
+        n_qubits: usize,
+    ) -> Result<Process, QdkSimError> {
         assert_eq!(self.n_qubits, 1);
-        Process {
+        Ok(Process {
             n_qubits,
             data: match &self.data {
                 Unitary(u) => Unitary(extend_one_to_n(u.view(), idx_qubit, n_qubits)),
@@ -98,22 +133,23 @@ impl Process {
                     paulis.iter()
                         .map(|(pr, pauli)| {
                             if pauli.len() != 1 {
-                                panic!("Pauli channel acts on more than one qubit, cannot extend to 𝑛 qubits.");
+                                return Err(QdkSimError::misc(format!("Pauli channel acts on more than one qubit, cannot extend to {} qubits.", n_qubits)));
                             }
                             let p = pauli[0];
                             let mut extended = std::iter::repeat(Pauli::I).take(n_qubits).collect_vec();
                             extended[idx_qubit] = p;
-                            (*pr, extended)
+                            Ok((*pr, extended))
                         })
-                        .collect_vec()
+                        .try_collect()?
                 ),
                 ProcessData::Unsupported => ProcessData::Unsupported,
                 ProcessData::Sequence(processes) => ProcessData::Sequence(
-                    processes.iter().map(|p| p.extend_one_to_n(idx_qubit, n_qubits)).collect()
+                    processes.iter().map(|p| p.extend_one_to_n(idx_qubit, n_qubits)).try_collect()?
                 ),
                 ProcessData::ChpDecomposition(_) => todo!(),
+                ProcessData::Superoperator(_) => todo!(),
             },
-        }
+        })
     }
 
     /// Returns a copy of this process that applies to registers of a given
@@ -123,12 +159,12 @@ impl Process {
         idx_qubit1: usize,
         idx_qubit2: usize,
         n_qubits: usize,
-    ) -> Process {
+    ) -> Result<Process, QdkSimError> {
         assert_eq!(self.n_qubits, 2);
-        Process {
+        Ok(Process {
             n_qubits,
             data: match &self.data {
-                Unitary(u) => Unitary(extend_two_to_n(u.view(), idx_qubit1, idx_qubit2, n_qubits)),
+                Unitary(u) => Unitary(extend_two_to_n(u.view(), idx_qubit1, idx_qubit2, n_qubits)?),
                 KrausDecomposition(ks) => {
                     // TODO: consolidate with extend_one_to_n, above.
                     let new_dim = 2usize.pow(n_qubits.try_into().unwrap());
@@ -137,7 +173,7 @@ impl Process {
                     for (idx_kraus, kraus) in ks.axis_iter(Axis(0)).enumerate() {
                         let mut target = extended.index_axis_mut(Axis(0), idx_kraus);
                         let big_kraus = extend_two_to_n(kraus, idx_qubit1, idx_qubit2, n_qubits);
-                        target.assign(&big_kraus);
+                        target.assign(&big_kraus?);
                     }
                     KrausDecomposition(extended)
                 },
@@ -157,11 +193,12 @@ impl Process {
                 ),
                 ProcessData::Unsupported => ProcessData::Unsupported,
                 ProcessData::Sequence(processes) => ProcessData::Sequence(
-                    processes.iter().map(|p| p.extend_two_to_n(idx_qubit1, idx_qubit2, n_qubits)).collect()
+                    processes.iter().map(|p| p.extend_two_to_n(idx_qubit1, idx_qubit2, n_qubits)).try_collect()?
                 ),
                 ProcessData::ChpDecomposition(_) => todo!(),
+                ProcessData::Superoperator(_) => todo!(),
             },
-        }
+        })
     }
 }
 
@@ -182,7 +219,8 @@ impl Mul<&Process> for C64 {
                     ks
                 }),
                 KrausDecomposition(ks) => KrausDecomposition(self.sqrt() * ks),
-                MixedPauli(paulis) => (self * promote_pauli_channel(paulis)).data,
+                MixedPauli(paulis) => (self * promote_pauli_channel(paulis).unwrap()).data,
+                ProcessData::Superoperator(rhs) => ProcessData::Superoperator(self * rhs),
                 ProcessData::Unsupported => ProcessData::Unsupported,
                 ProcessData::Sequence(processes) => {
                     ProcessData::Sequence(processes.iter().map(|p| self * p).collect())
@@ -380,17 +418,24 @@ impl IntoPauliMixture for Pauli {
 ///
 /// This function is a private utility mainly used in handling the case where
 /// a mixed Pauli channel is applied to a pure or mixed state.
-fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
-    // TODO: Check that there's at least one Pauli... empty vectors aren't
-    //       supported here.
-    if paulis.len() == 1 {
+fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Result<Process, QdkSimError> {
+    if paulis.is_empty() {
+        Err(QdkSimError::misc(
+            "Cannot promote Pauli channel with no outcomes to a process.".to_string(),
+        ))
+    } else if paulis.len() == 1 {
         // Just one Pauli, so can box it up into a unitary.
-        let (_, pauli) = &paulis[0];
-        // TODO[testing]: check that pr is 1.0.
-        Process {
+        let (pr, pauli) = &paulis[0];
+        if (pr - 1.0).abs() >= 1e-8 {
+            return Err(QdkSimError::misc(format!(
+                "Cannot promote Pauli channel with probability {} to quantum process.",
+                pr
+            )));
+        }
+        Ok(Process {
             n_qubits: pauli.len(),
             data: Unitary(pauli.as_unitary()),
-        }
+        })
     } else {
         // To turn a mixed Pauli channel into a Kraus decomposition, we need
         // to take the square root of each probability.
@@ -408,7 +453,7 @@ fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
                 x.to_owned()
             })
             .collect_vec();
-        Process {
+        Ok(Process {
             n_qubits: paulis[0].1.len(),
             data: KrausDecomposition(
                 ndarray::concatenate(
@@ -417,6 +462,6 @@ fn promote_pauli_channel(paulis: &[(f64, Vec<Pauli>)]) -> Process {
                 )
                 .unwrap(),
             ),
-        }
+        })
     }
 }

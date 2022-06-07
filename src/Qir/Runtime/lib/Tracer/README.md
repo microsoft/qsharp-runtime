@@ -2,7 +2,7 @@
 
 The purpose of the Resource Tracer is to provide efficient and flexible way to estimate resources of a quantum program
  in QIR representation. The estimates are calculated by simulating execution of the program (as opposed to the static
- analysis). Please see [Resource Estimator](https://docs.microsoft.com/en-us/azure/quantum/user-guide/machines/resources-estimator)
+ analysis). Please see [Resource Estimator](https://docs.microsoft.com/azure/quantum/machines/resources-estimator)
  for more background on resource estimation for quantum programs.
 
 To run against the tracer, the quantum program should comply with the

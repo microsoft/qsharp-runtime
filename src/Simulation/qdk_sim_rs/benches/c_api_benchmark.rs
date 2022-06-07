@@ -27,6 +27,11 @@ fn with_test_suite<T: criterion::measurement::Measurement>(
             c_api::z(sim_id, 0);
         })
     });
+    group.bench_function("apply ry", |b| {
+        b.iter(|| {
+            c_api::ry(sim_id, 1.234, 1);
+        })
+    });
     group.bench_function("apply cnot", |b| {
         b.iter(|| {
             c_api::cnot(sim_id, 0, 1);
@@ -46,7 +51,8 @@ fn with_test_suite<T: criterion::measurement::Measurement>(
 fn ideal(c: &mut Criterion) {
     let mut sim_id: usize = 0;
     unsafe {
-        let _err = c_api::init(3, CString::new("mixed").unwrap().as_ptr(), &mut sim_id);
+        let repr = CString::new("mixed").unwrap();
+        let _err = c_api::init(3, repr.as_ptr(), &mut sim_id);
     }
     let mut group = c.benchmark_group("ideal");
     with_test_suite(sim_id, &mut group);
@@ -57,14 +63,13 @@ fn ideal(c: &mut Criterion) {
 fn noisy(c: &mut Criterion) {
     let mut sim_id: usize = 0;
     unsafe {
-        let _err = c_api::init(3, CString::new("mixed").unwrap().as_ptr(), &mut sim_id);
+        let repr = CString::new("mixed").unwrap();
+        let _err = c_api::init(3, repr.as_ptr(), &mut sim_id);
     }
     // NB: The C API is not in general safe.
     unsafe {
-        c_api::set_noise_model(
-            sim_id,
-            CString::new(BENCHMARK_NOISE_MODEL_JSON).unwrap().as_ptr(),
-        );
+        let model = CString::new(BENCHMARK_NOISE_MODEL_JSON).unwrap();
+        c_api::set_noise_model(sim_id, model.as_ptr());
     }
     let mut group = c.benchmark_group("noisy");
     with_test_suite(sim_id, &mut group);

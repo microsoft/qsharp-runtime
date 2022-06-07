@@ -41,13 +41,13 @@ Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
     $DROP = "$Env:DROP_NATIVE/src/Simulation/qdk_sim_rs/drop";
     Write-Host "##[info]Copying qdk_sim_rs files from $DROP...";
     if (Test-Path "$DROP/libqdk_sim.dylib") {
-        Copy-Item -Verbose "$DROP/libqdk_sim.dylib" "osx/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+        Copy-Item -Verbose "$DROP/libqdk_sim.dylib" "osx/Microsoft.Quantum.QdkSimRs.Runtime.dll"
     }
     if (Test-Path "$DROP/libqdk_sim.so") {
-        Copy-Item -Verbose "$DROP/libqdk_sim.so" "linux/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+        Copy-Item -Verbose "$DROP/libqdk_sim.so" "linux/Microsoft.Quantum.QdkSimRs.Runtime.dll"
     }
     if (Test-Path "$DROP/qdk_sim.dll") {
-        Copy-Item -Verbose "$DROP/qdk_sim.dll"  "win10/Microsoft.Quantum.Experimental.Simulators.Runtime.dll"
+        Copy-Item -Verbose "$DROP/qdk_sim.dll"  "win10/Microsoft.Quantum.QdkSimRs.Runtime.dll"
     }
 Pop-Location
 

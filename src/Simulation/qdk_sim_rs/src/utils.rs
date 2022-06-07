@@ -4,6 +4,14 @@
 use ndarray::{s, Array1, Array2, ArrayView1};
 use num_complex::Complex;
 
+use crate::error::QdkSimError;
+
+/// Used for enums whose variant names are meaningful.
+/// In the future, this should be derived and not hard-coded.
+pub(crate) trait VariantName {
+    fn variant_name(&self) -> &'static str;
+}
+
 /// A complex number with two 64-bit floating point fields.
 /// That is, the analogy of [`f64`] to complex values.
 pub type C64 = Complex<f64>;
@@ -31,9 +39,9 @@ fn log_message(msg: &str) {
 }
 
 /// Prints a message as an error, and returns it as a [`Result`].
-pub fn log_as_err<T>(msg: String) -> Result<T, String> {
+pub fn log_as_err<T>(msg: String) -> Result<T, QdkSimError> {
     log(&msg);
-    Err(msg)
+    Err(QdkSimError::misc(msg))
 }
 
 /// Prints a message as an error.
@@ -114,4 +122,35 @@ pub fn phase_product(row1: &ArrayView1<bool>, row2: &ArrayView1<bool>) -> bool {
     }
 
     ((if r1 { 2 } else { 0 }) + (if r2 { 2 } else { 0 }) + acc) % 4 == 2
+}
+
+/// Macro for quickly declaring complex numbers of type [`cauchy::c64`].
+///
+/// # Example
+/// ```
+/// # use qdk_sim::c64;
+/// # use cauchy::c64;
+/// let re_unit = c64!(1.0);
+/// assert_eq!(re_unit, c64::new(1.0, 0.0));
+///
+/// let im_unit = c64!(1.0 i);
+/// assert_eq!(im_unit, c64::new(0.0, 1.0));
+///
+/// let z = c64!(1.0 + 2.0 i);
+/// assert_eq!(z, c64::new(1.0, 2.0));
+/// ```
+#[macro_export]
+macro_rules! c64 {
+    ($re:literal) => {
+        c64::new($re, 0.0)
+    };
+    ($re:literal + $im:literal i) => {
+        c64::new($re, $im)
+    };
+    ($re:literal - $im:literal i) => {
+        c64::new($re, -$im)
+    };
+    ($im:literal i) => {
+        c64::new(0.0, $im)
+    };
 }

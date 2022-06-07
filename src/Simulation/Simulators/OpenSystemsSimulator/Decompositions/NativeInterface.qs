@@ -4,7 +4,7 @@
 // This namespace contains those intrinsics supported by the experimental
 // simulators native interface (NativeInterface.cs).
 
-namespace Microsoft.Quantum.Experimental.Native {
+namespace Microsoft.Quantum.Simulation.Simulators.NativeInterface {
 
     operation H(target : Qubit) : Unit is Adj {
         body intrinsic;
@@ -39,6 +39,18 @@ namespace Microsoft.Quantum.Experimental.Native {
     operation CNOT(control : Qubit, target : Qubit) : Unit is Adj {
         body intrinsic;
         adjoint self;
+    }
+
+    operation Rx(theta : Double, target : Qubit) : Unit {
+        body intrinsic;
+    }
+
+    operation Ry(theta : Double, target : Qubit) : Unit {
+        body intrinsic;
+    }
+
+    operation Rz(theta : Double, target : Qubit) : Unit {
+        body intrinsic;
     }
 
     operation M(target : Qubit) : Result {
