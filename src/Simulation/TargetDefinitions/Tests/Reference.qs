@@ -38,6 +38,10 @@ namespace Reference {
         body intrinsic;
     }
 
+    operation Exp (paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Adj + Ctl {
+        body intrinsic;
+    }
+
     operation Reset(qubit : Qubit) : Unit {
         body intrinsic;
     }
