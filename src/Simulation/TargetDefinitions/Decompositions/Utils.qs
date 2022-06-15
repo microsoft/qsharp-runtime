@@ -6,12 +6,12 @@ namespace Microsoft.Quantum.Intrinsic {
 
     internal operation SpreadZ (from : Qubit, to : Qubit[]) : Unit is Adj {
         if (Length(to) > 0) {
-            CNOT(to[0], from);
             if (Length(to) > 1) {
                 let half = Length(to) / 2;
                 SpreadZ(to[0], to[half + 1 .. Length(to) - 1]);
                 SpreadZ(from, to[1 .. half]);
             }
+            CNOT(to[0], from);
         }
     }
 

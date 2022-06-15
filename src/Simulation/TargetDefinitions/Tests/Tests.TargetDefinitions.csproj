@@ -36,6 +36,8 @@
     <QSharpCompile Include="..\Decompositions\CX.qs" />
     <QSharpCompile Include="..\Decompositions\CYFromCNOT.qs" />
     <QSharpCompile Include="..\Decompositions\CZFromSinglyControlled.qs" />
+    <QsharpCompile Include="..\Decompositions\ExpFromExpUtil.qs" />
+    <QsharpCompile Include="..\Decompositions\ExpUtil.qs" />
     <QsharpCompile Include="..\Decompositions\HFromSinglyControlled.qs" />
     <QSharpCompile Include="..\Decompositions\MResetZExplicit.qs" />
     <QsharpCompile Include="..\Decompositions\RFromSinglyControlledR1.qs" />
