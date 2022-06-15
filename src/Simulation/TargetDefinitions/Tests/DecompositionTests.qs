@@ -106,6 +106,16 @@ namespace DecompositionTests {
         VerifyUnitaryAndFunctors2(SWAP, Reference.SWAP);
     }
 
+    @Test("SparseSimulator")
+    operation VerifyExp() : Unit {
+        // Use an angle that doesn't have any symmetries as a stand-in for broader validation.
+        let angle = PI() / 7.0;
+        VerifyUnitaryAndFunctors(q => Exp([PauliZ], angle, [q]), q => Reference.Exp([PauliZ], angle, [q]));
+        VerifyUnitaryAndFunctors2((q0, q1) => Exp([PauliZ, size = 2], angle, [q0, q1]), (q0, q1) => Reference.Exp([PauliZ, size = 2], angle, [q0, q1]));
+        VerifyUnitaryAndFunctors3((q0, q1, q2) => Exp([PauliZ, size = 3], angle, [q0, q1, q2]), (q0, q1, q2) => Reference.Exp([PauliZ, size = 3], angle, [q0, q1, q2]));
+        VerifyUnitaryAndFunctors4((q0, q1, q2, q3) => Exp([PauliZ, size = 4], angle, [q0, q1, q2, q3]), (q0, q1, q2, q3) => Reference.Exp([PauliZ, size = 4], angle, [q0, q1, q2, q3]));
+    }
+
     internal operation VerifyUnitaryAndFunctors(unitary : Qubit => Unit is Adj + Ctl, reference : Qubit => Unit is Adj + Ctl) : Unit {
         VerifyUnitary(unitary, reference, 8);
         VerifyUnitary(Adjoint unitary, Adjoint reference, 8);
@@ -125,6 +135,13 @@ namespace DecompositionTests {
         VerifyUnitary3(Adjoint unitary, Adjoint reference, 8);
         VerifyUnitary4((q0, q1, q2, q3) => Controlled unitary([q0], (q1, q2, q3)), (q0, q1, q2, q3) => Controlled reference([q0], (q1, q2, q3)), 7);
         VerifyUnitary4((q0, q1, q2, q3) => Controlled Adjoint unitary([q0], (q1, q2, q3)), (q0, q1, q2, q3) => Controlled Adjoint reference([q0], (q1, q2, q3)), 7);
+    }
+
+    internal operation VerifyUnitaryAndFunctors4(unitary : (Qubit, Qubit, Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit, Qubit, Qubit) => Unit is Adj + Ctl) : Unit {
+        VerifyUnitary4(unitary, reference, 8);
+        VerifyUnitary4(Adjoint unitary, Adjoint reference, 8);
+        VerifyUnitary5((q0, q1, q2, q3, q4) => Controlled unitary([q0], (q1, q2, q3, q4)), (q0, q1, q2, q3, q4) => Controlled reference([q0], (q1, q2, q3, q4)), 7);
+        VerifyUnitary5((q0, q1, q2, q3, q4) => Controlled Adjoint unitary([q0], (q1, q2, q3, q4)), (q0, q1, q2, q3, q4) => Controlled Adjoint reference([q0], (q1, q2, q3, q4)), 7);
     }
 
     internal operation VerifyUnitary(unitary : Qubit => Unit is Adj + Ctl, reference : Qubit => Unit is Adj + Ctl, limit : Int) : Unit {
@@ -168,6 +185,17 @@ namespace DecompositionTests {
         for numControls in 0..limit {
             Reference.AssertOperationsEqualReferenced(4 + numControls, qs => Controlled unitary(qs[4..(numControls + 3)], (qs[0], qs[1], qs[2], qs[3])),
                 qs => Controlled reference(qs[4..(numControls + 3)], (qs[0], qs[1], qs[2], qs[3])));
+        }
+    }
+
+    internal operation VerifyUnitary5(unitary : (Qubit, Qubit, Qubit, Qubit, Qubit) => Unit is Adj + Ctl, reference : (Qubit, Qubit, Qubit, Qubit, Qubit) => Unit is Adj + Ctl, limit : Int) : Unit {
+        // Verify equality up to 8 controls.
+        Reference.AssertOperationsEqualReferenced(5, qs => unitary(qs[0], qs[1], qs[2], qs[3], qs[4]),
+            qs => reference(qs[0], qs[1], qs[2], qs[3], qs[4]));
+
+        for numControls in 0..limit {
+            Reference.AssertOperationsEqualReferenced(5 + numControls, qs => Controlled unitary(qs[5..(numControls + 4)], (qs[0], qs[1], qs[2], qs[3], qs[4])),
+                qs => Controlled reference(qs[5..(numControls + 4)], (qs[0], qs[1], qs[2], qs[3], qs[4])));
         }
     }
 }
