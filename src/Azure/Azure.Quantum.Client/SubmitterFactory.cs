@@ -26,26 +26,30 @@ namespace Microsoft.Azure.Quantum
             new SubmitterInfo(
                 new Regex(@"\Amicrosoft\.simulator\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
-                "QirSubmitter"),
+                "QirSubmitter",
+                ImmutableArray.Create("FullComputation")),
             new SubmitterInfo(
                 new Regex(@"\Aquantinuum\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
                 "QirSubmitter",
-                true),
+                ImmutableArray.Create("AdaptiveExecution", "BasicExecution")), // support for BasicMeasurementFeedback goes via the QSharpSubmitter
             new SubmitterInfo(
                 new Regex(@"\Aqci\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.QCI.Targets.QCIQirSubmitter, Microsoft.Quantum.Providers.QCI",
-                "QirSubmitter"),
+                "QirSubmitter",
+                ImmutableArray.Create("AdaptiveExecution", "BasicExecution")),
             new SubmitterInfo(
                 new Regex(@"\Arigetti\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.Rigetti.Targets.RigettiQirSubmitter, Microsoft.Quantum.Providers.Rigetti",
-                "QirSubmitter"));
+                "QirSubmitter",
+                ImmutableArray.Create("BasicExecution")));
 
         private static readonly ImmutableList<SubmitterInfo> QirPayloadGenerators = ImmutableList.Create(
             new SubmitterInfo(
                 new Regex(@"\Amicrosoft\.simulator\.([\w]+\.)*[\w]+\z"),
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
-                "QirPayloadGenerator"));
+                "QirPayloadGenerator",
+                ImmutableArray.Create("FullComputation")));
 
         /// <summary>
         /// Information about each supported Q# submitter.
@@ -134,7 +138,8 @@ namespace Microsoft.Azure.Quantum
                 return null;
             }
 
-            if (submitter.RequiresTargetCapability && string.IsNullOrWhiteSpace(targetCapability))
+            var supportedTargetCapabilities = submitter.SupportedTargetCapabilities.Select(c => c.ToLower()).ToImmutableHashSet();
+            if (!supportedTargetCapabilities.Contains(targetCapability.ToLower()))
             {
                 return null;
             }
@@ -183,9 +188,9 @@ namespace Microsoft.Azure.Quantum
             /// <param name="methodName">The name of the static factory method.</param>
             /// <param name="requiresTargetCapability">The flag telling if the target capability is required by the target.</param>
             public SubmitterInfo(
-                Regex targetPattern, string typeName, string methodName, bool requiresTargetCapability = false) =>
-                (TargetPattern, TypeName, MethodName, RequiresTargetCapability) = 
-                    (targetPattern, typeName, methodName, requiresTargetCapability);
+                Regex targetPattern, string typeName, string methodName, IEnumerable<string>? supportedTargetCapabilities = null) =>
+                (TargetPattern, TypeName, MethodName, SupportedTargetCapabilities) =
+                    (targetPattern, typeName, methodName, supportedTargetCapabilities?.ToImmutableArray() ?? ImmutableArray<string>.Empty);
 
             /// <summary>
             /// The pattern for targets supported by the submitter.
@@ -205,7 +210,7 @@ namespace Microsoft.Azure.Quantum
             /// <summary>
             /// Flag telling if the target requires the target capability.
             /// </summary>
-            public bool RequiresTargetCapability { get; }
+            public IReadOnlyList<string> SupportedTargetCapabilities { get; }
         }
     }
 }
