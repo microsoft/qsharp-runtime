@@ -1,0 +1,3 @@
+[toolchain]
+# Needed to get access to backtraces in error reporting.
+channel = "nightly"

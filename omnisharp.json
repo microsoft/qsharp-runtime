@@ -1,5 +1,8 @@
 {
     "script": {
         "enableScriptNuGetReferences": true
+    },
+    "msbuild": {
+        "loadProjectsOnDemand": true
     }
 }

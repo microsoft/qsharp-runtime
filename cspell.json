@@ -1,0 +1,80 @@
+// Don't allow cspell to check this file, as it will fail on language-specific
+// configuration.
+// cspell: disable
+{
+    "words": [
+        // General terminology
+        "renormalize",
+        "stdlib",
+        "subtheories",
+        "vals",
+        "vecs",
+        "qsharp",
+        // Quantum terminology.
+        "qubit",
+        "qubits",
+        "Hadamard",
+        "paulis",
+        "subregister",
+        "subregisters",
+        "cnot",
+        // Open quantum systems terminology.
+        "CPTP",
+        "CPTNI",
+        "Kraus",
+        "Liouvillian",
+        "superoperator",
+        "superoperators",
+        // QEC terminology.
+        "destabilizer",
+        // NumPy terminology.
+        "numpy",
+        "isclose",
+        "dtype",
+        // QuTiP terminology.
+        "Qobj",
+        "qutip",
+        "isherm",
+        "oper",
+        "sigmay",
+        "eigenstates",
+        "qeye",
+        "sigmax",
+        // General math terminology
+        "coeff",
+        "pade",
+        "Expm",
+        "monoid",
+        "exponentials",
+        // Rust stdlib terminology
+        "consts",
+        // ndarray terminology
+        "linalg",
+        "ndarray",
+        "Repr",
+        "idxs",
+        // PyO3 terminology.
+        "pymethods",
+        // Itertools terminology.
+        "itertools",
+        // LaTeX commands.
+        "mathrm",
+        "mathrel",
+        "operatorname",
+        // Other
+        "struct",
+        "structs",
+        "intrinsics"
+    ],
+    "languageSettings": [
+        {
+            "languageId": "qsharp",
+            "words": [
+                "elif",
+                "callable",
+                "callables",
+                "Subarray"
+            ]
+        }
+    ]
+}

@@ -8,7 +8,7 @@ Push-Location $PSScriptRoot
     # PublishTestResults task.
     if ($IsCI) {
         cargo install cargo2junit
-        $testJson = cargo +nightly test -- -Z unstable-options --format json;
+        $testJson = cargo test -- -Z unstable-options --format json;
         $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
 
         $testJson `
@@ -18,7 +18,7 @@ Push-Location $PSScriptRoot
             | Out-File -FilePath opensim_results.xml -Encoding utf8NoBOM
     } else {
         # Outside of CI, show human-readable output.
-        cargo +nightly test
+        cargo test
         $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
     }
 

@@ -5,8 +5,8 @@
 // M.Q.Intrinsic, making it easier to forward intrinsic definitions from the
 // simulator.
 
-namespace Microsoft.Quantum.Experimental.Intrinsic {
-    open Microsoft.Quantum.Experimental.Native as Native;
+namespace Microsoft.Quantum.Simulation.Simulators.IntrinsicInterface {
+    open Microsoft.Quantum.Simulation.Simulators.NativeInterface as Native;
     open Microsoft.Quantum.Experimental.Decompositions;
 
     operation H(target : Qubit) : Unit is Adj + Ctl {
@@ -151,27 +151,295 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         }
     }
 
-    // NB: We separate out this operation to avoid hardware targeting rewrite
-    //     steps from trying to lift this operation and modifying the C#
-    //     code gen in the process.
-    //     See https://github.com/microsoft/qsharp-compiler/issues/768.
-    internal operation MeasureWithoutPauliI(bases : Pauli[], register : Qubit[]) : Result {
-        mutable newBases = [];
-        mutable newQubits = [];
-        // NB: using Zipped would be nice here, but this is built before
-        //     M.Q.Standard...
-        for idxBasis in 0..Length(bases) - 1 {
-            if bases[idxBasis] != PauliI {
-                set newBases += [bases[idxBasis]];
-                set newQubits += [register[idxBasis]];
+    operation Rx(theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
+        body (...) {
+            Native.Rx(theta, qubit);
+        }
+        controlled (controls, ...) {
+            if Length(controls) == 0 {
+                Native.Rx(theta, qubit);
+            }
+            else {
+                within {
+                    MapPauli(qubit, PauliZ, PauliX);
+                }
+                apply {
+                    Controlled Rz(controls, (theta, qubit));
+                }
+            }
+        }
+        adjoint (...) {
+            Rx(-theta, qubit);
+        }
+    }
+
+    operation Ry (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
+        body (...) {
+            Native.Ry(theta, qubit);
+        }
+        controlled (controls, ...) {
+            if Length(controls) == 0 {
+                Native.Ry(theta, qubit);
+            }
+            else {
+                within {
+                    MapPauli(qubit, PauliZ, PauliY);
+                }
+                apply {
+                    Controlled Rz(controls, (theta, qubit));
+                }
+            }
+        }
+        adjoint (...) {
+            Ry(-theta, qubit);
+        }
+    }
+
+    operation Rz (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
+        body (...) {
+            Native.Rz(theta, qubit);
+        }
+        controlled (controls, ...) {
+            if Length(controls) == 0 {
+                Native.Rz(theta, qubit);
+            }
+            elif Length(controls) == 1 {
+                CRz(controls[0], theta, qubit);
+            }
+            elif Length(controls) == 2 {
+                use temp = Qubit();
+                within {
+                    PhaseCCX(controls[0], controls[1], temp);
+                }
+                apply {
+                    CRz(temp, theta, qubit);
+                }
+            }
+            elif Length(controls) == 3 {
+                use temps = Qubit[2];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], temps[0], temps[1]);
+                }
+                apply {
+                    CRz(temps[1], theta, qubit);
+                }
+            }
+            elif Length(controls) == 4 {
+                use temps = Qubit[3];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(temps[0], temps[1], temps[2]);
+                }
+                apply {
+                    CRz(temps[2], theta, qubit);
+                }
+            }
+            elif Length(controls) == 5 {
+                use temps = Qubit[4];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(controls[4], temps[0], temps[2]);
+                    PhaseCCX(temps[1], temps[2], temps[3]);
+                }
+                apply {
+                    CRz(temps[3], theta, qubit);
+                }
+            }
+            elif Length(controls) == 6 {
+                use temps = Qubit[5];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(controls[4], controls[5], temps[2]);
+                    PhaseCCX(temps[0], temps[1], temps[3]);
+                    PhaseCCX(temps[2], temps[3], temps[4]);
+                }
+                apply {
+                    CRz(temps[4], theta, qubit);
+                }
+            }
+            elif Length(controls) == 7 {
+                use temps = Qubit[6];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(controls[4], controls[5], temps[2]);
+                    PhaseCCX(controls[6], temps[0], temps[3]);
+                    PhaseCCX(temps[1], temps[2], temps[4]);
+                    PhaseCCX(temps[3], temps[4], temps[5]);
+                }
+                apply {
+                    CRz(temps[5], theta, qubit);
+                }
+            }
+            elif Length(controls) == 8 {
+                use temps = Qubit[7];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(controls[4], controls[5], temps[2]);
+                    PhaseCCX(controls[6], controls[7], temps[3]);
+                    PhaseCCX(temps[0], temps[1], temps[4]);
+                    PhaseCCX(temps[2], temps[3], temps[5]);
+                    PhaseCCX(temps[4], temps[5], temps[6]);
+                }
+                apply {
+                    CRz(temps[6], theta, qubit);
+                }
+            }
+            else {
+                fail "Too many control qubits specified to Rz gate.";
+
+                // Eventually, we can use recursion via callables with the below utility:
+                // ApplyWithLessControlsA(Controlled Rz, (controls, qubit));
+            }
+        }
+        adjoint (...) {
+            Rz(-theta, qubit);
+        }
+    }
+
+    operation R(pauli : Pauli, theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
+        if (pauli == PauliX) {
+            Rx(theta, qubit);
+        }
+        elif (pauli == PauliY) {
+            Ry(theta, qubit);
+        }
+        elif (pauli == PauliZ) {
+            Rz(theta, qubit);
+        }
+        else { // PauliI
+            ApplyGlobalPhase(-theta / 2.0 );
+        }
+    }
+
+    /// # Summary
+    /// Applies a rotation about the $\ket{1}$ state by a given angle.
+    ///
+    /// # Description
+    /// \begin{align}
+    ///     R_1(\theta) \mathrel{:=}
+    ///     \operatorname{diag}(1, e^{i\theta}).
+    /// \end{align}
+    ///
+    /// # Input
+    /// ## theta
+    /// Angle about which the qubit is to be rotated.
+    /// ## qubit
+    /// Qubit to which the gate should be applied.
+    ///
+    /// # Remarks
+    /// Equivalent to:
+    /// ```qsharp
+    /// R(PauliZ, theta, qubit);
+    /// R(PauliI, -theta, qubit);
+    /// ```
+    operation R1 (theta : Double, qubit : Qubit) : Unit is Adj + Ctl {
+        body (...) {
+            Rz(theta, qubit);
+        }
+        controlled (controls, ...) {
+            if Length(controls) == 0 {
+                Rz(theta, qubit);
+            }
+            elif Length(controls) == 1 {
+                CR1(theta, controls[0], qubit);
+            }
+            elif Length(controls) == 2 {
+                use temp = Qubit();
+                within {
+                    PhaseCCX(controls[0], controls[1], temp);
+                }
+                apply {
+                    CR1(theta, temp, qubit);
+                }
+            }
+            elif Length(controls) == 3 {
+                use temps = Qubit[2];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], temps[0], temps[1]);
+                }
+                apply {
+                    CR1(theta, temps[1], qubit);
+                }
+            }
+            elif Length(controls) == 4 {
+                use temps = Qubit[3];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(temps[0], temps[1], temps[2]);
+                }
+                apply {
+                    CR1(theta, temps[2], qubit);
+                }
+            }
+            elif Length(controls) == 5 {
+                use temps = Qubit[4];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(controls[4], temps[0], temps[2]);
+                    PhaseCCX(temps[1], temps[2], temps[3]);
+                }
+                apply {
+                    CR1(theta, temps[3], qubit);
+                }
+            }
+            elif Length(controls) == 6 {
+                use temps = Qubit[5];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(controls[4], controls[5], temps[2]);
+                    PhaseCCX(temps[0], temps[1], temps[3]);
+                    PhaseCCX(temps[2], temps[3], temps[4]);
+                }
+                apply {
+                    CR1(theta, temps[4], qubit);
+                }
+            }
+            elif Length(controls) == 7 {
+                use temps = Qubit[6];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(controls[4], controls[5], temps[2]);
+                    PhaseCCX(controls[6], temps[0], temps[3]);
+                    PhaseCCX(temps[1], temps[2], temps[4]);
+                    PhaseCCX(temps[3], temps[4], temps[5]);
+                }
+                apply {
+                    CR1(theta, temps[5], qubit);
+                }
+            }
+            elif Length(controls) == 8 {
+                use temps = Qubit[7];
+                within {
+                    PhaseCCX(controls[0], controls[1], temps[0]);
+                    PhaseCCX(controls[2], controls[3], temps[1]);
+                    PhaseCCX(controls[4], controls[5], temps[2]);
+                    PhaseCCX(controls[6], controls[7], temps[3]);
+                    PhaseCCX(temps[0], temps[1], temps[4]);
+                    PhaseCCX(temps[2], temps[3], temps[5]);
+                    PhaseCCX(temps[4], temps[5], temps[6]);
+                }
+                apply {
+                    CR1(theta, temps[6], qubit);
+                }
+            }
+            else {
+                fail "Too many control qubits specified to R1 gate.";
             }
         }
 
-        if Length(newBases) == 0 {
-            return Zero;
-        } else {
-            return Measure(newBases, newQubits);
-        }
+        // R(PauliZ, theta, qubit);
+        // R(PauliI, -theta, qubit);
     }
 
     operation Measure(bases : Pauli[], register : Qubit[]) : Result {
@@ -206,6 +474,42 @@ namespace Microsoft.Quantum.Experimental.Intrinsic {
         } else {
             // TODO
             fail "Multi-qubit measurement is not yet implemented.";
+        }
+    }
+
+    /// # Summary
+    /// Applies the exponential of a multi-qubit Pauli operator.
+    ///
+    /// # Description
+    /// \begin{align}
+    ///     e^{i \theta [P_0 \otimes P_1 \cdots P_{N-1}]},
+    /// \end{align}
+    /// where $P_i$ is the $i$th element of `paulis`, and where
+    /// $N = $`Length(paulis)`.
+    ///
+    /// # Input
+    /// ## paulis
+    /// Array of single-qubit Pauli values indicating the tensor product
+    /// factors on each qubit.
+    /// ## theta
+    /// Angle about the given multi-qubit Pauli operator by which the
+    /// target register is to be rotated.
+    /// ## qubits
+    /// Register to apply the given rotation to.
+    operation Exp (paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Adj + Ctl {
+        body (...) {
+            if (Length(paulis) != Length(qubits)) { fail "Arrays 'pauli' and 'qubits' must have the same length"; }
+            let (newPaulis, newQubits) = RemovePauliI(paulis, qubits);
+
+            if (Length(newPaulis) != 0) {
+                ExpUtil(newPaulis, theta , newQubits, R(_, -2.0 * theta, _));
+            }
+            else {
+                ApplyGlobalPhase(theta);
+            }
+        }
+        adjoint(...) {
+            Exp(paulis, -theta, qubits);
         }
     }
 

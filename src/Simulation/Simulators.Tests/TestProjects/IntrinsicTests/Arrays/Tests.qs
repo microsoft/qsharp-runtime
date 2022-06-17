@@ -8,7 +8,7 @@ namespace Microsoft.Quantum.Arrays {
     /// Checks that empty arrays are indeed empty.
     @Test("QuantumSimulator")
     @Test("ToffoliSimulator")
-    @Test("Microsoft.Quantum.Experimental.OpenSystemsSimulator")
+    @Test("Microsoft.Quantum.Simulation.Simulators.OpenSystemsSimulator")
     @Test("SparseSimulator")
     function EmptyArraysAreEmpty() : Unit {
         Fact(

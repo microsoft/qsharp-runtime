@@ -28,16 +28,23 @@ namespace Microsoft.Quantum.Runtime.Submitters
         public ImmutableDictionary<string, string> InputParams { get; }
 
         /// <summary>
+        /// The target capability.
+        /// </summary>
+        public string TargetCapability { get; set; }
+
+        /// <summary>
         /// The default submission options.
         /// </summary>
         public static SubmissionOptions Default { get; } =
-            new SubmissionOptions("", 500, ImmutableDictionary<string, string>.Empty);
+            new SubmissionOptions("", 500, ImmutableDictionary<string, string>.Empty, "");
 
-        private SubmissionOptions(string friendlyName, int shots, ImmutableDictionary<string, string> inputParams)
+        private SubmissionOptions(
+            string friendlyName, int shots, ImmutableDictionary<string, string> inputParams, string targetCapability)
         {
             FriendlyName = friendlyName;
             Shots = shots;
             InputParams = inputParams;
+            TargetCapability = targetCapability;
         }
 
         /// <summary>
@@ -46,11 +53,14 @@ namespace Microsoft.Quantum.Runtime.Submitters
         /// <param name="friendlyName">The new friendly name, or <c>null</c> to leave unchanged.</param>
         /// <param name="shots">The new number of shots, or <c>null</c> to leave unchanged.</param>
         /// <param name="inputParams">The new input parameters, or <c>null</c> to leave unchanged.</param>
+        /// <param name="targetCapability">The target capability, or <c>null</c> to leave unchanged.</param>
         /// <returns>The updated submission options.</returns>
         public SubmissionOptions With(
             string? friendlyName = null,
             int? shots = null,
-            ImmutableDictionary<string, string>? inputParams = null) =>
-            new SubmissionOptions(friendlyName ?? FriendlyName, shots ?? Shots, inputParams ?? InputParams);
+            ImmutableDictionary<string, string>? inputParams = null,
+            string? targetCapability = null) =>
+            new SubmissionOptions(
+                friendlyName ?? FriendlyName, shots ?? Shots, inputParams ?? InputParams, targetCapability ?? TargetCapability);
     }
 }
