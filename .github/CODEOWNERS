@@ -1,11 +1,45 @@
-# Automatically tag in libraries maintainers on Q# API changes.
-*.qs    @microsoft/quantumlibraries
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-# DmitryVasilevsky ownership
-/src/Simulation/QCTraceSimulator.Tests/ @DmitryVasilevsky
-/src/Simulation/QCTraceSimulator/ @DmitryVasilevsky
-/src/Simulation/Simulators/CommonNativeSimulator/ @DmitryVasilevsky
-/src/Simulation/Simulators/QCTraceSimulator/ @DmitryVasilevsky
-/src/Simulation/Simulators/ResourcesEstimator/ @DmitryVasilevsky
-/src/Simulation/Simulators/ToffoliSimulator/ @DmitryVasilevsky
+# A later match takes precedence.
+# That is why we will hardly be able to keep the lines grouped by users or sorted alphabetically.
+# The entries will need to be ordered from the root of the file tree to the leaves.
+# For the same-level entries it still makes sense to order them alphabetically to simplify the search.
+
+/src/Qir/                                              @kuzminrobin @swernli
+
+/src/Simulation/AutoSubstitution/
+/src/Simulation/AutoSubstitution.Integration.Tests/
+/src/Simulation/AutoSubstitution.Tests/
+/src/Simulation/Common/                                @kuzminrobin
+/src/Simulation/Core/                                  @kuzminrobin
+/src/Simulation/EntryPointDriver/
+/src/Simulation/EntryPointDriver.Tests/
+/src/Simulation/Native/                                @kuzminrobin
+/src/Simulation/NativeSparseSimulator/                 @kuzminrobin
+/src/Simulation/QCTraceSimulator/                      @DmitryVasilevsky
+/src/Simulation/QCTraceSimulator.Tests/                @DmitryVasilevsky
+/src/Simulation/qdk_sim_rs/
+/src/Simulation/QSharpCore/
+/src/Simulation/QSharpFoundation/
+/src/Simulation/QSharpFoundation.Tests/                @swernli @kuzminrobin
+/src/Simulation/Simulators/                            @kuzminrobin
+/src/Simulation/Simulators/CommonNativeSimulator/      @kuzminrobin @DmitryVasilevsky
+/src/Simulation/Simulators/OpenSystemsSimulator/
+/src/Simulation/Simulators/Properties/
+/src/Simulation/Simulators/QCTraceSimulator/           @DmitryVasilevsky
+/src/Simulation/Simulators/QuantumSimulator/           @kuzminrobin
+/src/Simulation/Simulators/ResourcesEstimator/         @DmitryVasilevsky
+/src/Simulation/Simulators/SparseSimulator/            @kuzminrobin
+/src/Simulation/Simulators/ToffoliSimulator/           @DmitryVasilevsky
+/src/Simulation/Simulators.Tests/
 /src/Simulation/Simulators.Tests/QCTraceSimulatorPrimitivesTests/ @DmitryVasilevsky
+/src/Simulation/Simulators.Type1.Tests/
+/src/Simulation/Simulators.Type2.Tests/
+/src/Simulation/Simulators.Type3.Tests/
+/src/Simulation/Simulators.Type4.Tests/
+/src/Simulation/TargetDefinitions/
+/src/Simulation/Type1Core/
+/src/Simulation/Type2Core/
+/src/Simulation/Type3Core/
+/src/Simulation/Type4Core/
+/src/Simulation/README.md                              @kuzminrobin
