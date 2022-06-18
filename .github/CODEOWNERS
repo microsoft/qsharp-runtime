@@ -1,2 +1,11 @@
 # Automatically tag in libraries maintainers on Q# API changes.
 *.qs    @microsoft/quantumlibraries
+
+# DmitryVasilevsky ownership
+/src/Simulation/QCTraceSimulator.Tests/ @DmitryVasilevsky
+/src/Simulation/QCTraceSimulator/ @DmitryVasilevsky
+/src/Simulation/Simulators/CommonNativeSimulator/ @DmitryVasilevsky
+/src/Simulation/Simulators/QCTraceSimulator/ @DmitryVasilevsky
+/src/Simulation/Simulators/ResourcesEstimator/ @DmitryVasilevsky
+/src/Simulation/Simulators/ToffoliSimulator/ @DmitryVasilevsky
+/src/Simulation/Simulators.Tests/QCTraceSimulatorPrimitivesTests/ @DmitryVasilevsky
