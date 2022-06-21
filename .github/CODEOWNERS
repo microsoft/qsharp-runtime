@@ -43,3 +43,6 @@
 /src/Simulation/Type3Core/
 /src/Simulation/Type4Core/
 /src/Simulation/README.md                              @kuzminrobin
+
+# Automatically tag in libraries maintainers on Q# API changes.
+*.qs    @microsoft/quantumlibraries
