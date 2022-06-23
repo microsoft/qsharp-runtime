@@ -17,6 +17,7 @@
     <QSharpCompile Include="..\Simulators.Tests\Circuits\JointMeasureTest.qs" />
     <QSharpCompile Include="..\Simulators.Tests\Circuits\VerifyUnitary.qs" />
     <QSharpCompile Include="..\Simulators.Tests\Circuits\ExpTest.qs" />
+    <QSharpCompile Include="..\Simulators.Tests\Circuits\MeasureEachZTest.qs" />
   </ItemGroup>
 
 </Project>

@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Microsoft.Quantum.Runtime.Core.csproj" />
+    <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>

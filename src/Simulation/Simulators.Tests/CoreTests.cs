@@ -61,7 +61,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Null(ex);
             Assert.Equal(0, exitCode);
             Assert.Empty(error.ToString().Trim());
-            Assert.Equal("TargetedExe", output.ToString().Trim());
+            Assert.Equal("12345", output.ToString().Trim());
         }
 
         [Fact]
@@ -105,7 +105,61 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     "Resource Group: bar",
                     "Workspace: baz",
                     "Target: test.submitter.noop",
-                    "TargetCapability: MyTargetCapability",
+                    "TargetCapability: FullComputation",
+                    "Storage: ",
+                    "Base URI: ",
+                    "Location: myLocation",
+                    "Credential: Default",
+                    "AadToken: ",
+                    "UserAgent: ",
+                    "Job Name: ",
+                    "Job Parameters: ",
+                    "Shots: 500",
+                    "Output: FriendlyUri",
+                    "Dry Run: False",
+                    "Verbose: True",
+                    "",
+                    "Submitting QIR entry point.",
+                    "",
+                    "https://www.example.com/00000000-0000-0000-0000-0000000000000",
+                    ""),
+            output.ToString());
+        }
+
+        [Fact]
+        public void SubmitsTargetedQir()
+        {
+            var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assembly = Path.Combine(directory!, "TestProjects", "TargetedExe", "TargetedExe.dll");
+            var args = string.Join(
+                ' ',
+                assembly,
+                "submit",
+                "--subscription",
+                "foo",
+                "--resource-group",
+                "bar",
+                "--workspace",
+                "baz",
+                "--target",
+                "test.submitter.noop",
+                "--location",
+                "myLocation",
+                "--verbose");
+
+            ProcessRunner.Run("dotnet", args, out var output, out var error, out var status, out var ex);
+
+            Assert.Null(ex);
+            Assert.Equal(0, status);
+            Assert.Empty(error.ToString());
+            Assert.Equal(
+                string.Join(
+                    Environment.NewLine,
+                    "Subscription: foo",
+                    "Resource Group: bar",
+                    "Workspace: baz",
+                    "Target: test.submitter.noop",
+                    "TargetCapability: AdaptiveExecution",
                     "Storage: ",
                     "Base URI: ",
                     "Location: myLocation",

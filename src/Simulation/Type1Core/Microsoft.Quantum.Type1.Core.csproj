@@ -3,7 +3,6 @@
 
   <PropertyGroup>
     <Description>Type1 Targeting support for the Q# programming language.</Description>
-    <GenerateConcreteIntrinsic>true</GenerateConcreteIntrinsic>
   </PropertyGroup>
 
   <ItemGroup>

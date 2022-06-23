@@ -23,6 +23,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ExpFrac.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\I.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\M.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\MeasureEachZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetX.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetY.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\MResetZ.qs" />

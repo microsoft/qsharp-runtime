@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.Quantum.Sdk">
+﻿<Project Sdk="Microsoft.Quantum.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\..\..\Type3Core\Microsoft.Quantum.Type3.Core.csproj" IsTargetPackage='true' />
   </ItemGroup>
 
   <ItemGroup>

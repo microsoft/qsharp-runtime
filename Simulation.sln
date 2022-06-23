@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.2.32516.85
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32510.428
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Runtime.Core", "src\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj", "{E9123D45-C1B0-4462-8810-D26ED6D31944}"
 EndProject
@@ -127,7 +127,110 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Quantum.Type4.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.Simulators.Type4", "src\Simulation\Simulators.Type4.Tests\Tests.Microsoft.Quantum.Simulators.Type4.csproj", "{68E86360-B9E6-4282-A27B-2B1C2B0CC025}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Microsoft.Quantum.QSharp.Foundation", "src\Simulation\QSharpFoundation.Tests\Tests.Microsoft.Quantum.QSharp.Foundation.csproj", "{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Decompositions", "Decompositions", "{AFB174AB-C5E1-411C-B5A8-4FA375B55600}"
+	ProjectSection(SolutionItems) = preProject
+		src\Simulation\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs = src\Simulation\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs
+		src\Simulation\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs = src\Simulation\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs
+		src\Simulation\TargetDefinitions\Decompositions\CCNOT.qs = src\Simulation\TargetDefinitions\Decompositions\CCNOT.qs
+		src\Simulation\TargetDefinitions\Decompositions\CCNOTFromCCZ.qs = src\Simulation\TargetDefinitions\Decompositions\CCNOTFromCCZ.qs
+		src\Simulation\TargetDefinitions\Decompositions\CNOT.qs = src\Simulation\TargetDefinitions\Decompositions\CNOT.qs
+		src\Simulation\TargetDefinitions\Decompositions\CNOTFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\CNOTFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\CX.qs = src\Simulation\TargetDefinitions\Decompositions\CX.qs
+		src\Simulation\TargetDefinitions\Decompositions\CYFromCNOT.qs = src\Simulation\TargetDefinitions\Decompositions\CYFromCNOT.qs
+		src\Simulation\TargetDefinitions\Decompositions\CZFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\CZFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\ExpFrac.qs = src\Simulation\TargetDefinitions\Decompositions\ExpFrac.qs
+		src\Simulation\TargetDefinitions\Decompositions\ExpFracFromExpUtil.qs = src\Simulation\TargetDefinitions\Decompositions\ExpFracFromExpUtil.qs
+		src\Simulation\TargetDefinitions\Decompositions\ExpFromExpUtil.qs = src\Simulation\TargetDefinitions\Decompositions\ExpFromExpUtil.qs
+		src\Simulation\TargetDefinitions\Decompositions\ExpUtil.qs = src\Simulation\TargetDefinitions\Decompositions\ExpUtil.qs
+		src\Simulation\TargetDefinitions\Decompositions\ExpUtilFromIsing.qs = src\Simulation\TargetDefinitions\Decompositions\ExpUtilFromIsing.qs
+		src\Simulation\TargetDefinitions\Decompositions\HFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\HFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\I.qs = src\Simulation\TargetDefinitions\Decompositions\I.qs
+		src\Simulation\TargetDefinitions\Decompositions\M.qs = src\Simulation\TargetDefinitions\Decompositions\M.qs
+		src\Simulation\TargetDefinitions\Decompositions\Measure.qs = src\Simulation\TargetDefinitions\Decompositions\Measure.qs
+		src\Simulation\TargetDefinitions\Decompositions\MeasureEachZ.qs = src\Simulation\TargetDefinitions\Decompositions\MeasureEachZ.qs
+		src\Simulation\TargetDefinitions\Decompositions\MeasureWithNoReuse.qs = src\Simulation\TargetDefinitions\Decompositions\MeasureWithNoReuse.qs
+		src\Simulation\TargetDefinitions\Decompositions\MResetX.qs = src\Simulation\TargetDefinitions\Decompositions\MResetX.qs
+		src\Simulation\TargetDefinitions\Decompositions\MResetXExplicit.qs = src\Simulation\TargetDefinitions\Decompositions\MResetXExplicit.qs
+		src\Simulation\TargetDefinitions\Decompositions\MResetY.qs = src\Simulation\TargetDefinitions\Decompositions\MResetY.qs
+		src\Simulation\TargetDefinitions\Decompositions\MResetYExplicit.qs = src\Simulation\TargetDefinitions\Decompositions\MResetYExplicit.qs
+		src\Simulation\TargetDefinitions\Decompositions\MResetZ.qs = src\Simulation\TargetDefinitions\Decompositions\MResetZ.qs
+		src\Simulation\TargetDefinitions\Decompositions\MResetZExplicit.qs = src\Simulation\TargetDefinitions\Decompositions\MResetZExplicit.qs
+		src\Simulation\TargetDefinitions\Decompositions\MWithPostPrep.qs = src\Simulation\TargetDefinitions\Decompositions\MWithPostPrep.qs
+		src\Simulation\TargetDefinitions\Decompositions\PreparePostM.qs = src\Simulation\TargetDefinitions\Decompositions\PreparePostM.qs
+		src\Simulation\TargetDefinitions\Decompositions\PreparePostMNoop.qs = src\Simulation\TargetDefinitions\Decompositions\PreparePostMNoop.qs
+		src\Simulation\TargetDefinitions\Decompositions\R.qs = src\Simulation\TargetDefinitions\Decompositions\R.qs
+		src\Simulation\TargetDefinitions\Decompositions\R1.qs = src\Simulation\TargetDefinitions\Decompositions\R1.qs
+		src\Simulation\TargetDefinitions\Decompositions\R1Frac.qs = src\Simulation\TargetDefinitions\Decompositions\R1Frac.qs
+		src\Simulation\TargetDefinitions\Decompositions\R1FromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\R1FromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\Reset.qs = src\Simulation\TargetDefinitions\Decompositions\Reset.qs
+		src\Simulation\TargetDefinitions\Decompositions\ResetAll.qs = src\Simulation\TargetDefinitions\Decompositions\ResetAll.qs
+		src\Simulation\TargetDefinitions\Decompositions\RFrac.qs = src\Simulation\TargetDefinitions\Decompositions\RFrac.qs
+		src\Simulation\TargetDefinitions\Decompositions\RFromSinglyControlledR1.qs = src\Simulation\TargetDefinitions\Decompositions\RFromSinglyControlledR1.qs
+		src\Simulation\TargetDefinitions\Decompositions\Rx.qs = src\Simulation\TargetDefinitions\Decompositions\Rx.qs
+		src\Simulation\TargetDefinitions\Decompositions\RxFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\RxFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\Ry.qs = src\Simulation\TargetDefinitions\Decompositions\Ry.qs
+		src\Simulation\TargetDefinitions\Decompositions\RyFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\RyFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\Rz.qs = src\Simulation\TargetDefinitions\Decompositions\Rz.qs
+		src\Simulation\TargetDefinitions\Decompositions\RzFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\RzFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\SetToBasisState.qs = src\Simulation\TargetDefinitions\Decompositions\SetToBasisState.qs
+		src\Simulation\TargetDefinitions\Decompositions\SFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\SFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\SWAP.qs = src\Simulation\TargetDefinitions\Decompositions\SWAP.qs
+		src\Simulation\TargetDefinitions\Decompositions\SWAPFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\SWAPFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\TFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\TFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\Utils.qs = src\Simulation\TargetDefinitions\Decompositions\Utils.qs
+		src\Simulation\TargetDefinitions\Decompositions\XFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\XFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\YFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\YFromSinglyControlled.qs
+		src\Simulation\TargetDefinitions\Decompositions\ZFromSinglyControlled.qs = src\Simulation\TargetDefinitions\Decompositions\ZFromSinglyControlled.qs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Intrinsics", "Intrinsics", "{A3E68578-2DBE-4E32-84BC-9E416AF16B39}"
+	ProjectSection(SolutionItems) = preProject
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyControlledX.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyControlledX.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyControlledZ.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyControlledZ.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledH.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledH.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledSAdj.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledSAdj.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledSWAP.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledSWAP.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledTAdj.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledTAdj.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs
+		src\Simulation\TargetDefinitions\Intrinsic\Exp.qs = src\Simulation\TargetDefinitions\Intrinsic\Exp.qs
+		src\Simulation\TargetDefinitions\Intrinsic\H.qs = src\Simulation\TargetDefinitions\Intrinsic\H.qs
+		src\Simulation\TargetDefinitions\Intrinsic\IsingXX.qs = src\Simulation\TargetDefinitions\Intrinsic\IsingXX.qs
+		src\Simulation\TargetDefinitions\Intrinsic\IsingYY.qs = src\Simulation\TargetDefinitions\Intrinsic\IsingYY.qs
+		src\Simulation\TargetDefinitions\Intrinsic\IsingZZ.qs = src\Simulation\TargetDefinitions\Intrinsic\IsingZZ.qs
+		src\Simulation\TargetDefinitions\Intrinsic\M.qs = src\Simulation\TargetDefinitions\Intrinsic\M.qs
+		src\Simulation\TargetDefinitions\Intrinsic\Measure.qs = src\Simulation\TargetDefinitions\Intrinsic\Measure.qs
+		src\Simulation\TargetDefinitions\Intrinsic\MZ.qs = src\Simulation\TargetDefinitions\Intrinsic\MZ.qs
+		src\Simulation\TargetDefinitions\Intrinsic\R.qs = src\Simulation\TargetDefinitions\Intrinsic\R.qs
+		src\Simulation\TargetDefinitions\Intrinsic\Reset.qs = src\Simulation\TargetDefinitions\Intrinsic\Reset.qs
+		src\Simulation\TargetDefinitions\Intrinsic\Rx.qs = src\Simulation\TargetDefinitions\Intrinsic\Rx.qs
+		src\Simulation\TargetDefinitions\Intrinsic\Ry.qs = src\Simulation\TargetDefinitions\Intrinsic\Ry.qs
+		src\Simulation\TargetDefinitions\Intrinsic\Rz.qs = src\Simulation\TargetDefinitions\Intrinsic\Rz.qs
+		src\Simulation\TargetDefinitions\Intrinsic\S.qs = src\Simulation\TargetDefinitions\Intrinsic\S.qs
+		src\Simulation\TargetDefinitions\Intrinsic\SWAP.qs = src\Simulation\TargetDefinitions\Intrinsic\SWAP.qs
+		src\Simulation\TargetDefinitions\Intrinsic\T.qs = src\Simulation\TargetDefinitions\Intrinsic\T.qs
+		src\Simulation\TargetDefinitions\Intrinsic\X.qs = src\Simulation\TargetDefinitions\Intrinsic\X.qs
+		src\Simulation\TargetDefinitions\Intrinsic\Y.qs = src\Simulation\TargetDefinitions\Intrinsic\Y.qs
+		src\Simulation\TargetDefinitions\Intrinsic\Z.qs = src\Simulation\TargetDefinitions\Intrinsic\Z.qs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageDefinitions", "PackageDefinitions", "{FA7E8961-9F0E-4D9E-8D81-9B07E9DA29EE}"
+	ProjectSection(SolutionItems) = preProject
+		src\Simulation\TargetDefinitions\TargetPackages\Common.Package.props = src\Simulation\TargetDefinitions\TargetPackages\Common.Package.props
+		src\Simulation\TargetDefinitions\TargetPackages\QSharpCore.Package.props = src\Simulation\TargetDefinitions\TargetPackages\QSharpCore.Package.props
+		src\Simulation\TargetDefinitions\TargetPackages\Type1.Package.props = src\Simulation\TargetDefinitions\TargetPackages\Type1.Package.props
+		src\Simulation\TargetDefinitions\TargetPackages\Type2.Package.props = src\Simulation\TargetDefinitions\TargetPackages\Type2.Package.props
+		src\Simulation\TargetDefinitions\TargetPackages\Type3.Package.props = src\Simulation\TargetDefinitions\TargetPackages\Type3.Package.props
+		src\Simulation\TargetDefinitions\TargetPackages\Type4.Package.props = src\Simulation\TargetDefinitions\TargetPackages\Type4.Package.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.QSharp.Foundation", "src\Simulation\QSharpFoundation.Tests\Tests.Microsoft.Quantum.QSharp.Foundation.csproj", "{B23962F1-E6DD-4A01-B304-1D5E596117F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -877,22 +980,22 @@ Global
 		{68E86360-B9E6-4282-A27B-2B1C2B0CC025}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
 		{68E86360-B9E6-4282-A27B-2B1C2B0CC025}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
 		{68E86360-B9E6-4282-A27B-2B1C2B0CC025}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.Debug|x64.Build.0 = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.MinSizeRel|x64.Build.0 = Debug|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.Release|x64.ActiveCfg = Release|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.Release|x64.Build.0 = Release|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Debug|x64.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Release|x64.ActiveCfg = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.Release|x64.Build.0 = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|Any CPU.ActiveCfg = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -953,7 +1056,10 @@ Global
 		{E5CB56D0-EDB1-4E07-A304-E17041F67642} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
 		{EE45DFE5-8045-49A6-8581-31830E882905} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
 		{68E86360-B9E6-4282-A27B-2B1C2B0CC025} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
-		{ED9836B9-AEDA-4374-8B29-DC3C47934E6F} = {34D419E9-CCF1-4E48-9FA4-3AD4B86BEEB4}
+		{AFB174AB-C5E1-411C-B5A8-4FA375B55600} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
+		{A3E68578-2DBE-4E32-84BC-9E416AF16B39} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
+		{FA7E8961-9F0E-4D9E-8D81-9B07E9DA29EE} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
+		{B23962F1-E6DD-4A01-B304-1D5E596117F5} = {03736C2E-DB2A-46A9-B7B2-C1216BDECB4F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}
