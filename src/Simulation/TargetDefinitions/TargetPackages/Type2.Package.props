@@ -18,7 +18,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\X.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Y.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Z.qs" />
-    <QsharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
   </ItemGroup>
 
   <ItemGroup>
