@@ -5,6 +5,8 @@
 # The entries will need to be ordered from the root of the file tree to the leaves.
 # For the same-level entries it still makes sense to order them alphabetically to simplify the search.
 
+/src/Azure/                                            @cesarzc
+
 /src/Qir/                                              @kuzminrobin @swernli
 
 /src/Simulation/AutoSubstitution/
