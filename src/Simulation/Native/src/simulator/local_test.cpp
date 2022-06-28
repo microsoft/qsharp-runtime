@@ -912,7 +912,7 @@ void test_extract_qubits_cat_state(
     auto cmpl = Microsoft::Quantum::complement(subset, qubits_number);
 
     sim.H(q1[cmpl[0]]);
-    for (int i = 1; i < cmpl.size(); ++i)
+    for (size_t i = 1; i < cmpl.size(); ++i)
     {
         sim.CX(q1[cmpl[0]], q1[cmpl[i]]);
     }
@@ -935,7 +935,7 @@ void test_extract_qubits_cat_state(
     bool res = sim.M(q1[subset[0]]);
     if (res)
     {
-        for (int i = 0; i < subset.size(); ++i)
+        for (size_t i = 0; i < subset.size(); ++i)
         {
             sim.X(q1[subset[i]]);
         }
@@ -944,7 +944,7 @@ void test_extract_qubits_cat_state(
     bool res_compl = sim.M(q1[cmpl[0]]);
     if (res_compl)
     {
-        for (int i = 0; i < cmpl.size(); ++i)
+        for (size_t i = 0; i < cmpl.size(); ++i)
         {
             sim.X(q1[cmpl[i]]);
         }
