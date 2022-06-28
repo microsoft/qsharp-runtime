@@ -4,16 +4,16 @@
 namespace Microsoft.Quantum.Intrinsic {
 
     /// # Summary
-    /// Applies a rotation about the $x$-axis by a given angle. Note that the Controlled
+    /// Applies a rotation about the $y$-axis by a given angle. Note that the Controlled
     /// functor is not supported.
     ///
     /// # Description
     /// \begin{align}
-    ///     R_x(\theta) \mathrel{:=}
-    ///     e^{-i \theta \sigma_x / 2} = 
+    ///     R_y(\theta) \mathrel{:=}
+    ///     e^{-i \theta \sigma_y / 2} = 
     ///     \begin{bmatrix}
-    ///         \cos \frac{\theta}{2} & -i\sin \frac{\theta}{2}  \\\\
-    ///         -i\sin \frac{\theta}{2} & \cos \frac{\theta}{2}
+    ///         \cos \frac{\theta}{2} & -\sin \frac{\theta}{2}  \\\\
+    ///         \sin \frac{\theta}{2} & \cos \frac{\theta}{2}
     ///     \end{bmatrix}.
     /// \end{align}
     ///
@@ -26,9 +26,9 @@ namespace Microsoft.Quantum.Intrinsic {
     /// # Remarks
     /// Equivalent to:
     /// ```qsharp
-    /// R(PauliX, theta, qubit);
+    /// R(PauliY, theta, qubit);
     /// ```
-    internal operation ApplyUncontrolledRx (theta : Double, qubit : Qubit) : Unit {
+    internal operation ApplyUncontrolledRy (theta : Double, qubit : Qubit) : Unit {
         body (...) {
             ApplyUncontrolledSAdj(qubit);
             for _ in 1..3 {
