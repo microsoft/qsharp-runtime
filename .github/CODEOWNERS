@@ -12,8 +12,8 @@
 /src/Simulation/AutoSubstitution.Tests/
 /src/Simulation/Common/                                @kuzminrobin
 /src/Simulation/Core/                                  @kuzminrobin
-/src/Simulation/EntryPointDriver/                      @samarsha
-/src/Simulation/EntryPointDriver.Tests/                @samarsha
+/src/Simulation/EntryPointDriver/                      @samarsha @cesarzc
+/src/Simulation/EntryPointDriver.Tests/                @samarsha @cesarzc
 /src/Simulation/Native/                                @kuzminrobin
 /src/Simulation/NativeSparseSimulator/                 @kuzminrobin
 /src/Simulation/QCTraceSimulator/                      @DmitryVasilevsky
