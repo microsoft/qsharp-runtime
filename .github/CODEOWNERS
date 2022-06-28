@@ -18,7 +18,7 @@
 /src/Simulation/NativeSparseSimulator/                 @kuzminrobin
 /src/Simulation/QCTraceSimulator/                      @DmitryVasilevsky
 /src/Simulation/QCTraceSimulator.Tests/                @DmitryVasilevsky
-/src/Simulation/qdk_sim_rs/                            @swernli
+/src/Simulation/qdk_sim_rs/                            @cgranade @swernli
 /src/Simulation/QSharpCore/                            @swernli
 /src/Simulation/QSharpFoundation/                      @swernli
 /src/Simulation/QSharpFoundation.Tests/                @swernli @kuzminrobin
