@@ -904,7 +904,7 @@ void test_extract_qubits_cat_state(
     auto const q1 = sim.allocate(qubits_number);
 
     sim.H(q1[subset[0]]);
-    for (int i = 1; i < subset.size(); ++i)
+    for (size_t i = 1; i < subset.size(); ++i)
     {
         sim.CX(q1[subset[0]], q1[subset[i]]);
     }

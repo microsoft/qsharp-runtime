@@ -322,7 +322,7 @@ void test_permute_basis()
     }
 
     std::vector<unsigned> qbit_ids(nqubits);
-    for (unsigned i = 0; i < qbit_ids.size(); ++i)
+    for (size_t i = 0; i < qbit_ids.size(); ++i)
         qbit_ids[i] = i + 1;
 
     for (unsigned i = 0; i < nqubits + 1; ++i)

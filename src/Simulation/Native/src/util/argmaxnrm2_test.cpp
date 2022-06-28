@@ -12,7 +12,7 @@ void argmax_test(size_t testSize)
     using namespace Microsoft::Quantum;
     std::vector<std::complex<double>> wfn1(testSize);
     std::vector<std::complex<double>> wfn2(testSize);
-    for (int i = 0; i < testSize; ++i)
+    for (size_t i = 0; i < testSize; ++i)
     {
         wfn1[i] = 0.2 * i;
         wfn2[i] = 0.2 * (testSize - i);

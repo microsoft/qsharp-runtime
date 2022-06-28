@@ -34,7 +34,7 @@ void bititerator_test_with_chuncks(const std::vector<unsigned>& bits_to_iterate)
 
     using namespace Microsoft::Quantum;
     std::vector<size_t> chunks = split_interval_in_chunks(1ull << bits_to_iterate.size(), 6);
-    for (int i = 0; i < chunks.size() - 1; ++i)
+    for (unsigned long long i = 0; i < chunks.size() - 1; ++i)
     {
         std::uint64_t st = chunks[i];
         bititerator it(st, init, bits_to_iterate);
