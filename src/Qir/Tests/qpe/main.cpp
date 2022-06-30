@@ -98,6 +98,9 @@ int main(int argc, const char * argv[])
 
     json j;
     inFileStream >> j;
+
+    inFileStream.close();
+    
     const JWData jwData = j.get<JWData>();      // JW_json.hpp
 
     //std::cout << std::setw(4) << j << std::endl;
@@ -259,11 +262,11 @@ int main(int argc, const char * argv[])
     //     energyOffset: energyOffset,                              double energyOffset,      
         energyOffset,
     //     nBitsPrecision: 10,                                      int64_t nBitsPrecision,   
-        10,
+        11,
     //     trotterStepSize: 1.0,                                    double trotterStepSize,   
-        1.0,
+        0.1,
     //     trotterOrder: 2                                          int64_t trotterOrder);    
-        2);
+        1);
 
     // Console.WriteLine($"Result: {result}");
     cout << "Result: " << result << endl;
