@@ -21,6 +21,8 @@ add_subdirectory(nlohmann_json)
 
 add_executable(qpe
 #  QIR_dummy.cpp
+  IBMQ_qis.cpp
+
   JW_QIR.cpp
   JW_json.cpp
   main.cpp
@@ -29,10 +31,16 @@ add_executable(qpe
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../../Common/cmake")     # qir_cmake_include.cmake
 include(qir_cmake_include)  # target_source_from_qir
 set(TEST_FILES
-  #est-energy_fix.ll
-  #est-energy.pqAndPqqrTermIdxs.ll
+  #est-energy.qat.dbginfo.ll
 
-  est-energy.qat.dbginfo.ll
+  #est-energy.IBMQ.ll
+    # Removed `internal`.
+    # After fix of ApplyUncontrolledRx.qs ApplyUncontrolledRy.qs
+
+  est-energy.IBMQ.dbginfo.ll
+    # Removed `internal`.
+    # After fix of ApplyUncontrolledRx.qs ApplyUncontrolledRy.qs.
+
   #est-energy.ll
 )
 foreach(file ${TEST_FILES})
@@ -61,8 +69,10 @@ target_link_libraries(qpe PUBLIC
 endif()
 
 set(public_includes "${PROJECT_SOURCE_DIR}/../../Runtime/public")
+set(QSharpCore_includes "${PROJECT_SOURCE_DIR}/../../Runtime/lib/QSharpCore")
 target_include_directories(qpe PUBLIC
  #${test_includes}
  #${common_includes}
  ${public_includes}
+ ${QSharpCore_includes}
 )
