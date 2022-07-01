@@ -17,7 +17,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRx.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRy.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledH.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledHFromSqrtX.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledS.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledSAdj.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledT.qs" />
