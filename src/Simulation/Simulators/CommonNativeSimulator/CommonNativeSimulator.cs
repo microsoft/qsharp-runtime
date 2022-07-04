@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Microsoft.Quantum.Simulation.Simulators
 {
-    public abstract partial class CommonNativeSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IType3Core, IType4Core, IDisposable
+    public abstract partial class CommonNativeSimulator : SimulatorBase, IQSharpCore, IType1Core, IType2Core, IType3Core, IType4Core, IIntrinsicApplyUncontrolledSqrtX, IDisposable
     {
         /// <summary>
         /// Creates a an instance of a quantum simulator.

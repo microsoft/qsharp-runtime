@@ -30,13 +30,11 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ```
     internal operation ApplyUncontrolledRy (theta : Double, qubit : Qubit) : Unit {
         body (...) {
-            ApplyUncontrolledSAdj(qubit);
-            for _ in 1..3 {
-                ApplyUncontrolledSqrtX(qubit);
-            }
-            Rz(theta, qubit);
             ApplyUncontrolledSqrtX(qubit);
-            ApplyUncontrolledS(qubit);
+            ApplyUncontrolledRz(theta, qubit);
+            ApplyUncontrolledSqrtX(qubit);
+            ApplyUncontrolledSqrtX(qubit);
+            ApplyUncontrolledSqrtX(qubit);
         }
     }
 }
