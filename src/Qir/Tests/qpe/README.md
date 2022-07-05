@@ -14,15 +14,18 @@ The build and run instructions.
 # Enter PowerShell:
 pwsh
 
-git checkout kuzminrobin/qpeMoreTargPacks3 
+git checkout kuzminrobin/qpeMoreTargPacks4
 
 # Build the full-state simulator in Debug configuration:
 $Env:BUILD_CONFIGURATION = "Debug"
 Push-Location "src/Simulation/Native"
 .\build-native-simulator.ps1
+    # For now we ignore a few screen pages of warnings.
 Pop-Location
 
-# Build the QIR Runtime in Release configuration:
+# Build the QIR Runtime in Release configuration 
+# (the Debug configuration has one undesirable assert,
+# that's a known issue):
 $Env:BUILD_CONFIGURATION = "Release"
 Push-Location "src/Qir/Runtime"
 .\build-qir-runtime.ps1
@@ -51,20 +54,20 @@ dotnet build est-energy.IBMQ.csproj
     #       and then look at the contents of the file `qir/est-energy.IBMQ.no_internal.ll.diff`. 
     #
     #   Some more info about the steps below is here - 
-    #   https://stackoverflow.com/questions/31984503/is-there-a-debugger-for-llvm-ir/72398082#72398082.
+    #   https://stackoverflow.com/questions/31984503/is-there-a-debugger-for-llvm-ir/72398082#72398082
     #   [Build the `https://github.com/qir-alliance/qat` tool if not yet done (I have done that in WSL), and] 
     #   According to the instructions at https://github.com/qir-alliance/qat/pull/66 
     #       generate the file "qir/est-energy.IBMQ.no_internal.dbginfo.ll" 
-    #           from the qir/est-energy.IBMQ.no_internal.ll" (I do that in WSL).
+    #           from the "qir/est-energy.IBMQ.no_internal.ll" (I do that in WSL).
     #       $QAT_REPO/build/qir/qat/Apps/qat -S qir/est-energy.IBMQ.no_internal.ll > qir/est-energy.IBMQ.no_internal.dbginfo.ll
     #   Make sure that in here 
-    #   https://github.com/microsoft/qsharp-runtime/blob/316ac76180d6fa33c6810389ee4443c597e11a82/src/Qir/Tests/qpe/CMakeLists.txt#L34-L39
+    #   https://github.com/microsoft/qsharp-runtime/blob/3f2f23e7d0a00d62a4255ab8997b913d763a4c13/src/Qir/Tests/qpe/CMakeLists.txt#L33-L41
     #       the "qsharp/qir/est-energy.IBMQ.no_internal.dbginfo.ll" is listed 
     #       but the "qsharp/qir/est-energy.IBMQ.ll" is not, or is commented out
     #       (and other .ll files are not listed either).
     # Else (you don't need to debug it)
     #   Make sure that in here 
-    #       https://github.com/microsoft/qsharp-runtime/blob/316ac76180d6fa33c6810389ee4443c597e11a82/src/Qir/Tests/qpe/CMakeLists.txt#L34-L39
+    #   https://github.com/microsoft/qsharp-runtime/blob/3f2f23e7d0a00d62a4255ab8997b913d763a4c13/src/Qir/Tests/qpe/CMakeLists.txt#L33-L41
     #       the "qsharp/qir/est-energy.IBMQ.ll" is listed 
     #       but the "qsharp/qir/est-energy.IBMQ.no_internal.dbginfo.ll" is not, or is commented out
     #       (and other .ll files are not listed either).

@@ -1,3 +1,4 @@
 # Ignore the generated qir files from Q# compiler
 **/build/
 **/nlohmann_json/
+!qsharp/qir
