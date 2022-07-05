@@ -1,7 +1,7 @@
 # The Latest Build and Run Instructions
 (The sections after this one are out-of-date)  
-2022.07.15
-The [1e_0.181287518_-0.181287518.json](https://github.com/microsoft/qsharp-runtime/blob/kuzminrobin/qpeMoreTargPacks3/src/Qir/Tests/qpe/1e_0.181287518_-0.181287518.json)
+2022.07.15  
+The [1e_0.181287518_-0.181287518.json](https://github.com/microsoft/qsharp-runtime/blob/kuzminrobin/qpeMoreTargPacks4/src/Qir/Tests/qpe/1e_0.181287518_-0.181287518.json)
 (provided by Ang) is the smallest molecule that we can use to validate our decompositions and target packages.
 The result of the calculation should be close to either 0.181287518 or -0.181287518, with equal probability.
 
