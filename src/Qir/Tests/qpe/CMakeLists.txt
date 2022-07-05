@@ -31,16 +31,12 @@ add_executable(qpe
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../../Common/cmake")     # qir_cmake_include.cmake
 include(qir_cmake_include)  # target_source_from_qir
 set(TEST_FILES
+  qsharp/qir/est-energy.IBMQ.no_internal.dbginfo.ll
+    # Removed `internal`, with debug info.
+
+  #qsharp/qir/est-energy.IBMQ.ll
+
   #est-energy.qat.dbginfo.ll
-
-  #est-energy.IBMQ.ll
-    # Removed `internal`.
-    # After fix of ApplyUncontrolledRx.qs ApplyUncontrolledRy.qs
-
-  est-energy.IBMQ.dbginfo.ll
-    # Removed `internal`.
-    # After fix of ApplyUncontrolledRx.qs ApplyUncontrolledRy.qs.
-
   #est-energy.ll
 )
 foreach(file ${TEST_FILES})

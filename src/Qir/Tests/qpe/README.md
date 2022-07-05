@@ -1,6 +1,87 @@
-# Structure
+# The Latest Build and Run Instructions
+(The sections after this one are out-of-date)  
+2022.07.15
+The [1e_0.181287518_-0.181287518.json](https://github.com/microsoft/qsharp-runtime/blob/kuzminrobin/qpeMoreTargPacks3/src/Qir/Tests/qpe/1e_0.181287518_-0.181287518.json)
+(provided by Ang) is the smallest molecule that we can use to validate our decompositions and target packages.
+The result of the calculation should be close to either 0.181287518 or -0.181287518, with equal probability.
 
-I can walk you through all the steps during the Teams call with a screen share. Feel free to get in touch with me.
+The build and run instructions.
+```powershell
+# It is assumed 
+#   that you have a clean local copy of the repo,
+#   current working directory is the root of the repo.
+
+# Enter PowerShell:
+pwsh
+
+git checkout kuzminrobin/qpeMoreTargPacks3 
+
+# Build the full-state simulator in Debug configuration:
+$Env:BUILD_CONFIGURATION = "Debug"
+Push-Location "src/Simulation/Native"
+.\build-native-simulator.ps1
+Pop-Location
+
+# Build the QIR Runtime in Release configuration:
+$Env:BUILD_CONFIGURATION = "Release"
+Push-Location "src/Qir/Runtime"
+.\build-qir-runtime.ps1
+# FYI: On my machine the linker `lld-link` prints a few screen pages of warnings like this
+#   lld-link: warning: procedure symbol record for `__TypeMatch` in 
+#   D:\a\_work\1\s\Intermediate\vctools\libvcruntime.nativeproj_520857879\objr\amd64\frame.obj 
+#   refers to PDB item index 0x12B4 which is not a valid function ID record
+# These warnings started after we migrated to clang-13. For now I ignore those warnings.
+Pop-Location
+
+cd src/Qir/Tests/qpe
+
+# If the decompositions or target packages have been updated for IBMQ then 
+# re-generate the "qsharp\qir\est-energy.IBMQ.ll".
+Push-Location "qsharp"
+dotnet build est-energy.IBMQ.csproj
+    # This will update "qir/est-energy.IBMQ.ll".
+    # If you need to debug it (or look at the stack trace upon crash) then 
+    #   In the updated "qir/est-energy.IBMQ.ll" replace the fragments 
+    #   "define internal " with fragment "define " (remove "internal " from the function definitions),
+    #   and save with the name "qir/est-energy.IBMQ.no_internal.ll".
+    #   In Linux/WSL this can be done with the command
+    #       cat qir/est-energy.IBMQ.ll | sed -e "s/define internal /define /" > qir/est-energy.IBMQ.no_internal.ll
+    #       To make sure that the substitution is correct you can use the command 
+    #       diff qir/est-energy.IBMQ.ll qir/est-energy.IBMQ.no_internal.ll > qir/est-energy.IBMQ.no_internal.ll.diff
+    #       and then look at the contents of the file `qir/est-energy.IBMQ.no_internal.ll.diff`. 
+    #
+    #   Some more info about the steps below is here - 
+    #   https://stackoverflow.com/questions/31984503/is-there-a-debugger-for-llvm-ir/72398082#72398082.
+    #   [Build the `https://github.com/qir-alliance/qat` tool if not yet done (I have done that in WSL), and] 
+    #   According to the instructions at https://github.com/qir-alliance/qat/pull/66 
+    #       generate the file "qir/est-energy.IBMQ.no_internal.dbginfo.ll" 
+    #           from the qir/est-energy.IBMQ.no_internal.ll" (I do that in WSL).
+    #       $QAT_REPO/build/qir/qat/Apps/qat -S qir/est-energy.IBMQ.no_internal.ll > qir/est-energy.IBMQ.no_internal.dbginfo.ll
+    #   Make sure that in here 
+    #   https://github.com/microsoft/qsharp-runtime/blob/316ac76180d6fa33c6810389ee4443c597e11a82/src/Qir/Tests/qpe/CMakeLists.txt#L34-L39
+    #       the "qsharp/qir/est-energy.IBMQ.no_internal.dbginfo.ll" is listed 
+    #       but the "qsharp/qir/est-energy.IBMQ.ll" is not, or is commented out
+    #       (and other .ll files are not listed either).
+    # Else (you don't need to debug it)
+    #   Make sure that in here 
+    #       https://github.com/microsoft/qsharp-runtime/blob/316ac76180d6fa33c6810389ee4443c597e11a82/src/Qir/Tests/qpe/CMakeLists.txt#L34-L39
+    #       the "qsharp/qir/est-energy.IBMQ.ll" is listed 
+    #       but the "qsharp/qir/est-energy.IBMQ.no_internal.dbginfo.ll" is not, or is commented out
+    #       (and other .ll files are not listed either).
+Pop-Location
+
+# Build the QPE executable:
+./build.ps1
+# The `lld-link` prints a few screen pages of warnings again.
+
+# Run the QPE executable:
+./run.ps1
+# For me the run now takes more than 30 minutes.
+```
+The sections below are out-of-date.
+
+
+# Structure
 
 The `.\py_out.json` has been generated from 
 [Quantum/samples/chemistry/IntegralData/Broombridge_v0.2/LiH_sto-3g.yaml](https://github.com/microsoft/Quantum/blob/main/samples/chemistry/IntegralData/Broombridge_v0.2/LiH_sto-3g.yaml)
@@ -17,9 +98,7 @@ print(json.dumps(encode(problem.load_fermion_hamiltonian(), input_state)))
 ```
 
 ## If you need to regenerate the QIR
-See https://github.com/cgranade/qpe-for-pnnl  
-
-The `qsharp` folder from https://github.com/cgranade/qpe-for-pnnl has been copied to here and the work-around fixes were applied to `.\qsharp\Program.qs`.  
+See https://github.com/cgranade/qpe-for-pnnl. The `qsharp` folder from https://github.com/cgranade/qpe-for-pnnl has been copied to here and the work-around fixes were applied to `.\qsharp\Program.qs`.  
 The `.\qsharp\est-energy.csproj` refers the version `0.24.39585-alpha`
 (artifacts are [here](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_build/results?buildId=39585&view=artifacts&pathAsName=false&type=publishedArtifacts), 
 at `drop/drops/nugets`)
