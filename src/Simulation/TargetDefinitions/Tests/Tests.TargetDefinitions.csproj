@@ -40,6 +40,7 @@
     <QsharpCompile Include="..\Decompositions\ExpUtil.qs" />
     <QsharpCompile Include="..\Decompositions\HFromSinglyControlled.qs" />
     <QSharpCompile Include="..\Decompositions\MResetZExplicit.qs" />
+    <QSharpCompile Include="..\Decompositions\ResultArrayAsInt.qs" />
     <QsharpCompile Include="..\Decompositions\RFromSinglyControlledR1.qs" />
     <QsharpCompile Include="..\Decompositions\R1FromSinglyControlled.qs" />
     <QsharpCompile Include="..\Decompositions\RxFromSinglyControlled.qs" />
