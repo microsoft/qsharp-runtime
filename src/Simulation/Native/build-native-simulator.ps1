@@ -40,10 +40,15 @@ $SANITIZE_FLAGS=`
 
     #+ "-fsanitize=unsigned-integer-overflow "      # TODO(rokuzmin, #884): Disable this option for _specific_ lines 
                                                     # of code, but not for the whole binary.
-
 # There should be no space after -D CMAKE_BUILD_TYPE= but if we provide the environment variable inline, without
 # the space it doesn't seem to get substituted... With invalid -D CMAKE_BUILD_TYPE argument cmake silently produces
 # a DEBUG build.
+
+$buildType = $Env:BUILD_CONFIGURATION
+if ($buildType -eq "Release") {
+    $buildType = "RelWithDebInfo"
+}
+
 if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win"))))
 {
     $CMAKE_C_COMPILER = "-DCMAKE_C_COMPILER=clang.exe"
@@ -56,7 +61,7 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
     }
 
     cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER `
-        -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION"  ..
+        -D CMAKE_BUILD_TYPE="$buildType"  ..
         # Without `-G Ninja` we fail to switch from MSVC to Clang.
         # Sanitizers are not supported on Windows at the moment. Check again after migrating from Clang-11.
 }
@@ -65,7 +70,7 @@ elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ `
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
-        -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
+        -D CMAKE_BUILD_TYPE="$buildType" ..
 }
 elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin"))))
 {
@@ -74,12 +79,12 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
     cmake -D BUILD_SHARED_LIBS:BOOL="1" `
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
-        -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
+        -D CMAKE_BUILD_TYPE="$buildType" ..
 }
 else {
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$Env:BUILD_CONFIGURATION" ..
+    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$buildType" ..
 }
-cmake --build . --config "$Env:BUILD_CONFIGURATION" --target install
+cmake --build . --config "$buildType" --target install
 
 if ($IsMacOS) {
     Write-Host "##[info]Copying libomp..."
