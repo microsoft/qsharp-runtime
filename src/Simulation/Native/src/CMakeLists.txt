@@ -34,6 +34,8 @@ else(BUILD_SHARED_LIBS)
   set_source_files_properties(simulator/simulatoravx512.cpp PROPERTIES COMPILE_FLAGS ${AVX512FLAGS})
 endif(BUILD_SHARED_LIBS)
 
+target_link_libraries(Microsoft.Quantum.Simulator.Runtime ${SPECTRE_LIBS})
+
 install(TARGETS Microsoft.Quantum.Simulator.Runtime
         RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop"
         LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/drop"

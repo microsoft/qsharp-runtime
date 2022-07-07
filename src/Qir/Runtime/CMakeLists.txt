@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
 
+if (WIN32)
+    # Enforce use of static runtime (avoids target machine needing msvcrt installed).
+    # Must set policy CMP0091 before any projects are declared (see https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html#cmake-msvc-runtime-library)
+    cmake_policy(SET CMP0091 NEW)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif (WIN32)
+
 # set the project name and version
 project(qirruntime)
 
@@ -10,9 +17,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if (WIN32)
-    # Enforce use of static runtime (avoids target machine needing msvcrt installed).
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
     # Locate the vswhere application, which will provide paths to any installed Visual Studio instances.
     # By invoking it with "-find **/lib/spectre/x64" we will find any Spectre mitigated libaries that
     # have been installed.
@@ -29,6 +33,7 @@ if (WIN32)
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     file(TO_CMAKE_PATH "${_vs_install_loc_out}" SPECTRE_LIB_PATH_OUT)
     string(REGEX REPLACE "[\r\n]+" ";" SPECTRE_LIB_PATH ${SPECTRE_LIB_PATH_OUT})
+    list(REVERSE SPECTRE_LIB_PATH)
     message(INFO "*** install loc: ${SPECTRE_LIB_PATH}")
 
     # Locate the spectre mitigated runtime libraries and fail if they can't be found. Targets in this
