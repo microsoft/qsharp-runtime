@@ -2,7 +2,9 @@
 # Configure the flags used to ensure that required security settings are enabled
 macro(configure_security_flags)
     # Enable Control Flow Guard
-    add_link_options("LINKER:/guard:cf")
+    if (WIN32)
+        add_link_options("LINKER:/guard:cf")
+    endif()
 
     # Enable Compiler supported Spectre mitigations
     if (NOT APPLE)
