@@ -1,10 +1,18 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+
 message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
 
+if (WIN32)
+    # Enforce use of static runtime (avoids target machine needing msvcrt installed).
+    # Must set policy CMP0091 before any projects are declared (see https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html#cmake-msvc-runtime-library)
+    cmake_policy(SET CMP0091 NEW)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif (WIN32)
+
 project(quantum-simulator)
-cmake_minimum_required(VERSION 3.2.0 FATAL_ERROR)
 
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -34,9 +42,6 @@ option(USE_GATE_FUSION "Use gate fusion" ON)
 
 # Always use Spectre mitigations where available
 if (WIN32)
-    # Enforce use of static runtime (avoids target machine needing msvcrt installed).
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
     # Locate the vswhere application, which will provide paths to any installed Visual Studio instances.
     # By invoking it with "-find **/lib/spectre/x64" we will find any Spectre mitigated libaries that
     # have been installed.
@@ -47,7 +52,7 @@ if (WIN32)
         message(FATAL_ERROR "Could not locate vswhere.exe - unable to source vc redistributable")
     endif()
     execute_process(
-        COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/14.*.*/**/lib/spectre/x64 -sort
+        COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/14.29.*/**/lib/spectre/x64 -sort
         OUTPUT_VARIABLE _vs_install_loc_out
         RESULT_VARIABLE _vs_where_exitcode
         OUTPUT_STRIP_TRAILING_WHITESPACE)
