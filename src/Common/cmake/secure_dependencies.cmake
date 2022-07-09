@@ -38,7 +38,7 @@ macro(locate_win32_spectre_static_runtime)
             NAMES vswhere
             PATHS "$ENV{ProgramFiles\(x86\)}/Microsoft Visual Studio/Installer")
         if (NOT ${vswhere})
-            message(FATAL_ERROR "Could not locate vswhere.exe - unable to source vc redistributable")
+            message(FATAL_ERROR "Could not locate vswhere - unable to search for installed vcruntime libraries.")
         endif()
         execute_process(
             COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/14.29.*/**/lib/spectre/x64 -sort
