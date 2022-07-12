@@ -372,6 +372,10 @@ namespace Microsoft.Quantum.Simulation.Common {
             QArray<Qubit> result = QArray<Qubit>.Create(numToAllocate);
             for (int i = 0; i < numToAllocate; i++) {
                 long newQubitId = AllocateQubit();
+                if (newQubitId == None && MayExtendCapacity) {
+                    EnsureCapacity(QubitCapacity * 2);
+                    newQubitId = AllocateQubit();
+                }
                 if (newQubitId == None) {
                     for (int k = 0; k < i; k++) {
                         Release(result[k]);
