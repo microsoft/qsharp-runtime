@@ -212,6 +212,16 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
             Assert.Equal(1.0, sim.Data.Rows.Find("Depth")["Max"]);
         }
 
+        [Fact]
+        public void QubitRestrictedReuseManyQubitsTest() {
+            QCTraceSimulators.QCTraceSimulatorConfiguration config = ResourcesEstimator.RecommendedConfig();
+            config.OptimizeDepth = false;
+            config.EnableRestrictedReuse = true;
+            var sim = new ResourcesEstimator(config);
+
+            RestrictedUseManyQubits.Run(sim).Wait();
+        }
+
 
         /// <summary>
         /// Documents that the QubitCount and Depth statistics reflect independent lower
