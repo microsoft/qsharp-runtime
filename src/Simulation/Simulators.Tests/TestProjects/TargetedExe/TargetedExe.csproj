@@ -1,17 +1,20 @@
-<Project Sdk="Microsoft.Quantum.Sdk">
+﻿<Project Sdk="Microsoft.Quantum.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <QscVerbosity>detailed</QscVerbosity>
     <!-- we will provide our own -->
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeProviderPackages>false</IncludeProviderPackages>
-    <ExecutionTarget>honeywell.qpu</ExecutionTarget>
+    <ExecutionTarget>quantinuum.qpu</ExecutionTarget>
+    <TargetCapability>AdaptiveExecution</TargetCapability>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\EntryPointDriver\Microsoft.Quantum.EntryPointDriver.csproj" />
     <ProjectReference Include="..\..\..\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" />
+    <ProjectReference Include="..\..\..\Type1Core\Microsoft.Quantum.Type1.Core.csproj" IsTargetPackage='true' />
   </ItemGroup>
 
 </Project>

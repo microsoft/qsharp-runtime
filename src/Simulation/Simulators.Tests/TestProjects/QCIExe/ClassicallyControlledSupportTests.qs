@@ -44,13 +44,6 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
             for (index in 0 .. 3) {
                 let temp = index;
             }
-
-            repeat {
-                let success = true;
-            } until (success)
-            fixup {
-                let temp2 = 0;
-            }
         }
     }
 
@@ -82,23 +75,6 @@ namespace Microsoft.Quantum.Simulation.Testing.QCI.ClassicallyControlledSupportT
         let r = Zero;
         if (r == Zero) {
             Adjoint SubOpCA1();
-        }
-    }
-
-    operation PartialApplication(q : Int, w : Double) : Unit { }
-
-    operation LiftPartialApplication() : Unit {
-        let r = Zero;
-        if (r == Zero) {
-            (PartialApplication(1, _))(1.0);
-        }
-    }
-
-    operation LiftArrayItemCall() : Unit {
-        let f = [SubOp1];
-        let r = Zero;
-        if (r == Zero) {
-            f[0]();
         }
     }
 

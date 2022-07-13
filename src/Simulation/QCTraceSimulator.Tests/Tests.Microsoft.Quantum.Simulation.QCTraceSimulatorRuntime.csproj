@@ -5,6 +5,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IsPackable>false</IsPackable>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
