@@ -95,6 +95,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
     }
 
+    operation RestrictedUseManyQubits() : Unit {
+        use qubits = Qubit[2000];
+    }
+
 
     operation SimultaneousUse() : Unit {
         body (...){
