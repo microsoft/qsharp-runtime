@@ -6,7 +6,9 @@ $script:allOk = $true;
 Push-Location $PSScriptRoot
     # If running in CI, use cargo2junit to expose unit tests to the
     # PublishTestResults task.
-    if ($IsCI) {
+    if ($false -and $IsCI) {
+        # This path is disabled because of the bug below:
+        # https://github.com/rust-lang/rust/issues/99261
         cargo install cargo2junit
         $testJson = cargo test -- -Z unstable-options --format json;
         $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
