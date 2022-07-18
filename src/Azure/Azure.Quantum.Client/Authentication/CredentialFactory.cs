@@ -88,7 +88,8 @@ namespace Microsoft.Azure.Quantum.Authentication
     public static class CredentialFactory
     {
         // Used to fetch the tenantId automatically from ARM
-        private static readonly HttpClient Client = new HttpClient();
+        private static readonly HttpClient Client = new HttpClient(
+            new HttpClientHandler(){CheckCertificateRevocationList = true});
 
         // Used to catch all the TenantIds:
         private static readonly Dictionary<string, string?> TenantIds = new Dictionary<string, string?>();
