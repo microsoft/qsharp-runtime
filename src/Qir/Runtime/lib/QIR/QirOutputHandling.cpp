@@ -70,7 +70,7 @@ extern "C"
         }
     }
 
-    void __quantum__rt__integer_record_output(int64_t i64Val) // NOLINT
+    void __quantum__rt__int_record_output(int64_t i64Val) // NOLINT
     {
         std::stringstream strStream;
         strStream << QOH_REC_PREFIX << i64Val;

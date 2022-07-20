@@ -151,7 +151,7 @@ TEST_CASE("QIR: i64OutHandle", "[qir][out_handl][i64_record_output]")
         ostringstream actualStrStream;
         {
             OutputStream::ScopedRedirector qOStreamRedirector(actualStrStream);
-            __quantum__rt__integer_record_output(i64Value);
+            __quantum__rt__int_record_output(i64Value);
         }
 
         std::stringstream expectedStrStream;
@@ -197,14 +197,14 @@ TEST_CASE("QIR: MixedOutHandle", "[qir][out_handl][tuple_record_output]")
             __quantum__rt__array_start_record_output();
                 __quantum__rt__tuple_start_record_output();
                     __quantum__rt__double_record_output(6.67E+23);
-                    __quantum__rt__integer_record_output(42LL);
+                    __quantum__rt__int_record_output(42LL);
                     __quantum__rt__bool_record_output(true);
                     __quantum__rt__result_record_output(__quantum__rt__result_get_one());
                 __quantum__rt__tuple_end_record_output();
 
                 __quantum__rt__tuple_start_record_output();
                     __quantum__rt__double_record_output(-10.123);
-                    __quantum__rt__integer_record_output(-2049LL);
+                    __quantum__rt__int_record_output(-2049LL);
                     __quantum__rt__bool_record_output(false);
                     __quantum__rt__result_record_output(__quantum__rt__result_get_zero());
                 __quantum__rt__tuple_end_record_output();
