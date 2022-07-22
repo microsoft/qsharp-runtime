@@ -3,92 +3,74 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using LlvmBindings;
+using LlvmBindings.Types;
+using LlvmBindings.Values;
+using Microsoft.CodeAnalysis;
 using Microsoft.Quantum.Qir.Serialization;
-using Microsoft.Quantum.QsCompiler;
-using Microsoft.Quantum.QsCompiler.SyntaxTokens;
-using Microsoft.Quantum.QsCompiler.SyntaxTree;
-using Microsoft.Quantum.QsCompiler.QIR;
 
 namespace Microsoft.Quantum.Qir.Runtime.Tools
 {
-    using QsTypeKind = QsTypeKind<ResolvedType, UserDefinedType, QsTypeParameter, CallableInformation>;
-
     internal static class EntryPointLoader
     {
         /// <summary>
-        /// Loads the entry point operations found in the syntax tree included as a resource from <paramref name="assemblyFileInfo"/>.
+        /// Loads the entry point operations found in the QIR bit-code module.<paramref name="module"/>.
         /// </summary>
-        /// <param name="assemblyFileInfo">The file info of a .NET DLL from which to load entry point operations from.</param>
+        /// <param name="module">The bit-code module from which to load entry point operations from.</param>
         /// <returns>
         /// A list of entry point operation objects representing the QIR entry point operations.
         /// </returns>
-        /// <exception cref="FileNotFoundException"><paramref name="assemblyFileInfo"/> does not exist.</exception>
-        /// <exception cref="ArgumentException"><paramref name="assemblyFileInfo"/> does not contain a Q# syntax tree.</exception>
         /// <exception cref="ArgumentException">Encounters invalid parameters for an entry point.</exception>
-        public static IList<EntryPointOperation> LoadEntryPointOperations(FileInfo assemblyFileInfo)
+        public static IList<EntryPointOperation> LoadEntryPointOperations(BitcodeModule module)
         {
-            if (!AssemblyLoader.LoadReferencedAssembly(assemblyFileInfo.FullName, out var compilation))
-            {
-                throw new ArgumentException("Unable to read the Q# syntax tree from the given DLL.");
-            }
-
-            return GenerateEntryPointOperations(compilation);
-        }
-
-        private static IList<EntryPointOperation> GenerateEntryPointOperations(QsCompilation compilation)
-        {
-            var globals = compilation.Namespaces.GlobalCallableResolutions();
-
-            return compilation.EntryPoints.Select(ep => new EntryPointOperation()
-            {
-                Name = NameGeneration.InteropFriendlyWrapperName(ep),
-                Parameters = GetParams(globals[ep]),
-            }).ToList();
-        }
-
-        private static List<Parameter> GetParams(QsCallable callable)
-        {
-            return SyntaxGenerator.ExtractItems(callable.ArgumentTuple)
-                .Where(sym => !sym.Type.Resolution.IsUnitType)
-                .Select(sym => MakeParameter(sym))
+            return module.Functions
+                .Where(f =>
+                    f.Attributes.ContainsKey(LlvmBindings.Values.FunctionAttributeIndex.Function)
+                    && f.Attributes[LlvmBindings.Values.FunctionAttributeIndex.Function].Any(a => a.Name == "InteropFriendly"))
+                .Select(ep => new EntryPointOperation()
+                {
+                    Name = ep.Name,
+                    Parameters = ep.Parameters.Select(p => MakeParameter(p)).ToList()
+                })
                 .ToList();
         }
 
-        private static Parameter MakeParameter(LocalVariableDeclaration<QsLocalSymbol, ResolvedType> parameter)
+        private static Parameter MakeParameter(Argument parameter)
         {
-            var type = MapResolvedTypeToDataType(parameter.Type);
-            var arrayType = parameter.Type.Resolution is QsTypeKind.ArrayType innerType
-                ? (DataType?)MapResolvedTypeToDataType(innerType.Item)
-                : null;
-
-            if (arrayType == DataType.ArrayType)
-            {
-                throw new ArgumentException("Multi-dimensional arrays are not supported types of entry point parameters.");
-            }
-
             return new Parameter()
             {
-                Name = parameter.VariableName is QsLocalSymbol.ValidName name
-                    ? name.Item
-                    : throw new ArgumentException("Encountered invalid name for parameter."),
-                Type = type,
-                ArrayType = arrayType,
+                Name = parameter.Name,
+                Type = MapNativeTypeToDataType(parameter),
+                ArrayType = null
             };
         }
 
-        private static DataType MapResolvedTypeToDataType(ResolvedType rt) => rt.Resolution.Tag switch
+        private static DataType MapNativeTypeToDataType(Argument parameter)
         {
-            QsTypeKind.Tags.Bool => DataType.BoolType,
-            QsTypeKind.Tags.Int => DataType.IntegerType,
-            QsTypeKind.Tags.Double => DataType.DoubleType,
-            QsTypeKind.Tags.Pauli => DataType.PauliType,
-            QsTypeKind.Tags.Range => DataType.RangeType,
-            QsTypeKind.Tags.Result => DataType.ResultType,
-            QsTypeKind.Tags.String => DataType.StringType,
-            QsTypeKind.Tags.ArrayType => DataType.ArrayType,
-            _ => throw new ArgumentException($"Invalid type ({rt.Resolution.Tag}) for entry point parameter"),
-        };
+            DataType getSupportedPointerType(IPointerType pointerType)
+            {
+                var elementType = pointerType.ElementType;
+                if (elementType is IStructType structType)
+                {
+                    return structType.Name switch
+                    {
+                        "Result" => DataType.ResultType,
+                        _ => throw new ArgumentException(
+                            $"Parameter \"{parameter.Name}\"'s type is an unsupported pointer type ({structType.Name}).")
+                    };
+                }
+
+                throw new ArgumentException($"Parameter {parameter.Name} is not a pointer to a struct type.");
+            }
+
+            return parameter.NativeType.Kind switch
+            {
+                LlvmBindings.Types.TypeKind.Integer => DataType.IntegerType,
+                LlvmBindings.Types.TypeKind.Float64 => DataType.DoubleType,
+                LlvmBindings.Types.TypeKind.Pointer => getSupportedPointerType((IPointerType)parameter.NativeType),
+                _ => throw new ArgumentException($"Parameter \"{parameter.Name}\"'s native type ({parameter.NativeType.Kind}) is not supported.")
+            };
+        }
     }
 }
