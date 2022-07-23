@@ -19,10 +19,10 @@ namespace Quantum
             ~ScopedRedirector();
 
           private:
-            ScopedRedirector(const ScopedRedirector&) = delete;
+            ScopedRedirector(const ScopedRedirector&)            = delete;
             ScopedRedirector& operator=(const ScopedRedirector&) = delete;
             ScopedRedirector(ScopedRedirector&&)                 = delete;
-            ScopedRedirector& operator=(ScopedRedirector&&) = delete;
+            ScopedRedirector& operator=(ScopedRedirector&&)      = delete;
 
           private:
             std::ostream& old;

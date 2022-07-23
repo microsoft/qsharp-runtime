@@ -40,6 +40,10 @@ namespace Quantum
         // clang-format on
         {
         }
+
+        Layer(Layer&&) = default; // NOLINT(bugprone-exception-escape) // TODO(rokuzmin): Clang-tidy 14.0.6 complains
+            // that an exception can escape from the implicit move constructor. Failed to figure out within a reasonable
+            // time how to make the move constructor `noexecpt`.
     };
 
     /*==================================================================================================================
