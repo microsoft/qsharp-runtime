@@ -8,6 +8,7 @@
     <LanguageVersion>10.0</LanguageVersion>
     <Nullable>enable</Nullable>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
   </PropertyGroup>
@@ -17,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TargetDefinitions\Interfaces\Microsoft.Quantum.Targets.Interfaces.csproj" />
     <ProjectReference Include="..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
     <ProjectReference Include="..\QCTraceSimulator\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" IncludeInSimulatorPackage="true" />
   </ItemGroup>

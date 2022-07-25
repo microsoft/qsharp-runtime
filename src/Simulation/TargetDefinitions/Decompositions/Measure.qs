@@ -49,7 +49,7 @@ namespace Microsoft.Quantum.Intrinsic {
                 MapPauli(qubits[0], PauliZ, bases[0]);
             }
             apply {
-                set res = MZ(qubits[0]);
+                set res = M(qubits[0]);
             }
         }
         else {

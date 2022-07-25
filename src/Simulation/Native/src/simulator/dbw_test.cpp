@@ -218,7 +218,7 @@ int main()
     int itvl = loops / 10;
     for (int i = 0; i < loops; i++)
     {
-        for (int j = 0; j < prb.size(); j++)
+        for (size_t j = 0; j < prb.size(); j++)
         {
             auto qs = prb[j];
             uint32_t cs[2];
