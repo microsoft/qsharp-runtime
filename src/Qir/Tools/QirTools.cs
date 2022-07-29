@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using LlvmBindings;
 using Microsoft.Quantum.Qir.Runtime.Tools.Executable;
 using Microsoft.Quantum.QsCompiler;
 
@@ -38,13 +39,15 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
             }
 
             executablesDirectory.Create();
+            var qirBitcode = qirContentStream.ToArray();
+            var bitcodeModule = BitcodeModule.LoadFrom(qirBitcode, new Context());
 
             // Build an executable for each entry point operation. The builds must run one at a time because they write
             // to the same intermediate files.
-            foreach (var entryPointOp in EntryPointLoader.LoadEntryPointOperations(qsharpDll))
+            foreach (var entryPointOp in EntryPointLoader.LoadEntryPointOperations(bitcodeModule))
             {
                 var exeFileInfo = new FileInfo(Path.Combine(executablesDirectory.FullName, $"{entryPointOp.Name}.exe"));
-                var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray(), debug);
+                var exe = new QirFullStateExecutable(exeFileInfo, qirBitcode, debug);
                 await exe.BuildAsync(entryPointOp, libraryDirectories, includeDirectories);
             }
 

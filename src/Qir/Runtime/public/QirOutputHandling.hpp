@@ -57,7 +57,7 @@ extern "C"
 
     /// Produces output records of the format "RESULT\\tn" where n is the string representation of the integer value,
     /// such as "RESULT\\t42"
-    QIR_SHARED_API void __quantum__rt__integer_record_output(int64_t); // NOLINT
+    QIR_SHARED_API void __quantum__rt__int_record_output(int64_t); // NOLINT
 
     /// Produces output records of the format "RESULT\\td" where d is the string representation of the double value,
     /// such as "RESULT\\t3.14"
