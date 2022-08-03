@@ -5,6 +5,7 @@ namespace Microsoft.Quantum.Intrinsic {
 
     /// # Summary
     /// Applies a rotation about the $y$-axis by a given angle.
+    /// The angle argument is given in radians.
     ///
     /// # Description
     /// \begin{align}
