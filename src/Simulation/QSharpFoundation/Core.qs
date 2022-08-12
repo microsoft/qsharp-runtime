@@ -45,7 +45,7 @@ namespace Microsoft.Quantum.Core {
     /// # Type Parameters
     /// ## 'T
     /// The type of the default value to return. 
-    ///
+    @Deprecated("")
     function Default<'T> () : 'T {
         return (new 'T[1])[0];
     }
