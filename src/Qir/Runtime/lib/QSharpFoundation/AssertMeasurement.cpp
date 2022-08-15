@@ -23,8 +23,9 @@ extern "C"
     {
         if (__quantum__rt__array_get_size_1d(bases) != __quantum__rt__array_get_size_1d(qubits))
         {
-            __quantum__rt__fail_cstr("Both input arrays - bases, qubits - for AssertMeasurementProbability(), "
-                                     "must be of same size.");
+            __quantum__rt__fail(
+                __quantum__rt__string_create("Both input arrays - bases, qubits - for AssertMeasurementProbability(), "
+                                             "must be of same size."));
         }
 
         IRuntimeDriver* driver = GlobalContext()->GetDriver();
@@ -44,7 +45,7 @@ extern "C"
                 (long)__quantum__rt__array_get_size_1d(qubits), paulis.data(),
                 reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(qubits, 0)), prob, tol, nullptr))
         {
-            __quantum__rt__fail_cstr(__quantum__rt__string_get_data(msg));
+            __quantum__rt__fail(msg);
         }
     }
 

@@ -16,14 +16,14 @@ namespace Quantum
 
     [[noreturn]] static void FailNow(const char* message)
     {
-        __quantum__rt__fail_cstr(message);
+        throw std::runtime_error(message);
     }
 
     static void FailIf(bool condition, const char* message)
     {
         if (condition)
         {
-            __quantum__rt__fail_cstr(message);
+            FailNow(message);
         }
     }
 

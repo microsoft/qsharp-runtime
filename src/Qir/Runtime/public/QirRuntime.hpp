@@ -71,8 +71,7 @@ extern "C"
     QIR_SHARED_API char* __quantum__rt__memory_allocate(uint64_t size); // NOLINT
 
     // Fail the computation with the given error message.
-    [[noreturn]] QIR_SHARED_API void __quantum__rt__fail(QirString* msg);       // NOLINT
-    [[noreturn]] QIR_SHARED_API void __quantum__rt__fail_cstr(const char* msg); // NOLINT
+    [[noreturn]] QIR_SHARED_API void __quantum__rt__fail(QirString* msg); // NOLINT
 
     // Include the given message in the computation's execution log or equivalent.
     QIR_SHARED_API void __quantum__rt__message(QirString* msg); // NOLINT

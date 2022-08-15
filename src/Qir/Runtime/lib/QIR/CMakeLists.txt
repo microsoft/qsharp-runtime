@@ -13,7 +13,6 @@ set(rt_sup_source_files
   allocationsTracker.cpp
   context.cpp
   delegated.cpp
-  utils.cpp
   QubitManager.cpp
   BasicRuntimeDriver.cpp
 )

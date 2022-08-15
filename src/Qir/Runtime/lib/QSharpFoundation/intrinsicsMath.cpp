@@ -115,7 +115,7 @@ extern "C"
     {
         if (minimum > maximum)
         {
-            __quantum__rt__fail_cstr(Quantum::Qis::Internal::excStrDrawRandomVal);
+            __quantum__rt__fail(__quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal));
         }
 
         // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
@@ -131,7 +131,7 @@ extern "C"
     {
         if (minimum > maximum)
         {
-            __quantum__rt__fail_cstr(Quantum::Qis::Internal::excStrDrawRandomVal);
+            __quantum__rt__fail(__quantum__rt__string_create(Quantum::Qis::Internal::excStrDrawRandomVal));
         }
 
         // For testing purposes we need separate generators for Int and Double:

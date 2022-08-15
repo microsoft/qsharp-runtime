@@ -45,33 +45,62 @@ extern "C"
 
     QUBIT* __quantum__rt__qubit_allocate()
     {
-        return reinterpret_cast<QUBIT*>(Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit());
+        try
+        {
+            return reinterpret_cast<QUBIT*>(Microsoft::Quantum::GlobalContext()->GetDriver()->AllocateQubit());
+        }
+        catch (std::runtime_error& e)
+        {
+            __quantum__rt__fail(__quantum__rt__string_create(e.what()));
+        }
     }
 
     QirArray* __quantum__rt__qubit_allocate_array(int64_t count)
     {
-        QirArray* array = __quantum__rt__array_create_1d(sizeof(intptr_t), count);
-        for (QirArray::TItemCount i = 0; i < count; i++)
+        try
         {
-            *reinterpret_cast<QUBIT**>(__quantum__rt__array_get_element_ptr_1d(array, i)) =
-                __quantum__rt__qubit_allocate();
+            QirArray* array = __quantum__rt__array_create_1d(sizeof(intptr_t), count);
+            for (QirArray::TItemCount i = 0; i < count; i++)
+            {
+                *reinterpret_cast<QUBIT**>(__quantum__rt__array_get_element_ptr_1d(array, i)) =
+                    __quantum__rt__qubit_allocate();
+            }
+            return array;
         }
-        return array;
+        catch (std::runtime_error& e)
+        {
+            __quantum__rt__fail(__quantum__rt__string_create(e.what()));
+        }
     }
 
     void __quantum__rt__qubit_release(QUBIT* qubit)
     {
-        Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(reinterpret_cast<QubitIdType>(qubit));
+        try
+        {
+            Microsoft::Quantum::GlobalContext()->GetDriver()->ReleaseQubit(reinterpret_cast<QubitIdType>(qubit));
+        }
+        catch (std::runtime_error& e)
+        {
+            __quantum__rt__fail(__quantum__rt__string_create(e.what()));
+        }
     }
 
     void __quantum__rt__qubit_release_array(QirArray* array)
     {
-        QirArray::TItemCount count = (QirArray::TItemCount)__quantum__rt__array_get_size_1d(array);
-        for (QirArray::TItemCount i = 0; i < count; i++)
+        try
         {
-            __quantum__rt__qubit_release(*reinterpret_cast<QUBIT**>(__quantum__rt__array_get_element_ptr_1d(array, i)));
+            QirArray::TItemCount count = (QirArray::TItemCount)__quantum__rt__array_get_size_1d(array);
+            for (QirArray::TItemCount i = 0; i < count; i++)
+            {
+                __quantum__rt__qubit_release(
+                    *reinterpret_cast<QUBIT**>(__quantum__rt__array_get_element_ptr_1d(array, i)));
+            }
+            __quantum__rt__array_update_reference_count(array, -1);
         }
-        __quantum__rt__array_update_reference_count(array, -1);
+        catch (std::runtime_error& e)
+        {
+            __quantum__rt__fail(__quantum__rt__string_create(e.what()));
+        }
     }
 
     QUBIT* __quantum__rt__qubit_borrow()
@@ -98,17 +127,38 @@ extern "C"
 
     void __quantum__rt__qubit_restricted_reuse_area_start()
     {
-        RestrictedAreaManagement()->StartArea();
+        try
+        {
+            RestrictedAreaManagement()->StartArea();
+        }
+        catch (std::runtime_error& e)
+        {
+            __quantum__rt__fail(__quantum__rt__string_create(e.what()));
+        }
     }
 
     void __quantum__rt__qubit_restricted_reuse_segment_next()
     {
-        RestrictedAreaManagement()->NextSegment();
+        try
+        {
+            RestrictedAreaManagement()->NextSegment();
+        }
+        catch (std::runtime_error& e)
+        {
+            __quantum__rt__fail(__quantum__rt__string_create(e.what()));
+        }
     }
 
     void __quantum__rt__qubit_restricted_reuse_area_end()
     {
-        RestrictedAreaManagement()->EndArea();
+        try
+        {
+            RestrictedAreaManagement()->EndArea();
+        }
+        catch (std::runtime_error& e)
+        {
+            __quantum__rt__fail(__quantum__rt__string_create(e.what()));
+        }
     }
 
     void __quantum__rt__result_update_reference_count(RESULT* r, int32_t increment)

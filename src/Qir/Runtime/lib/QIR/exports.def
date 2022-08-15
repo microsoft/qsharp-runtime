@@ -44,7 +44,6 @@ EXPORTS
     __quantum__rt__double_record_output
     __quantum__rt__double_to_string
     __quantum__rt__fail
-    __quantum__rt__fail_cstr
     __quantum__rt__int_record_output
     __quantum__rt__int_to_string
     __quantum__rt__memory_allocate

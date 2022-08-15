@@ -1,5 +1,4 @@
 set(TEST_FILES
-  qir-test-noqsharp.ll
   qsharp/qir/qir-gen.ll
 )
 

@@ -171,27 +171,6 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][
     // }
 }
 
-// Manually authored QIR to test dumping range [0..2..6] into string and then raising a failure with it
-extern "C" void TestFailWithRangeString(int64_t start, int64_t step, int64_t end);
-TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
-{
-    QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
-
-    bool failed = false;
-    try
-    {
-        TestFailWithRangeString(0, 5, 42); // Returns with exception. Leaks the instances created from the moment of
-                                           // call to the moment of exception throw.
-                                           // TODO: Extract into a separate file compiled with leaks check off.
-    }
-    catch (const std::exception& e)
-    {
-        failed = true;
-        REQUIRE(std::string(e.what()) == "0..5..42");
-    }
-    REQUIRE(failed);
-}
-
 // TestPartials subtracts the second argument from the first and returns the result.
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__Interop(int64_t, int64_t); // NOLINT
 TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
