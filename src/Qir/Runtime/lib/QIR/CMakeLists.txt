@@ -10,7 +10,6 @@
 #
 set(rt_sup_source_files
   OutputStream.cpp
-  allocationsTracker.cpp
   context.cpp
   delegated.cpp
   QubitManager.cpp

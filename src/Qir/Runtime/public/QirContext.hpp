@@ -12,7 +12,6 @@ namespace Microsoft
 namespace Quantum
 {
     struct IRuntimeDriver;
-    struct AllocationsTracker;
 
     // Deprecated: Use `QirExecutionContext::Init()` instead.
     QIR_SHARED_API void InitializeQirContext(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
@@ -21,20 +20,14 @@ namespace Quantum
 
     struct QIR_SHARED_API QirExecutionContext
     {
-        // Direct access from outside of `QirExecutionContext` is deprecated: The variables are to become `private`.
-        // {
-        // Use `Microsoft::Quantum::GlobalContext()->GetDriver()` instead:
+      private:
         IRuntimeDriver* driver = nullptr;
-        // Use `QirExecutionContext::{OnAddRef(), OnRelease(), OnAllocate()}`instead of direct access:
-        bool trackAllocatedObjects = false;
-        std::unique_ptr<AllocationsTracker> allocationsTracker;
-        // }
 
+      public:
         static void Init(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
         static void Deinit();
 
-        QirExecutionContext(IRuntimeDriver* driver, bool trackAllocatedObjects);
-        ~QirExecutionContext();
+        QirExecutionContext(IRuntimeDriver* driver, bool trackAllocatedObjects = false);
 
         void OnAddRef(void* object);
         void OnRelease(void* object);
