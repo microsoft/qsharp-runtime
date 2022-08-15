@@ -165,15 +165,6 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture(line));
             this.Write("\r\n");
  } 
-            this.Write(@"
-    // Add the --simulation-output option.
-    string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt = app.add_option(
-        ""--simulation-output"",
-        simulationOutputFile,
-        ""File where the output produced during the simulation is written"");
-
-");
  if (EntryPoint.Parameters.Count > 0) { 
             this.Write("    // Add a command line option for each entry-point parameter.\r\n");
  } 
@@ -275,17 +266,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
  } 
             this.Write("\r\n");
  } 
-            this.Write(@"    // Redirect the simulator output from std::cout if the --simulation-output option is present.
-    ostream* simulatorOutputStream = &cout;
-    ofstream simulationOutputFileStream;
-    if (!simulationOutputFileOpt->empty())
-    {
-        simulationOutputFileStream.open(simulationOutputFile);
-        SetOutputStream(simulationOutputFileStream);
-        simulatorOutputStream = &simulationOutputFileStream;
-    }
-
-    // Execute the entry point operation.
+            this.Write(@"    // Execute the entry point operation.
     ");
             this.Write(this.ToStringHelper.ToStringWithCulture(EntryPoint.Name));
             this.Write("(\r\n");
@@ -297,9 +278,8 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture((isLastArg) ? "" : ","));
             this.Write("\r\n");
  } 
-            this.Write("    );\r\n\r\n    // Flush the output of the simulation.\r\n    simulatorOutputStream->" +
-                    "flush();\r\n    if (simulationOutputFileStream.is_open())\r\n    {\r\n        simulati" +
-                    "onOutputFileStream.close();\r\n    }\r\n\r\n    return 0;\r\n}\r\n");
+            this.Write("    );\r\n\r\n    // Flush the output of the simulation.\r\n    cout." +
+                    "flush();\r\n    return 0;\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

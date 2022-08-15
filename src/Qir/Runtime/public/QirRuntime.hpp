@@ -308,14 +308,3 @@ extern "C"
     // Returns true if the first big integer is greater than or equal to the second, false otherwise.
     // TODO QIR_SHARED_API bool __quantum__rt__bigint_greater_eq(QirBigInt*, QirBigInt*); // NOLINT
 }
-
-// TODO(rokuzmin): Consider separating the `extern "C"` exports and C++ exports.
-namespace Microsoft // Replace with `namespace Microsoft::Quantum` after migration to C++17.
-{
-namespace Quantum
-{
-    // Deprecated, use `Microsoft::Quantum::OutputStream::ScopedRedirector` or `Microsoft::Quantum::OutputStream::Set()`
-    // instead.
-    QIR_SHARED_API std::ostream& SetOutputStream(std::ostream& newOStream);
-} // namespace Quantum
-} // namespace Microsoft

@@ -11,7 +11,6 @@
 
 #include "SimFactory.hpp"
 #include "QirContext.hpp"
-#include "OutputStream.hpp"
 
 extern "C"
 {
@@ -69,32 +68,10 @@ TEST_CASE("QIR: DumpMachine", "[qir][DumpMachine]")
     QirExecutionContext::Scoped contextReleaser{sim.get()};
 
     // Dump to the std::cout:
-    {
-        std::ostringstream outStrStream;
-        {
-            // Redirect the output from std::cout to outStrStream:
-            OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
-
-            Microsoft__Quantum__Testing__QIR__DumpMachineTest__Interop();
-        } // qOStreamRedirector goes out of scope.
-
-        REQUIRE(outStrStream.str().size() != 0);
-    }
-
+    Microsoft__Quantum__Testing__QIR__DumpMachineTest__Interop();
 
     // Dump to empty string location (std::cout):
-    {
-        std::ostringstream outStrStream;
-        {
-            // Redirect the output from std::cout to outStrStream:
-            OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
-
-            Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__Interop("");
-        } // qOStreamRedirector goes out of scope.
-
-        REQUIRE(outStrStream.str().size() != 0);
-    }
-
+    Microsoft__Quantum__Testing__QIR__DumpMachineToFileTest__Interop("");
 
     // Dump to a file:
     const char* filePath = "DumpMachineTest.log";
@@ -126,32 +103,10 @@ TEST_CASE("QIR: DumpRegister", "[qir][DumpRegister]")
     QirExecutionContext::Scoped contextReleaser{sim.get()};
 
     // Dump to the std::cout:
-    {
-        std::ostringstream outStrStream;
-        {
-            // Redirect the output from std::cout to outStrStream:
-            OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
-
-            Microsoft__Quantum__Testing__QIR__DumpRegisterTest__Interop();
-        } // qOStreamRedirector goes out of scope.
-
-        REQUIRE(outStrStream.str().size() != 0);
-    }
-
+    Microsoft__Quantum__Testing__QIR__DumpRegisterTest__Interop();
 
     // Dump to empty string location (std::cout):
-    {
-        std::ostringstream outStrStream;
-        {
-            // Redirect the output from std::cout to outStrStream:
-            OutputStream::ScopedRedirector qOStreamRedirector(outStrStream);
-
-            Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__Interop("");
-        } // qOStreamRedirector goes out of scope.
-
-        REQUIRE(outStrStream.str().size() != 0);
-    }
-
+    Microsoft__Quantum__Testing__QIR__DumpRegisterToFileTest__Interop("");
 
     // Dump to a file:
     const char* filePath = "DumpRegisterTest.log";

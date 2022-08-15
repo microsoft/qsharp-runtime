@@ -71,13 +71,6 @@ int main(int argc, char* argv[])
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
 
-    // Add the --simulation-output option.
-    string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
-
     // Add a command line option for each entry-point parameter.
     vector<PauliId> PauliArrayArgCli;
     app.add_option("--PauliArrayArg", PauliArrayArgCli, "Option to provide a value for the PauliArrayArg parameter")
@@ -93,27 +86,13 @@ int main(int argc, char* argv[])
     unique_ptr<InteropArray> PauliArrayArgUniquePtr = CreateInteropArray(PauliArrayArgIntermediate);
     InteropArray* PauliArrayArgInterop = PauliArrayArgUniquePtr.get();
 
-    // Redirect the simulator output from std::cout if the --simulation-output option is present.
-    ostream* simulatorOutputStream = &cout;
-    ofstream simulationOutputFileStream;
-    if (!simulationOutputFileOpt->empty())
-    {
-        simulationOutputFileStream.open(simulationOutputFile);
-        SetOutputStream(simulationOutputFileStream);
-        simulatorOutputStream = &simulationOutputFileStream;
-    }
-
     // Execute the entry point operation.
     UsePauliArrayArg(
         PauliArrayArgInterop
     );
 
     // Flush the output of the simulation.
-    simulatorOutputStream->flush();
-    if (simulationOutputFileStream.is_open())
-    {
-        simulationOutputFileStream.close();
-    }
+    cout.flush();
 
     return 0;
 }

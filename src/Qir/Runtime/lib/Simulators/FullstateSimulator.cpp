@@ -23,7 +23,6 @@
 #include "QSharpSimApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimFactory.h"
-#include "OutputStream.hpp"
 #include "QubitManager.hpp"
 
 #ifdef _WIN32
@@ -619,14 +618,14 @@ namespace Quantum
             if (((outFileStream.rdstate() & std::ofstream::failbit) != 0) || openException)
             {
                 std::cerr << "Failed to open dump file \"" + filePath + "\".\n";
-                return OutputStream::Get(); // Dump to std::cout.
+                return std::cout; // Dump to std::cout.
             }
 
             return outFileStream;
         }
 
         // Otherwise dump to std::cout:
-        return OutputStream::Get();
+        return std::cout;
     }
 
     void CFullstateSimulator::DumpMachine(void* location)

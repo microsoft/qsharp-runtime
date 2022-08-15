@@ -17,7 +17,6 @@
 
 #include "QirContext.hpp"
 #include "SimFactory.hpp"
-#include "OutputStream.hpp"
 
 using namespace Microsoft::Quantum;
 using namespace std;
@@ -133,13 +132,6 @@ int main(int argc, char* argv[])
     unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped qirctx(sim.get(), false /*trackAllocatedObjects*/);
 
-    // Add the --simulation-output options.
-    // N.B. This option should be present in all standalone drivers.
-    string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt =
-        app.add_option("-s,--simulation-output", simulationOutputFile,
-                       "File where the output produced during the simulation is written");
-
     // Add the options that correspond to the parameters that the QIR entry-point needs.
     // Option for a Q# Int type.
     int64_t intValue = 0;
@@ -253,16 +245,6 @@ int main(int argc, char* argv[])
     TranslateVector<string, const char*>(stringVector, stringBufferVector, TranslateStringToCharBuffer);
     unique_ptr<InteropArray> stringArray = CreateInteropArray(stringBufferVector);
 
-    // Redirect the simulator output from std::cout if the --simulation-output option is present.
-    ostream* simulatorOutputStream = &cout;
-    ofstream simulationOutputFileStream;
-    if (!simulationOutputFileOpt->empty())
-    {
-        simulationOutputFileStream.open(simulationOutputFile);
-        Microsoft::Quantum::OutputStream::Set(simulationOutputFileStream);
-        simulatorOutputStream = &simulationOutputFileStream;
-    }
-
     // Run simulation and write the output of the operation to the corresponding stream.
     Quantum__StandaloneSupportedInputs__ExerciseInputs(intValue, integerArray.get(), doubleValue, doubleArray.get(),
                                                        boolAsCharValue, boolArray.get(), pauliAsCharValue,
@@ -270,9 +252,5 @@ int main(int argc, char* argv[])
                                                        resultArray.get(), stringValue.c_str());
 
     FreePointerVector(rangeVector);
-    simulatorOutputStream->flush();
-    if (simulationOutputFileStream.is_open())
-    {
-        simulationOutputFileStream.close();
-    }
+    cout.flush();
 }
