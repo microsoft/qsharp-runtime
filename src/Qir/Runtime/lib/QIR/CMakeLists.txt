@@ -13,7 +13,6 @@ set(rt_sup_source_files
   context.cpp
   delegated.cpp
   QubitManager.cpp
-  BasicRuntimeDriver.cpp
 )
 
 # Produce object lib we'll use to create a shared lib (so/dll) later on
