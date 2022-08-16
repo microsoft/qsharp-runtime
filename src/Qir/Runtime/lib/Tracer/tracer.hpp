@@ -33,7 +33,7 @@ namespace Quantum
         // Optional id, if the layer represents a global barrier.
         OpId barrierId = -1;
 
-        Layer(Time startTm, Duration dur)
+        Layer(Time startTm, Duration dur) // NOLINT
             // clang-format off
             : startTime(startTm)
             , duration(dur)
