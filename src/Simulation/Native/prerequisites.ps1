@@ -26,14 +26,14 @@ else {
             sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
         }
         sudo apt update
-        sudo apt-get install -y clang-14
+        sudo apt-get install -y clang-14 llvm-14-dev
     } else {
         if ($needClang) {
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
             add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
         }
         apt update
-        apt-get install -y clang-14
+        apt-get install -y clang-14 llvm-14-dev
     }
 }
 

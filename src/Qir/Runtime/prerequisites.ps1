@@ -35,14 +35,14 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
                 sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
             }
             sudo apt update
-            sudo apt-get install -y ninja-build clang-14 clang-tidy-14 clang-format-14
+            sudo apt-get install -y ninja-build clang-14 clang-tidy-14 clang-format-14 llvm-14-dev clang-tools-14
         } else {
             if ($needClang) {
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
                 add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
             }
             apt update
-            apt-get install -y ninja-build clang-14 clang-tidy-14 clang-format-14
+            apt-get install -y ninja-build clang-14 clang-tidy-14 clang-format-14 llvm-14-dev clang-tools-14
         }
     }
 }
