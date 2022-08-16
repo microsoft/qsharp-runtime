@@ -47,6 +47,7 @@ macro(locate_win32_spectre_static_runtime)
             OUTPUT_STRIP_TRAILING_WHITESPACE)
         file(TO_CMAKE_PATH "${_vs_install_loc_out}" SPECTRE_LIB_PATH_OUT)
         string(REGEX REPLACE "[\r\n]+" ";" SPECTRE_LIB_PATH ${SPECTRE_LIB_PATH_OUT})
+        list(REVERSE SPECTRE_LIB_PATH)
         message(INFO "*** install loc: ${SPECTRE_LIB_PATH}")
 
         # Locate the spectre mitigated runtime libraries and fail if they can't be found. Targets in this
