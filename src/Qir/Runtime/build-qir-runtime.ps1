@@ -10,7 +10,7 @@ Write-Host "##[info]Compile QIR Runtime"
 
 $IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
 
-Push-Location (Join-Path $PSScriptRoot lib riQIR)
+Push-Location (Join-Path $PSScriptRoot lib QIR)
 try {
     # Start with the quick check first and make sure that Rust sources
     # meet formatting and style guide rules.
