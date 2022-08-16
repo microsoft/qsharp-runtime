@@ -25,11 +25,13 @@ target_link_libraries(Microsoft.Quantum.Qir.QSharp.Core
   ${CMAKE_DL_LIBS}
   qsharp-core-qis-support-obj
   simulators-obj
-  "-L${CMAKE_BINARY_DIR}/lib/QIR"
-  -lMicrosoft.Quantum.Qir.Runtime
+  "-L${CMAKE_BINARY_DIR}/bin"
+  -lqir_runtime
+  "-L${CMAKE_BINARY_DIR}/lib/QSharpFoundation"
+  -lMicrosoft.Quantum.Qir.QSharp.Foundation
   ${SPECTRE_LIBS}
 )
-add_dependencies(Microsoft.Quantum.Qir.QSharp.Core Microsoft.Quantum.Qir.Runtime)
+add_dependencies(Microsoft.Quantum.Qir.QSharp.Core Microsoft.Quantum.Qir.QSharp.Foundation)
 
 target_include_directories(Microsoft.Quantum.Qir.QSharp.Core PUBLIC ${public_includes})
 target_compile_definitions(Microsoft.Quantum.Qir.QSharp.Core PRIVATE EXPORT_QIR_API)

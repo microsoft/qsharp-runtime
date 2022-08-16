@@ -21,7 +21,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
         public override string DriverFileExtension => "cpp";
 
         public override IList<string> LinkLibraries => new List<string> {
-                "Microsoft.Quantum.Qir.Runtime",
+                "qir_runtime",
                 "Microsoft.Quantum.Qir.QSharp.Foundation",
                 "Microsoft.Quantum.Qir.QSharp.Core"
             };

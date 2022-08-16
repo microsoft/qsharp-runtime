@@ -2,5 +2,5 @@
 
 members = [
     "src/Simulation/qdk_sim_rs",
-    "src/Qir/Runtime/lib/riQIR",
+    "src/Qir/Runtime/lib/QIR",
 ]

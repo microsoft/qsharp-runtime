@@ -38,6 +38,12 @@ try {
     # Actually run the build.
     cargo +nightly build @releaseFlag -Z unstable-options --out-dir (Join-Path $PSScriptRoot bin $Env:BUILD_CONFIGURATION bin)
     if ($LASTEXITCODE -ne 0) { throw "Failed cargo build on QIR Runtime." }
+    Remove-Item (Join-Path $PSScriptRoot bin $Env:BUILD_CONFIGURATION bin *.rlib)
+    $rustlib = (Join-Path $PSScriptRoot bin $Env:BUILD_CONFIGURATION bin qir_runtime.dll.lib)
+    if (Test-Path $rustlib) {
+        Remove-Item (Join-Path $PSScriptRoot bin $Env:BUILD_CONFIGURATION bin qir_runtime.lib) -ErrorAction SilentlyContinue
+        Rename-Item $rustlib qir_runtime.lib
+    }
 
     # When building in CI, free disk space by cleaning up.
     # Note that this takes longer, but saves ~1 GB of space.

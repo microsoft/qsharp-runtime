@@ -23,11 +23,10 @@ add_library(Microsoft.Quantum.Qir.Tracer SHARED)
 target_link_libraries(Microsoft.Quantum.Qir.Tracer
   ${CMAKE_DL_LIBS}
   tracer-obj
-  "-L${CMAKE_BINARY_DIR}/lib/QIR"
-  -lMicrosoft.Quantum.Qir.Runtime
+  "-L${CMAKE_BINARY_DIR}/bin"
+  -lqir_runtime
   ${SPECTRE_LIBS}
 )
-add_dependencies(Microsoft.Quantum.Qir.QSharp.Foundation Microsoft.Quantum.Qir.Runtime)
 
 target_include_directories(Microsoft.Quantum.Qir.Tracer PUBLIC ${includes})
 target_compile_definitions(Microsoft.Quantum.Qir.Tracer PRIVATE EXPORT_QIR_API)

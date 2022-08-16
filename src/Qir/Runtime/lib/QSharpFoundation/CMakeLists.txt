@@ -6,6 +6,9 @@
 # create qsharp-foundation-qis-support lib from the C++ sources
 #
 set(qsharp_foundation_sup_source_files
+  context.cpp
+  delegated.cpp
+  QubitManager.cpp
   AssertMeasurement.cpp
   intrinsicsMath.cpp
   conditionals.cpp
@@ -28,11 +31,10 @@ add_library(Microsoft.Quantum.Qir.QSharp.Foundation SHARED)
 target_link_libraries(Microsoft.Quantum.Qir.QSharp.Foundation
   ${CMAKE_DL_LIBS}
   qsharp-foundation-qis-support-obj
-  "-L${CMAKE_BINARY_DIR}/lib/QIR"
-  -lMicrosoft.Quantum.Qir.Runtime
+  "-L${CMAKE_BINARY_DIR}/bin"
+  -lqir_runtime
   ${SPECTRE_LIBS}
 )
-add_dependencies(Microsoft.Quantum.Qir.QSharp.Foundation Microsoft.Quantum.Qir.Runtime)
 
 target_include_directories(Microsoft.Quantum.Qir.QSharp.Foundation PUBLIC 
   ${public_includes}

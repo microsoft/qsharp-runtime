@@ -5,7 +5,7 @@ target_source_from_qir(fullstate-simulator-tests qsharp/obj/qsharp/qir-test-simu
 
 target_link_libraries(fullstate-simulator-tests PUBLIC
   "-L${runtime_lib_path}"
-  -lMicrosoft.Quantum.Qir.Runtime
+  -lqir_runtime
   -lMicrosoft.Quantum.Qir.QSharp.Foundation
   -lMicrosoft.Quantum.Qir.QSharp.Core
 )

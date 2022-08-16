@@ -9,7 +9,6 @@ add_executable(qir-runtime-unittests
   ToffoliTests.cpp
   TracerTests.cpp
   QubitManagerTests.cpp
-  $<TARGET_OBJECTS:qir-rt-support-obj>
   $<TARGET_OBJECTS:qsharp-foundation-qis-support-obj>
   $<TARGET_OBJECTS:qsharp-core-qis-support-obj>
   $<TARGET_OBJECTS:simulators-obj>
@@ -28,7 +27,7 @@ target_include_directories(qir-runtime-unittests PUBLIC
 target_link_libraries(qir-runtime-unittests
   ${CMAKE_DL_LIBS}
   "-L${CMAKE_BINARY_DIR}/bin"
-  -lrust_qir_runtime
+  -lqir_runtime
 )
 
 if (WIN32)

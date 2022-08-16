@@ -16,7 +16,8 @@ endforeach()
 
 target_link_libraries(qir-tracer-tests PUBLIC
   "-L${runtime_lib_path}"
-  -lMicrosoft.Quantum.Qir.Runtime
+  -lqir_runtime
+  -lMicrosoft.Quantum.Qir.QSharp.Foundation
   -lMicrosoft.Quantum.Qir.Tracer
 )
 

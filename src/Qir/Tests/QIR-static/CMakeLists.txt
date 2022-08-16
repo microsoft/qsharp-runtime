@@ -19,7 +19,7 @@ endforeach()
 
 target_link_libraries(qir-static-tests PUBLIC
   "-L${runtime_lib_path}"
-  -lMicrosoft.Quantum.Qir.Runtime
+  -lqir_runtime
   -lMicrosoft.Quantum.Qir.QSharp.Foundation
   -lMicrosoft.Quantum.Qir.QSharp.Core
 )
