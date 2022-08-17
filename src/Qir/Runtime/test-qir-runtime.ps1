@@ -3,7 +3,7 @@
 
 . (Join-Path $PSScriptRoot .. qir-utils.ps1)
 
-Push-Location (Join-Path $PSScriptRoot lib riQIR)
+Push-Location (Join-Path $PSScriptRoot lib QIR)
 try {
     $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();
 
