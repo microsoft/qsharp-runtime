@@ -10,6 +10,7 @@
 #include "SimFactory.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
+#include "QirOutputHandling.hpp"
 
 /*=============================================================================
     Note: QIR assumes a single global execution context!
