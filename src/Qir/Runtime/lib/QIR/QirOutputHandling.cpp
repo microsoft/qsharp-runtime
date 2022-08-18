@@ -16,7 +16,7 @@ static void PrintCStr(const char* cStr)
     WriteToCurrentStream(&msg);
 }
 
-static std::string EscapeString(std::string const &s)
+static std::string EscapeString(std::string const& s)
 {
     std::string out = "";
     for (std::string::const_iterator i = s.begin(), end = s.end(); i != end; i++)
