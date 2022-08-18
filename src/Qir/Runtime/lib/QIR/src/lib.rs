@@ -55,9 +55,9 @@ pub enum Pauli {
 
 #[repr(C)]
 pub struct Range {
-    start: u64,
+    start: i64,
     step: i64,
-    end: u64,
+    end: i64,
 }
 
 /// # Panics
@@ -376,15 +376,15 @@ pub unsafe extern "C" fn quantum__rt__array_slice_1d(
     range: Range,
 ) -> *const (usize, Vec<u8>) {
     let array = Rc::from_raw(arr);
-    let item_size: u64 = array.0.try_into().unwrap();
+    let item_size: i64 = array.0.try_into().unwrap();
     let mut slice = (array.0, Vec::new());
-    let iter: Box<dyn Iterator<Item = u64>> = if range.step > 0 {
+    let iter: Box<dyn Iterator<Item = i64>> = if range.step > 0 {
         Box::new(range.start * item_size..=range.end * item_size)
     } else {
         Box::new((range.end * item_size..=range.start * item_size).rev())
     };
 
-    let step: u64 = range.step.abs().try_into().unwrap();
+    let step: i64 = range.step.abs();
     for i in iter.step_by((step * item_size).try_into().unwrap()) {
         let index = i.try_into().unwrap();
         let mut copy = Vec::new();
@@ -1348,6 +1348,8 @@ mod tests {
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr5, 0), 31);
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr5, 1), 0);
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr5, 2), 42);
+            let arr6 = quantum__rt__array_slice_1d(arr5, Range {start: 0, step: 1, end: -1});
+            assert_eq!(__quantum__rt__array_get_size_1d(arr6), 0);
             __quantum__rt__array_update_reference_count(arr, -1);
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr2, 1), 31);
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr3, 0), 42);
@@ -1367,6 +1369,7 @@ mod tests {
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr5, 1), 0);
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr5, 2), 42);
             __quantum__rt__array_update_reference_count(arr5, -1);
+            __quantum__rt__array_update_reference_count(arr6, -1);
         }
     }
 
