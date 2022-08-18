@@ -14,6 +14,8 @@ fn main() {
         println!("cargo:rustc-cdylib-link-arg=/export:__quantum__rt__range_to_string");
     } else if cfg!(target_os = "macos") {
         // Use default compiler on MacOS
+        println!("cargo:rustc-cdylib-link-arg=-u __quantum__rt__array_slice_1d");
+        println!("cargo:rustc-cdylib-link-arg=-u __quantum__rt__range_to_string");
     }
     clang
         .file("src/bridge-rt.ll")
