@@ -1348,7 +1348,14 @@ mod tests {
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr5, 0), 31);
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr5, 1), 0);
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr5, 2), 42);
-            let arr6 = quantum__rt__array_slice_1d(arr5, Range {start: 0, step: 1, end: -1});
+            let arr6 = quantum__rt__array_slice_1d(
+                arr5,
+                Range {
+                    start: 0,
+                    step: 1,
+                    end: -1,
+                },
+            );
             assert_eq!(__quantum__rt__array_get_size_1d(arr6), 0);
             __quantum__rt__array_update_reference_count(arr, -1);
             assert_eq!(*__quantum__rt__array_get_element_ptr_1d(arr2, 1), 31);
