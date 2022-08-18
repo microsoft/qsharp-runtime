@@ -21,7 +21,7 @@ static std::string EscapeString(std::string const& s)
     std::string out = "";
     for (std::string::const_iterator i = s.begin(), end = s.end(); i != end; i++)
     {
-        unsigned char c = *i;
+        char c = *i;
         if (isprint(c) && c != '\\' && c != '"')
         {
             out += c;
@@ -49,8 +49,9 @@ static std::string EscapeString(std::string const& s)
             default:
                 char const* const hexdig = "0123456789ABCDEF";
                 out += 'x';
-                out += hexdig[c >> 4];
-                out += hexdig[c & 0xF];
+                unsigned char uc = (unsigned char)c;
+                out += hexdig[uc >> 4];
+                out += hexdig[uc & 0xF];
             }
         }
     }

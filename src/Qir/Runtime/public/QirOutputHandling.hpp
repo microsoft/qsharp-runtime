@@ -15,6 +15,7 @@
 
 #include "CoreDefines.h"
 #include "CoreTypes.hpp"
+#include "QirTypes.hpp"
 
 // clang-format off
 #define QOH_REC_TYPE "RESULT"
