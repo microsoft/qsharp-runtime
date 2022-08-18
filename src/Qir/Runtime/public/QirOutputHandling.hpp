@@ -18,8 +18,10 @@
 
 // clang-format off
 #define QOH_REC_TYPE "RESULT"
+#define QOH_INFO_TYPE "INFO"
 #define QOH_REC_COLUMN_DELIMITER "\t"
 #define QOH_REC_PREFIX QOH_REC_TYPE QOH_REC_COLUMN_DELIMITER /* "RESULT" "\t" (== "RESULT\t") */
+#define QOH_INFO_PREFIX QOH_INFO_TYPE QOH_REC_COLUMN_DELIMITER /* "INFO" "\t" (== "INFO\t") */
 #define QOH_REC_DELIMITER "\n"
 
 #define QOH_REC_VAL_TUPLE_START "TUPLE_START"
@@ -46,6 +48,10 @@
 extern "C"
 {
 #endif
+
+    // Message Records
+
+    QIR_SHARED_API void __quantum__rt__message_record_output(QirString* qstr); // NOLINT
 
     // Primitive Result Records
 

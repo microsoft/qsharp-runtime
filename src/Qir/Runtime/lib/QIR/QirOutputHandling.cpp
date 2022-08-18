@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <sstream>
+#include <cctype>
 #include "QirOutputHandling.hpp"
 #include "QirTypes.hpp"
 #include "QirRuntime.hpp"
@@ -15,9 +16,60 @@ static void PrintCStr(const char* cStr)
     WriteToCurrentStream(&msg);
 }
 
+static std::string EscapeString(std::string const &s)
+{
+    std::string out = "";
+    for (std::string::const_iterator i = s.begin(), end = s.end(); i != end; i++)
+    {
+        unsigned char c = *i;
+        if (isprint(c) && c != '\\' && c != '"')
+        {
+            out += c;
+        }
+        else
+        {
+            out += '\\';
+            switch (c)
+            {
+            case '"':
+                out += '"';
+                break;
+            case '\\':
+                out += '\\';
+                break;
+            case '\t':
+                out += 't';
+                break;
+            case '\r':
+                out += 'r';
+                break;
+            case '\n':
+                out += 'n';
+                break;
+            default:
+                char const* const hexdig = "0123456789ABCDEF";
+                out += 'x';
+                out += hexdig[c >> 4];
+                out += hexdig[c & 0xF];
+            }
+        }
+    }
+    return out;
+}
+
 
 extern "C"
 {
+    // Message Records
+
+    void __quantum__rt__message_record_output(QirString* qstr) // NOLINT
+    {
+        std::stringstream strStream;
+        strStream << QOH_INFO_PREFIX << EscapeString(qstr->str);
+        PrintCStr(strStream.str().c_str());
+    }
+
+
     // Tuple Type Records
 
     void __quantum__rt__tuple_start_record_output() // NOLINT
