@@ -923,6 +923,10 @@ extern "C" {
     pub fn __quantum__rt__range_to_string();
 }
 
+/// # Safety
+///
+/// THIS FUNCTION IS NOT SAFE TO CALL AND SHOULD NOT BE CALLED.
+/// It is included as linking workaround only.
 #[no_mangle]
 pub unsafe extern "C" fn __ll_funcs_do_not_call() {
     __quantum__rt__array_slice_1d();
