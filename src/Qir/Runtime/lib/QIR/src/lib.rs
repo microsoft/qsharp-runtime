@@ -918,6 +918,17 @@ pub extern "C" fn __quantum__rt__bool_record_output(val: bool) {
     println!("RESULT\t{}", val);
 }
 
+extern "C" {
+    pub fn __quantum__rt__array_slice_1d();
+    pub fn __quantum__rt__range_to_string();
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn __ll_funcs_do_not_call() {
+    __quantum__rt__array_slice_1d();
+    __quantum__rt__range_to_string();
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{
