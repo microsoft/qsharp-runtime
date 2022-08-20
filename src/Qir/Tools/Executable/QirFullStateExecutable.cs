@@ -22,6 +22,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
 
         public override IList<string> LinkLibraries => new List<string> {
                 "qir_runtime",
+                "qir_range_support",
                 "Microsoft.Quantum.Qir.QSharp.Foundation",
                 "Microsoft.Quantum.Qir.QSharp.Core"
             };

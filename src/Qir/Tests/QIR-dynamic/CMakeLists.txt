@@ -17,6 +17,7 @@ endforeach()
 target_link_libraries(qir-dynamic-tests PUBLIC
   "-L${runtime_lib_path}"
   -lqir_runtime
+  -lqir_range_support
   -lMicrosoft.Quantum.Qir.QSharp.Foundation
   -lMicrosoft.Quantum.Qir.QSharp.Core
 )

@@ -11,6 +11,7 @@ target_source_from_qir(qir-input-reference-standalone qsharp/obj/qsharp/qir-stan
 target_link_libraries(qir-input-reference-standalone PUBLIC
   "-L${runtime_lib_path}"
   -lqir_runtime
+  -lqir_range_support
   -lMicrosoft.Quantum.Qir.QSharp.Foundation
   -lMicrosoft.Quantum.Qir.QSharp.Core
 )

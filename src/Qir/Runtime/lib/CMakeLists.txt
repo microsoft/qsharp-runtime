@@ -1,3 +1,4 @@
+add_subdirectory(range_support)
 add_subdirectory(QSharpFoundation)
 add_subdirectory(QSharpCore)
 add_subdirectory(Simulators)

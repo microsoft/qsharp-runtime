@@ -58,6 +58,7 @@ $artifacts = @{
         ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\Microsoft.Quantum.Qir.QSharp.Core.dll",
         ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\Microsoft.Quantum.Qir.QSharp.Foundation.dll",
         ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\qir_runtime.dll",
+        ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\qir_range_support.dll",
         ".\src\Qir\Runtime\bin\$Env:BUILD_CONFIGURATION\bin\Microsoft.Quantum.Qir.Tracer.dll"
     ) | ForEach-Object { Join-Path $PSScriptRoot (Join-Path ".." $_) };
 }
