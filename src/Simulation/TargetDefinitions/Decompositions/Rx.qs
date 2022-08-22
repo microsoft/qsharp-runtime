@@ -5,7 +5,6 @@ namespace Microsoft.Quantum.Intrinsic {
 
     /// # Summary
     /// Applies a rotation about the $x$-axis by a given angle. 
-    /// The angle argument is given in radians.
     ///
     /// # Description
     /// \begin{align}
@@ -19,7 +18,7 @@ namespace Microsoft.Quantum.Intrinsic {
     ///
     /// # Input
     /// ## theta
-    /// Angle about which the qubit is to be rotated.
+    /// Angle in radians about which the qubit is to be rotated.
     /// ## qubit
     /// Qubit to which the gate should be applied.
     ///
