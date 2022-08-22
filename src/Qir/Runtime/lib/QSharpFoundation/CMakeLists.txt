@@ -10,7 +10,6 @@ set(qsharp_foundation_sup_source_files
   delegated.cpp
   QubitManager.cpp
   AssertMeasurement.cpp
-  intrinsicsMath.cpp
   conditionals.cpp
 )
 

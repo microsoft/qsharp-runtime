@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 #![deny(clippy::all, clippy::pedantic)]
 
 use num_bigint::BigInt;
@@ -9,6 +11,8 @@ use std::{
     rc::{Rc, Weak},
     usize,
 };
+
+pub mod math;
 
 // Rust Implementation for Quantum Intermediate Representation
 
@@ -166,7 +170,7 @@ pub unsafe extern "C" fn __quantum__rt__string_equal(
         == (&*s2).to_str().expect("Unable to convert string")
 }
 
-fn convert<T>(input: &T) -> *const CString
+pub(crate) fn convert<T>(input: &T) -> *const CString
 where
     T: Sized + ToString,
 {

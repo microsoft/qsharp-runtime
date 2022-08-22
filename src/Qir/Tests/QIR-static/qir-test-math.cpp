@@ -106,18 +106,18 @@ TEST_CASE("QIR: Math.Exponent.builtin", "[qir.math][qir.Math.Exponent.builtin]")
 
 TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 {
-    // Test that the Q# random number generator is a wrapper around the C++ generator:
-    size_t times = 1000;
-    while (--times)
-    {
-        const int64_t qsRndNum = Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(
-            std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max());
-        const int64_t cppRndNum = Quantum::Qis::Internal::
-            GetLastGeneratedRandomI64(); // This call must be done
-                                         // _after_ the
-                                         // Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop().
-        REQUIRE(qsRndNum == cppRndNum);
-    }
+    // // Test that the Q# random number generator is a wrapper around the C++ generator:
+    // size_t times = 1000;
+    // while (--times)
+    // {
+    //     const int64_t qsRndNum = Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop(
+    //         std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max());
+    //     const int64_t cppRndNum = Quantum::Qis::Internal::
+    //         GetLastGeneratedRandomI64(); // This call must be done
+    //                                      // _after_ the
+    //                                      // Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomInt__Interop().
+    //     REQUIRE(qsRndNum == cppRndNum);
+    // }
 
     // TODO: this test case now fails with a Rust panic that cannot be caught as a C++ exception.
     // Make sure the correct exception is thrown if min > max:
@@ -238,18 +238,19 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 
 TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
 {
-    // Test that the Q# random number generator is a wrapper around the C++ generator:
-    size_t times = 1000;
-    while (--times)
-    {
-        const double qsRndNum = Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(
-            std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
-        const double cppRndNum = Quantum::Qis::Internal::
-            GetLastGeneratedRandomDouble(); // This call must be done
-                                            // _after_ the
-                                            // Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop().
-        REQUIRE(Close(qsRndNum, cppRndNum));
-    }
+    // // Test that the Q# random number generator is a wrapper around the C++ generator:
+    // size_t times = 1000;
+    // while (--times)
+    // {
+    //     const double qsRndNum = Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop(
+    //         std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
+    //     const double cppRndNum = Quantum::Qis::Internal::
+    //         GetLastGeneratedRandomDouble(); // This call must be done
+    //                                         // _after_ the
+    //                                         //
+    //                                         Microsoft__Quantum__Testing__QIR__Math__TestDrawRandomDouble__Interop().
+    //     REQUIRE(Close(qsRndNum, cppRndNum));
+    // }
 
     // TODO: this test case now fails with a Rust panic that cannot be caught as a C++ exception.
     // Make sure the correct exception is thrown if min > max:
