@@ -19,9 +19,8 @@ static void PrintCStr(const char* cStr)
 static std::string EscapeString(std::string const& s)
 {
     std::string out = "";
-    for (std::string::const_iterator i = s.begin(), end = s.end(); i != end; i++)
+    for (auto c: s)
     {
-        char c = *i;
         if (isprint(c) && c != '\\' && c != '"')
         {
             out += c;
@@ -52,6 +51,7 @@ static std::string EscapeString(std::string const& s)
                 unsigned char uc = (unsigned char)c;
                 out += hexdig[uc >> 4];
                 out += hexdig[uc & 0xF];
+                break;
             }
         }
     }
