@@ -19,7 +19,7 @@ static void PrintCStr(const char* cStr)
 static std::string EscapeString(std::string const& s)
 {
     std::string out = "";
-    for (auto c: s)
+    for (auto c : s)
     {
         if (isprint(c) && c != '\\' && c != '"')
         {
