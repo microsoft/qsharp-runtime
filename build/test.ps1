@@ -49,6 +49,12 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         $script:all_ok = $False
     }
 
+    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/riqir")
+    & "$qirRuntime/test-qir-runtime.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
+
     $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests")
     & "$qirTests/test-qir-tests.ps1"
     if ($LastExitCode -ne 0) {

@@ -12,6 +12,11 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
+    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/riqir")
+    & "$qirRuntime/build-qir-runtime.ps1"
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
 } else {
     Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
 }

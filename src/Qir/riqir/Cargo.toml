@@ -1,0 +1,16 @@
+[package]
+name = "qir-runtime"
+version = "0.1.0"
+authors = ["Microsoft"]
+edition = "2021"
+
+[dependencies]
+num-bigint = { version = "0.4.3", default-features = false }
+rand = "0.8.5"
+
+[build-dependencies]
+cc = "1"
+which = "4.2.2"
+
+[lib]
+crate-type = ["cdylib","rlib"]

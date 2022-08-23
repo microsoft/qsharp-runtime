@@ -2,6 +2,7 @@
 
 members = [
     "src/Simulation/qdk_sim_rs",
+    "src/Qir/riqir",
 ]
 
 [profile.release]
