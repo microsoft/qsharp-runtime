@@ -56,12 +56,6 @@ wasm = ["web-sys"]
 ## how the simulator is called from interop code.
 trace_c_api = []
 
-
-[profile.release]
-codegen-units = 1   # Reduce number of codegen units to increase optimizations.
-opt-level = 3
-panic = 'unwind'
-
 [dependencies]
 anyhow = "1.0.56"
 # We use built to expose compile-time metadata about how this crate
