@@ -12,7 +12,7 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
 } elseif (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
     if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
         (Test-Path Env:/AGENT_OS)) {
-        choco install llvm --version=14.0.6 --allow-downgrade
+        choco install llvm --version=14 --allow-downgrade
         Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
     }
     if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
@@ -31,14 +31,18 @@ else {
             sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
         }
         sudo apt update
-        sudo apt-get install -y ninja-build clang-14 libomp-14-dev
+        sudo apt-get install -y ninja-build
+        sudo apt-get install -y libomp-14-dev
+        sudo apt-get install -y clang-14
     } else {
         if ($needClang) {
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
             add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
         }
         apt update
-        apt-get install -y ninja-build clang-14 libomp-14-dev
+        apt-get install -y ninja-build
+        apt-get install -y libomp-14-dev
+        apt-get install -y clang-14
     }
 }
 
