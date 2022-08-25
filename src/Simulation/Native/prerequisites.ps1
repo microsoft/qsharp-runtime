@@ -1,11 +1,14 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+Write-Host "##[info] Simulation/Native/prerequisites.ps1"
+
 if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
     # Skip explicit install for testing purposes
     # brew install libomp
     brew update
     brew install ninja
+    brew install llvm@14
 } elseif (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
     if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
         (Test-Path Env:/AGENT_OS)) {

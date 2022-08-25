@@ -3,6 +3,8 @@
 
 #Requires -Version 6.0
 
+Write-Host "##[info] Runtime/prerequisites.ps1"
+
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
@@ -36,14 +38,16 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
                 sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
             }
             sudo apt update
-            sudo apt-get install -y ninja-build clang-14 clang-tidy-14 clang-format-14
+            sudo apt-get install -y ninja-build
+            sudo apt-get install -y clang-14 clang-tidy-14 clang-format-14
         } else {
             if ($needClang) {
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
                 add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
             }
             apt update
-            apt-get install -y ninja-build clang-14 clang-tidy-14 clang-format-14
+            apt-get install -y ninja-build
+            apt-get install -y clang-14 clang-tidy-14 clang-format-14
         }
     }
 }

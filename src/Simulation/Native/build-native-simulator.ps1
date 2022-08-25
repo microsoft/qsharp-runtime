@@ -82,7 +82,7 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
         -D CMAKE_BUILD_TYPE="$buildType" ..
 }
 else {
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$buildType" ..
+    cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$buildType" ..
 }
 cmake --build . --config "$buildType" --target install
 
