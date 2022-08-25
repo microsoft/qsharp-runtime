@@ -1,0 +1,3 @@
+[target.'cfg(target_os = "windows")']
+rustflags = ["-C", "control-flow-guard"]
+
