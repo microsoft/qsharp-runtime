@@ -7,6 +7,7 @@
 pub mod arrays;
 pub mod bigints;
 pub mod callables;
+pub mod conditionals;
 pub mod math;
 pub mod output_recording;
 pub mod range_support;
@@ -77,7 +78,7 @@ pub extern "C" fn __quantum__rt__memory_allocate(size: u64) -> *mut u8 {
 /// Panics unconditionally with the given message.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__fail(str: *const CString) {
-    panic!("{}", (&*str).to_str().expect("Unable to convert string"));
+    panic!("{}", (*str).to_str().expect("Unable to convert string"));
 }
 
 /// # Safety
@@ -85,7 +86,7 @@ pub unsafe extern "C" fn __quantum__rt__fail(str: *const CString) {
 /// This function should only be called with a string created by `__quantum__rt__string_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__message(str: *const CString) {
-    println!("{}", (&*str).to_str().expect("Unable to convert string"));
+    println!("{}", (*str).to_str().expect("Unable to convert string"));
 }
 
 #[cfg(test)]

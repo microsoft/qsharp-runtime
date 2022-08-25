@@ -25,7 +25,7 @@ pub unsafe extern "C" fn __quantum__rt__string_create(str: *mut c_char) -> *cons
 /// This function should only be called with a string created by `__quantum__rt__string_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__string_get_data(str: *const CString) -> *const c_char {
-    (&*str).as_bytes_with_nul().as_ptr().cast::<i8>()
+    (*str).as_bytes_with_nul().as_ptr().cast::<i8>()
 }
 
 /// # Safety
@@ -36,7 +36,7 @@ pub unsafe extern "C" fn __quantum__rt__string_get_data(str: *const CString) -> 
 /// Will panic if length is larger than will fit in an 32-bit integer.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__string_get_length(str: *const CString) -> u32 {
-    (&*str).as_bytes().len().try_into().unwrap()
+    (*str).as_bytes().len().try_into().unwrap()
 }
 
 /// # Safety
@@ -60,13 +60,13 @@ pub unsafe extern "C" fn __quantum__rt__string_concatenate(
     s1: *const CString,
     s2: *const CString,
 ) -> *const CString {
-    let mut new_str = (&*s1)
+    let mut new_str = (*s1)
         .clone()
         .into_string()
         .expect("Unable to convert string");
 
     new_str.push_str(
-        (&*s2)
+        (*s2)
             .clone()
             .into_string()
             .expect("Unable to convert string")
@@ -86,8 +86,8 @@ pub unsafe extern "C" fn __quantum__rt__string_equal(
     s1: *const CString,
     s2: *const CString,
 ) -> bool {
-    (&*s1).to_str().expect("Unable to convert string")
-        == (&*s2).to_str().expect("Unable to convert string")
+    (*s1).to_str().expect("Unable to convert string")
+        == (*s2).to_str().expect("Unable to convert string")
 }
 
 pub(crate) fn convert<T>(input: &T) -> *const CString
