@@ -7,12 +7,12 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
+    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/riqir")
     & "$qirRuntime/build-qir-runtime.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/riqir")
+    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
     & "$qirRuntime/build-qir-runtime.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False

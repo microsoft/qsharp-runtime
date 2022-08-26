@@ -5,14 +5,7 @@ add_library(qir_range_support SHARED bridge-rt.cpp)
 
 target_source_from_qir(qir_range_support bridge-rt.ll)
 
-if(WIN32)
-    set(QIR_LIB_PATH "${CMAKE_SOURCE_DIR}/../drops/bin/win-x64/native")
-elseif(APPLE)
-    set(QIR_LIB_PATH "${CMAKE_SOURCE_DIR}/../drops/bin/osx-x64/native")
-else()
-    set(QIR_LIB_PATH "${CMAKE_SOURCE_DIR}/../drops/bin/linux-x64/native")
-endif()
-
+set(QIR_LIB_PATH "${CMAKE_SOURCE_DIR}/../drops/bin/$ENV{BUILD_PLATFORM}/native")
 
 target_link_libraries(qir_range_support
   ${CMAKE_DL_LIBS}
