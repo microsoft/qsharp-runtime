@@ -15,6 +15,9 @@ pub mod result_bool;
 pub mod strings;
 pub mod tuples;
 
+#[cfg(feature = "sim")]
+pub mod sim;
+
 use std::{
     ffi::CString,
     rc::{Rc, Weak},
@@ -53,7 +56,7 @@ unsafe fn update_counts<T>(raw_rc: *const T, update: i32, is_alias: bool) {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[repr(i8)]
 pub enum Pauli {
     I = 0,
