@@ -93,6 +93,11 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
+    $qirTests = (Join-Path $PSScriptRoot "../src/Qir/riqir-test")
+    & "$qirTests/build-qir-tests.ps1" -SkipQSharpBuild
+    if ($LastExitCode -ne 0) {
+        $script:all_ok = $False
+    }
     $qirSamples = (Join-Path $PSScriptRoot "../src/Qir/Samples")
     & "$qirSamples/build-qir-samples.ps1" -SkipQSharpBuild
     if ($LastExitCode -ne 0) {
