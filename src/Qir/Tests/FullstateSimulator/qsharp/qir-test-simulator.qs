@@ -33,7 +33,7 @@ namespace Microsoft.Quantum.Testing.QIR
     }
 
     @EntryPoint()
-    operation Test_Simulator_QIS() : Int
+    operation Test_Simulator_QIS(includeExp : Bool) : Int
     {
         mutable res = 0;
         set res = InvokeAllVariants(X);
@@ -57,23 +57,25 @@ namespace Microsoft.Quantum.Testing.QIR
         set res = InvokeAllVariants(R(PauliX, 0.42, _));
         if (res != 0) { return 60 + res; }
 
-        use (targets, ctls) = (Qubit[2], Qubit[2])
-        {
-            let theta = 0.42;
-            Exp([PauliX, PauliY], theta, targets);
-            Adjoint Exp([PauliX, PauliY], theta, targets);
-            if (M(targets[0]) != Zero) { set res = 1; }
+        if includeExp {
+            use (targets, ctls) = (Qubit[2], Qubit[2])
+            {
+                let theta = 0.42;
+                Exp([PauliX, PauliY], theta, targets);
+                Adjoint Exp([PauliX, PauliY], theta, targets);
+                if (M(targets[0]) != Zero) { set res = 1; }
 
-            H(ctls[0]);
-            H(ctls[1]);
-            Controlled Exp(ctls, ([PauliX, PauliY], theta, targets));
-            Adjoint Controlled Exp(ctls, ([PauliX, PauliY], theta, targets));
-            H(ctls[0]);
-            H(ctls[1]);
-            if (M(targets[0]) != Zero) { set res = 2; }
-            ResetAll(targets + ctls);
+                H(ctls[0]);
+                H(ctls[1]);
+                Controlled Exp(ctls, ([PauliX, PauliY], theta, targets));
+                Adjoint Controlled Exp(ctls, ([PauliX, PauliY], theta, targets));
+                H(ctls[0]);
+                H(ctls[1]);
+                if (M(targets[0]) != Zero) { set res = 2; }
+                ResetAll(targets + ctls);
+            }
+            if (res != 0) { return 70 + res; }
         }
-        if (res != 0) { return 70 + res; }
 
         use qs = Qubit[3]
         {

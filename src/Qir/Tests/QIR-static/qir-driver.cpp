@@ -12,6 +12,7 @@
 #include "CoreTypes.hpp"
 #include "QirContext.hpp"
 #include "QirTypes.hpp"
+#include "QirRuntime.hpp"
 #include "QirRuntimeApi_I.hpp"
 #include "SimFactory.hpp"
 #include "SimulatorStub.hpp"
@@ -56,8 +57,9 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop( // NO
     Array* array, int64_t index, int64_t val);
 TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
+#ifndef RIQIR_TESTING
     QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
-
+#endif
     constexpr int64_t n = 5;
     int64_t values[n]   = {0, 1, 2, 3, 4};
     auto array          = Array{n, values};
@@ -149,17 +151,21 @@ struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
 };
 TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][qir.result]")
 {
+#ifndef RIQIR_TESTING
     unique_ptr<QubitsResultsTestSimulator> sim = make_unique<QubitsResultsTestSimulator>();
     QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+#endif
 
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__Interop());
 
+#ifndef RIQIR_TESTING
     // check that all qubits have been released
     for (size_t id = 0; id < sim->qubits.size(); id++)
     {
         INFO(std::string("unreleased qubit: ") + std::to_string(id));
         CHECK(sim->qubits[id] == RELEASED);
     }
+#endif
 
     // check that all results, allocated by measurements have been released
     // TODO: enable after https://github.com/microsoft/qsharp-compiler/issues/780 is fixed
@@ -170,6 +176,8 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][
     // }
 }
 
+#ifndef RIQIR_TESTING
+
 #ifdef _WIN32
 // A non-sensical function that creates a 3D array with given dimensions, then projects on the index = 1 of the
 // second dimension and returns a function of the sizes of the dimensions of the projection and a the provided value,
@@ -178,7 +186,9 @@ TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][
 extern "C" int64_t TestMultidimArrays(char value, int64_t dim0, int64_t dim1, int64_t dim2);
 TEST_CASE("QIR: multidimensional arrays", "[qir][qir.arrMultid]")
 {
+#ifndef RIQIR_TESTING
     QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
+#endif
 
     REQUIRE(42 + (2 + 8) / 2 == TestMultidimArrays(42, 2, 4, 8));
     REQUIRE(17 + (3 + 7) / 2 == TestMultidimArrays(17, 3, 5, 7));
@@ -191,7 +201,9 @@ TEST_CASE("QIR: multidimensional arrays", "[qir][qir.arrMultid]")
 extern "C" void TestFailWithRangeString(int64_t start, int64_t step, int64_t end);
 TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
 {
+#ifndef RIQIR_TESTING
     QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
+#endif
 
     bool failed = false;
     try
@@ -208,11 +220,15 @@ TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
     REQUIRE(failed);
 }
 
+#endif // RIQIR_TESTING
+
 // TestPartials subtracts the second argument from the first and returns the result.
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__Interop(int64_t, int64_t); // NOLINT
 TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 {
+#ifndef RIQIR_TESTING
     QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
+#endif
 
     const int64_t res = Microsoft__Quantum__Testing__QIR__TestPartials__Interop(42, 17);
     REQUIRE(res == 42 - 17);
@@ -220,6 +236,7 @@ TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 
 // The Microsoft__Quantum__Testing__QIR__TestFunctors__Interop tests needs proper semantics of X and M, and nothing
 // else. The validation is done inside the test and it would throw in case of failure.
+#ifndef RIQIR_TESTING
 struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
 {
     std::vector<int> qubits;
@@ -311,19 +328,38 @@ extern "C" void __quantum__qis__k__ctl(QirArray* controls, QUBIT* q) // NOLINT
     g_ctrqapi->ControlledX((long)(controls->count), reinterpret_cast<QubitIdType*>(controls->buffer),
                            reinterpret_cast<QubitIdType>(q));
 }
+#else
+extern "C" void __quantum__qis__x__body(QUBIT* q);                               // NOLINT
+extern "C" void __quantum__qis__x__ctl(QirArray* controls, QUBIT* q);            // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__Interop();       // NOLINT
+extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__Interop(); // NOLINT
+extern "C" void __quantum__qis__k__body(QUBIT* q)                                // NOLINT
+{
+    __quantum__qis__x__body(q);
+}
+extern "C" void __quantum__qis__k__ctl(QirArray* controls, QUBIT* q) // NOLINT
+{
+    __quantum__qis__x__ctl(controls, q);
+}
+#endif
 TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
 {
+#ifndef RIQIR_TESTING
     unique_ptr<FunctorsTestSimulator> qapi = make_unique<FunctorsTestSimulator>();
     QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
     g_ctrqapi = qapi.get();
-
+#endif
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctors__Interop());
 
+#ifndef RIQIR_TESTING
     const int cKCalls           = g_cKCalls;
     const int cKCallsControlled = g_cKCallsControlled;
+#endif
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__Interop());
+#ifndef RIQIR_TESTING
     CHECK(g_cKCalls - cKCalls == 3);
     CHECK(g_cKCallsControlled - cKCallsControlled == 5);
 
     g_ctrqapi = nullptr;
+#endif
 }

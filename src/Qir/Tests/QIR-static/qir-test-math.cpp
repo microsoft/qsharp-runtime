@@ -106,6 +106,7 @@ TEST_CASE("QIR: Math.Exponent.builtin", "[qir.math][qir.Math.Exponent.builtin]")
 
 TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 {
+#ifndef RIQIR_TESTING
     // Test that the Q# random number generator is a wrapper around the C++ generator:
     size_t times = 1000;
     while (--times)
@@ -137,6 +138,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
     {
         REQUIRE(0 == strcmp(exc.what(), Quantum::Qis::Internal::excStrDrawRandomVal));
     }
+#endif
 
     // Test equal minimum and maximum:
     for (int64_t num : {-5, 0, 3})
@@ -234,6 +236,7 @@ TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 
 } // TEST_CASE("QIR: Math.DrawRandomInt", "[qir.math][qir.Math.DrawRandomInt]")
 
+#ifndef RIQIR_TESTING
 TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
 {
     // Test that the Q# random number generator is a wrapper around the C++ generator:
@@ -269,3 +272,4 @@ TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
         REQUIRE(0 == strcmp(exc.what(), Quantum::Qis::Internal::excStrDrawRandomVal));
     }
 } // TEST_CASE("QIR: Math.DrawRandomDouble", "[qir.math][qir.Math.DrawRandomDouble]")
+#endif

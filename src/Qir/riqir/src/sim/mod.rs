@@ -449,8 +449,6 @@ struct PauliRotationArgs {
 /// # Safety
 ///
 /// This function should only be called with arrays and tuples created by the QIR runtime library.
-/// # Panics
-///
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__qis__r__ctl(
@@ -511,8 +509,6 @@ pub unsafe extern "C" fn __quantum__qis__r__ctladj(
 }
 
 /// QIR API for applying a SWAP gate to the given qubits.
-/// # Panics
-///
 #[no_mangle]
 pub extern "C" fn __quantum__qis__swap__body(qubit0: *mut c_void, qubit1: *mut c_void) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
@@ -531,9 +527,45 @@ pub extern "C" fn __quantum__qis__swap__body(qubit0: *mut c_void, qubit1: *mut c
     *sim_lock = Some(sim);
 }
 
+/// QIR API for performing the exponential of a multi-qubit Pauli operator with the given angle.
+#[no_mangle]
+pub extern "C" fn __quantum__qis__exp__body(
+    _paulis: *const (usize, Vec<u8>),
+    _theta: c_double,
+    _qubits: *const (usize, Vec<u8>),
+) {
+    unimplemented!("Exp is not implemented.")
+}
+
+/// QIR API for performing the adjoint exponential of a multi-qubit Pauli operator with the given angle.
+#[no_mangle]
+pub extern "C" fn __quantum__qis__exp__adj(
+    paulis: *const (usize, Vec<u8>),
+    theta: c_double,
+    qubits: *const (usize, Vec<u8>),
+) {
+    __quantum__qis__exp__body(paulis, -theta, qubits);
+}
+
+/// QIR API for performing the multicontrolled exponential of a multi-qubit Pauli operator with the given angle.
+#[no_mangle]
+pub extern "C" fn __quantum__qis__exp__ctl(
+    _ctls: *const (usize, Vec<u8>),
+    _arg_tuple: *mut *const Vec<u8>,
+) {
+    unimplemented!("Controlled Exp is not implemented.")
+}
+
+/// QIR API for performing the adjoint multicontrolled exponential of a multi-qubit Pauli operator with the given angle.
+#[no_mangle]
+pub extern "C" fn __quantum__qis__exp__ctladj(
+    _ctls: *const (usize, Vec<u8>),
+    _arg_tuple: *mut *const Vec<u8>,
+) {
+    unimplemented!("Controlled Exp is not implemented.")
+}
+
 /// QIR API for resetting the given qubit in the computational basis.
-/// # Panics
-///
 #[no_mangle]
 pub extern "C" fn __quantum__qis__reset__body(qubit: *mut c_void) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
@@ -550,15 +582,13 @@ pub extern "C" fn __quantum__qis__reset__body(qubit: *mut c_void) {
 }
 
 /// QIR API for measuring the given qubit in the computation basis and storing the measured value with the given result identifier.
-/// # Panics
-///
 #[no_mangle]
 pub extern "C" fn __quantum__qis__mz__body(qubit: *mut c_void, result: *mut c_void) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
     let mut sim = sim_lock
         .take()
         .map_or_else(SparseStateQuantumSim::new, |s| s);
-    let mut res = RESULTS.lock().unwrap();
+    let mut res = RESULTS.lock().expect("Unable to lock global result state.");
     let res_id = result as usize;
     ensure_sufficient_qubits(&mut sim, qubit as usize);
 
@@ -566,24 +596,25 @@ pub extern "C" fn __quantum__qis__mz__body(qubit: *mut c_void, result: *mut c_vo
         res.resize(res_id + 1, false);
     }
 
-    *res.get_mut(res_id).unwrap() = sim.measure(qubit as usize);
+    *res.get_mut(res_id)
+        .expect("Result with given id missing after expansion.") = sim.measure(qubit as usize);
 
     *sim_lock = Some(sim);
 }
 
 /// QIR API that reads the Boolean value corresponding to the given result identifier, where true
 /// indicates a |1⟩ state and false indicates a |0⟩ state.
-/// # Panics
-///
 #[no_mangle]
 pub extern "C" fn __quantum__qis__read_result__body(result: *mut c_void) -> bool {
-    let mut res = RESULTS.lock().unwrap();
+    let mut res = RESULTS.lock().expect("Unable to lock global result state.");
     let res_id = result as usize;
     if res.len() < res_id + 1 {
         res.resize(res_id + 1, false);
     }
 
-    let b = *res.get(res_id).unwrap();
+    let b = *res
+        .get(res_id)
+        .expect("Result with given id missing after expansion.");
     b
 }
 
@@ -720,11 +751,9 @@ pub unsafe extern "C" fn __quantum__qis__assertmeasurementprobability__ctl(
 }
 
 /// QIR API for recording the given result into the program output.
-/// # Panics
-///
 #[no_mangle]
 pub extern "C" fn __quantum__rt__result_record_output(result: *mut c_void) {
-    let mut res = RESULTS.lock().unwrap();
+    let mut res = RESULTS.lock().expect("Unable to lock global result state.");
     let res_id = result as usize;
     let b = if res.len() == 0 {
         // No static measurements have been used, so default to dynamic handling.
@@ -733,15 +762,14 @@ pub extern "C" fn __quantum__rt__result_record_output(result: *mut c_void) {
         if res.len() < res_id + 1 {
             res.resize(res_id + 1, false);
         }
-        *res.get(res_id).unwrap()
+        *res.get(res_id)
+            .expect("Result with given id missing after expansion.")
     };
 
     println!("RESULT\t{}", if b { "1" } else { "0" });
 }
 
 /// QIR API that allocates the next available qubit in the simulation.
-/// # Panics
-///
 #[no_mangle]
 pub extern "C" fn __quantum__rt__qubit_allocate() -> *mut c_void {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
@@ -791,8 +819,6 @@ pub unsafe extern "C" fn __quantum__rt__qubit_release_array(arr: *const (usize, 
 }
 
 /// QIR API for releasing the given qubit from the simulation.
-/// # Panics
-///
 #[no_mangle]
 pub extern "C" fn __quantum__rt__qubit_release(qubit: *mut c_void) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
@@ -804,20 +830,38 @@ pub extern "C" fn __quantum__rt__qubit_release(qubit: *mut c_void) {
 }
 
 /// API for viewing the current global result and quantum state for the simulator.
-/// # Panics
-///
 #[no_mangle]
 pub extern "C" fn dump_state() {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
     let mut sim = sim_lock
         .take()
         .map_or_else(SparseStateQuantumSim::new, |s| s);
-    let res = RESULTS.lock().unwrap();
+    let res = RESULTS.lock().expect("Unable to lock global result state.");
 
-    println!("Global Results: {}", *res);
+    if !(*res).is_empty() {
+        println!("Global Results: {}", *res);
+    }
     sim.dump();
 
     *sim_lock = Some(sim);
+}
+
+/// QIR API for dumping full internal simulator state.
+#[no_mangle]
+pub extern "C" fn __quantum__qis__dumpmachine__body(location: *mut c_void) {
+    if !location.is_null() {
+        unimplemented!("Dump to location is not implemented.")
+    }
+    dump_state();
+}
+
+/// QIR API for dumping the internal simulator state for the given qubits.
+#[no_mangle]
+pub extern "C" fn __quantum__qis__dumpregister__body(
+    _location: *mut c_void,
+    _qubits: *const (usize, Vec<u8>),
+) {
+    unimplemented!("Dump of qubit register is not implemented.")
 }
 
 #[cfg(test)]

@@ -120,44 +120,56 @@ struct ConditionalsTestSimulator : public Microsoft::Quantum::SimulatorStub
 extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyIf__Interop(); // NOLINT
 TEST_CASE("QIR: ApplyIf", "[qir][qir.conditionals]")
 {
+#ifndef RIQIR_TESTING
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
     QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+#endif
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIf__Interop());
 
+#ifndef RIQIR_TESTING
     INFO(qapi->GetHistory());
     CHECK(qapi->xCallbacks.size() == 8);
     CHECK(qapi->cxCallbacks.size() == 0);
     CHECK(qapi->otherCallbacks.size() == 0);
+#endif
 }
 
 extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__Interop(); // NOLINT
 TEST_CASE("QIR: ApplyIf with functors", "[qir][qir.conditionals]")
 {
+#ifndef RIQIR_TESTING
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
     QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+#endif
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyIfWithFunctors__Interop());
 
+#ifndef RIQIR_TESTING
     INFO(qapi->GetHistory());
     CHECK(qapi->xCallbacks.size() == 5);
     CHECK(qapi->cxCallbacks.size() == 7);
     CHECK(qapi->otherCallbacks.size() == 0);
+#endif
 }
 
 extern "C" void Microsoft__Quantum__Testing__QIR__TestApplyConditionally__Interop(); // NOLINT
 TEST_CASE("QIR: ApplyConditionally", "[qir][qir.conditionals]")
 {
+#ifndef RIQIR_TESTING
     unique_ptr<ConditionalsTestSimulator> qapi =
         make_unique<ConditionalsTestSimulator>(vector<ResultValue>{Result_Zero, Result_One});
     QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
+#endif
 
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestApplyConditionally__Interop());
 
+#ifndef RIQIR_TESTING
     INFO(qapi->GetHistory());
     CHECK(qapi->xCallbacks.size() == 4);
     CHECK(qapi->cxCallbacks.size() == 2);
     CHECK(qapi->otherCallbacks.size() == 0);
+#endif
 }

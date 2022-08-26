@@ -7,6 +7,7 @@ extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Other__ParityTest__Interop
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Other__PauliArrayAsIntTest__Interop();     // NOLINT
 extern "C" uint64_t Microsoft__Quantum__Testing__QIR__Other__PauliArrayAsIntFailTest__Interop(); // NOLINT
 
+#ifndef RIQIR_TESTING
 TEST_CASE("QIR: Other.PauliArrayAsIntFail", "[qir.Other][qir.Other.PauliArrayAsIntFail]")
 {
     REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__Other__PauliArrayAsIntFailTest__Interop());
@@ -14,6 +15,7 @@ TEST_CASE("QIR: Other.PauliArrayAsIntFail", "[qir.Other][qir.Other.PauliArrayAsI
     // to the moment of exception throw.
     // TODO: Extract into a separate file compiled with leaks check off.
 }
+#endif
 
 TEST_CASE("QIR: Other.PauliArrayAsInt", "[qir.Other][qir.Other.PauliArrayAsInt]")
 {

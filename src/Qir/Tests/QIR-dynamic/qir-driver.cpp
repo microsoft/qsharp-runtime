@@ -42,8 +42,10 @@ using namespace Microsoft::Quantum;
 
 TEST_CASE("QIR: Generate a random number with full state simulator", "[qir]")
 {
+#ifndef RIQIR_TESTING
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
+#endif
 
     const int64_t ret1 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
     const int64_t ret2 = Microsoft__Quantum__Testing__QIR__QuantumRandomNumberGenerator__Interop();
@@ -57,7 +59,7 @@ TEST_CASE("QIR: Generate a random number with full state simulator", "[qir]")
     CHECK(ret2 != ret3);
 }
 
-
+#ifndef RIQIR_TESTING
 static bool FileExists(const char* filePath)
 {
     return std::ifstream(filePath).operator bool();
@@ -190,12 +192,14 @@ static void AssertMeasMessageTest(void (*funcPtr)(const char*))
                                       // TODO: Extract into a separate .cpp compiled with leak detection off.
     REQUIRE(outStrStream.str() == (std::string(testStr) + "\n"));
 }
-
+#endif
 
 TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
 {
+#ifndef RIQIR_TESTING
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped contextReleaser{sim.get()};
+#endif
 
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasAlloc1OKTest__Interop());
 
@@ -208,7 +212,9 @@ TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertMeasMixedBasesTest__Interop());
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__AssertGHZMeasurementsTest__Interop());
 
+#ifndef RIQIR_TESTING
     AssertMeasMessageTest(Microsoft__Quantum__Testing__QIR__AssertMeasMessageTest__Interop);
     AssertMeasMessageTest(Microsoft__Quantum__Testing__QIR__AssertMeasProbMessageTest__Interop);
+#endif
 
 } // TEST_CASE("QIR: AssertMeasurement", "[qir][AssertMeasurement]")

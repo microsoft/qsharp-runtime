@@ -17,6 +17,8 @@
 using namespace Microsoft::Quantum;
 using namespace std;
 
+#ifndef RIQIR_TESTING
+
 // The tests rely on the implementation detail of CFullstateSimulator that the qubits are nothing more but contiguously
 // incremented ids.
 static unsigned GetQubitId(QubitIdType q)
@@ -420,20 +422,29 @@ TEST_CASE("QIR: Simulator rejects unmeasured, non-zero release", "[fullstate_sim
     QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
     REQUIRE_THROWS(Microsoft__Quantum__Testing__QIR__InvalidRelease__Interop());
 }
+#endif
 
 extern "C" int Microsoft__Quantum__Testing__QIR__MeasureRelease__Interop(); // NOLINT
 TEST_CASE("QIR: Simulator accepts measured release", "[fullstate_simulator]")
 {
+#ifndef RIQIR_TESTING
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+#endif
+
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__MeasureRelease__Interop());
 }
 
-extern "C" int Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop(); // NOLINT
+extern "C" int Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop(bool); // NOLINT
 TEST_CASE("QIR: invoke all standard Q# gates against the fullstate simulator", "[fullstate_simulator]")
 {
+#ifndef RIQIR_TESTING
     std::unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
     QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
+    bool includeExp = true;
+#else
+    bool includeExp = false;
+#endif
 
-    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop());
+    REQUIRE(0 == Microsoft__Quantum__Testing__QIR__Test_Simulator_QIS__Interop(includeExp));
 }
