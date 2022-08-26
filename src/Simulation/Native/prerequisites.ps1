@@ -4,15 +4,13 @@
 Write-Host "##[info] Simulation/Native/prerequisites.ps1"
 
 if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
-    # Skip explicit install for testing purposes
-    # brew install libomp
     brew update
     brew install ninja
     brew install llvm@14
 } elseif (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
     if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
         (Test-Path Env:/AGENT_OS)) {
-        choco install llvm --version=14 --allow-downgrade
+        choco install llvm --version=14.0.6 --allow-downgrade
         Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
     }
     if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {

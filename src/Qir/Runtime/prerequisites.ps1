@@ -10,7 +10,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
             !(Get-Command clang-format -ErrorAction SilentlyContinue) -or `
             (Test-Path Env:/AGENT_OS)) {
-            choco install llvm --version=14 --allow-downgrade
+            choco install llvm --version=14.0.6 --allow-downgrade
             Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
@@ -28,7 +28,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         brew install ninja
         brew install llvm@14
         if (!(Get-Command clang-format -ErrorAction SilentlyContinue)) {
-            brew install clang-format@14
+            brew install clang-format@14    # Still needed after the LLVM is installed.
         }
     } else {
         $needClang = !(Get-Command clang-14 -ErrorAction SilentlyContinue)
