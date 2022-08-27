@@ -14,13 +14,7 @@ if (-not (Build-CMakeProject $PSScriptRoot "QIR Runtime")) {
 
 # Copy the results of runtime compilation and the corresponding headers to the QIR drops folder so
 # they can be included in pipeline artifacts.
-$osDir = "win-x64"
-if ($IsLinux) {
-    $osDir = "linux-x64"
-} elseif ($IsMacOS) {
-    $osDir = "osx-x64"
-}
-$qirDropsBin = (Join-Path $Env:QIR_DROPS bin $osDir native)
+$qirDropsBin = (Join-Path $Env:QIR_DROPS bin $env:BUILD_PLATFORM native)
 $qirDropsInclude = (Join-Path $Env:QIR_DROPS include)
 if (-not (Test-Path $Env:QIR_DROPS)) {
     New-Item -Path $Env:QIR_DROPS -ItemType "directory"

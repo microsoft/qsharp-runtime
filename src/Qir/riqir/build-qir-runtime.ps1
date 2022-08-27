@@ -40,7 +40,7 @@ try {
         New-Item -Path $qirDropsBin -ItemType "directory"
     }
     $qirBinaries = (Join-Path $PSScriptRoot .. .. .. target "$Env:BUILD_CONFIGURATION".ToLower() *)
-    Copy-Item $qirBinaries $qirDropsBin -Include "qir_runtime*" -Exclude "*.rlib","*.d","*.exp"
+    Copy-Item $qirBinaries $qirDropsBin -Include "*qir_runtime*" -Exclude "*.rlib","*.d","*.exp"
 
     # For Windows platforms, make sure to update the extension of the lib file used for linking
     # from *.dll.lib to just .lib
