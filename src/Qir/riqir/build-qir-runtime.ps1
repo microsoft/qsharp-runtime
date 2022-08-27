@@ -30,12 +30,6 @@ try {
     cargo build @releaseFlag
     if ($LASTEXITCODE -ne 0) { throw "Failed cargo build on QIR Runtime." }
 
-    # When building in CI, free disk space by cleaning up.
-    # Note that this takes longer, but saves ~1 GB of space.
-    if ($IsCI) {
-        cargo clean;
-    }
-
     # Copy the results of runtime compilation and the corresponding headers to the QIR drops folder so
     # they can be included in pipeline artifacts.
     $qirDropsBin = (Join-Path $Env:QIR_DROPS bin $env:BUILD_PLATFORM native)
@@ -56,6 +50,11 @@ try {
         Rename-Item $rustlib qir_runtime.lib
     }
 
+    # When building in CI, free disk space by cleaning up.
+    # Note that this takes longer, but saves ~1 GB of space.
+    if ($IsCI) {
+        cargo clean;
+    }
 }
 finally {
     Pop-Location
