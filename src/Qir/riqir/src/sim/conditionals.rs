@@ -2,11 +2,12 @@
 // Licensed under the MIT License.
 #![deny(clippy::all, clippy::pedantic)]
 
+use super::result_bool::{__quantum__rt__result_equal, __quantum__rt__result_get_one};
+
 use crate::{
     __quantum__rt__fail,
     arrays::{__quantum__rt__array_get_element_ptr_1d, __quantum__rt__array_get_size_1d},
     callables::{Callable, __quantum__rt__callable_invoke},
-    result_bool::{__quantum__rt__result_equal, __quantum__rt__result_get_one},
     strings::convert,
 };
 use std::{ffi::c_void, ptr::null_mut};

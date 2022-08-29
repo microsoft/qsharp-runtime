@@ -3,6 +3,9 @@
 
 //! Module defining QIR compliant APIs for quantum simulation.
 
+pub mod conditionals;
+pub mod result_bool;
+
 mod common_matrices;
 mod simulator;
 mod sparsestate;
@@ -17,14 +20,15 @@ use std::os::raw::c_double;
 use std::sync::atomic::{AtomicUsize, Ordering::Relaxed};
 use std::sync::Mutex;
 
+use result_bool::{
+    __quantum__rt__result_equal, __quantum__rt__result_get_one, __quantum__rt__result_get_zero,
+};
+
 use super::{
     Pauli, __quantum__rt__fail,
     arrays::{
         __quantum__rt__array_create_1d, __quantum__rt__array_get_element_ptr_1d,
         __quantum__rt__array_get_size_1d, __quantum__rt__array_update_alias_count,
-    },
-    result_bool::{
-        __quantum__rt__result_equal, __quantum__rt__result_get_one, __quantum__rt__result_get_zero,
     },
     strings::__quantum__rt__string_create,
     tuples::{__quantum__rt__tuple_create, __quantum__rt__tuple_update_reference_count},

@@ -7,11 +7,9 @@
 pub mod arrays;
 pub mod bigints;
 pub mod callables;
-pub mod conditionals;
 pub mod math;
 pub mod output_recording;
 pub mod range_support;
-pub mod result_bool;
 pub mod strings;
 pub mod tuples;
 
