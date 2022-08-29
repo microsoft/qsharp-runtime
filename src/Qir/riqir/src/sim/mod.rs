@@ -53,7 +53,7 @@ unsafe fn map_paulis(
     let qubits_size = __quantum__rt__array_get_size_1d(qubits);
     if paulis_size != qubits_size {
         __quantum__rt__fail(__quantum__rt__string_create(
-            CString::new("Pauli array and Qubit array for Measurement must be the same size.")
+            CString::new("Pauli array and Qubit array must be the same size.")
                 .unwrap()
                 .as_bytes_with_nul()
                 .as_ptr() as *mut i8,
