@@ -2,5 +2,9 @@
 
 members = [
     "src/Simulation/qdk_sim_rs",
-    "src/Qir/microsoft-quantum-qir-runtime-sys",
 ]
+
+[profile.release]
+codegen-units = 1   # Reduce number of codegen units to increase optimizations.
+opt-level = 3
+panic = 'unwind'

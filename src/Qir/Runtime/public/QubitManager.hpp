@@ -38,7 +38,7 @@ namespace Quantum
         CQubitManager(QubitIdType initialQubitCapacity = DefaultQubitCapacity, bool mayExtendCapacity = true);
 
         // No complex scenarios for now. Don't need to support copying/moving.
-        CQubitManager(const CQubitManager&) = delete;
+        CQubitManager(const CQubitManager&)            = delete;
         CQubitManager& operator=(const CQubitManager&) = delete;
         ~CQubitManager(); // If this dtor is made _virtual_ then the QIR RT tests crash (at least in Debug config)
                           // if the native simulator is compiled with Clang (as opposed to GCC). Nothing wrong found in
@@ -194,12 +194,12 @@ namespace Quantum
         {
           public:
             // No complex scenarios for now. Don't need to support copying/moving.
-            CRestrictedReuseAreaStack()                                 = default;
-            CRestrictedReuseAreaStack(const CRestrictedReuseAreaStack&) = delete;
+            CRestrictedReuseAreaStack()                                            = default;
+            CRestrictedReuseAreaStack(const CRestrictedReuseAreaStack&)            = delete;
             CRestrictedReuseAreaStack& operator=(const CRestrictedReuseAreaStack&) = delete;
             CRestrictedReuseAreaStack(CRestrictedReuseAreaStack&&)                 = delete;
-            CRestrictedReuseAreaStack& operator=(CRestrictedReuseAreaStack&&) = delete;
-            ~CRestrictedReuseAreaStack()                                      = default;
+            CRestrictedReuseAreaStack& operator=(CRestrictedReuseAreaStack&&)      = delete;
+            ~CRestrictedReuseAreaStack()                                           = default;
 
             void PushToBack(RestrictedReuseArea area);
             RestrictedReuseArea PopFromBack();

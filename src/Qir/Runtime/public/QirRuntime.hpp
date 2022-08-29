@@ -61,12 +61,6 @@ extern "C"
     // Utils
     // ------------------------------------------------------------------------
 
-    // Allocate a block of memory on the heap.
-    QIR_SHARED_API char* __quantum__rt__heap_alloc(uint64_t size); // NOLINT
-
-    // Release a block of allocated heap memory.
-    QIR_SHARED_API void __quantum__rt__heap_free(char* buffer); // NOLINT
-
     // Returns a pointer to the malloc-allocated block.
     QIR_SHARED_API char* __quantum__rt__memory_allocate(uint64_t size); // NOLINT
 

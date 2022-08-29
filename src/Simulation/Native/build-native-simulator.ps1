@@ -67,7 +67,7 @@ if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("W
 }
 elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin"))))
 {
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ `
+    cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-14 -D CMAKE_CXX_COMPILER=clang++-14 `
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$buildType" ..
@@ -76,13 +76,13 @@ elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith(
 {
     Write-Host "On MacOS build using the default C/C++ compiler (should be AppleClang)"
 
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" `
+    cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" `
         -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
         -D CMAKE_BUILD_TYPE="$buildType" ..
 }
 else {
-    cmake -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$buildType" ..
+    cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$buildType" ..
 }
 cmake --build . --config "$buildType" --target install
 

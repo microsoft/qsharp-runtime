@@ -27,7 +27,11 @@ set(runtime_lib_path "${PROJECT_SOURCE_DIR}/../Runtime/bin/$ENV{BUILD_CONFIGURAT
 include(qir_cmake_include)
 include(unit_test_include)
 
+# Temporarily exclude the `FullstateSimulator` test from the sanitized (Debug) build on Linux:
+if(NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Linux" OR  NOT "${CMAKE_BUILD_TYPE}" MATCHES "Debug")  # TODO(kuzminrobin, #1078): Remove this condition after the bug is fixed.
 add_subdirectory(FullstateSimulator)
+endif()
+
 add_subdirectory(QIR-dynamic)
 add_subdirectory(QIR-static)
 add_subdirectory(QIR-tracer)

@@ -120,9 +120,11 @@ namespace Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime
                 stream.Position = 0;
                 // Deserialize the graph into a new set of objects and
                 // return the root of the graph (deep copy) to the caller
-                T res = formatter.Deserialize(stream) as T;
-                Debug.Assert(res != null);
-                return res;
+                object res = formatter.Deserialize(stream);
+                if (res.GetType() != typeof(T)) {
+                    throw new ApplicationException("Deserialization failed while copying an object.");
+                }
+                return (T)res;
             }
         }
 

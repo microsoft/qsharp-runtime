@@ -41,12 +41,13 @@ macro(locate_win32_spectre_static_runtime)
             message(FATAL_ERROR "Could not locate vswhere - unable to search for installed vcruntime libraries.")
         endif()
         execute_process(
-            COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/14.29.*/**/lib/spectre/x64 -sort
+            COMMAND "${_vswhere_tool}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **/14.*.*/**/lib/spectre/x64 -sort
             OUTPUT_VARIABLE _vs_install_loc_out
             RESULT_VARIABLE _vs_where_exitcode
             OUTPUT_STRIP_TRAILING_WHITESPACE)
         file(TO_CMAKE_PATH "${_vs_install_loc_out}" SPECTRE_LIB_PATH_OUT)
         string(REGEX REPLACE "[\r\n]+" ";" SPECTRE_LIB_PATH ${SPECTRE_LIB_PATH_OUT})
+        list(REVERSE SPECTRE_LIB_PATH)
         message(INFO "*** install loc: ${SPECTRE_LIB_PATH}")
 
         # Locate the spectre mitigated runtime libraries and fail if they can't be found. Targets in this
