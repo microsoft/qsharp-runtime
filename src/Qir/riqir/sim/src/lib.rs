@@ -24,14 +24,9 @@ use result_bool::{
     __quantum__rt__result_equal, __quantum__rt__result_get_one, __quantum__rt__result_get_zero,
 };
 
-use super::{
-    Pauli, __quantum__rt__fail,
-    arrays::{
-        __quantum__rt__array_create_1d, __quantum__rt__array_get_element_ptr_1d,
-        __quantum__rt__array_get_size_1d, __quantum__rt__array_update_alias_count,
-    },
-    strings::__quantum__rt__string_create,
-    tuples::{__quantum__rt__tuple_create, __quantum__rt__tuple_update_reference_count},
+pub use qir_runtime::{
+    arrays::*, bigints::*, callables::*, math::*, output_recording::*, range_support::*,
+    strings::*, tuples::*, *,
 };
 
 lazy_static! {
@@ -879,7 +874,7 @@ mod tests {
         __quantum__rt__qubit_release, __quantum__rt__qubit_release_array,
         __quantum__rt__result_equal, __quantum__rt__result_get_one, dump_state,
     };
-    use crate::arrays::__quantum__rt__array_get_element_ptr_1d;
+    use qir_runtime::arrays::__quantum__rt__array_get_element_ptr_1d;
 
     // TODO(swernli): Split and expand simulator unit tests.
     #[allow(clippy::cast_ptr_alignment)]

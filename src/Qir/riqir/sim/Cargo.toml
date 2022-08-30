@@ -1,0 +1,19 @@
+[package]
+name = "qir-sim"
+version = "0.1.0"
+authors = ["Microsoft"]
+edition = "2021"
+
+[dependencies]
+qir-runtime = { path = "../runtime" }
+rand = "0.8.5"
+rustc-hash = "1.1.0"
+num-complex = "0.4"
+num-traits = "0.2.14"
+rayon = "1.5.1"
+ndarray = { version = "0.15.4", features = [ "rayon", "matrixmultiply-threading" ] }
+lazy_static = "1.4.0"
+bitvec = "1.0.0"
+
+[lib]
+crate-type = ["cdylib","rlib"]

@@ -4,13 +4,16 @@
 
 use super::result_bool::{__quantum__rt__result_equal, __quantum__rt__result_get_one};
 
-use crate::{
+use qir_runtime::{
     __quantum__rt__fail,
     arrays::{__quantum__rt__array_get_element_ptr_1d, __quantum__rt__array_get_size_1d},
     callables::{Callable, __quantum__rt__callable_invoke},
-    strings::convert,
+    strings::__quantum__rt__string_create,
 };
-use std::{ffi::c_void, ptr::null_mut};
+use std::{
+    ffi::{c_void, CString},
+    ptr::null_mut,
+};
 
 /// # Safety
 ///
@@ -45,9 +48,13 @@ pub unsafe extern "C" fn __quantum__qis__applyconditionallyintrinsic__body(
 ) {
     let result_len = __quantum__rt__array_get_size_1d(results);
     if result_len != __quantum__rt__array_get_size_1d(expected) {
-        __quantum__rt__fail(convert(
-            &"Invalid Argument: expected and actual result arrays must have the same size."
-                .to_string(),
+        __quantum__rt__fail(__quantum__rt__string_create(
+            CString::new(
+                "Invalid Argument: expected and actual result arrays must have the same size.",
+            )
+            .expect("Unable to allocate string for error message.")
+            .as_bytes_with_nul()
+            .as_ptr() as *mut i8,
         ));
     }
 

@@ -6,7 +6,7 @@ target_source_from_qir(fullstate-simulator-tests ../../Tests/FullstateSimulator/
 target_link_libraries(fullstate-simulator-tests PUBLIC
   "-L${runtime_lib_path}"
   -lqir_range_support
-  -lqir_runtime
+  -lqir_sim
 )
 
 target_include_directories(fullstate-simulator-tests PUBLIC

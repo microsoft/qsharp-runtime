@@ -13,9 +13,6 @@ pub mod range_support;
 pub mod strings;
 pub mod tuples;
 
-#[cfg(feature = "sim")]
-pub mod sim;
-
 use std::{
     ffi::CString,
     rc::{Rc, Weak},

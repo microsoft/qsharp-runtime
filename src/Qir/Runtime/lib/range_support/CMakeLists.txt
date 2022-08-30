@@ -10,7 +10,7 @@ set(QIR_LIB_PATH "${CMAKE_SOURCE_DIR}/../drops/bin/$ENV{BUILD_PLATFORM}/native")
 target_link_libraries(qir_range_support
   ${CMAKE_DL_LIBS}
   "-L${QIR_LIB_PATH}"
-  -lqir_runtime
+  -lqir_sim
   ${SPECTRE_LIBS}
 )
 

@@ -439,7 +439,7 @@ mod tests {
         common_matrices::{adjoint, controlled, h, s, x},
         *,
     };
-    use crate::sim::sparsestate::SparseStateQuantumSim;
+    use crate::sparsestate::SparseStateQuantumSim;
     use ndarray::array;
     use num_traits::{One, Zero};
 
