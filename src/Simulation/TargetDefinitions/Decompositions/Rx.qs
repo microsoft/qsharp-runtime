@@ -4,7 +4,7 @@
 namespace Microsoft.Quantum.Intrinsic {
 
     /// # Summary
-    /// Applies a rotation about the $x$-axis by a given angle. 
+    /// Applies a rotation about the $x$-axis by a given angle.
     ///
     /// # Description
     /// \begin{align}
