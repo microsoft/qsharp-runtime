@@ -1,17 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-use std::convert::TryInto;
-
 use ndarray::Array2;
+use num_bigint::BigUint;
 use num_complex::Complex64;
-use num_traits::{One, Zero};
+use num_traits::{One, ToPrimitive, Zero};
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
 
 use super::simulator::{detail::QuantumSimImpl, parallel_chunk_size, OpBuffer, QuantumSim};
 
-pub type SparseState = FxHashMap<u128, Complex64>;
+pub type SparseState = FxHashMap<BigUint, Complex64>;
 
 /// Sparse quantum state simulation using a dictionary of states with non-zero amplitudes, based on <https://arxiv.org/pdf/2105.01533.pdf>.
 /// This simulator is memory efficient for highly entangled states, allowing for the use of up to 128 qubits, but less performant
@@ -47,11 +46,9 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
     ///
     /// This function will panic if the total number of allocated qubits would increase beyond 128.
     fn extend_state(&mut self) {
-        if self.id_map.len() >= 128 {
-            panic!("Attempting to allocate more than 128 qubits. Internal data structures of sparse simulation can handle at most 128 qubits.");
-        } else if self.id_map.is_empty() {
+        if self.id_map.is_empty() {
             // Add the intial value for the zero state.
-            self.state.insert(0, Complex64::one());
+            self.state.insert(BigUint::zero(), Complex64::one());
         }
     }
 
@@ -60,8 +57,8 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
         if qubit1 == qubit2 {
             return;
         }
-        let offset1 = 1_u128 << qubit1;
-        let offset2 = 1_u128 << qubit2;
+
+        let (q1, q2) = (qubit1 as u64, qubit2 as u64);
 
         // In parallel, swap entries in the sparse state to correspond to swapping of two qubits'
         // locations.
@@ -73,10 +70,13 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
             .par_chunks(chunk_size)
             .fold(FxHashMap::default, |mut accum, chunk| {
                 for (k, v) in chunk {
-                    if (k & offset1 > 0) == (k & offset2 > 0) {
-                        accum.insert(*k, *v);
+                    if k.bit(q1) == k.bit(q2) {
+                        accum.insert(k.clone(), *v);
                     } else {
-                        accum.insert((k ^ offset1) ^ offset2, *v);
+                        let mut new_k = k.clone();
+                        new_k.set_bit(q1, !k.bit(q1));
+                        new_k.set_bit(q2, !k.bit(q2));
+                        accum.insert(new_k, *v);
                     }
                 }
                 accum
@@ -96,7 +96,7 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
     /// The function will panic if the given id does not correpsond to an allocated qubit.
     fn cleanup_state(&mut self, res: bool) {
         if res {
-            let offset = 1_u128 << self.id_map.len();
+            let qubit = self.id_map.len() as u64;
             let chunk_size = parallel_chunk_size(self.state.len());
             self.state = self
                 .state
@@ -105,7 +105,9 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
                 .par_chunks(chunk_size)
                 .fold(FxHashMap::default, |mut accum, chunk| {
                     for (k, v) in chunk {
-                        accum.insert(k ^ offset, *v);
+                        let mut new_k = k.clone();
+                        new_k.set_bit(qubit, !k.bit(qubit));
+                        accum.insert(new_k, *v);
                     }
                     accum
                 })
@@ -126,13 +128,13 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
             println!("MAP: {:?}", self.id_map);
         };
         print!("STATE: [ ");
-        let mut sorted_keys = self.state.keys().copied().collect::<Vec<_>>();
+        let mut sorted_keys = self.state.keys().collect::<Vec<_>>();
         sorted_keys.sort_unstable();
         for key in sorted_keys {
             print!(
                 "|{}\u{27e9}: {}, ",
                 key,
-                self.state.get(&key).map_or_else(Complex64::zero, |v| *v)
+                self.state.get(key).map_or_else(Complex64::zero, |v| *v)
             );
         }
         println!("]");
@@ -143,7 +145,7 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
     fn apply_impl(&mut self) {
         // let state_size = 1_usize << self.id_map.len();
         let chunk_size = parallel_chunk_size(self.state.len());
-        let op_size = self.op_buffer.ops.nrows() as u128;
+        let op_size = self.op_buffer.ops.nrows();
         self.state = self
             .state
             .drain()
@@ -152,18 +154,17 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
             .fold(FxHashMap::default, |mut accum, chunk| {
                 for (index, val) in chunk {
                     let i = index / op_size;
-                    let l = (index % op_size) as usize;
+                    let l = (index % op_size)
+                        .to_usize()
+                        .expect("Cannot operate on more than 64 qubits at a time.");
                     for j in
                         (0..op_size).filter(|j| !self.op_buffer.ops.row(*j as usize)[l].is_zero())
                     {
-                        let loc = (i * op_size) + (j as u128);
+                        let loc = (&i * op_size) + (j as u128);
                         if let Some(entry) = accum.get_mut(&loc) {
-                            *entry += self.op_buffer.ops.row(j.try_into().unwrap())[l] * val;
+                            *entry += self.op_buffer.ops.row(j)[l] * val;
                         } else {
-                            accum.insert(
-                                (i * op_size) + (j as u128),
-                                self.op_buffer.ops.row(j.try_into().unwrap())[l] * val,
-                            );
+                            accum.insert((&i * op_size) + j, self.op_buffer.ops.row(j)[l] * val);
                         }
                         if accum
                             .get(&loc)
@@ -181,7 +182,7 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
                     if let Some(entry) = accum.get_mut(&k) {
                         *entry += v;
                     } else if !v.is_zero() {
-                        accum.insert(k, v);
+                        accum.insert(k.clone(), v);
                     }
                     if accum
                         .get(&k)
@@ -199,13 +200,15 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
     /// are set. This corresponds to the probability of jointly measuring those qubits in the computational
     /// basis.
     fn check_joint_probability(&self, locs: &[usize]) -> f64 {
-        let mask = locs.iter().fold(0_u128, |accum, loc| accum | (1 << loc));
+        let mask = locs.iter().fold(BigUint::zero(), |accum, loc| {
+            accum | (BigUint::one() << loc)
+        });
         (&self.state)
             .into_par_iter()
             .fold(
                 || 0.0_f64,
                 |accum, (index, val)| {
-                    if (index & mask).count_ones() & 1 > 0 {
+                    if (index & &mask).count_ones() & 1 > 0 {
                         accum + val.norm_sqr()
                     } else {
                         accum
@@ -239,7 +242,9 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
     /// The entries that do not correspond to the given boolean value are removed, and then the whole
     /// state is normalized.
     fn joint_collapse(&mut self, locs: &[usize], val: bool) {
-        let mask = locs.iter().fold(0_u128, |accum, loc| accum | (1 << loc));
+        let mask = locs.iter().fold(BigUint::zero(), |accum, loc| {
+            accum | (BigUint::one() << loc)
+        });
 
         let chunk_size = parallel_chunk_size(self.state.len());
         self.state = self
@@ -250,9 +255,9 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
             .fold(FxHashMap::default, |mut accum, chunk| {
                 for (k, v) in chunk
                     .iter()
-                    .filter(|(index, _)| ((index & mask).count_ones() & 1 > 0) == val)
+                    .filter(|(index, _)| ((index & &mask).count_ones() & 1 > 0) == val)
                 {
-                    accum.insert(*k, *v);
+                    accum.insert(k.clone(), *v);
                 }
                 accum
             })

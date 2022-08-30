@@ -684,4 +684,20 @@ mod tests {
         let q = sim.allocate();
         sim.apply(&array![[Complex64::zero()], [Complex64::one()]], &[q], None);
     }
+
+    /// Large, entangled state handling.
+    #[test]
+    fn test_large_state() {
+        let mut sim = SparseStateQuantumSim::new();
+        let ctl = sim.allocate();
+        sim.apply(&h(), &[ctl], None);
+        for _ in 0..4999 {
+            let q = sim.allocate();
+            sim.apply(&x(), &[q], Some(&[ctl]));
+        }
+        let _ = sim.measure(ctl);
+        for i in 0..5000 {
+            sim.release(i);
+        }
+    }
 }
