@@ -22,7 +22,7 @@ foreach ($folder in "runtime","sim") {
         # If there's a false positive, that check should be explicitly disabled
         # at the point where the false positive occurs with an explanation as to
         # why it's OK.
-        cargo clippy -- -D warnings
+        cargo clippy --all-targets -- -D warnings
         if ($LASTEXITCODE -ne 0) { throw "Failed clippy linting check on QIR $folder." }
 
         $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();

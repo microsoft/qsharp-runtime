@@ -17,6 +17,11 @@ use std::ops::ControlFlow;
 /// just the value used to determine whether the buffer should accept the current incoming operation.
 const BUFFER_LIMIT: usize = 4;
 
+/// Scaling used to determine when an operation is big enough to warrant multithreading. If the size
+/// is too small the overhead of threading leads to performance degredation compared to the single threaded
+/// approach. The scaling must be a power of two.
+const CHUNK_SCALING: usize = 512;
+
 /// Get the chunk size we want to use in parallel for the given number of items based on the threads available in the
 /// thread pool.
 pub(crate) fn parallel_chunk_size(total_size: usize) -> usize {
@@ -25,20 +30,11 @@ pub(crate) fn parallel_chunk_size(total_size: usize) -> usize {
     while chunk_count << 1 <= current_num_threads() {
         chunk_count <<= 1;
     }
-    if total_size > chunk_count {
+    if chunk_count > 1 && total_size / CHUNK_SCALING > chunk_count {
         total_size / chunk_count
     } else {
-        // Try some well known sizes.
-        if total_size > 8 {
-            total_size / 8
-        } else if total_size > 4 {
-            total_size / 4
-        } else if total_size > 2 {
-            total_size / 2
-        } else {
-            // Treat as a single chunk.
-            total_size
-        }
+        // Treat as a single chunk.
+        total_size
     }
 }
 
@@ -307,7 +303,7 @@ where
         ));
         ndarray::Zip::from(out.exact_chunks_mut((dim_beta_rows, dim_beta_cols)))
             .and(alpha)
-            .par_for_each(|out, &a| {
+            .for_each(|out, &a| {
                 ndarray::Zip::from(out).and(beta).for_each(|out, &b| {
                     *out = MaybeUninit::new(a * b);
                 });

@@ -5,19 +5,22 @@
 use crate::update_counts;
 use std::{rc::Rc, usize};
 
+#[derive(Debug, Clone)]
+pub struct QirArray {
+    pub(crate) elem_size: usize,
+    pub(crate) data: Vec<u8>,
+}
+
 /// # Panics
 ///
 /// This function panics if the passed in sizes do not fit into the usize type for the
 /// current platform.
 #[no_mangle]
-pub extern "C" fn __quantum__rt__array_create_1d(
-    elem_size: u32,
-    size: u64,
-) -> *const (usize, Vec<u8>) {
-    let elem_size_size: usize = elem_size.try_into().unwrap();
-    let size_size: usize = size.try_into().unwrap();
-    let array = vec![0_u8; elem_size_size * size_size];
-    Rc::into_raw(Rc::new((elem_size_size, array)))
+pub extern "C" fn __quantum__rt__array_create_1d(elem_size: u32, size: u64) -> *const QirArray {
+    let elem_size = elem_size.try_into().unwrap();
+    let size: usize = size.try_into().unwrap();
+    let data = vec![0_u8; elem_size * size];
+    Rc::into_raw(Rc::new(QirArray { elem_size, data }))
 }
 
 /// # Safety
@@ -25,9 +28,9 @@ pub extern "C" fn __quantum__rt__array_create_1d(
 /// This function should only be called with an array created by `__quantum__rt__array_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_copy(
-    arr: *const (usize, Vec<u8>),
+    arr: *const QirArray,
     force: bool,
-) -> *const (usize, Vec<u8>) {
+) -> *const QirArray {
     let rc = Rc::from_raw(arr);
     if force || Rc::weak_count(&rc) > 0 {
         let copy = rc.as_ref().clone();
@@ -48,27 +51,30 @@ pub unsafe extern "C" fn __quantum__rt__array_copy(
 /// This function will panic if the given arrays use different element sizes.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_concatenate(
-    arr1: *const (usize, Vec<u8>),
-    arr2: *const (usize, Vec<u8>),
-) -> *const (usize, Vec<u8>) {
+    arr1: *const QirArray,
+    arr2: *const QirArray,
+) -> *const QirArray {
     let array1 = Rc::from_raw(arr1);
     let array2 = Rc::from_raw(arr2);
     assert!(
-        array1.0 == array2.0,
+        array1.elem_size == array2.elem_size,
         "Cannot concatenate arrays with differing element sizes: {} vs {}",
-        array1.0,
-        array2.0
+        array1.elem_size,
+        array2.elem_size
     );
 
-    let mut new_array = (array1.0, Vec::new());
-    new_array.1.resize(array1.1.len(), 0_u8);
-    new_array.1.copy_from_slice(array1.1.as_slice());
+    let mut new_array = QirArray {
+        elem_size: array1.elem_size,
+        data: Vec::new(),
+    };
+    new_array.data.resize(array1.data.len(), 0_u8);
+    new_array.data.copy_from_slice(array1.data.as_slice());
 
     let mut copy = Vec::new();
-    copy.resize(array2.1.len(), 0_u8);
-    copy.copy_from_slice(array2.1.as_slice());
+    copy.resize(array2.data.len(), 0_u8);
+    copy.copy_from_slice(array2.data.as_slice());
 
-    new_array.1.append(&mut copy);
+    new_array.data.append(&mut copy);
     let _ = Rc::into_raw(array1);
     let _ = Rc::into_raw(array2);
     Rc::into_raw(Rc::new(new_array))
@@ -81,9 +87,9 @@ pub unsafe extern "C" fn __quantum__rt__array_concatenate(
 ///
 /// This function panics if the array size is larger than u64. This shouldn't happen.
 #[no_mangle]
-pub unsafe extern "C" fn __quantum__rt__array_get_size_1d(arr: *const (usize, Vec<u8>)) -> u64 {
+pub unsafe extern "C" fn __quantum__rt__array_get_size_1d(arr: *const QirArray) -> u64 {
     let array = Rc::from_raw(arr);
-    let size = array.1.len() / array.0;
+    let size = array.data.len() / array.elem_size;
     let _ = Rc::into_raw(array);
     size.try_into().unwrap()
 }
@@ -96,12 +102,12 @@ pub unsafe extern "C" fn __quantum__rt__array_get_size_1d(arr: *const (usize, Ve
 /// This function panics if the given index is larger than the usize type for the current platform.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_get_element_ptr_1d(
-    arr: *const (usize, Vec<u8>),
+    arr: *const QirArray,
     index: u64,
 ) -> *mut i8 {
     let array = Rc::from_raw(arr);
     let i: usize = index.try_into().unwrap();
-    let ptr = array.1.as_ptr().wrapping_add(array.0 * i) as *mut i8;
+    let ptr = array.data.as_ptr().wrapping_add(array.elem_size * i) as *mut i8;
     let _ = Rc::into_raw(array);
     ptr
 }
@@ -113,7 +119,7 @@ pub unsafe extern "C" fn __quantum__rt__array_get_element_ptr_1d(
 /// and the pointer is no longer valid.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_update_reference_count(
-    arr: *const (usize, Vec<u8>),
+    arr: *const QirArray,
     update: i32,
 ) {
     update_counts(arr, update, false);
@@ -124,7 +130,7 @@ pub unsafe extern "C" fn __quantum__rt__array_update_reference_count(
 /// This function should only be called with an array created by `__quantum__rt__array_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_update_alias_count(
-    arr: *const (usize, Vec<u8>),
+    arr: *const QirArray,
     update: i32,
 ) {
     update_counts(arr, update, true);

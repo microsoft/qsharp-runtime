@@ -47,6 +47,8 @@ unsafe fn update_counts<T>(raw_rc: *const T, update: i32, is_alias: bool) {
             remaining += 1;
         }
 
+        // To make sure the local Rc does not decrement the underlying count when it goes out of scope,
+        // it must be converted into a raw pointer first.
         let _ = Rc::into_raw(rc);
     }
 }

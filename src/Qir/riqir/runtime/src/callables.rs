@@ -3,7 +3,9 @@
 #![deny(clippy::all, clippy::pedantic)]
 
 use crate::{
-    arrays::{__quantum__rt__array_concatenate, __quantum__rt__array_update_reference_count},
+    arrays::{
+        QirArray, __quantum__rt__array_concatenate, __quantum__rt__array_update_reference_count,
+    },
     tuples::{__quantum__rt__tuple_copy, __quantum__rt__tuple_update_reference_count},
     update_counts,
 };
@@ -57,28 +59,25 @@ pub unsafe extern "C" fn __quantum__rt__callable_invoke(
             // If there are any controls, increment the reference count on the control list. This is just
             // to balance the decrement that will happen in the loop and at the end of invoking the callable
             // to ensure the original, non-owned list does not get incorrectly cleaned up.
-            __quantum__rt__array_update_reference_count(
-                *args_copy.cast::<*const (usize, Vec<u8>)>(),
-                1,
-            );
+            __quantum__rt__array_update_reference_count(*args_copy.cast::<*const QirArray>(), 1);
 
             let mut ctl_count = *call.is_ctl.borrow();
             while ctl_count > 1 {
-                let ctls = *args_copy.cast::<*const (usize, Vec<u8>)>();
+                let ctls = *args_copy.cast::<*const QirArray>();
                 let inner_tuple = *args_copy
-                    .cast::<*const (usize, Vec<u8>)>()
+                    .cast::<*const QirArray>()
                     .wrapping_add(1)
                     .cast::<*mut *const Vec<u8>>();
-                let inner_ctls = *inner_tuple.cast::<*const (usize, Vec<u8>)>();
+                let inner_ctls = *inner_tuple.cast::<*const QirArray>();
                 let new_ctls = __quantum__rt__array_concatenate(ctls, inner_ctls);
                 let new_args = __quantum__rt__tuple_copy(inner_tuple, true);
-                *new_args.cast::<*const (usize, Vec<u8>)>() = new_ctls;
+                *new_args.cast::<*const QirArray>() = new_ctls;
 
                 // Decrementing the reference count is either the extra count added above or the new
                 // list created when performing concatenate above. In the latter case, the concatenated
                 // list will get cleaned up, preventing memory from leaking.
                 __quantum__rt__array_update_reference_count(
-                    *args_copy.cast::<*const (usize, Vec<u8>)>(),
+                    *args_copy.cast::<*const QirArray>(),
                     -1,
                 );
                 // Decrement the count on the copy to clean it up as well, since we created a new copy
@@ -99,10 +98,7 @@ pub unsafe extern "C" fn __quantum__rt__callable_invoke(
         res_tup,
     );
     if *call.is_ctl.borrow() > 0 {
-        __quantum__rt__array_update_reference_count(
-            *args_copy.cast::<*const (usize, Vec<u8>)>(),
-            -1,
-        );
+        __quantum__rt__array_update_reference_count(*args_copy.cast::<*const QirArray>(), -1);
     }
     if !args_copy.is_null() {
         __quantum__rt__tuple_update_reference_count(args_copy, -1);

@@ -4,7 +4,7 @@
 
 // Functionality in this file can be removed when range support is dropped from the QIR runtime.
 
-use crate::strings::convert;
+use crate::{arrays::QirArray, strings::convert};
 use std::{ffi::CString, rc::Rc};
 
 #[repr(C)]
@@ -34,12 +34,15 @@ pub extern "C" fn quantum__rt__range_to_string(input: Range) -> *const CString {
 /// u64. This should never happen.
 #[no_mangle]
 pub unsafe extern "C" fn quantum__rt__array_slice_1d(
-    arr: *const (usize, Vec<u8>),
+    arr: *const QirArray,
     range: Range,
-) -> *const (usize, Vec<u8>) {
+) -> *const QirArray {
     let array = Rc::from_raw(arr);
-    let item_size: i64 = array.0.try_into().unwrap();
-    let mut slice = (array.0, Vec::new());
+    let item_size: i64 = array.elem_size.try_into().unwrap();
+    let mut slice = QirArray {
+        elem_size: array.elem_size,
+        data: Vec::new(),
+    };
     let iter: Box<dyn Iterator<Item = i64>> = if range.step > 0 {
         Box::new(range.start * item_size..=range.end * item_size)
     } else {
@@ -50,9 +53,9 @@ pub unsafe extern "C" fn quantum__rt__array_slice_1d(
     for i in iter.step_by((step * item_size).try_into().unwrap()) {
         let index = i.try_into().unwrap();
         let mut copy = Vec::new();
-        copy.resize(array.0, 0_u8);
-        copy.copy_from_slice(&array.1[index..index + array.0]);
-        slice.1.append(&mut copy);
+        copy.resize(array.elem_size, 0_u8);
+        copy.copy_from_slice(&array.data[index..index + array.elem_size]);
+        slice.data.append(&mut copy);
     }
 
     let _ = Rc::into_raw(array);

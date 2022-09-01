@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+use crate::nearly_zero::NearlyZero;
 use ndarray::Array2;
 use num_bigint::BigUint;
 use num_complex::Complex64;
@@ -157,8 +158,8 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
                     let l = (index % op_size)
                         .to_usize()
                         .expect("Cannot operate on more than 64 qubits at a time.");
-                    for j in
-                        (0..op_size).filter(|j| !self.op_buffer.ops.row(*j as usize)[l].is_zero())
+                    for j in (0..op_size)
+                        .filter(|j| !self.op_buffer.ops.row(*j as usize)[l].is_nearly_zero())
                     {
                         let loc = (&i * op_size) + (j as u128);
                         if let Some(entry) = accum.get_mut(&loc) {
@@ -168,8 +169,7 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
                         }
                         if accum
                             .get(&loc)
-                            .map_or_else(Complex64::one, |entry| *entry)
-                            .is_zero()
+                            .map_or_else(|| false, |entry| (*entry).is_nearly_zero())
                         {
                             accum.remove(&loc);
                         }
@@ -181,13 +181,13 @@ impl QuantumSimImpl for QuantumSim<SparseState> {
                 for (k, v) in sparse_chunk.drain() {
                     if let Some(entry) = accum.get_mut(&k) {
                         *entry += v;
-                    } else if !v.is_zero() {
+                    } else if !v.is_nearly_zero() {
                         accum.insert(k.clone(), v);
                     }
                     if accum
                         .get(&k)
                         .map_or_else(Complex64::one, |entry| *entry)
-                        .is_zero()
+                        .is_nearly_zero()
                     {
                         accum.remove(&k);
                     }

@@ -6,7 +6,7 @@ use super::result_bool::{__quantum__rt__result_equal, __quantum__rt__result_get_
 
 use qir_runtime::{
     __quantum__rt__fail,
-    arrays::{__quantum__rt__array_get_element_ptr_1d, __quantum__rt__array_get_size_1d},
+    arrays::{QirArray, __quantum__rt__array_get_element_ptr_1d, __quantum__rt__array_get_size_1d},
     callables::{Callable, __quantum__rt__callable_invoke},
     strings::__quantum__rt__string_create,
 };
@@ -41,8 +41,8 @@ pub unsafe extern "C" fn __quantum__qis__applyifelseintrinsic__body(
 #[no_mangle]
 #[allow(clippy::cast_ptr_alignment)]
 pub unsafe extern "C" fn __quantum__qis__applyconditionallyintrinsic__body(
-    results: *const (usize, Vec<u8>),
-    expected: *const (usize, Vec<u8>),
+    results: *const QirArray,
+    expected: *const QirArray,
     true_callable: *const Callable,
     false_callable: *const Callable,
 ) {

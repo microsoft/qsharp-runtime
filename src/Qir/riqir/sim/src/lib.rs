@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+#![deny(clippy::all, clippy::pedantic)]
 
 //! Module defining QIR compliant APIs for quantum simulation.
 
@@ -7,6 +8,7 @@ pub mod conditionals;
 pub mod result_bool;
 
 mod common_matrices;
+mod nearly_zero;
 mod simulator;
 mod sparsestate;
 
@@ -45,8 +47,8 @@ fn ensure_sufficient_qubits(sim: &mut SparseStateQuantumSim, qubit_id: usize) {
 #[allow(clippy::cast_ptr_alignment)]
 unsafe fn map_paulis(
     sim: &mut SparseStateQuantumSim,
-    paulis: *const (usize, Vec<u8>),
-    qubits: *const (usize, Vec<u8>),
+    paulis: *const QirArray,
+    qubits: *const QirArray,
 ) -> Vec<(Pauli, usize)> {
     let paulis_size = __quantum__rt__array_get_size_1d(paulis);
     let qubits_size = __quantum__rt__array_get_size_1d(qubits);
@@ -286,7 +288,7 @@ macro_rules! multicontrolled_qubit_gate {
         ///
         /// This function should only be called with arrays and tuples created by the QIR runtime library.
         #[no_mangle]
-        pub unsafe extern "C" fn $qir_name(ctls: *const (usize, Vec<u8>), qubit: *mut c_void) {
+        pub unsafe extern "C" fn $qir_name(ctls: *const QirArray, qubit: *mut c_void) {
             let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
             let mut sim = sim_lock
                 .take()
@@ -366,7 +368,7 @@ macro_rules! multicontrolled_qubit_rotation {
         /// This function should only be called with arrays and tuples created by the QIR runtime library.
         #[no_mangle]
         pub unsafe extern "C" fn $qir_name(
-            ctls: *const (usize, Vec<u8>),
+            ctls: *const QirArray,
             arg_tuple: *mut *const Vec<u8>,
         ) {
             let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
@@ -451,7 +453,7 @@ struct PauliRotationArgs {
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__qis__r__ctl(
-    ctls: *const (usize, Vec<u8>),
+    ctls: *const QirArray,
     arg_tuple: *mut *const Vec<u8>,
 ) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
@@ -492,7 +494,7 @@ pub unsafe extern "C" fn __quantum__qis__r__ctl(
 /// This function should only be called with arrays and tuples created by the QIR runtime library.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__qis__r__ctladj(
-    ctls: *const (usize, Vec<u8>),
+    ctls: *const QirArray,
     arg_tuple: *mut *const Vec<u8>,
 ) {
     let args = *arg_tuple.cast::<PauliRotationArgs>();
@@ -529,9 +531,9 @@ pub extern "C" fn __quantum__qis__swap__body(qubit0: *mut c_void, qubit1: *mut c
 /// QIR API for performing the exponential of a multi-qubit Pauli operator with the given angle.
 #[no_mangle]
 pub extern "C" fn __quantum__qis__exp__body(
-    _paulis: *const (usize, Vec<u8>),
+    _paulis: *const QirArray,
     _theta: c_double,
-    _qubits: *const (usize, Vec<u8>),
+    _qubits: *const QirArray,
 ) {
     unimplemented!("Exp is not implemented.")
 }
@@ -539,9 +541,9 @@ pub extern "C" fn __quantum__qis__exp__body(
 /// QIR API for performing the adjoint exponential of a multi-qubit Pauli operator with the given angle.
 #[no_mangle]
 pub extern "C" fn __quantum__qis__exp__adj(
-    paulis: *const (usize, Vec<u8>),
+    paulis: *const QirArray,
     theta: c_double,
-    qubits: *const (usize, Vec<u8>),
+    qubits: *const QirArray,
 ) {
     __quantum__qis__exp__body(paulis, -theta, qubits);
 }
@@ -549,7 +551,7 @@ pub extern "C" fn __quantum__qis__exp__adj(
 /// QIR API for performing the multicontrolled exponential of a multi-qubit Pauli operator with the given angle.
 #[no_mangle]
 pub extern "C" fn __quantum__qis__exp__ctl(
-    _ctls: *const (usize, Vec<u8>),
+    _ctls: *const QirArray,
     _arg_tuple: *mut *const Vec<u8>,
 ) {
     unimplemented!("Controlled Exp is not implemented.")
@@ -558,7 +560,7 @@ pub extern "C" fn __quantum__qis__exp__ctl(
 /// QIR API for performing the adjoint multicontrolled exponential of a multi-qubit Pauli operator with the given angle.
 #[no_mangle]
 pub extern "C" fn __quantum__qis__exp__ctladj(
-    _ctls: *const (usize, Vec<u8>),
+    _ctls: *const QirArray,
     _arg_tuple: *mut *const Vec<u8>,
 ) {
     unimplemented!("Controlled Exp is not implemented.")
@@ -648,8 +650,8 @@ pub extern "C" fn __quantum__qis__m__body(qubit: *mut c_void) -> *mut c_void {
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__qis__measure__body(
-    paulis: *const (usize, Vec<u8>),
-    qubits: *const (usize, Vec<u8>),
+    paulis: *const QirArray,
+    qubits: *const QirArray,
 ) -> *mut c_void {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
     let mut sim = sim_lock
@@ -682,8 +684,8 @@ pub unsafe extern "C" fn __quantum__qis__measure__body(
 /// This function should only be called with arrays created by the QIR runtime library.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__qis__assertmeasurementprobability__body(
-    paulis: *const (usize, Vec<u8>),
-    qubits: *const (usize, Vec<u8>),
+    paulis: *const QirArray,
+    qubits: *const QirArray,
     result: *mut c_void,
     prob: c_double,
     msg: *const CString,
@@ -719,8 +721,8 @@ pub unsafe extern "C" fn __quantum__qis__assertmeasurementprobability__body(
 #[derive(Copy, Clone)]
 #[repr(C)]
 struct AssertMeasurementProbabilityArgs {
-    paulis: *const (usize, Vec<u8>),
-    qubits: *const (usize, Vec<u8>),
+    paulis: *const QirArray,
+    qubits: *const QirArray,
     result: *mut c_void,
     prob: c_double,
     msg: *const CString,
@@ -735,7 +737,7 @@ struct AssertMeasurementProbabilityArgs {
 /// This function should only be called with arrays created by the QIR runtime library.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__qis__assertmeasurementprobability__ctl(
-    _ctls: *const (usize, Vec<u8>),
+    _ctls: *const QirArray,
     arg_tuple: *mut *const Vec<u8>,
 ) {
     let args = *arg_tuple.cast::<AssertMeasurementProbabilityArgs>();
@@ -792,7 +794,7 @@ pub extern "C" fn __quantum__rt__qubit_allocate() -> *mut c_void {
 /// a `u32`.
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
-pub extern "C" fn __quantum__rt__qubit_allocate_array(size: u64) -> *const (usize, Vec<u8>) {
+pub extern "C" fn __quantum__rt__qubit_allocate_array(size: u64) -> *const QirArray {
     let arr = __quantum__rt__array_create_1d(size_of::<usize>().try_into().unwrap(), size);
     for index in 0..size {
         unsafe {
@@ -809,7 +811,7 @@ pub extern "C" fn __quantum__rt__qubit_allocate_array(size: u64) -> *const (usiz
 /// This function should only be called with arrays created by `__quantum__rt__qubit_allocate_array`.
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
-pub unsafe extern "C" fn __quantum__rt__qubit_release_array(arr: *const (usize, Vec<u8>)) {
+pub unsafe extern "C" fn __quantum__rt__qubit_release_array(arr: *const QirArray) {
     for index in 0..__quantum__rt__array_get_size_1d(arr) {
         let elem = __quantum__rt__array_get_element_ptr_1d(arr, index).cast::<*mut c_void>();
         __quantum__rt__qubit_release(*elem);
@@ -858,7 +860,7 @@ pub extern "C" fn __quantum__qis__dumpmachine__body(location: *mut c_void) {
 #[no_mangle]
 pub extern "C" fn __quantum__qis__dumpregister__body(
     _location: *mut c_void,
-    _qubits: *const (usize, Vec<u8>),
+    _qubits: *const QirArray,
 ) {
     unimplemented!("Dump of qubit register is not implemented.")
 }

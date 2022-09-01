@@ -18,7 +18,7 @@ pub extern "C" fn __quantum__rt__tuple_create(size: u64) -> *mut *const Vec<u8> 
     ];
 
     unsafe {
-        let header = mem.as_mut_ptr().cast::<*const std::vec::Vec<u8>>();
+        let header = mem.as_mut_ptr().cast::<*const Vec<u8>>();
         *header = Rc::into_raw(Rc::new(mem));
         header.wrapping_add(1)
     }
@@ -37,7 +37,7 @@ pub unsafe extern "C" fn __quantum__rt__tuple_copy(
     if force || Rc::weak_count(&rc) > 0 {
         let mut copy = rc.as_ref().clone();
         let _ = Rc::into_raw(rc);
-        let header = copy.as_mut_ptr().cast::<*const std::vec::Vec<u8>>();
+        let header = copy.as_mut_ptr().cast::<*const Vec<u8>>();
         *header = Rc::into_raw(Rc::new(copy));
         header.wrapping_add(1)
     } else {
@@ -88,7 +88,7 @@ mod tests {
     fn test_tuple_update_reference_count() {
         let tup = __quantum__rt__tuple_create(size_of::<u32>() as u64);
         unsafe {
-            let rc = Rc::from_raw(*tup.cast::<*const std::vec::Vec<u8>>().wrapping_sub(1));
+            let rc = Rc::from_raw(*tup.cast::<*const Vec<u8>>().wrapping_sub(1));
             assert_eq!(Rc::strong_count(&rc), 1);
             __quantum__rt__tuple_update_reference_count(tup, 2);
             assert_eq!(Rc::strong_count(&rc), 3);
@@ -103,7 +103,7 @@ mod tests {
     fn test_tuple_update_alias_count() {
         let tup = __quantum__rt__tuple_create(size_of::<u32>() as u64);
         unsafe {
-            let rc = Rc::from_raw(*tup.cast::<*const std::vec::Vec<u8>>().wrapping_sub(1));
+            let rc = Rc::from_raw(*tup.cast::<*const Vec<u8>>().wrapping_sub(1));
             assert_eq!(Rc::strong_count(&rc), 1);
             assert_eq!(Rc::weak_count(&rc), 0);
             __quantum__rt__tuple_update_alias_count(tup, 2);

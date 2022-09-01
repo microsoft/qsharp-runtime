@@ -60,21 +60,11 @@ pub unsafe extern "C" fn __quantum__rt__string_concatenate(
     s1: *const CString,
     s2: *const CString,
 ) -> *const CString {
-    let mut new_str = (*s1)
-        .clone()
-        .into_string()
-        .expect("Unable to convert string");
-
-    new_str.push_str(
-        (*s2)
-            .clone()
-            .into_string()
-            .expect("Unable to convert string")
-            .as_str(),
-    );
+    let mut new_str = (*s1).clone().into_bytes();
+    new_str.extend_from_slice((*s2).to_bytes());
 
     Rc::into_raw(Rc::new(
-        CString::new(new_str.as_bytes()).expect("Unable to convert string"),
+        CString::new(new_str).expect("Unable to convert string"),
     ))
 }
 
@@ -86,13 +76,12 @@ pub unsafe extern "C" fn __quantum__rt__string_equal(
     s1: *const CString,
     s2: *const CString,
 ) -> bool {
-    (*s1).to_str().expect("Unable to convert string")
-        == (*s2).to_str().expect("Unable to convert string")
+    *s1 == *s2
 }
 
 pub(crate) fn convert<T>(input: &T) -> *const CString
 where
-    T: Sized + ToString,
+    T: ToString,
 {
     unsafe {
         __quantum__rt__string_create(
