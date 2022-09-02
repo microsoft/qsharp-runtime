@@ -7,6 +7,7 @@ use num_complex::Complex64;
 use num_traits::{One, Zero};
 
 /// Returns a unitary matrix representing the `X` operation.
+#[cfg(test)]
 #[must_use]
 pub fn x() -> Array2<Complex64> {
     array![
@@ -16,6 +17,7 @@ pub fn x() -> Array2<Complex64> {
 }
 
 /// Returns a unitary matrix representing the `Y` operation.
+#[cfg(test)]
 #[must_use]
 pub fn y() -> Array2<Complex64> {
     array![
@@ -25,6 +27,7 @@ pub fn y() -> Array2<Complex64> {
 }
 
 /// Returns a unitary matrix representing the `Z` operation.
+#[cfg(test)]
 #[must_use]
 pub fn z() -> Array2<Complex64> {
     array![

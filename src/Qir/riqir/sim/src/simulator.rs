@@ -3,10 +3,14 @@
 
 use super::common_matrices;
 
+use crate::nearly_zero::NearlyZero;
 use ndarray::Array2;
+use num_bigint::BigUint;
 use num_complex::Complex64;
+use num_traits::{One, ToPrimitive, Zero};
 use rand::Rng;
 use rayon::current_num_threads;
+use rayon::prelude::*;
 use rustc_hash::FxHashMap;
 use std::convert::TryInto;
 use std::mem::MaybeUninit;
@@ -24,7 +28,7 @@ const CHUNK_SCALING: usize = 512;
 
 /// Get the chunk size we want to use in parallel for the given number of items based on the threads available in the
 /// thread pool.
-pub(crate) fn parallel_chunk_size(total_size: usize) -> usize {
+fn parallel_chunk_size(total_size: usize) -> usize {
     // Chunk count needs to be a power of two to work with the state vector math.
     let mut chunk_count = 1_usize;
     while chunk_count << 1 <= current_num_threads() {
@@ -38,57 +42,60 @@ pub(crate) fn parallel_chunk_size(total_size: usize) -> usize {
     }
 }
 
-pub(crate) struct OpBuffer {
+struct OpBuffer {
     pub targets: Vec<usize>,
     pub ops: Array2<Complex64>,
 }
 
+pub type SparseState = FxHashMap<BigUint, Complex64>;
+
 /// The `QuantumSim` struct contains the necessary state for tracking the simulation. Each instance of a
 /// `QuantumSim` represents an independant simulation.
-pub(crate) struct QuantumSim<T> {
+pub(crate) struct QuantumSim {
     /// The structure that describes the current quantum state.
-    pub state: T,
+    state: FxHashMap<BigUint, Complex64>,
 
     /// The mapping from qubit identifiers to internal state locations.
-    pub id_map: FxHashMap<usize, usize>,
+    id_map: FxHashMap<usize, usize>,
 
     /// The ordered buffer containing queued quantum operations that have not yet been applied to the
     /// state.
-    pub op_buffer: OpBuffer,
+    op_buffer: OpBuffer,
 }
 
-pub(crate) mod detail {
-    pub trait QuantumSimImpl {
-        fn extend_state(&mut self);
-        fn swap_qubits(&mut self, qubit1: usize, qubit2: usize);
-        fn cleanup_state(&mut self, res: bool);
-        fn dump_impl(&self, print_id_map: bool);
-        fn apply_impl(&mut self);
-        fn check_joint_probability(&self, locs: &[usize]) -> f64;
-        fn collapse(&mut self, loc: usize, val: bool);
-        fn joint_collapse(&mut self, locs: &[usize], val: bool);
-        fn normalize(&mut self);
+impl Default for QuantumSim {
+    fn default() -> Self {
+        Self::new()
     }
 }
-use detail::QuantumSimImpl;
 
 /// Provides the common set of functionality across all quantum simulation types.
-impl<T> QuantumSim<T>
-where
-    Self: detail::QuantumSimImpl,
-{
+impl QuantumSim {
+    /// Creates a new sparse state quantum simulator object with empty initial state (no qubits allocated, no operations buffered).
+    #[must_use]
+    fn new() -> Self {
+        QuantumSim {
+            state: FxHashMap::default(),
+
+            id_map: FxHashMap::default(),
+
+            op_buffer: OpBuffer {
+                targets: vec![],
+                ops: Array2::default((0, 0)),
+            },
+        }
+    }
+
     /// Allocates a fresh qubit, returning its identifier. Note that this will use the lowest available
     /// identifier, and may result in qubits being allocated "in the middle" of an existing register
     /// if those identifiers are available.
     #[must_use]
     pub(crate) fn allocate(&mut self) -> usize {
-        self.extend_state();
-        self.allocate_next_id()
-    }
+        if self.id_map.is_empty() {
+            // Add the intial value for the zero state.
+            self.state.insert(BigUint::zero(), Complex64::one());
+        }
 
-    /// Utility that finds and reserves the next available qubit id in the map, returning the reserved
-    /// id.
-    fn allocate_next_id(&mut self) -> usize {
         // Add the new entry into the FxHashMap at the first available sequential ID.
         let mut sorted_keys: Vec<&usize> = self.id_map.keys().collect();
         sorted_keys.sort();
@@ -103,6 +110,43 @@ where
 
         // Return the new ID that was used.
         new_key
+    }
+
+    /// Utility function that will swap states of two qubits throughout the sparse state map.
+    fn swap_qubits(&mut self, qubit1: usize, qubit2: usize) {
+        if qubit1 == qubit2 {
+            return;
+        }
+
+        let (q1, q2) = (qubit1 as u64, qubit2 as u64);
+
+        // In parallel, swap entries in the sparse state to correspond to swapping of two qubits'
+        // locations.
+        let chunk_size = parallel_chunk_size(self.state.len());
+        self.state = self
+            .state
+            .drain()
+            .collect::<Vec<_>>()
+            .par_chunks(chunk_size)
+            .fold(FxHashMap::default, |mut accum, chunk| {
+                for (k, v) in chunk {
+                    if k.bit(q1) == k.bit(q2) {
+                        accum.insert(k.clone(), *v);
+                    } else {
+                        let mut new_k = k.clone();
+                        new_k.set_bit(q1, !k.bit(q1));
+                        new_k.set_bit(q2, !k.bit(q2));
+                        accum.insert(new_k, *v);
+                    }
+                }
+                accum
+            })
+            .reduce(FxHashMap::default, |mut accum, mut chunk| {
+                for (k, v) in chunk.drain() {
+                    accum.insert(k, v);
+                }
+                accum
+            });
     }
 
     /// Releases the given qubit, collapsing its state in the process. After release that identifier is
@@ -141,12 +185,43 @@ where
         self.cleanup_state(res);
     }
 
+    /// Releases the given qubit, collapsing its state in the process. After release that identifier is
+    /// no longer valid for use in other functions and will cause an error if used.
+    /// # Panics
+    ///
+    /// The function will panic if the given id does not correpsond to an allocated qubit.
+    fn cleanup_state(&mut self, res: bool) {
+        if res {
+            let qubit = self.id_map.len() as u64;
+            let chunk_size = parallel_chunk_size(self.state.len());
+            self.state = self
+                .state
+                .drain()
+                .collect::<Vec<_>>()
+                .par_chunks(chunk_size)
+                .fold(FxHashMap::default, |mut accum, chunk| {
+                    for (k, v) in chunk {
+                        let mut new_k = k.clone();
+                        new_k.set_bit(qubit, !k.bit(qubit));
+                        accum.insert(new_k, *v);
+                    }
+                    accum
+                })
+                .reduce(FxHashMap::default, |mut accum, mut chunk| {
+                    for (k, v) in chunk.drain() {
+                        accum.insert(k, v);
+                    }
+                    accum
+                });
+        }
+    }
+
     /// Flushes the current operations buffer and updates the resulting state, clearing the buffer
     /// in the process.
     /// # Panics
     ///
     /// This function will panic if the given ids that do not correspond to allocated qubits.
-    fn flush(&mut self) {
+    pub(crate) fn flush(&mut self) {
         if !self.op_buffer.targets.is_empty() {
             // Swap each of the target qubits to the right-most entries in the state, in order.
             self.op_buffer
@@ -427,6 +502,289 @@ where
         self.joint_collapse(&locs, res);
         res
     }
+
+    /// Utility function that performs the actual output of state (and optionally map) to screen. Can
+    /// be called internally from other functions to aid in debugging and does not perform any modification
+    /// of the internal structures.
+    fn dump_impl(&self, print_id_map: bool) {
+        if print_id_map {
+            println!("MAP: {:?}", self.id_map);
+        };
+        print!("STATE: [ ");
+        let mut sorted_keys = self.state.keys().collect::<Vec<_>>();
+        sorted_keys.sort_unstable();
+        for key in sorted_keys {
+            print!(
+                "|{}\u{27e9}: {}, ",
+                key,
+                self.state.get(key).map_or_else(Complex64::zero, |v| *v)
+            );
+        }
+        println!("]");
+    }
+
+    /// Utility that actually performs the application of the buffered unitary to the targets within the
+    /// sparse state.
+    fn apply_impl(&mut self) {
+        // let state_size = 1_usize << self.id_map.len();
+        let chunk_size = parallel_chunk_size(self.state.len());
+        let op_size = self.op_buffer.ops.nrows();
+        self.state = self
+            .state
+            .drain()
+            .collect::<Vec<_>>()
+            .par_chunks(chunk_size)
+            .fold(FxHashMap::default, |mut accum, chunk| {
+                for (index, val) in chunk {
+                    let i = index / op_size;
+                    let l = (index % op_size)
+                        .to_usize()
+                        .expect("Cannot operate on more than 64 qubits at a time.");
+                    for j in
+                        (0..op_size).filter(|j| !self.op_buffer.ops.row(*j)[l].is_nearly_zero())
+                    {
+                        let loc = (&i * op_size) + j;
+                        if let Some(entry) = accum.get_mut(&loc) {
+                            *entry += self.op_buffer.ops.row(j)[l] * val;
+                        } else {
+                            accum.insert((&i * op_size) + j, self.op_buffer.ops.row(j)[l] * val);
+                        }
+                        if accum
+                            .get(&loc)
+                            .map_or_else(|| false, |entry| (*entry).is_nearly_zero())
+                        {
+                            accum.remove(&loc);
+                        }
+                    }
+                }
+                accum
+            })
+            .reduce(FxHashMap::default, |mut accum, mut sparse_chunk| {
+                for (k, v) in sparse_chunk.drain() {
+                    if let Some(entry) = accum.get_mut(&k) {
+                        *entry += v;
+                    } else if !v.is_nearly_zero() {
+                        accum.insert(k.clone(), v);
+                    }
+                    if accum
+                        .get(&k)
+                        .map_or_else(Complex64::one, |entry| *entry)
+                        .is_nearly_zero()
+                    {
+                        accum.remove(&k);
+                    }
+                }
+                accum
+            });
+        assert!(
+            !self.state.is_empty(),
+            "State vector should never be empty."
+        );
+    }
+
+    /// Utility to get the sum of all probabilies where an odd number of the bits at the given locations
+    /// are set. This corresponds to the probability of jointly measuring those qubits in the computational
+    /// basis.
+    fn check_joint_probability(&self, locs: &[usize]) -> f64 {
+        let mask = locs.iter().fold(BigUint::zero(), |accum, loc| {
+            accum | (BigUint::one() << loc)
+        });
+        (&self.state)
+            .into_par_iter()
+            .fold(
+                || 0.0_f64,
+                |accum, (index, val)| {
+                    if (index & &mask).count_ones() & 1 > 0 {
+                        accum + val.norm_sqr()
+                    } else {
+                        accum
+                    }
+                },
+            )
+            .sum()
+    }
+
+    /// Utility to perform the normalize of the state.
+    fn normalize(&mut self) {
+        let scale = 1.0
+            / self
+                .state
+                .par_iter()
+                .fold(|| 0.0_f64, |sum, (_, val)| sum + val.norm_sqr())
+                .sum::<f64>()
+                .sqrt();
+
+        self.state.par_iter_mut().for_each(|(_, val)| *val *= scale);
+    }
+
+    /// Utility to collapse the probability at the given location based on the boolean value. This means
+    /// that if the given value is 'true' then all keys in the sparse state where the given location
+    /// has a zero bit will be reduced to zero and removed. Then the sparse state is normalized.
+    fn collapse(&mut self, loc: usize, val: bool) {
+        self.joint_collapse(&[loc], val);
+    }
+
+    /// Utility to collapse the joint probability of a particular set of locations in the sparse state.
+    /// The entries that do not correspond to the given boolean value are removed, and then the whole
+    /// state is normalized.
+    fn joint_collapse(&mut self, locs: &[usize], val: bool) {
+        let mask = locs.iter().fold(BigUint::zero(), |accum, loc| {
+            accum | (BigUint::one() << loc)
+        });
+
+        let chunk_size = parallel_chunk_size(self.state.len());
+        self.state = self
+            .state
+            .drain()
+            .collect::<Vec<_>>()
+            .par_chunks(chunk_size)
+            .fold(FxHashMap::default, |mut accum, chunk| {
+                for (k, v) in chunk
+                    .iter()
+                    .filter(|(index, _)| ((index & &mask).count_ones() & 1 > 0) == val)
+                {
+                    accum.insert(k.clone(), *v);
+                }
+                accum
+            })
+            .reduce(FxHashMap::default, |mut accum, mut chunk| {
+                for (k, v) in chunk.drain() {
+                    accum.insert(k, v);
+                }
+                accum
+            });
+
+        self.normalize();
+    }
+
+    fn fast_gate<F>(&mut self, target: usize, mut op: F)
+    where
+        F: FnMut((BigUint, Complex64), u64) -> (BigUint, Complex64),
+    {
+        assert!(self.op_buffer.targets.is_empty());
+        let target = *self
+            .id_map
+            .get(&target)
+            .unwrap_or_else(|| panic!("Unable to find qubit with id {}", target));
+        self.state = self
+            .state
+            .drain()
+            .into_iter()
+            .map(|kvp| op(kvp, target as u64))
+            .fold(SparseState::default(), |mut accum, (k, v)| {
+                accum.insert(k, v);
+                accum
+            });
+    }
+
+    fn fast_controlled_gate<F>(&mut self, ctls: &[usize], target: usize, mut op: F)
+    where
+        F: FnMut((BigUint, Complex64), u64) -> (BigUint, Complex64),
+    {
+        assert!(self.op_buffer.targets.is_empty());
+
+        let target = *self
+            .id_map
+            .get(&target)
+            .unwrap_or_else(|| panic!("Unable to find qubit with id {}", target));
+
+        let ctls: Vec<usize> = ctls
+            .iter()
+            .map(|c| {
+                *self
+                    .id_map
+                    .get(c)
+                    .unwrap_or_else(|| panic!("Unable to find qubit with id {}", c))
+            })
+            .collect();
+
+        let mut sorted_qubits = ctls.clone();
+        sorted_qubits.push(target);
+        sorted_qubits.sort_unstable();
+        if let ControlFlow::Break(Some(duplicate)) =
+            sorted_qubits.iter().try_fold(None, |last, current| {
+                last.map_or_else(
+                    || ControlFlow::Continue(Some(current)),
+                    |last| {
+                        if last == current {
+                            ControlFlow::Break(Some(current))
+                        } else {
+                            ControlFlow::Continue(Some(current))
+                        }
+                    },
+                )
+            })
+        {
+            panic!("Duplicate qubit id '{}' found in application.", duplicate);
+        }
+
+        self.state = self
+            .state
+            .drain()
+            .into_iter()
+            .map(|kvp| {
+                if ctls.iter().all(|c| kvp.0.bit(*c as u64)) {
+                    op(kvp, target as u64)
+                } else {
+                    kvp
+                }
+            })
+            .fold(SparseState::default(), |mut accum, (k, v)| {
+                accum.insert(k, v);
+                accum
+            });
+    }
+
+    fn x_transform((mut index, val): (BigUint, Complex64), target: u64) -> (BigUint, Complex64) {
+        index.set_bit(target, !index.bit(target));
+        (index, val)
+    }
+
+    pub(crate) fn fast_x(&mut self, target: usize) {
+        self.fast_gate(target, Self::x_transform);
+    }
+
+    pub(crate) fn fast_mcx(&mut self, ctls: &[usize], target: usize) {
+        self.fast_controlled_gate(ctls, target, Self::x_transform);
+    }
+
+    fn y_transform(
+        (mut index, mut val): (BigUint, Complex64),
+        target: u64,
+    ) -> (BigUint, Complex64) {
+        index.set_bit(target, !index.bit(target));
+        val *= if index.bit(target) {
+            Complex64::i()
+        } else {
+            -Complex64::i()
+        };
+        (index, val)
+    }
+
+    pub(crate) fn fast_y(&mut self, target: usize) {
+        self.fast_gate(target, Self::y_transform);
+    }
+
+    pub(crate) fn fast_mcy(&mut self, ctls: &[usize], target: usize) {
+        self.fast_controlled_gate(ctls, target, Self::y_transform);
+    }
+
+    fn z_transform((index, mut val): (BigUint, Complex64), target: u64) -> (BigUint, Complex64) {
+        val *= if index.bit(target) {
+            -Complex64::one()
+        } else {
+            Complex64::one()
+        };
+        (index, val)
+    }
+
+    pub(crate) fn fast_z(&mut self, target: usize) {
+        self.fast_gate(target, Self::z_transform);
+    }
+
+    pub(crate) fn fast_mcz(&mut self, ctls: &[usize], target: usize) {
+        self.fast_controlled_gate(ctls, target, Self::z_transform);
+    }
 }
 
 #[cfg(test)]
@@ -435,7 +793,6 @@ mod tests {
         common_matrices::{adjoint, controlled, h, s, x},
         *,
     };
-    use crate::sparsestate::SparseStateQuantumSim;
     use ndarray::array;
     use num_traits::{One, Zero};
 
@@ -446,7 +803,7 @@ mod tests {
     // Test that basic allocation and release of qubits doesn't fail.
     #[test]
     fn test_alloc_release() {
-        let sim = &mut SparseStateQuantumSim::default();
+        let sim = &mut QuantumSim::default();
         for i in 0..16 {
             assert_eq!(sim.allocate(), i);
         }
@@ -469,7 +826,7 @@ mod tests {
     /// of the state.
     #[test]
     fn test_apply1() {
-        let mut sim = SparseStateQuantumSim::default();
+        let mut sim = QuantumSim::default();
         for i in 0..6 {
             assert_eq!(sim.allocate(), i);
         }
@@ -489,7 +846,7 @@ mod tests {
     /// of the state.
     #[test]
     fn test_apply2() {
-        let mut sim = SparseStateQuantumSim::default();
+        let mut sim = QuantumSim::default();
         let q0 = sim.allocate();
         let q1 = sim.allocate();
         let q2 = sim.allocate();
@@ -507,7 +864,7 @@ mod tests {
     /// Verifies that application of gates to a qubit results in the correct probabilities.
     #[test]
     fn test_probability() {
-        let mut sim = SparseStateQuantumSim::default();
+        let mut sim = QuantumSim::default();
         let q = sim.allocate();
         let extra = sim.allocate();
         assert!(almost_equal(0.0, sim.joint_probability(&[q])));
@@ -535,7 +892,7 @@ mod tests {
     /// can be operationally reset back into the ground state.
     #[test]
     fn test_measure() {
-        let mut sim = SparseStateQuantumSim::default();
+        let mut sim = QuantumSim::default();
         let q = sim.allocate();
         let extra = sim.allocate();
         assert!(!sim.measure(q));
@@ -562,7 +919,7 @@ mod tests {
     /// qubits.
     #[test]
     fn test_joint_probability() {
-        let mut sim = SparseStateQuantumSim::default();
+        let mut sim = QuantumSim::default();
         let q0 = sim.allocate();
         let q1 = sim.allocate();
         assert!(almost_equal(0.0, sim.joint_probability(&[q0, q1])));
@@ -582,7 +939,7 @@ mod tests {
     /// qubits.
     #[test]
     fn test_joint_measurement() {
-        let mut sim = SparseStateQuantumSim::default();
+        let mut sim = QuantumSim::default();
         let q0 = sim.allocate();
         let q1 = sim.allocate();
         assert!(!sim.joint_measure(&[q0, q1]));
@@ -605,7 +962,7 @@ mod tests {
     /// Test arbitrary controls, which should extend the applied unitary matrix.
     #[test]
     fn test_arbitrary_controls() {
-        let mut sim = SparseStateQuantumSim::default();
+        let mut sim = QuantumSim::default();
         let q0 = sim.allocate();
         let q1 = sim.allocate();
         let q2 = sim.allocate();
@@ -635,7 +992,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "Duplicate qubit id '0' found in application.")]
     fn test_duplicate_target() {
-        let mut sim = SparseStateQuantumSim::new();
+        let mut sim = QuantumSim::new();
         let q = sim.allocate();
         sim.apply(&controlled(&x(), 1), &[q, q], None);
     }
@@ -644,7 +1001,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "Duplicate qubit id '1' found in application.")]
     fn test_duplicate_control() {
-        let mut sim = SparseStateQuantumSim::new();
+        let mut sim = QuantumSim::new();
         let q = sim.allocate();
         let c = sim.allocate();
         sim.apply(&x(), &[q], Some(&[c, c]));
@@ -654,7 +1011,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "Duplicate qubit id '0' found in application.")]
     fn test_target_in_control() {
-        let mut sim = SparseStateQuantumSim::new();
+        let mut sim = QuantumSim::new();
         let q = sim.allocate();
         let c = sim.allocate();
         sim.apply(&x(), &[q], Some(&[c, q]));
@@ -667,7 +1024,7 @@ mod tests {
         expected = "Application given incorrect number of targets; expected 2, given 1."
     )]
     fn test_target_count() {
-        let mut sim = SparseStateQuantumSim::new();
+        let mut sim = QuantumSim::new();
         let q = sim.allocate();
         sim.apply(&controlled(&x(), 1), &[q], None);
     }
@@ -676,7 +1033,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "Application given non-square matrix.")]
     fn test_nonsquare() {
-        let mut sim = SparseStateQuantumSim::new();
+        let mut sim = QuantumSim::new();
         let q = sim.allocate();
         sim.apply(&array![[Complex64::zero()], [Complex64::one()]], &[q], None);
     }
@@ -684,7 +1041,7 @@ mod tests {
     /// Large, entangled state handling.
     #[test]
     fn test_large_state() {
-        let mut sim = SparseStateQuantumSim::new();
+        let mut sim = QuantumSim::new();
         let ctl = sim.allocate();
         sim.apply(&h(), &[ctl], None);
         for _ in 0..4999 {
@@ -695,5 +1052,114 @@ mod tests {
         for i in 0..5000 {
             sim.release(i);
         }
+    }
+
+    /// Utility for testing operation equivalence.
+    fn assert_operation_equal_referenced<F1, F2>(mut op: F1, mut reference: F2, count: usize)
+    where
+        F1: FnMut(&mut QuantumSim, &[usize]),
+        F2: FnMut(&mut QuantumSim, &[usize]),
+    {
+        let mut sim = QuantumSim::new();
+
+        // Allocte the control we use to verify behavior.
+        let ctl = sim.allocate();
+        sim.apply(&common_matrices::h(), &[ctl], None);
+
+        // Allocate the requested number of targets, entangling the control with them.
+        let mut qs = vec![];
+        for _ in 0..count {
+            let q = sim.allocate();
+            sim.apply(&common_matrices::x(), &[q], Some(&[ctl]));
+            qs.push(q);
+        }
+
+        op(&mut sim, &qs);
+        reference(&mut sim, &qs);
+
+        // Undo the entanglement.
+        for q in qs {
+            sim.apply(&common_matrices::x(), &[q], Some(&[ctl]));
+            sim.release(q);
+        }
+        sim.apply(&common_matrices::h(), &[ctl], None);
+
+        // We know the operations are equal if the control is left in the zero state.
+        assert!(sim.joint_probability(&[ctl]).is_nearly_zero());
+    }
+
+    /// Test fast X
+    #[test]
+    fn test_fast_x() {
+        assert_operation_equal_referenced(
+            |sim, qs| {
+                sim.flush();
+                sim.fast_x(qs[0]);
+            },
+            |sim, qs| {
+                sim.apply(&common_matrices::x(), &[qs[0]], None);
+            },
+            1,
+        );
+    }
+
+    /// Test fast Y
+    #[test]
+    fn test_fast_y() {
+        assert_operation_equal_referenced(
+            |sim, qs| {
+                sim.flush();
+                sim.fast_y(qs[0]);
+            },
+            |sim, qs| {
+                sim.apply(&common_matrices::y(), &[qs[0]], None);
+            },
+            1,
+        );
+    }
+
+    /// Test fast Z
+    #[test]
+    fn test_fast_z() {
+        assert_operation_equal_referenced(
+            |sim, qs| {
+                sim.flush();
+                sim.fast_z(qs[0]);
+            },
+            |sim, qs| {
+                sim.apply(&common_matrices::z(), &[qs[0]], None);
+            },
+            1,
+        );
+    }
+
+    /// Test fast CX
+    #[test]
+    fn test_fast_cx() {
+        assert_operation_equal_referenced(
+            |sim, qs| {
+                sim.flush();
+                sim.fast_mcx(&[qs[0]], qs[1]);
+            },
+            |sim, qs| {
+                sim.apply(&common_matrices::x(), &[qs[1]], Some(&[qs[0]]));
+            },
+            2,
+        );
+    }
+
+    /// Test fast CZ
+    #[test]
+    fn test_fast_cz() {
+        assert_operation_equal_referenced(
+            |sim, qs| {
+                sim.flush();
+                sim.fast_mcz(&[qs[0]], qs[1]);
+            },
+            |sim, qs| {
+                sim.apply(&common_matrices::z(), &[qs[1]], Some(&[qs[0]]));
+            },
+            2,
+        );
     }
 }

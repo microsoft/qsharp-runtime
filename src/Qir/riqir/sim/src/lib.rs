@@ -10,11 +10,10 @@ pub mod result_bool;
 mod common_matrices;
 mod nearly_zero;
 mod simulator;
-mod sparsestate;
 
 use bitvec::prelude::*;
 use lazy_static::lazy_static;
-use sparsestate::SparseStateQuantumSim;
+use simulator::QuantumSim;
 use std::convert::TryInto;
 use std::ffi::{c_void, CString};
 use std::mem::size_of;
@@ -32,12 +31,12 @@ pub use qir_runtime::{
 };
 
 lazy_static! {
-    static ref SIM: Mutex<Option<SparseStateQuantumSim>> = Mutex::new(None);
+    static ref SIM: Mutex<Option<QuantumSim>> = Mutex::new(None);
     static ref RESULTS: Mutex<BitVec> = Mutex::new(bitvec![]);
     static ref MAX_QUBIT_ID: AtomicUsize = AtomicUsize::new(0);
 }
 
-fn ensure_sufficient_qubits(sim: &mut SparseStateQuantumSim, qubit_id: usize) {
+fn ensure_sufficient_qubits(sim: &mut QuantumSim, qubit_id: usize) {
     while qubit_id + 1 > (*MAX_QUBIT_ID).load(Relaxed) {
         let _ = sim.allocate();
         (*MAX_QUBIT_ID).fetch_add(1, Relaxed);
@@ -46,7 +45,7 @@ fn ensure_sufficient_qubits(sim: &mut SparseStateQuantumSim, qubit_id: usize) {
 
 #[allow(clippy::cast_ptr_alignment)]
 unsafe fn map_paulis(
-    sim: &mut SparseStateQuantumSim,
+    sim: &mut QuantumSim,
     paulis: *const QirArray,
     qubits: *const QirArray,
 ) -> Vec<(Pauli, usize)> {
@@ -91,7 +90,7 @@ unsafe fn map_paulis(
     combined_list
 }
 
-fn unmap_paulis(sim: &mut SparseStateQuantumSim, combined_list: Vec<(Pauli, usize)>) {
+fn unmap_paulis(sim: &mut QuantumSim, combined_list: Vec<(Pauli, usize)>) {
     for (pauli, qubit) in combined_list {
         match pauli {
             Pauli::X => sim.apply(&common_matrices::h(), &[qubit], None),
@@ -118,10 +117,30 @@ macro_rules! single_qubit_gate {
             let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
             let mut sim = sim_lock
                 .take()
-                .map_or_else(SparseStateQuantumSim::new, |s| s);
+                .map_or_else(QuantumSim::default, |s| s);
             ensure_sufficient_qubits(&mut sim, qubit as usize);
 
             sim.apply(&$gate_matrix, &[qubit as usize], None);
+
+            *sim_lock = Some(sim);
+        }
+    };
+}
+
+macro_rules! fast_single_qubit_gate {
+    ($(#[$meta:meta])*
+    $qir_name:ident, $fast_gate:expr) => {
+        $(#[$meta])*
+        #[no_mangle]
+        pub extern "C" fn $qir_name(qubit: *mut c_void) {
+            let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
+            let mut sim = sim_lock
+                .take()
+                .map_or_else(QuantumSim::default, |s| s);
+            ensure_sufficient_qubits(&mut sim, qubit as usize);
+
+            sim.flush();
+            $fast_gate(&mut sim, qubit as usize);
 
             *sim_lock = Some(sim);
         }
@@ -153,42 +172,43 @@ single_qubit_gate!(
     __quantum__qis__t__adj,
     common_matrices::adjoint(&common_matrices::t())
 );
-single_qubit_gate!(
+fast_single_qubit_gate!(
     /// QIR API for performing the X gate on the given qubit.
     __quantum__qis__x__body,
-    common_matrices::x()
+    QuantumSim::fast_x
 );
-single_qubit_gate!(
+fast_single_qubit_gate!(
     /// QIR API for performing the Y gate on the given qubit.
     __quantum__qis__y__body,
-    common_matrices::y()
+    QuantumSim::fast_y
 );
-single_qubit_gate!(
+fast_single_qubit_gate!(
     /// QIR API for performing the Z gate on the given qubit.
     __quantum__qis__z__body,
-    common_matrices::z()
+    QuantumSim::fast_z
 );
 
-macro_rules! controlled_qubit_gate {
+macro_rules! fast_controlled_qubit_gate {
     ($(#[$meta:meta])*
-    $qir_name:ident, $gate_matrix:expr, 1) => {
+    $qir_name:ident, $fast_gate:expr, 1) => {
         $(#[$meta])*
         #[no_mangle]
         pub extern "C" fn $qir_name(control: *mut c_void, target: *mut c_void) {
             let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
             let mut sim = sim_lock
                 .take()
-                .map_or_else(SparseStateQuantumSim::new, |s| s);
+                .map_or_else(QuantumSim::default, |s| s);
             ensure_sufficient_qubits(&mut sim, target as usize);
             ensure_sufficient_qubits(&mut sim, control as usize);
 
-            sim.apply(&$gate_matrix, &[target as usize], Some(&[control as usize]));
+            sim.flush();
+            $fast_gate(&mut sim, &[control as usize], target as usize);
 
             *sim_lock = Some(sim);
         }
     };
     ($(#[$meta:meta])*
-    $qir_name:ident, $gate_matrix:expr, 2) => {
+    $qir_name:ident, $fast_gate:expr, 2) => {
         $(#[$meta])*
         #[no_mangle]
         pub extern "C" fn $qir_name(
@@ -199,44 +219,41 @@ macro_rules! controlled_qubit_gate {
             let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
             let mut sim = sim_lock
                 .take()
-                .map_or_else(SparseStateQuantumSim::new, |s| s);
+                .map_or_else(QuantumSim::default, |s| s);
             ensure_sufficient_qubits(&mut sim, target as usize);
             ensure_sufficient_qubits(&mut sim, control_1 as usize);
             ensure_sufficient_qubits(&mut sim, control_2 as usize);
 
-            sim.apply(
-                &$gate_matrix,
-                &[target as usize],
-                Some(&[control_1 as usize, control_2 as usize]),
-            );
+            sim.flush();
+            $fast_gate(&mut sim, &[control_1 as usize, control_2 as usize], target as usize);
 
             *sim_lock = Some(sim);
         }
     };
 }
 
-controlled_qubit_gate!(
+fast_controlled_qubit_gate!(
     /// QIR API for performing the CNOT gate with the given qubits.
     __quantum__qis__cnot__body,
-    common_matrices::x(),
+    QuantumSim::fast_mcx,
     1
 );
-controlled_qubit_gate!(
-    /// QIR API for performing the CX gate with the given qubits.
+fast_controlled_qubit_gate!(
+    /// QIR API for performing the CNOT gate with the given qubits.
     __quantum__qis__cx__body,
-    common_matrices::x(),
+    QuantumSim::fast_mcx,
     1
 );
-controlled_qubit_gate!(
-    /// QIR API for performing the CCX gate with the given qubits.
+fast_controlled_qubit_gate!(
+    /// QIR API for performing the CNOT gate with the given qubits.
     __quantum__qis__ccx__body,
-    common_matrices::x(),
+    QuantumSim::fast_mcx,
     2
 );
-controlled_qubit_gate!(
+fast_controlled_qubit_gate!(
     /// QIR API for performing the CZ gate with the given qubits.
     __quantum__qis__cz__body,
-    common_matrices::z(),
+    QuantumSim::fast_mcz,
     1
 );
 
@@ -249,7 +266,7 @@ macro_rules! single_qubit_rotation {
             let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
             let mut sim = sim_lock
                 .take()
-                .map_or_else(SparseStateQuantumSim::new, |s| s);
+                .map_or_else(QuantumSim::default, |s| s);
             ensure_sufficient_qubits(&mut sim, qubit as usize);
 
             sim.apply(&$gate_matrix(theta), &[qubit as usize], None);
@@ -292,7 +309,7 @@ macro_rules! multicontrolled_qubit_gate {
             let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
             let mut sim = sim_lock
                 .take()
-                .map_or_else(SparseStateQuantumSim::new, |s| s);
+                .map_or_else(QuantumSim::default, |s| s);
             ensure_sufficient_qubits(&mut sim, qubit as usize);
             let ctls_size = __quantum__rt__array_get_size_1d(ctls);
             let ctls_list: Vec<usize> = (0..ctls_size)
@@ -305,6 +322,38 @@ macro_rules! multicontrolled_qubit_gate {
                 .collect();
 
             sim.apply(&$gate_matrix, &[qubit as usize], Some(&ctls_list));
+
+            *sim_lock = Some(sim);
+        }
+    };
+}
+
+macro_rules! fast_multicontrolled_qubit_gate {
+    ($(#[$meta:meta])*
+    $qir_name:ident, $fast_gate:expr) => {
+        $(#[$meta])*
+        /// # Safety
+        ///
+        /// This function should only be called with arrays and tuples created by the QIR runtime library.
+        #[no_mangle]
+        pub unsafe extern "C" fn $qir_name(ctls: *const QirArray, qubit: *mut c_void) {
+            let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
+            let mut sim = sim_lock
+                .take()
+                .map_or_else(QuantumSim::default, |s| s);
+            ensure_sufficient_qubits(&mut sim, qubit as usize);
+            let ctls_size = __quantum__rt__array_get_size_1d(ctls);
+            let ctls_list: Vec<usize> = (0..ctls_size)
+                .map(|index| {
+                    let q = *__quantum__rt__array_get_element_ptr_1d(ctls, index)
+                        .cast::<*mut c_void>() as usize;
+                    ensure_sufficient_qubits(&mut sim, q);
+                    q
+                })
+                .collect();
+
+            sim.flush();
+            $fast_gate(&mut sim, &ctls_list, qubit as usize);
 
             *sim_lock = Some(sim);
         }
@@ -336,20 +385,20 @@ multicontrolled_qubit_gate!(
     __quantum__qis__t__ctladj,
     common_matrices::adjoint(&common_matrices::t())
 );
-multicontrolled_qubit_gate!(
+fast_multicontrolled_qubit_gate!(
     /// QIR API for performing the multicontrolled X gate with the given qubits.
     __quantum__qis__x__ctl,
-    common_matrices::x()
+    QuantumSim::fast_mcx
 );
-multicontrolled_qubit_gate!(
+fast_multicontrolled_qubit_gate!(
     /// QIR API for performing the multicontrolled Y gate with the given qubits.
     __quantum__qis__y__ctl,
-    common_matrices::y()
+    QuantumSim::fast_mcy
 );
-multicontrolled_qubit_gate!(
+fast_multicontrolled_qubit_gate!(
     /// QIR API for performing the multicontrolled Z gate with the given qubits.
     __quantum__qis__z__ctl,
-    common_matrices::z()
+    QuantumSim::fast_mcz
 );
 
 #[derive(Copy, Clone)]
@@ -374,7 +423,7 @@ macro_rules! multicontrolled_qubit_rotation {
             let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
             let mut sim = sim_lock
                 .take()
-                .map_or_else(SparseStateQuantumSim::new, |s| s);
+                .map_or_else(QuantumSim::default, |s| s);
 
             let args = *arg_tuple.cast::<RotationArgs>();
 
@@ -457,9 +506,7 @@ pub unsafe extern "C" fn __quantum__qis__r__ctl(
     arg_tuple: *mut *const Vec<u8>,
 ) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
 
     let args = *arg_tuple.cast::<PauliRotationArgs>();
 
@@ -513,9 +560,7 @@ pub unsafe extern "C" fn __quantum__qis__r__ctladj(
 #[no_mangle]
 pub extern "C" fn __quantum__qis__swap__body(qubit0: *mut c_void, qubit1: *mut c_void) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
     ensure_sufficient_qubits(&mut sim, qubit0 as usize);
     ensure_sufficient_qubits(&mut sim, qubit1 as usize);
 
@@ -570,13 +615,12 @@ pub extern "C" fn __quantum__qis__exp__ctladj(
 #[no_mangle]
 pub extern "C" fn __quantum__qis__reset__body(qubit: *mut c_void) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
     ensure_sufficient_qubits(&mut sim, qubit as usize);
 
     if sim.measure(qubit as usize) {
-        sim.apply(&common_matrices::x(), &[qubit as usize], None);
+        sim.flush();
+        sim.fast_x(qubit as usize);
     }
 
     *sim_lock = Some(sim);
@@ -586,9 +630,7 @@ pub extern "C" fn __quantum__qis__reset__body(qubit: *mut c_void) {
 #[no_mangle]
 pub extern "C" fn __quantum__qis__mz__body(qubit: *mut c_void, result: *mut c_void) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
     let mut res = RESULTS.lock().expect("Unable to lock global result state.");
     let res_id = result as usize;
     ensure_sufficient_qubits(&mut sim, qubit as usize);
@@ -625,9 +667,7 @@ pub extern "C" fn __quantum__qis__read_result__body(result: *mut c_void) -> bool
 #[no_mangle]
 pub extern "C" fn __quantum__qis__m__body(qubit: *mut c_void) -> *mut c_void {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
     ensure_sufficient_qubits(&mut sim, qubit as usize);
 
     let res = sim.measure(qubit as usize);
@@ -654,9 +694,7 @@ pub unsafe extern "C" fn __quantum__qis__measure__body(
     qubits: *const QirArray,
 ) -> *mut c_void {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
 
     let combined_list = map_paulis(&mut sim, paulis, qubits);
 
@@ -692,9 +730,7 @@ pub unsafe extern "C" fn __quantum__qis__assertmeasurementprobability__body(
     tol: c_double,
 ) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
 
     let combined_list = map_paulis(&mut sim, paulis, qubits);
 
@@ -774,9 +810,7 @@ pub extern "C" fn __quantum__rt__result_record_output(result: *mut c_void) {
 #[no_mangle]
 pub extern "C" fn __quantum__rt__qubit_allocate() -> *mut c_void {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
     let qubit_id = sim.allocate();
 
     // Increase the max qubit id global so that `ensure_sufficient_qubits` wont trigger more allocations.
@@ -823,9 +857,7 @@ pub unsafe extern "C" fn __quantum__rt__qubit_release_array(arr: *const QirArray
 #[no_mangle]
 pub extern "C" fn __quantum__rt__qubit_release(qubit: *mut c_void) {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
     sim.release(qubit as usize);
     *sim_lock = Some(sim);
 }
@@ -834,9 +866,7 @@ pub extern "C" fn __quantum__rt__qubit_release(qubit: *mut c_void) {
 #[no_mangle]
 pub extern "C" fn dump_state() {
     let mut sim_lock = SIM.lock().expect("Unable to lock global simulator state.");
-    let mut sim = sim_lock
-        .take()
-        .map_or_else(SparseStateQuantumSim::new, |s| s);
+    let mut sim = sim_lock.take().map_or_else(QuantumSim::default, |s| s);
     let res = RESULTS.lock().expect("Unable to lock global result state.");
 
     if !(*res).is_empty() {
