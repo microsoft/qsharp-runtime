@@ -31,9 +31,9 @@ pub extern "C" fn __quantum__rt__result_to_string(res: *mut c_void) -> *const CS
         __quantum__rt__string_create(
             CString::new(
                 if __quantum__rt__result_equal(res, __quantum__rt__result_get_one()) {
-                    "1"
+                    "One"
                 } else {
-                    "0"
+                    "Zero"
                 },
             )
             .expect("Failed to allocate memory for result string.")

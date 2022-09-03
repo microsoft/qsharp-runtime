@@ -862,6 +862,22 @@ pub extern "C" fn __quantum__rt__qubit_release(qubit: *mut c_void) {
     *sim_lock = Some(sim);
 }
 
+/// QIR API for getting the string interpretation of a qubit identifier.
+/// # Panics
+///
+/// This function will panic if it is unable to allocate the memory for the string.
+#[no_mangle]
+pub extern "C" fn __quantum__rt__qubit_to_string(qubit: *mut c_void) -> *const CString {
+    unsafe {
+        __quantum__rt__string_create(
+            CString::new(format!("{}", qubit as usize))
+                .unwrap()
+                .as_bytes_with_nul()
+                .as_ptr() as *mut i8,
+        )
+    }
+}
+
 /// API for viewing the current global result and quantum state for the simulator.
 #[no_mangle]
 pub extern "C" fn dump_state() {
