@@ -25,7 +25,7 @@ use result_bool::{
     __quantum__rt__result_equal, __quantum__rt__result_get_one, __quantum__rt__result_get_zero,
 };
 
-pub use qir_runtime::{
+pub use qir_stdlib::{
     arrays::*, bigints::*, callables::*, math::*, output_recording::*, range_support::*,
     strings::*, tuples::*, *,
 };
@@ -922,7 +922,7 @@ mod tests {
         __quantum__rt__qubit_release, __quantum__rt__qubit_release_array,
         __quantum__rt__result_equal, __quantum__rt__result_get_one, dump_state,
     };
-    use qir_runtime::arrays::__quantum__rt__array_get_element_ptr_1d;
+    use qir_stdlib::arrays::__quantum__rt__array_get_element_ptr_1d;
 
     // TODO(swernli): Split and expand simulator unit tests.
     #[allow(clippy::cast_ptr_alignment)]

@@ -2,7 +2,7 @@
 
 members = [
     "src/Simulation/qdk_sim_rs",
-    "src/Qir/riqir/runtime",
+    "src/Qir/riqir/stdlib",
     "src/Qir/riqir/sim",
 ]
 

@@ -38,7 +38,7 @@ target_include_directories(Microsoft.Quantum.Simulator.Runtime PRIVATE "${PROJEC
 target_link_libraries(Microsoft.Quantum.Simulator.Runtime 
   ${SPECTRE_LIBS}
   "-L${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native"
-  -lqir_runtime
+  -lqir_stdlib
 )
 
 if (WIN32)
@@ -47,7 +47,7 @@ if (WIN32)
     Bcrypt
     Userenv
   )
-  target_sources(Microsoft.Quantum.Simulator.Runtime PUBLIC "${PROJECT_BINARY_DIR}/../../../Qir/drops/include/qir_runtime.def")
+  target_sources(Microsoft.Quantum.Simulator.Runtime PUBLIC "${PROJECT_BINARY_DIR}/../../../Qir/drops/include/qir_stdlib.def")
 else()
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
     pthread

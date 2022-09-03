@@ -13,6 +13,14 @@ Push-Location (Join-Path $PSScriptRoot "./src/Simulation/qdk_sim_rs")
 Pop-Location
 
 if (-not (Test-Path Env:/AGENT_OS)) {                                    # If not CI build, i.e. local build (if AGENT_OS envvar is not defined)
+    if ($Env:ENABLE_QIRRUNTIME -ne "false") {
+        Write-Host "Build release flavor of the QIR standard library"
+        $Env:BUILD_CONFIGURATION = "Release"
+        Push-Location (Join-Path $PSScriptRoot "src/Qir/riqir")
+            .\build-qir-stdlib.ps1
+        Pop-Location
+        $Env:BUILD_CONFIGURATION = $null
+    }
     if ($Env:ENABLE_NATIVE -ne "false") {
         $Env:BUILD_CONFIGURATION = "Release"
         Write-Host "Build release flavor of the full state simulator"
@@ -32,14 +40,6 @@ if (-not (Test-Path Env:/AGENT_OS)) {                                    # If no
             } else {
                 Write-Verbose "cargo was not installed, skipping qdk_sim_rs build.";
             }
-        Pop-Location
-        $Env:BUILD_CONFIGURATION = $null
-    }
-    if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-        Write-Host "Build release flavor of the QIR Runtime"
-        $Env:BUILD_CONFIGURATION = "Release"
-        Push-Location (Join-Path $PSScriptRoot "src/Qir/Runtime")
-            .\build-qir-runtime.ps1
         Pop-Location
         $Env:BUILD_CONFIGURATION = $null
     }

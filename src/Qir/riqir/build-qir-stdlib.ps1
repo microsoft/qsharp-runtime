@@ -7,7 +7,7 @@
 
 $IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
 
-foreach ($folder in "runtime","sim") {
+foreach ($folder in "stdlib","sim") {
     Push-Location (Join-Path $PSScriptRoot $folder)
     try {
         # Start with the quick check first and make sure that Rust sources
@@ -48,8 +48,8 @@ foreach ($folder in "runtime","sim") {
         Copy-Item $qirBinaries $qirDropsBin -Include "*qir_$folder*" -Exclude "*.rlib","*.d","*.exp"
 
         # Copy the C API header and def file
-        Copy-Item (Join-Path $PSScriptRoot runtime include QirRuntime.h) (Join-Path $Env:QIR_DROPS include)
-        Copy-Item (Join-Path $PSScriptRoot runtime include qir_runtime.def) (Join-Path $Env:QIR_DROPS include)
+        Copy-Item (Join-Path $PSScriptRoot stdlib include qir_stdlib.h) (Join-Path $Env:QIR_DROPS include)
+        Copy-Item (Join-Path $PSScriptRoot stdlib include qir_stdlib.def) (Join-Path $Env:QIR_DROPS include)
 
         # When building in CI, free disk space by cleaning up.
         # Note that this takes longer, but saves ~1 GB of space.

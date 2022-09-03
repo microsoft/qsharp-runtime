@@ -50,7 +50,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     }
 
     $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/riqir")
-    & "$qirRuntime/test-qir-runtime.ps1"
+    & "$qirRuntime/test-qir-stdlib.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }

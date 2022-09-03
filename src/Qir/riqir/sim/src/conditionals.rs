@@ -4,7 +4,7 @@
 
 use super::result_bool::{__quantum__rt__result_equal, __quantum__rt__result_get_one};
 
-use qir_runtime::{
+use qir_stdlib::{
     __quantum__rt__fail,
     arrays::{QirArray, __quantum__rt__array_get_element_ptr_1d, __quantum__rt__array_get_size_1d},
     callables::{Callable, __quantum__rt__callable_invoke},

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "QirRuntime.h"
+#include "qir_stdlib.h"
 #include <cstdint>
 
 #ifdef _WIN32

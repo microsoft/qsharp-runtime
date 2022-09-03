@@ -8,7 +8,7 @@ $all_ok = $True
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/riqir")
-    & "$qirRuntime/build-qir-runtime.ps1"
+    & "$qirRuntime/build-qir-stdlib.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }

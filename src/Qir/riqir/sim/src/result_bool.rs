@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 #![deny(clippy::all, clippy::pedantic)]
 
-use qir_runtime::strings::__quantum__rt__string_create;
+use qir_stdlib::strings::__quantum__rt__string_create;
 use std::ffi::{c_void, CString};
 
 #[no_mangle]
