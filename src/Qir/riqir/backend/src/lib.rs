@@ -4,7 +4,6 @@
 
 //! Module defining QIR compliant APIs for quantum simulation.
 
-pub mod conditionals;
 pub mod result_bool;
 
 mod common_matrices;
