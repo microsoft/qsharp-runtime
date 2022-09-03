@@ -7,7 +7,7 @@
 
 $IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
 
-foreach ($folder in "stdlib","sim") {
+foreach ($folder in "stdlib","backend") {
     Push-Location (Join-Path $PSScriptRoot $folder)
     try {
         # Start with the quick check first and make sure that Rust sources

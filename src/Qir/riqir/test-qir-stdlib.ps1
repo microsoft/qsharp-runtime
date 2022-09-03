@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-foreach ($folder in "stdlib","sim") {
+foreach ($folder in "stdlib","backend") {
     Push-Location (Join-Path $PSScriptRoot $folder)
     try {
         $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();
