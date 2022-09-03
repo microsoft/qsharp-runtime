@@ -15,9 +15,8 @@ foreach(file ${TEST_FILES})
 endforeach()
 
 target_link_libraries(qir-dynamic-tests PUBLIC
-  "-L${runtime_lib_path}"
-  -lqir_range_support
-  -lqir_sim
+  "-L${simulator_lib_path}"
+  -lMicrosoft.Quantum.Simulator.Runtime
 )
 
 target_include_directories(qir-dynamic-tests PUBLIC

@@ -28,8 +28,8 @@ steps:
 
 - script: |
     rustup install nightly
-    rustup component add rustfmt clippy
-    rustup component add rustfmt clippy --toolchain nightly
+    rustup component add rustfmt clippy llvm-tools-preview
+    rustup component add rustfmt clippy llvm-tools-preview --toolchain nightly
   displayName: Enable Rust formatting and nightly options.
 
 ##

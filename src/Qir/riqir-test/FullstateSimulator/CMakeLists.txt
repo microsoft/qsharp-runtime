@@ -4,9 +4,8 @@ add_executable(fullstate-simulator-tests
 target_source_from_qir(fullstate-simulator-tests ../../Tests/FullstateSimulator/qsharp/obj/qsharp/qir-test-simulator.bc)
 
 target_link_libraries(fullstate-simulator-tests PUBLIC
-  "-L${runtime_lib_path}"
-  -lqir_range_support
-  -lqir_sim
+  "-L${simulator_lib_path}"
+  -lMicrosoft.Quantum.Simulator.Runtime
 )
 
 target_include_directories(fullstate-simulator-tests PUBLIC

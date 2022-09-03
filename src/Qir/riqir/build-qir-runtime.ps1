@@ -34,22 +34,22 @@ foreach ($folder in "runtime","sim") {
         # Copy the results of compilation and the corresponding headers to the QIR drops folder so
         # they can be included in pipeline artifacts.
         $qirDropsBin = (Join-Path $Env:QIR_DROPS bin $env:BUILD_PLATFORM native)
+        $qirDropsInclude = (Join-Path $Env:QIR_DROPS include)
         if (-not (Test-Path $Env:QIR_DROPS)) {
             New-Item -Path $Env:QIR_DROPS -ItemType "directory"
         }
         if (-not (Test-Path $qirDropsBin)) {
             New-Item -Path $qirDropsBin -ItemType "directory"
         }
+        if (-not (Test-Path $qirDropsInclude)) {
+            New-Item -Path $qirDropsInclude -ItemType "directory"
+        }
         $qirBinaries = (Join-Path $PSScriptRoot .. .. .. target "$Env:BUILD_CONFIGURATION".ToLower() *)
         Copy-Item $qirBinaries $qirDropsBin -Include "*qir_$folder*" -Exclude "*.rlib","*.d","*.exp"
 
-        # For Windows platforms, make sure to update the extension of the lib file used for linking
-        # from *.dll.lib to just .lib
-        $rustlib = (Join-Path $qirDropsBin "qir_$folder.dll.lib")
-        if (Test-Path $rustlib) {
-            Remove-Item (Join-Path $qirDropsBin "qir_$folder.lib") -ErrorAction SilentlyContinue
-            Rename-Item $rustlib "qir_$folder.lib"
-        }
+        # Copy the C API header and def file
+        Copy-Item (Join-Path $PSScriptRoot runtime include QirRuntime.h) (Join-Path $Env:QIR_DROPS include)
+        Copy-Item (Join-Path $PSScriptRoot runtime include qir_runtime.def) (Join-Path $Env:QIR_DROPS include)
 
         # When building in CI, free disk space by cleaning up.
         # Note that this takes longer, but saves ~1 GB of space.

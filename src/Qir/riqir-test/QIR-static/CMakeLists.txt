@@ -7,7 +7,6 @@ set(TEST_FILES
 #
 add_executable(qir-static-tests
   ../../Tests/QIR-static/qir-driver.cpp
-  ../../Tests/QIR-static/qir-test-conditionals.cpp
   ../../Tests/QIR-static/qir-test-math.cpp
   ../../Tests/QIR-static/qir-test-strings.cpp
   ../../Tests/QIR-static/qir-test-other.cpp
@@ -18,9 +17,8 @@ foreach(file ${TEST_FILES})
 endforeach()
 
 target_link_libraries(qir-static-tests PUBLIC
-  "-L${runtime_lib_path}"
-  -lqir_range_support
-  -lqir_sim
+  "-L${simulator_lib_path}"
+  -lMicrosoft.Quantum.Simulator.Runtime
 )
 
 target_include_directories(qir-static-tests PUBLIC
