@@ -11,10 +11,12 @@ namespace Microsoft.Quantum.Canon {
     /// This operation can be simulated by the unitary matrix
     /// $$
     /// \begin{align}
-    ///     1 & 0 & 0 & 0 \\\\
-    ///     0 & 1 & 0 & 0 \\\\
-    ///     0 & 0 & 1 & 0 \\\\
-    ///     0 & 0 & 0 & -1
+    ///     \left(\begin{matrix}
+    ///         1 & 0 & 0 & 0 \\\\
+    ///         0 & 1 & 0 & 0 \\\\
+    ///         0 & 0 & 1 & 0 \\\\
+    ///         0 & 0 & 0 & -1
+    ///     \end{matrix}\right)
     /// \end{align},
     /// $$
     /// where rows and columns are organized as in the quantum concepts guide.
