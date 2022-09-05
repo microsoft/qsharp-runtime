@@ -18,7 +18,7 @@ namespace Microsoft.Quantum.Intrinsic {
     ///
     /// > [!WARNING]
     /// > This operation uses the **opposite** sign convention from
-    /// > @"microsoft.quantum.intrinsic.r".
+    /// > <xref:Microsoft.Quantum.Intrinsic.R>.
     ///
     /// # Input
     /// ## pauli
