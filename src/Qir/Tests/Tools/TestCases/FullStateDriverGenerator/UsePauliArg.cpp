@@ -13,26 +13,15 @@
 
 #include "CLI11.hpp"
 
-#include "QirRuntime.hpp"
-#include "QirContext.hpp"
-
-#include "SimFactory.hpp"
-
-using namespace Microsoft::Quantum;
 using namespace std;
 
 // Auxiliary functions for interop with Q# Pauli type.
-map<string, PauliId> PauliMap{
-    {"PauliI", PauliId::PauliId_I},
-    {"PauliX", PauliId::PauliId_X},
-    {"PauliY", PauliId::PauliId_Y},
-    {"PauliZ", PauliId::PauliId_Z}
+map<string, char> PauliMap{
+    {"PauliI", 0},
+    {"PauliX", 1},
+    {"PauliY", 3},
+    {"PauliZ", 2}
 };
-
-char TranslatePauliToChar(PauliId& pauli)
-{
-    return static_cast<char>(pauli);
-}
 
 extern "C" void UsePauliArg(
     char PauliArg
@@ -43,19 +32,9 @@ int main(int argc, char* argv[])
     CLI::App app("QIR Standalone Entry Point");
 
     // Initialize runtime.
-    unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
-
-    // Add the --simulation-output option.
-    string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
-
     // Add a command line option for each entry-point parameter.
-    PauliId PauliArgCli;
-    PauliArgCli = PauliId::PauliId_I;
+    char PauliArgCli;
+    PauliArgCli = 0;
     app.add_option("--PauliArg", PauliArgCli, "Option to provide a value for the PauliArg parameter")
         ->required()
         ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
@@ -64,17 +43,7 @@ int main(int argc, char* argv[])
     CLI11_PARSE(app, argc, argv);
 
     // Cast parsed arguments to its interop types.
-    char PauliArgInterop = TranslatePauliToChar(PauliArgCli);
-
-    // Redirect the simulator output from std::cout if the --simulation-output option is present.
-    ostream* simulatorOutputStream = &cout;
-    ofstream simulationOutputFileStream;
-    if (!simulationOutputFileOpt->empty())
-    {
-        simulationOutputFileStream.open(simulationOutputFile);
-        SetOutputStream(simulationOutputFileStream);
-        simulatorOutputStream = &simulationOutputFileStream;
-    }
+    char PauliArgInterop = PauliArgCli;
 
     // Execute the entry point operation.
     UsePauliArg(
@@ -82,11 +51,7 @@ int main(int argc, char* argv[])
     );
 
     // Flush the output of the simulation.
-    simulatorOutputStream->flush();
-    if (simulationOutputFileStream.is_open())
-    {
-        simulationOutputFileStream.close();
-    }
+    cout.flush();
 
     return 0;
 }

@@ -9,17 +9,14 @@ add_executable(qir-input-reference-standalone
 target_source_from_qir(qir-input-reference-standalone qsharp/obj/qsharp/qir-standalone-input-reference.bc)
 
 target_link_libraries(qir-input-reference-standalone PUBLIC
-  "-L${runtime_lib_path}"
-  -lMicrosoft.Quantum.Qir.Runtime
-  -lMicrosoft.Quantum.Qir.QSharp.Foundation
-  -lMicrosoft.Quantum.Qir.QSharp.Core
+  "-L${simulator_lib_path}"
+  -lMicrosoft.Quantum.Simulator.Runtime
 )
 
 set(standalone_includes "${PROJECT_SOURCE_DIR}/../Common/Externals/CLI11")
 
 target_include_directories(qir-input-reference-standalone PUBLIC
   "${standalone_includes}"
-  "${public_includes}"
 )
 
 install(TARGETS qir-input-reference-standalone RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")

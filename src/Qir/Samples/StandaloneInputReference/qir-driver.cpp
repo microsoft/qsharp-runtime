@@ -15,11 +15,6 @@
 #pragma clang diagnostic pop
 // clang-format on
 
-#include "QirContext.hpp"
-#include "SimFactory.hpp"
-#include "OutputStream.hpp"
-
-using namespace Microsoft::Quantum;
 using namespace std;
 
 namespace // == `static`
@@ -68,10 +63,7 @@ static map<string, bool> BoolAsCharMap{{"0", InteropFalseAsChar},
                                        {"1", InteropTrueAsChar},
                                        {"true", InteropTrueAsChar}};
 
-static map<string, PauliId> PauliMap{{"PauliI", PauliId::PauliId_I},
-                                     {"PauliX", PauliId::PauliId_X},
-                                     {"PauliY", PauliId::PauliId_Y},
-                                     {"PauliZ", PauliId::PauliId_Z}};
+static map<string, char> PauliMap{{"PauliI", 0}, {"PauliX", 1}, {"PauliY", 3}, {"PauliZ", 2}};
 
 static const char InteropResultZeroAsChar = 0x0;
 static const char InteropResultOneAsChar  = 0x1;
@@ -102,11 +94,6 @@ void FreePointerVector(vector<T*>& v)
     }
 }
 
-static char TranslatePauliToChar(PauliId& pauli)
-{
-    return static_cast<char>(pauli);
-}
-
 template<typename S, typename D>
 void TranslateVector(vector<S>& sourceVector, vector<D>& destinationVector, function<D(S&)> translationFunction)
 {
@@ -130,15 +117,6 @@ int main(int argc, char* argv[])
     CLI::App app("QIR Standalone Entry Point Inputs Reference");
 
     // Initialize simulator.
-    unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirExecutionContext::Scoped qirctx(sim.get(), false /*trackAllocatedObjects*/);
-
-    // Add the --simulation-output options.
-    // N.B. This option should be present in all standalone drivers.
-    string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt =
-        app.add_option("-s,--simulation-output", simulationOutputFile,
-                       "File where the output produced during the simulation is written");
 
     // Add the options that correspond to the parameters that the QIR entry-point needs.
     // Option for a Q# Int type.
@@ -172,13 +150,13 @@ int main(int argc, char* argv[])
         ->transform(CLI::CheckedTransformer(BoolAsCharMap, CLI::ignore_case));
 
     // Option for Q# Pauli type.
-    PauliId pauliValue = PauliId::PauliId_I;
+    char pauliValue = 0;
     app.add_option("--pauli-value", pauliValue, "A Pauli value")
         ->required()
         ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
 
     // Option for a Q# Array<Pauli> type.
-    std::vector<PauliId> pauliVector;
+    std::vector<char> pauliVector;
     app.add_option("--pauli-array", pauliVector, "A Pauli array")
         ->required()
         ->transform(CLI::CheckedTransformer(PauliMap, CLI::ignore_case));
@@ -232,12 +210,10 @@ int main(int argc, char* argv[])
     unique_ptr<InteropArray> boolArray = CreateInteropArray(boolAsCharVector);
 
     // Translate a PauliID value to its char representation.
-    char pauliAsCharValue = TranslatePauliToChar(pauliValue);
+    char pauliAsCharValue = pauliValue;
 
     // Create an interop array of Pauli values represented as chars.
-    vector<char> pauliAsCharVector;
-    TranslateVector<PauliId, char>(pauliVector, pauliAsCharVector, TranslatePauliToChar);
-    unique_ptr<InteropArray> pauliArray = CreateInteropArray(pauliAsCharVector);
+    unique_ptr<InteropArray> pauliArray = CreateInteropArray(pauliVector);
 
     // Create an interop range.
     unique_ptr<InteropRange> rangeValue = CreateInteropRange(rangeTuple);
@@ -253,16 +229,6 @@ int main(int argc, char* argv[])
     TranslateVector<string, const char*>(stringVector, stringBufferVector, TranslateStringToCharBuffer);
     unique_ptr<InteropArray> stringArray = CreateInteropArray(stringBufferVector);
 
-    // Redirect the simulator output from std::cout if the --simulation-output option is present.
-    ostream* simulatorOutputStream = &cout;
-    ofstream simulationOutputFileStream;
-    if (!simulationOutputFileOpt->empty())
-    {
-        simulationOutputFileStream.open(simulationOutputFile);
-        Microsoft::Quantum::OutputStream::Set(simulationOutputFileStream);
-        simulatorOutputStream = &simulationOutputFileStream;
-    }
-
     // Run simulation and write the output of the operation to the corresponding stream.
     Quantum__StandaloneSupportedInputs__ExerciseInputs(intValue, integerArray.get(), doubleValue, doubleArray.get(),
                                                        boolAsCharValue, boolArray.get(), pauliAsCharValue,
@@ -270,9 +236,5 @@ int main(int argc, char* argv[])
                                                        resultArray.get(), stringValue.c_str());
 
     FreePointerVector(rangeVector);
-    simulatorOutputStream->flush();
-    if (simulationOutputFileStream.is_open())
-    {
-        simulationOutputFileStream.close();
-    }
+    cout.flush();
 }

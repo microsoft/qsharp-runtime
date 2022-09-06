@@ -11,8 +11,8 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
     {
         private readonly QirCppDriverGenerator DriverGenerator;
 
-        public QirFullStateDriverGenerator(bool debug) =>
-            DriverGenerator = new QirCppDriverGenerator(new QirFullStateSimulatorInitializer(debug));
+        public QirFullStateDriverGenerator() =>
+            DriverGenerator = new QirCppDriverGenerator(new QirFullStateSimulatorInitializer());
 
         public async Task GenerateAsync(EntryPointOperation entryPoint, Stream stream) =>
             await DriverGenerator.GenerateAsync(entryPoint, stream);

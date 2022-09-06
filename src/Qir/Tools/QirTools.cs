@@ -23,7 +23,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
         /// <param name="libraryDirectories">Directory where the libraries to link to are located.</param>
         /// <param name="includeDirectories">Directory where the headers needed for compilation are located.</param>
         /// <param name="executablesDirectory">Directory where the created executables are placed.</param>
-        /// <param name="debug">Enable additional debugging checks at runtime.</param>
+        /// <param name="debug">Ignored.</param>
         public static async Task BuildFromQSharpDll(
             FileInfo qsharpDll,
             IList<DirectoryInfo> libraryDirectories,
@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
             foreach (var entryPointOp in EntryPointLoader.LoadEntryPointOperations(qsharpDll))
             {
                 var exeFileInfo = new FileInfo(Path.Combine(executablesDirectory.FullName, $"{entryPointOp.Name}.exe"));
-                var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray(), debug);
+                var exe = new QirFullStateExecutable(exeFileInfo, qirContentStream.ToArray());
                 await exe.BuildAsync(entryPointOp, libraryDirectories, includeDirectories);
             }
 
