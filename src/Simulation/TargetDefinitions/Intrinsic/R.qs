@@ -17,7 +17,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## pauli
     /// Pauli operator ($\mu$) to be exponentiated to form the rotation.
     /// ## theta
-    /// Angle about which the qubit is to be rotated.
+    /// Angle in radians about which the qubit is to be rotated.
     /// ## qubit
     /// Qubit to which the gate should be applied.
     ///
