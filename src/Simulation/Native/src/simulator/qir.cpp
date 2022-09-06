@@ -11,11 +11,18 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <climits>
 
 #include "capi.hpp"
 #include "qir.hpp"
 
-static const unsigned GLOBAL_SIM = init();
+unsigned SimId()
+{
+    // Using `thread_local` ensures each thread gets a unique simulator instance. This matches
+    // expected QIR usage where multithreaded program execution is not supported.
+    thread_local unsigned _sim = init();
+    return _sim;
+}
 
 // Pauli consts are {i2} in QIR, likely stored as {i8} in arrays, but we are using the standard C++ enum type based on
 // {i32} so cannot pass through the buffer and have to allocate a new one instead and copy.
@@ -123,7 +130,7 @@ TDumpToLocationCallback const dumpToLocationCallback =
 void DumpMachineImpl(std::ostream& outStream)
 {
     outStream << "# wave function for qubits (least to most significant qubit ids):" << std::endl;
-    DumpToLocation(GLOBAL_SIM, dumpToLocationCallback, (TDumpLocation)&outStream);
+    DumpToLocation(SimId(), dumpToLocationCallback, (TDumpLocation)&outStream);
     outStream.flush();
 }
 
@@ -144,7 +151,7 @@ void DumpRegisterImpl(std::ostream& outStream, QirArray* qubits)
     }
     outStream << ':' << std::endl;
 
-    if (!DumpQubitsToLocation(GLOBAL_SIM, ids.size(), ids.data(), dumpToLocationCallback, (TDumpLocation)&outStream))
+    if (!DumpQubitsToLocation(SimId(), ids.size(), ids.data(), dumpToLocationCallback, (TDumpLocation)&outStream))
     {
         outStream << "## Qubits were entangled with an external qubit. Cannot dump corresponding wave function. ##"
                   << std::endl;
@@ -174,7 +181,7 @@ extern "C"
 {
     QUBIT* __quantum__rt__qubit_allocate()
     {
-        return reinterpret_cast<QUBIT*>(allocate(GLOBAL_SIM));
+        return reinterpret_cast<QUBIT*>(allocate(SimId()));
     }
 
     QirArray* __quantum__rt__qubit_allocate_array(int64_t count)
@@ -190,7 +197,7 @@ extern "C"
 
     void __quantum__rt__qubit_release(QUBIT* qubit)
     {
-        release(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        release(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__rt__qubit_release_array(QirArray* array)
@@ -255,7 +262,7 @@ extern "C"
         auto targets = reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(qubits, 0));
         std::vector<unsigned> ids = GetQubitIds(numTargets, targets);
         std::vector<unsigned> convertedBases = GetBases(numTargets, pauliIds.data());
-        Exp(GLOBAL_SIM, (unsigned)numTargets, convertedBases.data(), angle, ids.data());
+        Exp(SimId(), (unsigned)numTargets, convertedBases.data(), angle, ids.data());
     }
 
     void __quantum__qis__exp__adj(QirArray* paulis, double angle, QirArray* qubits)
@@ -276,7 +283,7 @@ extern "C"
         std::vector<unsigned> idsControls = GetQubitIds(numControls, controls);
         std::vector<unsigned> convertedBases = GetBases(numTargets, pauliIds.data());
         MCExp(
-            GLOBAL_SIM, (unsigned)numTargets, convertedBases.data(), args->angle, (unsigned)numControls, idsControls.data(),
+            SimId(), (unsigned)numTargets, convertedBases.data(), args->angle, (unsigned)numControls, idsControls.data(),
             idsTargets.data());
     }
 
@@ -291,7 +298,7 @@ extern "C"
 
     void __quantum__qis__h__body(QUBIT* qubit)
     {
-        H(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        H(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__h__ctl(QirArray* ctls, QUBIT* qubit)
@@ -299,7 +306,7 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> ids =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCH(GLOBAL_SIM, numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
+        MCH(SimId(), numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     RESULT* __quantum__qis__measure__body(QirArray* paulis, QirArray* qubits)
@@ -311,13 +318,13 @@ extern "C"
         std::vector<unsigned> convertedBases = GetBases(count, pauliIds.data());
         std::vector<unsigned> ids =
             GetQubitIds(count, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(qubits, 0)));
-        return Measure(GLOBAL_SIM, count, convertedBases.data(), ids.data()) ? __quantum__rt__result_get_one()
+        return Measure(SimId(), count, convertedBases.data(), ids.data()) ? __quantum__rt__result_get_one()
                                                                          : __quantum__rt__result_get_zero();
     }
 
     void __quantum__qis__r__body(PauliId axis, double angle, QUBIT* qubit)
     {
-        R(GLOBAL_SIM, static_cast<unsigned>(axis), angle, reinterpret_cast<QubitIdType>(qubit));
+        R(SimId(), static_cast<unsigned>(axis), angle, reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__r__adj(PauliId axis, double angle, QUBIT* qubit)
@@ -330,7 +337,7 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> controls =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCR(GLOBAL_SIM, static_cast<unsigned>(args->pauli), args->angle, numControls, controls.data(),
+        MCR(SimId(), static_cast<unsigned>(args->pauli), args->angle, numControls, controls.data(),
             reinterpret_cast<QubitIdType>(args->target));
     }
 
@@ -342,12 +349,12 @@ extern "C"
 
     void __quantum__qis__s__body(QUBIT* qubit)
     {
-        S(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        S(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__s__adj(QUBIT* qubit)
     {
-        AdjS(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        AdjS(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__s__ctl(QirArray* ctls, QUBIT* qubit)
@@ -355,7 +362,7 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> ids =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCS(GLOBAL_SIM, numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
+        MCS(SimId(), numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__s__ctladj(QirArray* ctls, QUBIT* qubit)
@@ -363,17 +370,17 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> ids =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCAdjS(GLOBAL_SIM, numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
+        MCAdjS(SimId(), numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__t__body(QUBIT* qubit)
     {
-        T(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        T(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__t__adj(QUBIT* qubit)
     {
-        AdjT(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        AdjT(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__t__ctl(QirArray* ctls, QUBIT* qubit)
@@ -381,7 +388,7 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> ids =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCT(GLOBAL_SIM, numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
+        MCT(SimId(), numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__t__ctladj(QirArray* ctls, QUBIT* qubit)
@@ -389,12 +396,12 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> ids =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCAdjT(GLOBAL_SIM, numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
+        MCAdjT(SimId(), numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__x__body(QUBIT* qubit)
     {
-        X(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        X(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__x__ctl(QirArray* ctls, QUBIT* qubit)
@@ -402,12 +409,12 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> ids =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCX(GLOBAL_SIM, numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
+        MCX(SimId(), numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__y__body(QUBIT* qubit)
     {
-        Y(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        Y(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__y__ctl(QirArray* ctls, QUBIT* qubit)
@@ -415,12 +422,12 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> ids =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCY(GLOBAL_SIM, numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
+        MCY(SimId(), numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__z__body(QUBIT* qubit)
     {
-        Z(GLOBAL_SIM, reinterpret_cast<QubitIdType>(qubit));
+        Z(SimId(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__z__ctl(QirArray* ctls, QUBIT* qubit)
@@ -428,7 +435,7 @@ extern "C"
         auto numControls = __quantum__rt__array_get_size_1d(ctls);
         std::vector<unsigned> ids =
             GetQubitIds(numControls, reinterpret_cast<QubitIdType*>(__quantum__rt__array_get_element_ptr_1d(ctls, 0)));
-        MCZ(GLOBAL_SIM, numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
+        MCZ(SimId(), numControls, ids.data(), reinterpret_cast<QubitIdType>(qubit));
     }
 
     void __quantum__qis__dumpmachine__body(uint8_t* location)
@@ -477,7 +484,7 @@ extern "C"
         std::vector<unsigned> convertedBases = GetBases(paulis.size(), paulis.data());
         double actualProbability =
             1.0 - JointEnsembleProbability(
-                      GLOBAL_SIM, (unsigned)paulis.size(), reinterpret_cast<int*>(convertedBases.data()), ids.data());
+                      SimId(), (unsigned)paulis.size(), reinterpret_cast<int*>(convertedBases.data()), ids.data());
 
         if (!(std::abs(actualProbability - prob) < 1e-10))
         {
