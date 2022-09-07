@@ -50,7 +50,7 @@ if (WIN32)
   target_sources(Microsoft.Quantum.Simulator.Runtime PUBLIC "${PROJECT_BINARY_DIR}/../../../Qir/drops/include/qir_stdlib.def")
 elseif (APPLE)
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
-    "-Wl,-force_load,${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native/qir_stdlib"
+    "-Wl,-force_load,${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native/libqir_stdlib.a"
     pthread
     dl
   )
