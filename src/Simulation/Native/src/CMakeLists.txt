@@ -36,12 +36,12 @@ endif(BUILD_SHARED_LIBS)
 
 target_include_directories(Microsoft.Quantum.Simulator.Runtime PRIVATE "${PROJECT_BINARY_DIR}/../../../Qir/drops/include")
 target_link_libraries(Microsoft.Quantum.Simulator.Runtime 
-  ${SPECTRE_LIBS}
-  "-L${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native"
 )
 
 if (WIN32)
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
+    ${SPECTRE_LIBS}
+    "-L${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native"
     qir_stdlib
     Ws2_32
     Bcrypt
@@ -50,12 +50,13 @@ if (WIN32)
   target_sources(Microsoft.Quantum.Simulator.Runtime PUBLIC "${PROJECT_BINARY_DIR}/../../../Qir/drops/include/qir_stdlib.def")
 elseif (APPLE)
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
-    "-Wl,-force_load,qir_stdlib"
+    "-Wl,-force_load,${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native/qir_stdlib"
     pthread
     dl
   )
 else()
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
+    "-L${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native"
     "-Wl,--whole-archive"
     qir_stdlib
     "-Wl,--no-whole-archive"
