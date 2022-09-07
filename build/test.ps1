@@ -43,25 +43,13 @@ function Test-One {
 Test-One '../Simulation.sln'
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
-    & "$qirRuntime/test-qir-runtime.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/riqir")
-    & "$qirRuntime/test-qir-stdlib.ps1"
+    $qirstdlib = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
+    & "$qirstdlib/test-qir-stdlib.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
 
     $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests")
-    & "$qirTests/test-qir-tests.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-
-    $qirTests = (Join-Path $PSScriptRoot "../src/Qir/riqir-test")
     & "$qirTests/test-qir-tests.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False

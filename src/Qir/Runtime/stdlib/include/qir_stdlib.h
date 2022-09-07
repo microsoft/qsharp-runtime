@@ -66,8 +66,8 @@ extern "C"
 
     // Initializes the callable with the provided function table and capture tuple. The capture tuple pointer
     // should be null if there is no capture.
-    QIR_SHARED_API QirCallable* __quantum__rt__callable_create(t_CallableEntry*, t_CaptureCallback*,
-                                                               QirTuple*); // NOLINT
+    QIR_SHARED_API QirCallable* __quantum__rt__callable_create( // NOLINT
+        t_CallableEntry*, t_CaptureCallback*, QirTuple*);
 
     // Adds the given integer value to the reference count for the callable. Deallocates the callable if the reference
     // count becomes 0. The behavior is undefined if the reference count becomes negative.

@@ -7,13 +7,8 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/riqir")
-    & "$qirRuntime/build-qir-stdlib.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
-    & "$qirRuntime/build-qir-runtime.ps1"
+    $qirstdlib = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
+    & "$qirstdlib/build-qir-stdlib.ps1"
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
@@ -89,11 +84,6 @@ Build-One 'build' '../Simulation.sln'
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests")
-    & "$qirTests/build-qir-tests.ps1" -SkipQSharpBuild
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-    $qirTests = (Join-Path $PSScriptRoot "../src/Qir/riqir-test")
     & "$qirTests/build-qir-tests.ps1" -SkipQSharpBuild
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False

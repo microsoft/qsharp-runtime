@@ -1,3 +1,0 @@
-InheritParentConfig: true
-Checks: 
-  '-cert-err58-cpp'

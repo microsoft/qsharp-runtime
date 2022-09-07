@@ -19,7 +19,7 @@ steps:
   displayName: "Install QIR Runtime Prerequisites"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
-- pwsh: src/Qir/Runtime/build-qir-runtime.ps1
+- pwsh: src/Qir/Runtime/build-qir-stdlib.ps1
   displayName: "Build QIR Runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
@@ -34,7 +34,7 @@ steps:
   workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
 
   # QIR Runtime Tests:
-- pwsh: src/Qir/Runtime/test-qir-runtime.ps1
+- pwsh: src/Qir/Runtime/test-qir-stdlib.ps1
   displayName: "Test QIR Runtime"
   workingDirectory: $(System.DefaultWorkingDirectory)
 

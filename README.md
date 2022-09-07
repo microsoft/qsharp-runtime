@@ -28,8 +28,6 @@ You may also visit our [Quantum](https://github.com/microsoft/quantum) repositor
 
 Note that when building from source, this repository is configured so that .NET will automatically look at the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) in addition to any other feeds you may have configured.
 
-Building **QIR Runtime** isn't enabled by default yet. Please see [its readme](./src/Qir/Runtime/README.md) for details.
-
 ### All platforms ###
 
 1. Install the pre-reqs:

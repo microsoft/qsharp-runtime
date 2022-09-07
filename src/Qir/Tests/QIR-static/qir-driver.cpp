@@ -9,26 +9,17 @@
 #include <unordered_set>
 #include <cstdint>
 
-#include "CoreTypes.hpp"
-#include "QirContext.hpp"
-#include "QirTypes.hpp"
-#include "QirRuntime.hpp"
-#include "QirRuntimeApi_I.hpp"
-#include "SimFactory.hpp"
-#include "SimulatorStub.hpp"
-
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
+
+#include "qir_stdlib.h"
+
+class QUBIT;
 
 // Identifiers exposed externally:
 extern "C" void __quantum__qis__k__body(QUBIT* q);                    // NOLINT
 extern "C" void __quantum__qis__k__ctl(QirArray* controls, QUBIT* q); // NOLINT
 
-// Used by a couple test simulators. Catch's REQUIRE macro doesn't deal well with static class members so making it
-// into a global constant.
-constexpr int RELEASED = -1;
-
-using namespace Microsoft::Quantum;
 using namespace std;
 
 /*
@@ -57,9 +48,6 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop( // NO
     Array* array, int64_t index, int64_t val);
 TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
-#ifndef RIQIR_TESTING
-    QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
-#endif
     constexpr int64_t n = 5;
     int64_t values[n]   = {0, 1, 2, 3, 4};
     auto array          = Array{n, values};
@@ -69,266 +57,21 @@ TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 }
 
 extern "C" void Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__Interop(); // NOLINT
-struct QubitsResultsTestSimulator : public Microsoft::Quantum::SimulatorStub
-{
-    // no intelligent reuse, we just want to check that QIR releases all qubits
-    vector<int> qubits;           // released, or |0>, or |1> states (no entanglement allowed)
-    vector<int> results = {0, 1}; // released, or Zero(0) or One(1)
-
-    uint64_t GetQubitId(QubitIdType qubit) const
-    {
-        const uint64_t id = (uint64_t)qubit;
-        REQUIRE(id < this->qubits.size());
-
-        return id;
-    }
-
-    uint8_t GetResultId(Result result) const
-    {
-        const uint8_t id = (uint8_t)(uintptr_t)result;
-        REQUIRE(id < this->results.size());
-
-        return id;
-    }
-
-    QubitIdType AllocateQubit() override
-    {
-        qubits.push_back(0);
-        return static_cast<QubitIdType>(this->qubits.size() - 1);
-    }
-
-    void ReleaseQubit(QubitIdType qubit) override
-    {
-        const uint64_t id = GetQubitId(qubit);
-        REQUIRE(this->qubits[id] != RELEASED); // no double-release
-        this->qubits[id] = RELEASED;
-    }
-
-    void X(QubitIdType qubit) override
-    {
-        const uint64_t id = GetQubitId(qubit);
-        REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
-        this->qubits[id] = 1 - this->qubits[id];
-    }
-
-    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */,
-                   QubitIdType targets[]) override
-    {
-        assert(numBases == 1 && "QubitsResultsTestSimulator doesn't support joint measurements");
-
-        const uint64_t id = GetQubitId(targets[0]);
-        REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
-        this->results.push_back(this->qubits[id]);
-        return reinterpret_cast<Result>(this->results.size() - 1);
-    }
-
-    bool AreEqualResults(Result r1, Result r2) override
-    {
-        uint8_t i1 = GetResultId(r1);
-        uint8_t i2 = GetResultId(r2);
-        REQUIRE(this->results[i1] != RELEASED);
-        REQUIRE(this->results[i2] != RELEASED);
-
-        return (results[i1] == results[i2]);
-    }
-
-    void ReleaseResult(Result result) override
-    {
-        uint8_t i = GetResultId(result);
-        REQUIRE(this->results[i] != RELEASED); // no double release
-        this->results[i] = RELEASED;
-    }
-
-    Result UseZero() override
-    {
-        return reinterpret_cast<Result>(0);
-    }
-
-    Result UseOne() override
-    {
-        return reinterpret_cast<Result>(1);
-    }
-};
 TEST_CASE("QIR: allocating and releasing qubits and results", "[qir][qir.qubit][qir.result]")
 {
-#ifndef RIQIR_TESTING
-    unique_ptr<QubitsResultsTestSimulator> sim = make_unique<QubitsResultsTestSimulator>();
-    QirExecutionContext::Scoped qirctx(sim.get(), true /*trackAllocatedObjects*/);
-#endif
-
     REQUIRE_NOTHROW(Microsoft__Quantum__Testing__QIR__TestQubitResultManagement__Interop());
-
-#ifndef RIQIR_TESTING
-    // check that all qubits have been released
-    for (size_t id = 0; id < sim->qubits.size(); id++)
-    {
-        INFO(std::string("unreleased qubit: ") + std::to_string(id));
-        CHECK(sim->qubits[id] == RELEASED);
-    }
-#endif
-
-    // check that all results, allocated by measurements have been released
-    // TODO: enable after https://github.com/microsoft/qsharp-compiler/issues/780 is fixed
-    // for (size_t id = 2; id < sim->results.size(); id++)
-    // {
-    //     INFO(std::string("unreleased results: ") + std::to_string(id));
-    //     CHECK(sim->results[id] == RELEASED);
-    // }
 }
-
-#ifndef RIQIR_TESTING
-
-#ifdef _WIN32
-// A non-sensical function that creates a 3D array with given dimensions, then projects on the index = 1 of the
-// second dimension and returns a function of the sizes of the dimensions of the projection and a the provided value,
-// that is written to the original array at [1,1,1] and then retrieved from [1,1].
-// Thus, all three dimensions must be at least 2.
-extern "C" int64_t TestMultidimArrays(char value, int64_t dim0, int64_t dim1, int64_t dim2);
-TEST_CASE("QIR: multidimensional arrays", "[qir][qir.arrMultid]")
-{
-#ifndef RIQIR_TESTING
-    QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
-#endif
-
-    REQUIRE(42 + (2 + 8) / 2 == TestMultidimArrays(42, 2, 4, 8));
-    REQUIRE(17 + (3 + 7) / 2 == TestMultidimArrays(17, 3, 5, 7));
-}
-#else // not _WIN32
-// TODO: The bridge for variadic functions is broken on Linux!
-#endif
-
-// Manually authored QIR to test dumping range [0..2..6] into string and then raising a failure with it
-extern "C" void TestFailWithRangeString(int64_t start, int64_t step, int64_t end);
-TEST_CASE("QIR: Report range in a failure message", "[qir][qir.range]")
-{
-#ifndef RIQIR_TESTING
-    QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
-#endif
-
-    bool failed = false;
-    try
-    {
-        TestFailWithRangeString(0, 5, 42); // Returns with exception. Leaks the instances created from the moment of
-                                           // call to the moment of exception throw.
-                                           // TODO: Extract into a separate file compiled with leaks check off.
-    }
-    catch (const std::exception& e)
-    {
-        failed = true;
-        REQUIRE(std::string(e.what()) == "0..5..42");
-    }
-    REQUIRE(failed);
-}
-
-#endif // RIQIR_TESTING
 
 // TestPartials subtracts the second argument from the first and returns the result.
 extern "C" int64_t Microsoft__Quantum__Testing__QIR__TestPartials__Interop(int64_t, int64_t); // NOLINT
 TEST_CASE("QIR: Partial application of a callable", "[qir][qir.partCallable]")
 {
-#ifndef RIQIR_TESTING
-    QirExecutionContext::Scoped qirctx(nullptr, true /*trackAllocatedObjects*/);
-#endif
-
     const int64_t res = Microsoft__Quantum__Testing__QIR__TestPartials__Interop(42, 17);
     REQUIRE(res == 42 - 17);
 }
 
 // The Microsoft__Quantum__Testing__QIR__TestFunctors__Interop tests needs proper semantics of X and M, and nothing
 // else. The validation is done inside the test and it would throw in case of failure.
-#ifndef RIQIR_TESTING
-struct FunctorsTestSimulator : public Microsoft::Quantum::SimulatorStub
-{
-    std::vector<int> qubits;
-
-    uint64_t GetQubitId(QubitIdType qubit) const
-    {
-        const uint64_t id = (uint64_t)qubit;
-        REQUIRE(id < this->qubits.size());
-        return id;
-    }
-
-    QubitIdType AllocateQubit() override
-    {
-        this->qubits.push_back(0);
-        return static_cast<QubitIdType>(this->qubits.size() - 1);
-    }
-
-    void ReleaseQubit(QubitIdType qubit) override
-    {
-        const uint64_t id = GetQubitId(qubit);
-        REQUIRE(this->qubits[id] != RELEASED);
-        this->qubits[id] = RELEASED;
-    }
-
-    void X(QubitIdType qubit) override
-    {
-        const uint64_t id = GetQubitId(qubit);
-        REQUIRE(this->qubits[id] != RELEASED); // the qubit must be alive
-        this->qubits[id] = 1 - this->qubits[id];
-    }
-
-    void ControlledX(long numControls, QubitIdType controls[], QubitIdType qubit) override
-    {
-        for (long i = 0; i < numControls; i++)
-        {
-            const uint64_t id = GetQubitId(controls[i]);
-            REQUIRE(this->qubits[id] != RELEASED);
-            if (this->qubits[id] == 0)
-            {
-                return;
-            }
-        }
-        X(qubit);
-    }
-
-    Result Measure([[maybe_unused]] long numBases, PauliId* /* bases */, long /* numTargets */,
-                   QubitIdType targets[]) override
-    {
-        assert(numBases == 1 && "FunctorsTestSimulator doesn't support joint measurements");
-
-        const uint64_t id = GetQubitId(targets[0]);
-        REQUIRE(this->qubits[id] != RELEASED);
-        return reinterpret_cast<Result>(this->qubits[id]);
-    }
-
-    bool AreEqualResults(Result r1, Result r2) override
-    {
-        // those are bogus pointers but it's ok to compare them _as pointers_
-        return (r1 == r2);
-    }
-
-    void ReleaseResult(Result /*result*/) override
-    {
-    } // the results aren't allocated by this test simulator
-
-    Result UseZero() override
-    {
-        return reinterpret_cast<Result>(0);
-    }
-
-    Result UseOne() override
-    {
-        return reinterpret_cast<Result>(1);
-    }
-};
-static FunctorsTestSimulator* g_ctrqapi = nullptr;
-static int g_cKCalls                    = 0;
-static int g_cKCallsControlled          = 0;
-extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__Interop();       // NOLINT
-extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__Interop(); // NOLINT
-extern "C" void __quantum__qis__k__body(QUBIT* q)                                // NOLINT
-{
-    g_cKCalls++;
-    g_ctrqapi->X(reinterpret_cast<QubitIdType>(q));
-}
-extern "C" void __quantum__qis__k__ctl(QirArray* controls, QUBIT* q) // NOLINT
-{
-    g_cKCallsControlled++;
-    g_ctrqapi->ControlledX((long)(controls->count), reinterpret_cast<QubitIdType*>(controls->buffer),
-                           reinterpret_cast<QubitIdType>(q));
-}
-#else
 extern "C" void __quantum__qis__x__body(QUBIT* q);                               // NOLINT
 extern "C" void __quantum__qis__x__ctl(QirArray* controls, QUBIT* q);            // NOLINT
 extern "C" void Microsoft__Quantum__Testing__QIR__TestFunctors__Interop();       // NOLINT
@@ -341,25 +84,9 @@ extern "C" void __quantum__qis__k__ctl(QirArray* controls, QUBIT* q) // NOLINT
 {
     __quantum__qis__x__ctl(controls, q);
 }
-#endif
+
 TEST_CASE("QIR: application of nested controlled functor", "[qir][qir.functor]")
 {
-#ifndef RIQIR_TESTING
-    unique_ptr<FunctorsTestSimulator> qapi = make_unique<FunctorsTestSimulator>();
-    QirExecutionContext::Scoped qirctx(qapi.get(), true /*trackAllocatedObjects*/);
-    g_ctrqapi = qapi.get();
-#endif
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctors__Interop());
-
-#ifndef RIQIR_TESTING
-    const int cKCalls           = g_cKCalls;
-    const int cKCallsControlled = g_cKCallsControlled;
-#endif
     CHECK_NOTHROW(Microsoft__Quantum__Testing__QIR__TestFunctorsNoArgs__Interop());
-#ifndef RIQIR_TESTING
-    CHECK(g_cKCalls - cKCalls == 3);
-    CHECK(g_cKCallsControlled - cKCallsControlled == 5);
-
-    g_ctrqapi = nullptr;
-#endif
 }

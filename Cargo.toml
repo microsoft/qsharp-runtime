@@ -2,8 +2,8 @@
 
 members = [
     "src/Simulation/qdk_sim_rs",
-    "src/Qir/riqir/stdlib",
-    "src/Qir/riqir/backend",
+    "src/Qir/Runtime/stdlib",
+    "src/Qir/Runtime/backend",
 ]
 
 [profile.release]

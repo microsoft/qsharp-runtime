@@ -16,7 +16,7 @@ if (-not (Test-Path Env:/AGENT_OS)) {                                    # If no
     if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         Write-Host "Build release flavor of the QIR standard library"
         $Env:BUILD_CONFIGURATION = "Release"
-        Push-Location (Join-Path $PSScriptRoot "src/Qir/riqir")
+        Push-Location (Join-Path $PSScriptRoot "src/Qir/Runtime")
             .\build-qir-stdlib.ps1
         Pop-Location
         $Env:BUILD_CONFIGURATION = $null

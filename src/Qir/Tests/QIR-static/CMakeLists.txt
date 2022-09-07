@@ -1,5 +1,4 @@
 set(TEST_FILES
-  qir-test-noqsharp.ll
   qsharp/qir/qir-gen.ll
 )
 
@@ -10,7 +9,6 @@ add_executable(qir-static-tests
   qir-driver.cpp
   qir-test-math.cpp
   qir-test-strings.cpp
-  qir-test-ouput.cpp
   qir-test-other.cpp
 )
 
@@ -19,18 +17,14 @@ foreach(file ${TEST_FILES})
 endforeach()
 
 target_link_libraries(qir-static-tests PUBLIC
-  "-L${runtime_lib_path}"
-  -lMicrosoft.Quantum.Qir.Runtime
-  -lMicrosoft.Quantum.Qir.QSharp.Foundation
-  -lMicrosoft.Quantum.Qir.QSharp.Core
+  "-L${simulator_lib_path}"
+  -lMicrosoft.Quantum.Simulator.Runtime
 )
 
 target_include_directories(qir-static-tests PUBLIC
   ${test_includes}
-  ${common_includes}
   ${public_includes}
 )
-# target_compile_definitions(qir-static-tests PRIVATE EXPORT_QIR_API)
 
 install(TARGETS qir-static-tests RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/bin")
 add_unit_test(qir-static-tests)
