@@ -3,7 +3,6 @@
 members = [
     "src/Simulation/qdk_sim_rs",
     "src/Qir/Runtime/stdlib",
-    "src/Qir/Runtime/backend",
 ]
 
 [profile.release]
