@@ -35,8 +35,6 @@ else(BUILD_SHARED_LIBS)
 endif(BUILD_SHARED_LIBS)
 
 target_include_directories(Microsoft.Quantum.Simulator.Runtime PRIVATE "${PROJECT_BINARY_DIR}/../../../Qir/drops/include")
-target_link_libraries(Microsoft.Quantum.Simulator.Runtime 
-)
 
 if (WIN32)
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
@@ -47,14 +45,17 @@ if (WIN32)
     Bcrypt
     Userenv
   )
+  # On Windows, use a .def file to force export stdlib functions from the static library.
   target_sources(Microsoft.Quantum.Simulator.Runtime PUBLIC "${PROJECT_BINARY_DIR}/../../../Qir/drops/include/qir_stdlib.def")
 elseif (APPLE)
+  # On MacOS, use -force_load and explicit path to pull in entire contents of stdlib static archive.
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
     "-Wl,-force_load,${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native/libqir_stdlib.a"
     pthread
     dl
   )
 else()
+  # On Unix systems, use --whole-archive to to pull in entire contents of stdlib  static archive.
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
     "-L${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native"
     "-Wl,--whole-archive"
