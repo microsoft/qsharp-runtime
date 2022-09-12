@@ -30,12 +30,17 @@ Note that when building from source, this repository is configured so that .NET 
 
 Building **QIR Runtime** isn't enabled by default yet. Please see [its readme](./src/Qir/Runtime/README.md) for details.
 
+### All platforms ###
+
+1. Install the pre-reqs:
+    * Install [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell).
+    * Install [CMake](https://cmake.org/install/) 3.20 or newer.
+
 ### Windows ###
 
 To build on Windows:
 
 1. Install the pre-reqs:
-    * Install [CMake](https://cmake.org/install/) 3.20 or newer.
     * Install [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/). Make sure you install the following workloads:
         * **Desktop development with C++**
         * **Spectre-mitigated libraries. Once Visual Studio has been installed, using the installer for the VS version of interest,
@@ -56,32 +61,30 @@ The `Simulation.sln` solution does not include the full-state quantum simulator.
 To build on other platforms:
 
 1. Install the pre-reqs:
-    * Install [CMake](https://cmake.org/install/) 3.20 or newer
     * Install [.NET 6.0](https://dotnet.microsoft.com/download) (version lower than 6.0.300 is recommended)
     * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
+      * .NET 6.0: `sudo apt install dotnet-sdk-6.0 dotnet-runtime-6.0`. The possible result can be as in listing B below.  
+        See also other ways [here](https://docs.microsoft.com/en-us/dotnet/core/install/linux) or [here](https://dotnet.microsoft.com/en-us/download).
       * Install [`libomp`](https://openmp.llvm.org) needed for the native (C++) full-state simulator.
-        `sudo apt install libomp-13-dev`. The possible result can be as in listing A below.
-      * .NET 6.0: `sudo apt install dotnet-sdk-6.0 dotnet-runtime-6.0`. The possible result can be as in listing B below.
+        `sudo apt install libomp-14-dev`. The possible result can be as in listing A below.
 
 Listing A.
 
 ```bash
 # In an empty directory:
 dpkg -l *libomp*
-
 # Desired=Unknown/Install/Remove/Purge/Hold
 # | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
 # |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
-# ||/ Name             Version                                                         Architecture Description
-# +++-================-===============================================================-============-=================================
-# un  libomp-11-dev    <none>                                                          <none>       (no description available)
-# ii  libomp-13-dev    1:13.0.1~++20220120110924+75e33f71c2da-1~exp1~20220120231001.58 amd64        LLVM OpenMP runtime - dev package
-# un  libomp-13-doc    <none>                                                          <none>       (no description available)
-# un  libomp-dev       <none>                                                          <none>       (no description available)
-# un  libomp-x.y       <none>                                                          <none>       (no description available)
-# un  libomp-x.y-dev   <none>                                                          <none>       (no description available)
-# un  libomp5          <none>                                                          <none>       (no description available)
-# ii  libomp5-13:amd64 1:13.0.1~++20220120110924+75e33f71c2da-1~exp1~20220120231001.58 amd64        LLVM OpenMP runtime
+# ||/ Name             Version           Architecture Description
+# +++-================-=================-============-=================================
+# ii  libomp-14-dev    1:14.0.0-1ubuntu1 amd64        LLVM OpenMP runtime - dev package
+# un  libomp-14-doc    <none>            <none>       (no description available)
+# un  libomp-dev       <none>            <none>       (no description available)
+# un  libomp-x.y       <none>            <none>       (no description available)
+# un  libomp-x.y-dev   <none>            <none>       (no description available)
+# un  libomp5          <none>            <none>       (no description available)
+# ii  libomp5-14:amd64 1:14.0.0-1ubuntu1 amd64        LLVM OpenMP runtime
 ```
 
 Listing B.

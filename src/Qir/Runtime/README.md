@@ -14,7 +14,7 @@ The QIR runtime includes an implementation of the
 
 ### Prerequisites
 
-The QirRuntime project is using CMake (3.17) + Ninja(1.10.0) + Clang++(11.0.0). Other versions of the tools might work
+The QirRuntime project is using CMake (3.17) + Ninja(1.10.0) + Clang++(14). Other versions of the tools might work
  but haven't been tested. Only x64 architecture is supported.  
 For running the PowerShell scripts below use 
 [PowerShell Core or PowerShell 7+ (`pwsh`)](https://github.com/PowerShell/PowerShell), not the inbox PowerShell.
@@ -26,7 +26,7 @@ while on macOS, `prerequisites.ps1` relies on the [`brew` package manager](https
 
 #### Windows pre-reqs
 
-1. Install Clang 13, Ninja and CMake from the public distros.
+1. Install Clang 14, Ninja and CMake from the public distros.
 1. Add all three to your/system `%PATH%`.
 1. Install VS 2019 and enable "Desktop development with C++" component (Clang uses MSVC's standard library on Windows).
 1. Install clang-tidy and clang-format if your Clang/LLVM packages didn't include the tools.
@@ -42,11 +42,11 @@ Running cmake from the editors will likely default to MSVC or clang-cl and fail.
 1. In the Ubuntu's terminal:
     1. `$ sudo apt install cmake` (`$ cmake --version` should return 3.16.3)
     1. `$ sudo apt-get install ninja-build` (`$ ninja --version` should return 1.10.0)
-    1. `$ sudo apt install clang-13` (`$ clang++-13 --version` should return 13.0.0)
+    1. `$ sudo apt install clang-14` (`$ clang++-14 --version` should return 14.0.0 or newer)
     1. Set Clang as the preferred C/C++ compiler:
-        - $ export CC=/usr/bin/clang-13
-        - $ export CXX=/usr/bin/clang++-13
-    1. `$ sudo apt install clang-tidy-13` (`$ clang-tidy-13 --version` should return 'LLVM version 13.0.0')
+        - $ export CC=/usr/bin/clang-14
+        - $ export CXX=/usr/bin/clang++-14
+    1. `$ sudo apt install clang-tidy-14` (`$ clang-tidy-14 --version` should return 'LLVM version 14.0.0' or newer)
     1. Install the same version of dotnet as specified by qsharp-runtime [README](../../../README.md)
 
 See [https://code.visualstudio.com/docs/remote/wsl] on how to use VS Code with WSL.

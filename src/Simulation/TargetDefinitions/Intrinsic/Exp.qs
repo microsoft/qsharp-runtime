@@ -19,7 +19,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// factors on each qubit.
     /// ## theta
     /// Angle about the given multi-qubit Pauli operator by which the
-    /// target register is to be rotated.
+    /// target register is to be rotated. Expressed in radians.
     /// ## qubits
     /// Register to apply the given rotation to.
     operation Exp (paulis : Pauli[], theta : Double, qubits : Qubit[]) : Unit is Adj + Ctl {

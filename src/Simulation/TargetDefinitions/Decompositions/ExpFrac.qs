@@ -22,10 +22,10 @@ namespace Microsoft.Quantum.Intrinsic {
     /// factors on each qubit.
     /// ## numerator
     /// Numerator ($k$) in the dyadic fraction representation of the angle
-    /// by which the qubit register is to be rotated.
+    /// by which the qubit register is to be rotated. The angle is expressed in radians.
     /// ## power
     /// Power of two ($n$) specifying the denominator of the angle by which
-    /// the qubit register is to be rotated.
+    /// the qubit register is to be rotated. The angle is expressed in radians.
     /// ## qubits
     /// Register to apply the given rotation to.
     operation ExpFrac (paulis : Pauli[], numerator : Int, power : Int, qubits : Qubit[]) : Unit is Adj + Ctl {

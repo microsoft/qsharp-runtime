@@ -25,10 +25,10 @@ namespace Microsoft.Quantum.Intrinsic {
     /// Pauli operator to be exponentiated to form the rotation.
     /// ## numerator
     /// Numerator in the dyadic fraction representation of the angle
-    /// by which the qubit is to be rotated.
+    /// by which the qubit is to be rotated. This angle is expressed in radians.
     /// ## power
     /// Power of two specifying the denominator of the angle by which
-    /// the qubit is to be rotated.
+    /// the qubit is to be rotated. This angle is expressed in radians.
     /// ## qubit
     /// Qubit to which the gate should be applied.
     ///
