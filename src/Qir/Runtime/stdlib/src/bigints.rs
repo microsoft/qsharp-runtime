@@ -230,33 +230,51 @@ pub unsafe extern "C" fn __quantum__rt__bigint_greater_eq(
 
 #[cfg(test)]
 mod tests {
+    use std::convert::TryInto;
+
     use super::*;
 
     #[test]
-    fn test_bigint_basics() {
+    fn test_bigint_create_from_int() {
         let bigint_0 = __quantum__rt__bigint_create_i64(42);
+        unsafe {
+            assert_eq!(*bigint_0, (42).try_into().unwrap());
+            // Note that the test must decrement the reference count on any created items to ensure
+            // they are cleaned up and tests can pass with address sanitizer.
+            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
+        }
+    }
+
+    #[test]
+    fn test_bigint_create_from_array() {
         let bytes = 42_i64.to_be_bytes();
         unsafe {
             let bigint_1 =
                 __quantum__rt__bigint_create_array(bytes.len().try_into().unwrap(), bytes.as_ptr());
-            assert!(__quantum__rt__bigint_equal(bigint_0, bigint_1));
+            assert_eq!(*bigint_1, (42).try_into().unwrap());
+            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
+        }
+    }
+
+    #[test]
+    fn test_bigint_arithmetic() {
+        let bigint_0 = __quantum__rt__bigint_create_i64(42);
+        let bigint_1 = __quantum__rt__bigint_create_i64(3);
+        unsafe {
             let bigint_2 = __quantum__rt__bigint_add(bigint_0, bigint_1);
-            let bigint_3 = __quantum__rt__bigint_create_i64(84);
-            assert!((*bigint_2) == 84.try_into().unwrap());
-            assert!(__quantum__rt__bigint_equal(bigint_2, bigint_3));
-            let bigint_4 = __quantum__rt__bigint_negate(bigint_0);
-            assert!((*bigint_4) == (-42).try_into().unwrap());
-            let bigint_5 = __quantum__rt__bigint_add(bigint_2, bigint_4);
-            assert!((*bigint_5) == (42).try_into().unwrap());
-            assert!(__quantum__rt__bigint_greater(bigint_2, bigint_5));
-            assert!(__quantum__rt__bigint_greater(bigint_5, bigint_4));
-            let bigint_6 = __quantum__rt__bigint_create_i64(2);
-            let bigint_7 = __quantum__rt__bigint_multiply(bigint_5, bigint_6);
-            assert!(__quantum__rt__bigint_equal(bigint_7, bigint_2));
-            let bigint_8 = __quantum__rt__bigint_shiftleft(bigint_5, 1);
-            assert!(__quantum__rt__bigint_equal(bigint_7, bigint_8));
-            let bigint_9 = __quantum__rt__bigint_shiftright(bigint_8, 1);
-            assert!(__quantum__rt__bigint_equal(bigint_9, bigint_0));
+            assert_eq!(*bigint_2, (45).try_into().unwrap());
+            let bigint_3 = __quantum__rt__bigint_subtract(bigint_2, bigint_1);
+            assert_eq!(*bigint_3, (42).try_into().unwrap());
+            let bigint_4 = __quantum__rt__bigint_divide(bigint_3, bigint_1);
+            assert_eq!(*bigint_4, (14).try_into().unwrap());
+            let bigint_5 = __quantum__rt__bigint_multiply(bigint_4, bigint_1);
+            assert_eq!(*bigint_5, (42).try_into().unwrap());
+            let bigint_6 = __quantum__rt__bigint_modulus(bigint_5, bigint_1);
+            assert_eq!(*bigint_6, (0).try_into().unwrap());
+            let bigint_7 = __quantum__rt__bigint_negate(bigint_5);
+            assert_eq!(*bigint_7, (-42).try_into().unwrap());
+            let bigint_8 = __quantum__rt__bigint_power(bigint_7, 3);
+            assert_eq!(*bigint_8, (-74088).try_into().unwrap());
             __quantum__rt__bigint_update_reference_count(bigint_0, -1);
             __quantum__rt__bigint_update_reference_count(bigint_1, -1);
             __quantum__rt__bigint_update_reference_count(bigint_2, -1);
@@ -266,7 +284,52 @@ mod tests {
             __quantum__rt__bigint_update_reference_count(bigint_6, -1);
             __quantum__rt__bigint_update_reference_count(bigint_7, -1);
             __quantum__rt__bigint_update_reference_count(bigint_8, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_9, -1);
+        }
+    }
+
+    #[test]
+    fn test_bigint_bitops() {
+        let bigint_0 = __quantum__rt__bigint_create_i64(42);
+        let bigint_1 = __quantum__rt__bigint_create_i64(3);
+        unsafe {
+            let bigint_2 = __quantum__rt__bigint_bitand(bigint_0, bigint_1);
+            assert_eq!(*bigint_2, (2).try_into().unwrap());
+            let bigint_3 = __quantum__rt__bigint_bitor(bigint_0, bigint_1);
+            assert_eq!(*bigint_3, (43).try_into().unwrap());
+            let bigint_4 = __quantum__rt__bigint_bitxor(bigint_0, bigint_3);
+            assert_eq!(*bigint_4, (1).try_into().unwrap());
+            let bigint_5 = __quantum__rt__bigint_bitnot(bigint_4);
+            assert_eq!(*bigint_5, (-2).try_into().unwrap());
+            let bigint_6 = __quantum__rt__bigint_shiftleft(bigint_0, 2);
+            assert_eq!(*bigint_6, (168).try_into().unwrap());
+            let bigint_7 = __quantum__rt__bigint_shiftright(bigint_6, 3);
+            assert_eq!(*bigint_7, (21).try_into().unwrap());
+            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_2, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_3, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_5, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_6, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_7, -1);
+        }
+    }
+
+    #[test]
+    fn test_bigint_comparisons() {
+        let bigint_0 = __quantum__rt__bigint_create_i64(42);
+        let bigint_1 = __quantum__rt__bigint_create_i64(43);
+        let bigint_2 = __quantum__rt__bigint_create_i64(42);
+        unsafe {
+            assert!(__quantum__rt__bigint_greater(bigint_1, bigint_0));
+            assert!(!__quantum__rt__bigint_greater(bigint_0, bigint_1));
+            assert!(__quantum__rt__bigint_equal(bigint_0, bigint_2));
+            assert!(__quantum__rt__bigint_greater_eq(bigint_0, bigint_2));
+            assert!(__quantum__rt__bigint_greater_eq(bigint_1, bigint_2));
+            assert!(!__quantum__rt__bigint_greater_eq(bigint_0, bigint_1));
+            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_2, -1);
         }
     }
 }
