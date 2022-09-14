@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 #![deny(clippy::all, clippy::pedantic)]
 
-use std::os::raw::c_double;
+use std::{ffi::CString, os::raw::c_double};
 
 #[no_mangle]
 pub extern "C" fn __quantum__rt__array_start_record_output() {
@@ -46,4 +46,18 @@ pub extern "C" fn __quantum__rt__double_record_output(val: c_double) {
 #[no_mangle]
 pub extern "C" fn __quantum__rt__bool_record_output(val: bool) {
     println!("RESULT\t{}", val);
+}
+
+/// # Safety
+///
+/// This function should only be called with strings created by `__quantum__rt__string_*` functions.
+#[no_mangle]
+pub unsafe extern "C" fn __quantum__rt__message_record_output(str: *const CString) {
+    println!(
+        "INFO\t{}",
+        (*str)
+            .to_str()
+            .expect("Unable to convert input string")
+            .escape_default()
+    );
 }
