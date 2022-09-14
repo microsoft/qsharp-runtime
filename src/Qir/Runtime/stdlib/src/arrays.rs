@@ -138,7 +138,7 @@ pub unsafe extern "C" fn __quantum__rt__array_update_alias_count(
 
 #[cfg(test)]
 mod tests {
-    use std::{mem::size_of, convert::TryInto};
+    use std::{convert::TryInto, mem::size_of};
 
     use super::*;
 
@@ -276,20 +276,59 @@ mod tests {
         unsafe {
             assert_eq!(__quantum__rt__array_get_size_1d(arr), 3);
             let first = __quantum__rt__array_get_element_ptr_1d(arr, 0).cast::<Data>();
-            *first = Data{first: 1, second: 2, third: 3};
+            *first = Data {
+                first: 1,
+                second: 2,
+                third: 3,
+            };
             let second = __quantum__rt__array_get_element_ptr_1d(arr, 1).cast::<Data>();
-            *second = Data{first: 10, second: 20, third: 30};
+            *second = Data {
+                first: 10,
+                second: 20,
+                third: 30,
+            };
             let third = __quantum__rt__array_get_element_ptr_1d(arr, 2).cast::<Data>();
-            *third = Data{first: 100, second: 200, third: 300};
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 0).cast::<Data>())).first, 1);
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 0).cast::<Data>())).second, 2);
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 0).cast::<Data>())).third, 3);
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 1).cast::<Data>())).first, 10);
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 1).cast::<Data>())).second, 20);
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 1).cast::<Data>())).third, 30);
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 2).cast::<Data>())).first, 100);
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 2).cast::<Data>())).second, 200);
-            assert_eq!((*(__quantum__rt__array_get_element_ptr_1d(arr, 2).cast::<Data>())).third, 300);
+            *third = Data {
+                first: 100,
+                second: 200,
+                third: 300,
+            };
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 0).cast::<Data>())).first,
+                1
+            );
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 0).cast::<Data>())).second,
+                2
+            );
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 0).cast::<Data>())).third,
+                3
+            );
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 1).cast::<Data>())).first,
+                10
+            );
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 1).cast::<Data>())).second,
+                20
+            );
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 1).cast::<Data>())).third,
+                30
+            );
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 2).cast::<Data>())).first,
+                100
+            );
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 2).cast::<Data>())).second,
+                200
+            );
+            assert_eq!(
+                (*(__quantum__rt__array_get_element_ptr_1d(arr, 2).cast::<Data>())).third,
+                300
+            );
             __quantum__rt__array_update_reference_count(arr, -1);
         }
     }
