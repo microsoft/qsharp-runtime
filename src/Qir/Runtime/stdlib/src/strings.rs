@@ -101,9 +101,9 @@ pub extern "C" fn __quantum__rt__int_to_string(input: i64) -> *const CString {
 #[no_mangle]
 pub extern "C" fn __quantum__rt__double_to_string(input: c_double) -> *const CString {
     if (input.floor() - input.ceil()).abs() < c_double::EPSILON {
-            // The value is a whole number, which by convention is displayed with one decimal point
-            // to differentiate it from an integer value.
-            convert(&format!("{:.1}", input))
+        // The value is a whole number, which by convention is displayed with one decimal point
+        // to differentiate it from an integer value.
+        convert(&format!("{:.1}", input))
     } else {
         convert(&input)
     }
