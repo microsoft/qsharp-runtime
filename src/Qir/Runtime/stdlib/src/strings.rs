@@ -331,6 +331,36 @@ mod tests {
                 "4.2"
             );
         }
+        let input1_1 = 4.0;
+        let str1_1 = __quantum__rt__double_to_string(input1_1);
+        unsafe {
+            assert_eq!(
+                CStr::from_ptr(__quantum__rt__string_get_data(str1_1))
+                    .to_str()
+                    .unwrap(),
+                "4.0"
+            );
+        }
+        let input1_2 = 0.1;
+        let str1_2 = __quantum__rt__double_to_string(input1_2);
+        unsafe {
+            assert_eq!(
+                CStr::from_ptr(__quantum__rt__string_get_data(str1_2))
+                    .to_str()
+                    .unwrap(),
+                "0.1"
+            );
+        }
+        let input1_3 = 0.100_000_000_01;
+        let str1_3 = __quantum__rt__double_to_string(input1_3);
+        unsafe {
+            assert_eq!(
+                CStr::from_ptr(__quantum__rt__string_get_data(str1_3))
+                    .to_str()
+                    .unwrap(),
+                "0.10000000001"
+            );
+        }
         let input2 = false;
         let str2 = __quantum__rt__bool_to_string(input2);
         unsafe {
@@ -363,6 +393,9 @@ mod tests {
 
             __quantum__rt__string_update_reference_count(str0, -1);
             __quantum__rt__string_update_reference_count(str1, -1);
+            __quantum__rt__string_update_reference_count(str1_1, -1);
+            __quantum__rt__string_update_reference_count(str1_2, -1);
+            __quantum__rt__string_update_reference_count(str1_3, -1);
             __quantum__rt__string_update_reference_count(str2, -1);
             __quantum__rt__string_update_reference_count(str3, -1);
             __quantum__rt__string_update_reference_count(str4, -1);
