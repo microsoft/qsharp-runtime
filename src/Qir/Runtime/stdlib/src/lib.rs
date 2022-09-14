@@ -78,6 +78,7 @@ pub extern "C" fn __quantum__rt__memory_allocate(size: u64) -> *mut u8 {
 /// Panics unconditionally with the given message.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__fail(str: *const CString) {
+    __quantum__rt__message(str);
     panic!("{}", (*str).to_str().expect("Unable to convert string"));
 }
 
