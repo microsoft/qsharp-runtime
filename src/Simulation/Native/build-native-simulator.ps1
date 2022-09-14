@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-Write-Host "##[info]Build Native simulator for $Env:BUILD_CONFIGURATION"
-
 & (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
+
+Write-Host "##[info]Build Native simulator for $Env:BUILD_CONFIGURATION"
 
 if ($IsMacOS) {
     # To ensure loading succeeds on Mac the install id of the library needs to be updated to use 

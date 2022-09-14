@@ -34,6 +34,8 @@ pub extern "C" fn __quantum__rt__double_record_output(val: c_double) {
     println!(
         "RESULT\t{}",
         if (val.floor() - val.ceil()).abs() < c_double::EPSILON {
+            // The value is a whole number, which by convention is displayed with one decimal point
+            // to differentiate it from an integer value.
             format!("{:.1}", val)
         } else {
             format!("{}", val)

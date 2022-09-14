@@ -14,13 +14,13 @@ steps:
     packageType: sdk
     version: '6.0.x'
 
-  # QIR Runtime:
+  # QIR stdlib:
 - pwsh: src/Qir/Runtime/prerequisites.ps1
-  displayName: "Install QIR Runtime Prerequisites"
+  displayName: "Install QIR stdlib Prerequisites"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
 - pwsh: src/Qir/Runtime/build-qir-stdlib.ps1
-  displayName: "Build QIR Runtime"
+  displayName: "Build QIR stdlib"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
   # Native Simulator (needed to build and run the QIR tests):
@@ -33,9 +33,9 @@ steps:
   displayName: "Build Native Simulator"
   workingDirectory: $(System.DefaultWorkingDirectory)/src/Simulation/Native
 
-  # QIR Runtime Tests:
+  # QIR stdlib Tests:
 - pwsh: src/Qir/Runtime/test-qir-stdlib.ps1
-  displayName: "Test QIR Runtime"
+  displayName: "Test QIR stdlib"
   workingDirectory: $(System.DefaultWorkingDirectory)
 
   # QIR Tests:
