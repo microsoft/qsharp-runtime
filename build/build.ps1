@@ -7,8 +7,8 @@ $ErrorActionPreference = 'Stop'
 $all_ok = $True
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirstdlib = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
-    & "$qirstdlib/build-qir-stdlib.ps1"
+    $qirStdLibPath = (Join-Path $PSScriptRoot .. src Qir Runtime build-qir-stdlib.ps1)
+    & $qirStdLibPath
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }

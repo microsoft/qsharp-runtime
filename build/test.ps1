@@ -43,8 +43,8 @@ function Test-One {
 Test-One '../Simulation.sln'
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirstdlib = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
-    & "$qirstdlib/test-qir-stdlib.ps1"
+    $qirStdLibPath = (Join-Path $PSScriptRoot .. src Qir Runtime test-qir-stdlib.ps1)
+    & $qirStdLibPath
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }
