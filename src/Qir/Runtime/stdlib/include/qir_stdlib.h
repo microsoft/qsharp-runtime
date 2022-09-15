@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+#pragma once
+#ifndef QIR_STDLIB_H
+#define QIR_STDLIB_H
+
 #include <cstdint>
 
 #ifdef _WIN32
@@ -20,6 +24,13 @@ extern "C"
     struct QirTuple;
     struct QirBigInt;
 
+    // Type aliases with the same name are added for ease of use in C code.
+    typedef struct QirString QirString;
+    typedef struct QirArray QirArray;
+    typedef struct QirCallable QirCallable;
+    typedef struct QirTuple QirTuple;
+    typedef struct QirBigInt QirBigInt;
+
     enum PauliId : int8_t
     {
         PauliId_I = 0,
@@ -32,7 +43,7 @@ extern "C"
     typedef void (*t_CaptureCallback)(QirTuple*, int32_t);
 
     // Returns a pointer to the malloc-allocated block.
-    QIR_SHARED_API char* __quantum__rt__memory_allocate(uint64_t size); // NOLINT
+    QIR_SHARED_API void* __quantum__rt__memory_allocate(uint64_t size); // NOLINT
 
     // Fail the computation with the given error message.
     [[noreturn]] QIR_SHARED_API void __quantum__rt__fail(QirString* msg); // NOLINT
@@ -149,7 +160,7 @@ extern "C"
 
     // Creates a big integer with the initial value specified by the i8 array. The 0-th element of the array is the
     // highest-order byte, followed by the first element, etc.
-    QIR_SHARED_API QirBigInt* __quantum__rt__bigint_create_array(int, char*); // NOLINT
+    QIR_SHARED_API QirBigInt* __quantum__rt__bigint_create_array(int32_t, char*); // NOLINT
 
     // Adds the given integer value to the reference count for the big integer. Deallocates the big integer if the
     // reference count becomes 0. The behavior is undefined if the reference count becomes negative.
@@ -174,7 +185,7 @@ extern "C"
     QIR_SHARED_API QirBigInt* __quantum__rt__bigint_modulus(QirBigInt*, QirBigInt*); // NOLINT
 
     // Returns the big integer raised to the integer power.
-    QIR_SHARED_API QirBigInt* __quantum__rt__bigint_power(QirBigInt*, int); // NOLINT
+    QIR_SHARED_API QirBigInt* __quantum__rt__bigint_power(QirBigInt*, int32_t); // NOLINT
 
     // Returns the bitwise-AND of two big integers.
     QIR_SHARED_API QirBigInt* __quantum__rt__bigint_bitand(QirBigInt*, QirBigInt*); // NOLINT
@@ -188,10 +199,10 @@ extern "C"
     // Returns the bitwise complement of the big integer.
     QIR_SHARED_API QirBigInt* __quantum__rt__bigint_bitnot(QirBigInt*); // NOLINT
 
-    // Returns the big integer arithmetically shifted left by the integer amount of bits.
+    // Returns the big integer arithmetically shifted left by the (positive) integer amount of bits.
     QIR_SHARED_API QirBigInt* __quantum__rt__bigint_shiftleft(QirBigInt*, int64_t); // NOLINT
 
-    // Returns the big integer arithmetically shifted right by the integer amount of bits.
+    // Returns the big integer arithmetically shifted right by the (positive) integer amount of bits.
     QIR_SHARED_API QirBigInt* __quantum__rt__bigint_shiftright(QirBigInt*, int64_t); // NOLINT
 
     // Returns true if the two big integers are equal, false otherwise.
@@ -227,4 +238,6 @@ extern "C"
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
+
 #endif

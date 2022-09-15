@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-#![deny(clippy::all, clippy::pedantic)]
 
-// TODO: transition math functions to `__quantum__rt` once compiler support is ready.
+// TODO: transition math functions to `__quantum__rt` once compiler support is ready (https://github.com/microsoft/qsharp-compiler/issues/1557).
 
 use rand::Rng;
 use std::os::raw::c_double;

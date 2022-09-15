@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+#Requires -PSEdition Core
+
 $ErrorActionPreference = 'Stop'
 
 & "$PSScriptRoot/set-env.ps1"

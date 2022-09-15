@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-#![deny(clippy::all, clippy::pedantic)]
 
 use crate::{
     arrays::{
@@ -17,7 +16,7 @@ pub struct Callable {
     mem_table: *mut *mut u8,
     cap_tuple: *mut u8,
     is_adj: RefCell<bool>,
-    is_ctl: RefCell<u32>,
+    ctls_count: RefCell<u32>,
 }
 
 #[no_mangle]
@@ -31,13 +30,10 @@ pub extern "C" fn __quantum__rt__callable_create(
         mem_table,
         cap_tuple,
         is_adj: RefCell::new(false),
-        is_ctl: RefCell::new(0),
+        ctls_count: RefCell::new(0),
     }))
 }
 
-/// # Safety
-///
-/// This function should only be called with a callable created by `__quantum__rt__callable_*` functions.
 #[no_mangle]
 #[allow(clippy::cast_ptr_alignment)]
 pub unsafe extern "C" fn __quantum__rt__callable_invoke(
@@ -47,7 +43,7 @@ pub unsafe extern "C" fn __quantum__rt__callable_invoke(
 ) {
     let call = Rc::from_raw(callable);
     let index = (if *call.is_adj.borrow() { 1 } else { 0 })
-        + (if *call.is_ctl.borrow() > 0 { 2 } else { 0 });
+        + (if *call.ctls_count.borrow() > 0 { 2 } else { 0 });
 
     // Collect any nested controls into a single control list.
     let mut args_copy: *mut *const Vec<u8> = std::ptr::null_mut();
@@ -55,13 +51,13 @@ pub unsafe extern "C" fn __quantum__rt__callable_invoke(
         // Copy the tuple so we can potentially edit it.
         args_copy = __quantum__rt__tuple_copy(args_tup.cast::<*const Vec<u8>>(), true);
 
-        if *call.is_ctl.borrow() > 0 {
+        if *call.ctls_count.borrow() > 0 {
             // If there are any controls, increment the reference count on the control list. This is just
             // to balance the decrement that will happen in the loop and at the end of invoking the callable
             // to ensure the original, non-owned list does not get incorrectly cleaned up.
             __quantum__rt__array_update_reference_count(*args_copy.cast::<*const QirArray>(), 1);
 
-            let mut ctl_count = *call.is_ctl.borrow();
+            let mut ctl_count = *call.ctls_count.borrow();
             while ctl_count > 1 {
                 let ctls = *args_copy.cast::<*const QirArray>();
                 let inner_tuple = *args_copy
@@ -97,7 +93,7 @@ pub unsafe extern "C" fn __quantum__rt__callable_invoke(
         args_copy.cast::<u8>(),
         res_tup,
     );
-    if *call.is_ctl.borrow() > 0 {
+    if *call.ctls_count.borrow() > 0 {
         __quantum__rt__array_update_reference_count(*args_copy.cast::<*const QirArray>(), -1);
     }
     if !args_copy.is_null() {
@@ -106,9 +102,6 @@ pub unsafe extern "C" fn __quantum__rt__callable_invoke(
     let _ = Rc::into_raw(call);
 }
 
-/// # Safety
-///
-/// This function should only be called with a callable created by `__quantum__rt__callable_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__callable_copy(
     callable: *const Callable,
@@ -126,9 +119,6 @@ pub unsafe extern "C" fn __quantum__rt__callable_copy(
     }
 }
 
-/// # Safety
-///
-/// This function should only be called with a callable created by `__quantum__rt__callable_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__callable_make_adjoint(callable: *const Callable) {
     let call = Rc::from_raw(callable);
@@ -136,21 +126,13 @@ pub unsafe extern "C" fn __quantum__rt__callable_make_adjoint(callable: *const C
     let _ = Rc::into_raw(call);
 }
 
-/// # Safety
-///
-/// This function should only be called with a callable created by `__quantum__rt__callable_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__callable_make_controlled(callable: *const Callable) {
     let call = Rc::from_raw(callable);
-    let _ = call.is_ctl.replace_with(|&mut old| old + 1);
+    let _ = call.ctls_count.replace_with(|&mut old| old + 1);
     let _ = Rc::into_raw(call);
 }
 
-/// # Safety
-///
-/// This function should only be called with a callable created by `__quantum__rt__callable_*` functions.
-/// If the reference count after update is less than or equal to zero, the callable is cleaned up
-/// and the pointer is no longer valid.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__callable_update_reference_count(
     callable: *const Callable,
@@ -159,9 +141,6 @@ pub unsafe extern "C" fn __quantum__rt__callable_update_reference_count(
     update_counts(callable, update, false);
 }
 
-/// # Safety
-///
-/// This function should only be called with a callable created by `__quantum__rt__callable_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__callable_update_alias_count(
     callable: *const Callable,
@@ -170,11 +149,6 @@ pub unsafe extern "C" fn __quantum__rt__callable_update_alias_count(
     update_counts(callable, update, true);
 }
 
-/// # Safety
-///
-/// This function should only be called with a callable created by `__quantum__rt__callable_*` functions.
-/// If the reference count after update is less than or equal to zero, the capture tuple is cleaned up
-/// and the pointer is no longer valid.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__capture_update_reference_count(
     callable: *const Callable,
@@ -187,9 +161,6 @@ pub unsafe extern "C" fn __quantum__rt__capture_update_reference_count(
     let _ = Rc::into_raw(call);
 }
 
-/// # Safety
-///
-/// This function should only be called with a callable created by `__quantum__rt__callable_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__capture_update_alias_count(
     callable: *const Callable,

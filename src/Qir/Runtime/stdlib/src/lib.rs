@@ -1,8 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 #![deny(clippy::all, clippy::pedantic)]
+#![allow(clippy::missing_safety_doc)]
+#![allow(clippy::missing_panics_doc)]
 
-// Rust Implementation for Quantum Intermediate Representation
+//! # Rust Implementation for Quantum Intermediate Representation
+//! This library implements the classical runtime functions described in the [QIR specification](https://github.com/qir-alliance/qir-spec).
+
+// FUTURE: We should add microbenchmarks to verify behavior of these APIs and have a baseline on how changes affect
+// peformance of the APIs.
 
 pub mod arrays;
 pub mod bigints;
@@ -62,29 +68,23 @@ pub enum Pauli {
     Y = 3,
 }
 
-/// # Panics
-///
-/// Will panic if unable to allocate memory.
 #[no_mangle]
 pub extern "C" fn __quantum__rt__memory_allocate(size: u64) -> *mut u8 {
-    (vec![0_u8; size.try_into().unwrap()]).leak().as_mut_ptr()
+    (vec![
+        0_u8;
+        size.try_into()
+            .expect("Memory size is too large for `usize` type on this platform.")
+    ])
+    .leak()
+    .as_mut_ptr()
 }
 
-/// # Safety
-///
-/// This function should only be called with a string created by `__quantum__rt__string_*` functions.
-/// # Panics
-///
-/// Panics unconditionally with the given message.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__fail(str: *const CString) {
     __quantum__rt__message(str);
     panic!("{}", (*str).to_str().expect("Unable to convert string"));
 }
 
-/// # Safety
-///
-/// This function should only be called with a string created by `__quantum__rt__string_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__message(str: *const CString) {
     println!("{}", (*str).to_str().expect("Unable to convert string"));

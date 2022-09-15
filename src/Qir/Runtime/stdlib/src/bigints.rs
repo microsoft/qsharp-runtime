@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-#![deny(clippy::all, clippy::pedantic)]
 
 use crate::update_counts;
 use num_bigint::BigInt;
@@ -11,10 +10,6 @@ pub extern "C" fn __quantum__rt__bigint_create_i64(input: i64) -> *const BigInt 
     Rc::into_raw(Rc::new(input.into()))
 }
 
-/// # Safety
-///
-/// This function expects the second argument to be a well-formed C-style array of signed big-endian bytes
-/// with the size of that array passed as the first argument.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_create_array(
     size: u32,
@@ -25,31 +20,18 @@ pub unsafe extern "C" fn __quantum__rt__bigint_create_array(
     )))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_get_data(input: *const BigInt) -> *const u8 {
     ManuallyDrop::new((*input).to_signed_bytes_be()).as_ptr()
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
-/// # Panics
-///
-/// This function will panic if the length of the QIR bigint as an array is larger than can fit in a u32.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_get_length(input: *const BigInt) -> u32 {
     let size = (*input).to_signed_bytes_be().len();
-    size.try_into().unwrap()
+    size.try_into()
+        .expect("Length of bigint representation too large for 32-bit integer.")
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
-/// If the reference count after update is less than or equal to zero, the QIR bigint is cleaned up
-/// and the pointer is no longer valid.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_update_reference_count(
     input: *const BigInt,
@@ -58,17 +40,11 @@ pub unsafe extern "C" fn __quantum__rt__bigint_update_reference_count(
     update_counts(input, update, false);
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_negate(input: *const BigInt) -> *const BigInt {
     Rc::into_raw(Rc::new(&(*input) * -1))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_add(
     lhs: *const BigInt,
@@ -77,9 +53,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_add(
     Rc::into_raw(Rc::new(&(*lhs) + &(*rhs)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_subtract(
     lhs: *const BigInt,
@@ -88,9 +61,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_subtract(
     Rc::into_raw(Rc::new(&(*lhs) - &(*rhs)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_multiply(
     lhs: *const BigInt,
@@ -99,9 +69,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_multiply(
     Rc::into_raw(Rc::new(&(*lhs) * &(*rhs)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_divide(
     lhs: *const BigInt,
@@ -110,9 +77,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_divide(
     Rc::into_raw(Rc::new(&(*lhs) / &(*rhs)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_modulus(
     lhs: *const BigInt,
@@ -121,9 +85,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_modulus(
     Rc::into_raw(Rc::new(&(*lhs) % &(*rhs)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_power(
     base: *const BigInt,
@@ -132,9 +93,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_power(
     Rc::into_raw(Rc::new((*base).pow(exponent)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_bitand(
     lhs: *const BigInt,
@@ -143,9 +101,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_bitand(
     Rc::into_raw(Rc::new(&(*lhs) & &(*rhs)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_bitor(
     lhs: *const BigInt,
@@ -154,9 +109,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_bitor(
     Rc::into_raw(Rc::new(&(*lhs) | &(*rhs)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_bitxor(
     lhs: *const BigInt,
@@ -165,17 +117,11 @@ pub unsafe extern "C" fn __quantum__rt__bigint_bitxor(
     Rc::into_raw(Rc::new(&(*lhs) ^ &(*rhs)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_bitnot(input: *const BigInt) -> *const BigInt {
     Rc::into_raw(Rc::new(!&(*input)))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_shiftleft(
     input: *const BigInt,
@@ -184,9 +130,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_shiftleft(
     Rc::into_raw(Rc::new(&(*input) << amount))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_shiftright(
     input: *const BigInt,
@@ -195,9 +138,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_shiftright(
     Rc::into_raw(Rc::new(&(*input) >> amount))
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_equal(
     lhs: *const BigInt,
@@ -206,9 +146,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_equal(
     (*lhs) == (*rhs)
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_greater(
     lhs: *const BigInt,
@@ -217,9 +154,6 @@ pub unsafe extern "C" fn __quantum__rt__bigint_greater(
     (*lhs) > (*rhs)
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_greater_eq(
     lhs: *const BigInt,
@@ -275,15 +209,16 @@ mod tests {
             assert_eq!(*bigint_7, (-42).try_into().unwrap());
             let bigint_8 = __quantum__rt__bigint_power(bigint_7, 3);
             assert_eq!(*bigint_8, (-74088).try_into().unwrap());
-            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_2, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_3, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_5, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_6, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_7, -1);
             __quantum__rt__bigint_update_reference_count(bigint_8, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_7, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_6, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_5, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_3, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_2, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
         }
     }
 
@@ -304,14 +239,15 @@ mod tests {
             assert_eq!(*bigint_6, (168).try_into().unwrap());
             let bigint_7 = __quantum__rt__bigint_shiftright(bigint_6, 3);
             assert_eq!(*bigint_7, (21).try_into().unwrap());
-            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_2, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_3, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_5, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_6, -1);
             __quantum__rt__bigint_update_reference_count(bigint_7, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_6, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_5, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_3, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_2, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
         }
     }
 
@@ -327,9 +263,9 @@ mod tests {
             assert!(__quantum__rt__bigint_greater_eq(bigint_0, bigint_2));
             assert!(__quantum__rt__bigint_greater_eq(bigint_1, bigint_2));
             assert!(!__quantum__rt__bigint_greater_eq(bigint_0, bigint_1));
-            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
             __quantum__rt__bigint_update_reference_count(bigint_2, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_1, -1);
+            __quantum__rt__bigint_update_reference_count(bigint_0, -1);
         }
     }
 }

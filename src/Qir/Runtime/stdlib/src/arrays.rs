@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-#![deny(clippy::all, clippy::pedantic)]
 
-use crate::update_counts;
+use crate::{__quantum__rt__fail, strings::convert, update_counts};
 use std::{rc::Rc, usize};
 
 #[derive(Debug, Clone)]
@@ -11,21 +10,18 @@ pub struct QirArray {
     pub(crate) data: Vec<u8>,
 }
 
-/// # Panics
-///
-/// This function panics if the passed in sizes do not fit into the usize type for the
-/// current platform.
 #[no_mangle]
-pub extern "C" fn __quantum__rt__array_create_1d(elem_size: u32, size: u64) -> *const QirArray {
-    let elem_size = elem_size.try_into().unwrap();
-    let size: usize = size.try_into().unwrap();
-    let data = vec![0_u8; elem_size * size];
+pub extern "C" fn __quantum__rt__array_create_1d(elem_size: u32, count: u64) -> *const QirArray {
+    let elem_size = elem_size
+        .try_into()
+        .expect("The `elem_size` argument should fit in the `usize` type for this platform.");
+    let count: usize = count
+        .try_into()
+        .expect("The `count` argument should fit in the `usize` type for this platform.");
+    let data = vec![0_u8; elem_size * count];
     Rc::into_raw(Rc::new(QirArray { elem_size, data }))
 }
 
-/// # Safety
-///
-/// This function should only be called with an array created by `__quantum__rt__array_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_copy(
     arr: *const QirArray,
@@ -34,21 +30,15 @@ pub unsafe extern "C" fn __quantum__rt__array_copy(
     let rc = Rc::from_raw(arr);
     if force || Rc::weak_count(&rc) > 0 {
         let copy = rc.as_ref().clone();
-        let _ = Rc::into_raw(rc);
+        Rc::into_raw(rc);
         Rc::into_raw(Rc::new(copy))
     } else {
-        let _ = Rc::into_raw(Rc::clone(&rc));
-        let _ = Rc::into_raw(rc);
+        Rc::into_raw(Rc::clone(&rc));
+        Rc::into_raw(rc);
         arr
     }
 }
 
-/// # Safety
-///
-/// This function should only be called with arrays created by `__quantum__rt__array_*` functions.
-/// # Panics
-///
-/// This function will panic if the given arrays use different element sizes.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_concatenate(
     arr1: *const QirArray,
@@ -56,12 +46,12 @@ pub unsafe extern "C" fn __quantum__rt__array_concatenate(
 ) -> *const QirArray {
     let array1 = Rc::from_raw(arr1);
     let array2 = Rc::from_raw(arr2);
-    assert!(
-        array1.elem_size == array2.elem_size,
-        "Cannot concatenate arrays with differing element sizes: {} vs {}",
-        array1.elem_size,
-        array2.elem_size
-    );
+    if array1.elem_size != array2.elem_size {
+        __quantum__rt__fail(convert(&format!(
+            "Cannot concatenate arrays with differing element sizes: {} vs {}",
+            array1.elem_size, array2.elem_size
+        )));
+    }
 
     let mut new_array = QirArray {
         elem_size: array1.elem_size,
@@ -75,48 +65,34 @@ pub unsafe extern "C" fn __quantum__rt__array_concatenate(
     copy.copy_from_slice(array2.data.as_slice());
 
     new_array.data.append(&mut copy);
-    let _ = Rc::into_raw(array1);
-    let _ = Rc::into_raw(array2);
+    Rc::into_raw(array1);
+    Rc::into_raw(array2);
     Rc::into_raw(Rc::new(new_array))
 }
 
-/// # Safety
-///
-/// This function should only be called with an array created by `__quantum__rt__array_*` functions.
-/// # Panics
-///
-/// This function panics if the array size is larger than u64. This shouldn't happen.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_get_size_1d(arr: *const QirArray) -> u64 {
     let array = Rc::from_raw(arr);
-    let size = array.data.len() / array.elem_size;
-    let _ = Rc::into_raw(array);
-    size.try_into().unwrap()
+    let len = array.data.len() / array.elem_size;
+    Rc::into_raw(array);
+    len.try_into()
+        .expect("Length of array should always fit in a 64-bit integer.")
 }
 
-/// # Safety
-///
-/// This function should only be called with an array created by `__quantum__rt__array_*` functions.
-/// # Panics
-///
-/// This function panics if the given index is larger than the usize type for the current platform.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_get_element_ptr_1d(
     arr: *const QirArray,
     index: u64,
 ) -> *mut i8 {
     let array = Rc::from_raw(arr);
-    let i: usize = index.try_into().unwrap();
-    let ptr = array.data.as_ptr().add(array.elem_size * i) as *mut i8;
-    let _ = Rc::into_raw(array);
+    let index: usize = index
+        .try_into()
+        .expect("Indices into an array should fit into the `usize` ");
+    let ptr = array.data.as_ptr().add(array.elem_size * index) as *mut i8;
+    Rc::into_raw(array);
     ptr
 }
 
-/// # Safety
-///
-/// This function should only be called with an array created by `__quantum__rt__array_*` functions.
-/// If the reference count after update is less than or equal to zero, the array is cleaned up
-/// and the pointer is no longer valid.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_update_reference_count(
     arr: *const QirArray,
@@ -125,9 +101,6 @@ pub unsafe extern "C" fn __quantum__rt__array_update_reference_count(
     update_counts(arr, update, false);
 }
 
-/// # Safety
-///
-/// This function should only be called with an array created by `__quantum__rt__array_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_update_alias_count(
     arr: *const QirArray,

@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+#Requires -PSEdition Core
+
 $ErrorActionPreference = 'Stop'
 
 Push-Location (Join-Path $PSScriptRoot "build")

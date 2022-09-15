@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-#![deny(clippy::all, clippy::pedantic)]
 
 use crate::update_counts;
 use crate::Pauli;
@@ -11,39 +10,26 @@ use std::{
     rc::Rc,
 };
 
-/// # Safety
-///
-/// This function should only be called with a valid, null-terminated, C-style string.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__string_create(str: *mut c_char) -> *const CString {
     let cstring = CString::new(CStr::from_ptr(str).to_owned()).expect("Failed to create %String");
     Rc::into_raw(Rc::new(cstring))
 }
 
-/// # Safety
-///
-/// This function should only be called with a string created by `__quantum__rt__string_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__string_get_data(str: *const CString) -> *const c_char {
     (*str).as_bytes_with_nul().as_ptr().cast::<i8>()
 }
 
-/// # Safety
-///
-/// This function should only be called with a string created by `__quantum__rt__string_*` functions.
-/// # Panics
-///
-/// Will panic if length is larger than will fit in an 32-bit integer.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__string_get_length(str: *const CString) -> u32 {
-    (*str).as_bytes().len().try_into().unwrap()
+    (*str)
+        .as_bytes()
+        .len()
+        .try_into()
+        .expect("String length is too large for 32-bit integer.")
 }
 
-/// # Safety
-///
-/// This function should only be called with a string created by `__quantum__rt__string_*` functions.
-/// If the reference count after update is less than or equal to zero, the string is cleaned up
-/// and the pointer is no longer valid.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__string_update_reference_count(
     str: *const CString,
@@ -52,9 +38,6 @@ pub unsafe extern "C" fn __quantum__rt__string_update_reference_count(
     update_counts(str, update, false);
 }
 
-/// # Safety
-///
-/// This function should only be called with strings created by `__quantum__rt__string_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__string_concatenate(
     s1: *const CString,
@@ -68,9 +51,6 @@ pub unsafe extern "C" fn __quantum__rt__string_concatenate(
     ))
 }
 
-/// # Safety
-///
-/// This function should only be called with strings created by `__quantum__rt__string_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__string_equal(
     s1: *const CString,
@@ -86,7 +66,7 @@ where
     unsafe {
         __quantum__rt__string_create(
             CString::new(input.to_string())
-                .unwrap()
+                .expect("Unable to allocate string for conversion.")
                 .as_bytes_with_nul()
                 .as_ptr() as *mut i8,
         )
@@ -98,15 +78,19 @@ pub extern "C" fn __quantum__rt__int_to_string(input: i64) -> *const CString {
     convert(&input)
 }
 
-#[no_mangle]
-pub extern "C" fn __quantum__rt__double_to_string(input: c_double) -> *const CString {
+pub(crate) fn double_to_string(input: c_double) -> String {
     if (input.floor() - input.ceil()).abs() < c_double::EPSILON {
         // The value is a whole number, which by convention is displayed with one decimal point
         // to differentiate it from an integer value.
-        convert(&format!("{:.1}", input))
+        format!("{:.1}", input)
     } else {
-        convert(&input)
+        format!("{}", input)
     }
+}
+
+#[no_mangle]
+pub extern "C" fn __quantum__rt__double_to_string(input: c_double) -> *const CString {
+    convert(&double_to_string(input))
 }
 
 #[no_mangle]
@@ -124,9 +108,6 @@ pub extern "C" fn __quantum__rt__pauli_to_string(input: Pauli) -> *const CString
     }
 }
 
-/// # Safety
-///
-/// This function should only be called with a QIR bigint created by the `__quantum__rt__bigint_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__bigint_to_string(input: *const BigInt) -> *const CString {
     convert(&*input)

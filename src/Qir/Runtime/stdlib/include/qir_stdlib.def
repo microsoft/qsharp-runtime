@@ -1,3 +1,9 @@
+; Copyright (c) Microsoft Corporation.
+; Licensed under the MIT License.
+
+; This file lists the APIs defined by the qir_stdlib so that they can be re-exported on Windows platforms.
+; See https://docs.microsoft.com/en-us/cpp/build/exporting-from-a-dll-using-def-files
+
 EXPORTS
     __quantum__rt__memory_allocate
     __quantum__rt__fail

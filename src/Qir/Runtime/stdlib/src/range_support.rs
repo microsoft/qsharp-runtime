@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-#![deny(clippy::all, clippy::pedantic)]
 
 // Functionality in this file can be removed when range support is dropped from the QIR runtime.
 
@@ -25,20 +24,16 @@ pub extern "C" fn quantum__rt__range_to_string(input: Range) -> *const CString {
     convert(&range_str)
 }
 
-/// # Safety
-///
-/// This function should only be called with an array created by `__quantum__rt__array_*` functions.
-/// # Panics
-///
-/// This function will panic if the item size in the array or the range step size is larger than what can be stored in an
-/// u64. This should never happen.
 #[no_mangle]
 pub unsafe extern "C" fn quantum__rt__array_slice_1d(
     arr: *const QirArray,
     range: Range,
 ) -> *const QirArray {
     let array = Rc::from_raw(arr);
-    let item_size: i64 = array.elem_size.try_into().unwrap();
+    let item_size: i64 = array
+        .elem_size
+        .try_into()
+        .expect("Array element size too large for `usize` type on this platform.");
     let mut slice = QirArray {
         elem_size: array.elem_size,
         data: Vec::new(),
@@ -50,8 +45,12 @@ pub unsafe extern "C" fn quantum__rt__array_slice_1d(
     };
 
     let step: i64 = range.step.abs();
-    for i in iter.step_by((step * item_size).try_into().unwrap()) {
-        let index = i.try_into().unwrap();
+    for i in iter.step_by((step * item_size).try_into().expect(
+        "Range step multiplied by item size is too large for `usize` type on this platform",
+    )) {
+        let index = i
+            .try_into()
+            .expect("Item index too large for `usize` type on this platform.");
         let mut copy = Vec::new();
         copy.resize(array.elem_size, 0_u8);
         copy.copy_from_slice(&array.data[index..index + array.elem_size]);

@@ -1,19 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-#![deny(clippy::all, clippy::pedantic)]
 
 use crate::update_counts;
 use std::{mem::size_of, rc::Rc, usize};
 
-/// # Panics
-///
-/// Will panic if the given size is larger than pointer width for the platform.
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
 pub extern "C" fn __quantum__rt__tuple_create(size: u64) -> *mut *const Vec<u8> {
     let mut mem = vec![
         0_u8;
-        <usize as std::convert::TryFrom<u64>>::try_from(size).unwrap()
+        <usize as std::convert::TryFrom<u64>>::try_from(size)
+            .expect("Tuple size too large for `usize` type on this platform.")
             + size_of::<*const Vec<u8>>()
     ];
 
@@ -24,9 +21,6 @@ pub extern "C" fn __quantum__rt__tuple_create(size: u64) -> *mut *const Vec<u8> 
     }
 }
 
-/// # Safety
-///
-/// This function should only be called with a tuple created by `__quantum__rt__tuple_*` functions.
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__tuple_copy(
@@ -47,11 +41,6 @@ pub unsafe extern "C" fn __quantum__rt__tuple_copy(
     }
 }
 
-/// # Safety
-///
-/// This function should only be called with a tuple created by `__quantum__rt__tuple_*` functions.
-/// If the reference count after update is less than or equal to zero, the tuple is be cleaned up
-/// and the pointer is no longer be valid.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__tuple_update_reference_count(
     raw_tup: *mut *const Vec<u8>,
@@ -60,9 +49,6 @@ pub unsafe extern "C" fn __quantum__rt__tuple_update_reference_count(
     update_counts(*raw_tup.wrapping_sub(1), update, false);
 }
 
-/// # Safety
-///
-/// This function should only be called with a tuple created by `__quantum__rt__tuple_*` functions.
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__tuple_update_alias_count(
     raw_tup: *mut *const Vec<u8>,

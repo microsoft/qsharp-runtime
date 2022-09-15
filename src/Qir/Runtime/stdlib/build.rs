@@ -9,13 +9,15 @@ use llvm_tools::LlvmTools;
 
 fn main() -> Result<(), String> {
     // Compile the LLVM IR bridge file. Requires the llvm-tools-preview component.
+    // This is only needed for range support, and this entire build.rs can be dropped when that functionality is
+    // no longer needed.
     let out_dir = env::var_os("OUT_DIR")
         .map(PathBuf::from)
         .ok_or_else(|| "Environment variable OUT_DIR not defined.".to_string())?;
 
     let llvm_tools = LlvmTools::new().map_err(|err| {
         format!(
-            "Failed to locate llvm tools: {:?}. Is the llvm-tools-preview component installed?",
+            "Failed to locate llvm tools: {:?}. Is the llvm-tools-preview component installed? Try using `rustup component add llvm-tools-preview`.",
             err
         )
     })?;
