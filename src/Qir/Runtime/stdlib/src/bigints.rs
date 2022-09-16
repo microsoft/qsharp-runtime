@@ -214,7 +214,6 @@ mod tests {
             __quantum__rt__bigint_update_reference_count(bigint_6, -1);
             __quantum__rt__bigint_update_reference_count(bigint_5, -1);
             __quantum__rt__bigint_update_reference_count(bigint_4, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
             __quantum__rt__bigint_update_reference_count(bigint_3, -1);
             __quantum__rt__bigint_update_reference_count(bigint_2, -1);
             __quantum__rt__bigint_update_reference_count(bigint_1, -1);
@@ -242,7 +241,6 @@ mod tests {
             __quantum__rt__bigint_update_reference_count(bigint_7, -1);
             __quantum__rt__bigint_update_reference_count(bigint_6, -1);
             __quantum__rt__bigint_update_reference_count(bigint_5, -1);
-            __quantum__rt__bigint_update_reference_count(bigint_4, -1);
             __quantum__rt__bigint_update_reference_count(bigint_4, -1);
             __quantum__rt__bigint_update_reference_count(bigint_3, -1);
             __quantum__rt__bigint_update_reference_count(bigint_2, -1);
