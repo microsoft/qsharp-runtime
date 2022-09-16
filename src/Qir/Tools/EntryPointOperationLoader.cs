@@ -27,7 +27,7 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
             return module.Functions
                 .Where(f =>
                     f.Attributes.ContainsKey(LlvmBindings.Values.FunctionAttributeIndex.Function)
-                    && f.Attributes[LlvmBindings.Values.FunctionAttributeIndex.Function].Any(a => a.Name == "EntryPoint"))
+                    && f.Attributes[LlvmBindings.Values.FunctionAttributeIndex.Function].Any(a => a.Name == "InteropFriendly"))
                 .Select(ep => new EntryPointOperation()
                 {
                     Name = ep.Name,
