@@ -23,13 +23,11 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools
         /// <param name="libraryDirectories">Directory where the libraries to link to are located.</param>
         /// <param name="includeDirectories">Directory where the headers needed for compilation are located.</param>
         /// <param name="executablesDirectory">Directory where the created executables are placed.</param>
-        /// <param name="debug">Ignored.</param>
         public static async Task BuildFromQSharpDll(
             FileInfo qsharpDll,
             IList<DirectoryInfo> libraryDirectories,
             IList<DirectoryInfo> includeDirectories,
-            DirectoryInfo executablesDirectory,
-            bool debug)
+            DirectoryInfo executablesDirectory)
         {
             using var qirContentStream = new MemoryStream();
             if (!AssemblyLoader.LoadQirBitcode(qsharpDll, qirContentStream))

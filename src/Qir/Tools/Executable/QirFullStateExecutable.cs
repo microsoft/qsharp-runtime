@@ -20,9 +20,10 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
     {
         public override string DriverFileExtension => "cpp";
 
-        public override IList<string> LinkLibraries => new List<string> {
-                "Microsoft.Quantum.Simulator.Runtime"
-            };
+        public override IList<string> LinkLibraries => new List<string>
+        {
+            "Microsoft.Quantum.Simulator.Runtime"
+        };
 
         public override IList<DirectoryInfo> HeaderDirectories { get; } = new List<DirectoryInfo>();
 

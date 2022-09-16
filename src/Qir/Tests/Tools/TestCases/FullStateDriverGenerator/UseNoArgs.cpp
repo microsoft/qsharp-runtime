@@ -22,7 +22,6 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point");
 
-    // Initialize runtime.
     // After all the options have been added, parse arguments from the command line.
     CLI11_PARSE(app, argc, argv);
 

@@ -115,6 +115,8 @@ pub unsafe extern "C" fn __quantum__rt__bigint_to_string(input: *const BigInt) -
 
 #[cfg(test)]
 mod tests {
+    use std::mem::ManuallyDrop;
+
     use super::*;
     use crate::bigints::{
         __quantum__rt__bigint_create_i64, __quantum__rt__bigint_update_reference_count,
@@ -182,13 +184,12 @@ mod tests {
             let str = __quantum__rt__string_create(
                 CString::new("Data").unwrap().as_bytes_with_nul().as_ptr() as *mut i8,
             );
-            let rc = Rc::from_raw(str);
+            let rc = ManuallyDrop::new(Rc::from_raw(str));
             assert_eq!(Rc::strong_count(&rc), 1);
             __quantum__rt__string_update_reference_count(str, 2);
             assert_eq!(Rc::strong_count(&rc), 3);
             __quantum__rt__string_update_reference_count(str, -2);
             assert_eq!(Rc::strong_count(&rc), 1);
-            let _ = Rc::into_raw(rc);
             __quantum__rt__string_update_reference_count(str, -1);
         }
     }
@@ -207,9 +208,8 @@ mod tests {
             );
             let str3 = __quantum__rt__string_concatenate(str1, str2);
             // Concatenated string should have combined value.
-            let rc = Rc::from_raw(str3);
+            let rc = ManuallyDrop::new(Rc::from_raw(str3));
             assert_eq!(Rc::strong_count(&rc), 1);
-            let _ = Rc::into_raw(rc);
             assert_eq!(
                 CStr::from_ptr(__quantum__rt__string_get_data(str3))
                     .to_str()
@@ -218,9 +218,8 @@ mod tests {
             );
             __quantum__rt__string_update_reference_count(str3, -1);
             // After decrement and drop, original strings should still be valid.
-            let rc = Rc::from_raw(str2);
+            let rc = ManuallyDrop::new(Rc::from_raw(str2));
             assert_eq!(Rc::strong_count(&rc), 1);
-            let _ = Rc::into_raw(rc);
             assert_eq!(
                 CStr::from_ptr(__quantum__rt__string_get_data(str2))
                     .to_str()
@@ -228,9 +227,8 @@ mod tests {
                 ", World!"
             );
             __quantum__rt__string_update_reference_count(str2, -1);
-            let rc = Rc::from_raw(str1);
+            let rc = ManuallyDrop::new(Rc::from_raw(str1));
             assert_eq!(Rc::strong_count(&rc), 1);
-            let _ = Rc::into_raw(rc);
             assert_eq!(
                 CStr::from_ptr(__quantum__rt__string_get_data(str1))
                     .to_str()
@@ -259,9 +257,8 @@ mod tests {
             assert!(__quantum__rt__string_equal(str1, str2));
             assert!(!__quantum__rt__string_equal(str1, str3));
             // Confirm data is still valid and not consumed by the check.
-            let rc = Rc::from_raw(str3);
+            let rc = ManuallyDrop::new(Rc::from_raw(str3));
             assert_eq!(Rc::strong_count(&rc), 1);
-            let _ = Rc::into_raw(rc);
             assert_eq!(
                 CStr::from_ptr(__quantum__rt__string_get_data(str3))
                     .to_str()
@@ -269,9 +266,8 @@ mod tests {
                 "Not Data"
             );
             __quantum__rt__string_update_reference_count(str3, -1);
-            let rc = Rc::from_raw(str2);
+            let rc = ManuallyDrop::new(Rc::from_raw(str2));
             assert_eq!(Rc::strong_count(&rc), 1);
-            let _ = Rc::into_raw(rc);
             assert_eq!(
                 CStr::from_ptr(__quantum__rt__string_get_data(str2))
                     .to_str()
@@ -279,9 +275,8 @@ mod tests {
                 "Data"
             );
             __quantum__rt__string_update_reference_count(str2, -1);
-            let rc = Rc::from_raw(str1);
+            let rc = ManuallyDrop::new(Rc::from_raw(str1));
             assert_eq!(Rc::strong_count(&rc), 1);
-            let _ = Rc::into_raw(rc);
             assert_eq!(
                 CStr::from_ptr(__quantum__rt__string_get_data(str1))
                     .to_str()

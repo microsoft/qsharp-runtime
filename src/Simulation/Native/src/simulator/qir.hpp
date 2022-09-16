@@ -31,32 +31,38 @@ typedef intptr_t QubitIdType;
 
 class RESULT;
 
-struct QirRTuple
-{
-    PauliId pauli;
-    double angle;
-    QUBIT* target;
-};
-
-struct QirExpTuple
-{
-    QirArray* paulis;
-    double angle;
-    QirArray* targets;
-};
-
-struct QirAssertMeasurementProbabilityTuple
-{
-    QirArray* bases;
-    QirArray* qubits;
-    RESULT* result;
-    double prob;
-    QirString* msg;
-    double tol;
-};
-
 extern "C"
 {
+    // This struct matches the argument tuple for a controlled R specialization in Q#. It must
+    // be kept in sync with src\Simulation\TargetDefinitions\Intrinsic\R.qs and Q# compiler behavior.
+    typedef struct
+    {
+        PauliId pauli;
+        double angle;
+        QUBIT* target;
+    } QirRTuple;
+
+    // This struct matches the argument tuple for a controlled Exp specialization in Q#. It must
+    // be kept in sync with src\Simulation\TargetDefinitions\Intrinsic\Exp.qs and Q# compiler behavior.
+    typedef struct
+    {
+        QirArray* paulis;
+        double angle;
+        QirArray* targets;
+    } QirExpTuple;
+
+    // This struct matches the argument tuple for a controlled AsssertMeasurementProbability specialization in Q#. It must
+    // be kept in sync with src\Simulation\QSharpFoundation\Diagnostics\Assert.qs and Q# compiler behavior.
+    typedef struct
+    {
+        QirArray* bases;
+        QirArray* qubits;
+        RESULT* result;
+        double prob;
+        QirString* msg;
+        double tol;
+    } QirAssertMeasurementProbabilityTuple;
+
     // Quantum Runtime
     QIR_EXPORT_API QUBIT* __quantum__rt__qubit_allocate();                              // NOLINT
     QIR_EXPORT_API QirArray* __quantum__rt__qubit_allocate_array(int64_t count);        // NOLINT

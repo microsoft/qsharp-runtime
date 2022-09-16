@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point");
 
-    // Initialize runtime.
     // Add a command line option for each entry-point parameter.
     string StringArgCli;
     app.add_option("--StringArg", StringArgCli, "Option to provide a value for the StringArg parameter")

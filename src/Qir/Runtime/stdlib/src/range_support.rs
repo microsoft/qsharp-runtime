@@ -29,7 +29,7 @@ pub unsafe extern "C" fn quantum__rt__array_slice_1d(
     arr: *const QirArray,
     range: Range,
 ) -> *const QirArray {
-    let array = Rc::from_raw(arr);
+    let array = &*arr;
     let item_size: i64 = array
         .elem_size
         .try_into()
@@ -57,7 +57,6 @@ pub unsafe extern "C" fn quantum__rt__array_slice_1d(
         slice.data.append(&mut copy);
     }
 
-    let _ = Rc::into_raw(array);
     Rc::into_raw(Rc::new(slice))
 }
 

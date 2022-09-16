@@ -152,7 +152,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write("\r\n");
  } 
             this.Write("); // QIR interop function.\r\n\r\nint main(int argc, char* argv[])\r\n{\r\n    CLI::App " +
-                    "app(\"QIR Standalone Entry Point\");\r\n\r\n    // Initialize runtime.\r\n");
+                    "app(\"QIR Standalone Entry Point\");\r\n\r\n");
  var initializerReader = new StringReader(RuntimeInitializer.Generate());
    string line;
    while((line = initializerReader.ReadLine()) != null) { 

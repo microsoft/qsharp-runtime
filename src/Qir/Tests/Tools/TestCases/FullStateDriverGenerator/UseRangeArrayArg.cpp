@@ -89,7 +89,6 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point");
 
-    // Initialize runtime.
     // Add a command line option for each entry-point parameter.
     vector<RangeTuple> RangeArrayArgCli;
     app.add_option("--RangeArrayArg", RangeArrayArgCli, "Option to provide a value for the RangeArrayArg parameter")

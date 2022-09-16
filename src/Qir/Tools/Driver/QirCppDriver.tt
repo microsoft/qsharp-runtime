@@ -149,7 +149,6 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point");
 
-    // Initialize runtime.
 <# var initializerReader = new StringReader(RuntimeInitializer.Generate());
    string line;
    while((line = initializerReader.ReadLine()) != null) { #>

@@ -21,6 +21,7 @@ pub mod tuples;
 
 use std::{
     ffi::CString,
+    mem::{self, ManuallyDrop},
     rc::{Rc, Weak},
 };
 
@@ -28,34 +29,30 @@ use std::{
 unsafe fn update_counts<T>(raw_rc: *const T, update: i32, is_alias: bool) {
     let mut remaining = update;
     while remaining != 0 {
-        let rc = Rc::from_raw(raw_rc);
+        let rc = ManuallyDrop::new(Rc::from_raw(raw_rc));
         if remaining > 0 {
-            // Create and leak new instances to increment the count on the contained item.
             if is_alias {
-                let _ = Weak::into_raw(Rc::downgrade(&rc));
+                // Create and leak new downgraded instances to increment the weak count on the contained item.
+                mem::forget(Rc::downgrade(&rc));
             } else {
-                let _ = Rc::into_raw(Rc::clone(&rc));
+                Rc::increment_strong_count(raw_rc);
             }
 
             remaining -= 1;
         } else {
-            // Create and drop instances to decrement the count on contained item.
             if is_alias {
+                // Create and drop downgraded instances to decrement the weak count on contained item.
                 let w = Weak::into_raw(Rc::downgrade(&rc));
 
                 // Need to drop two for a net decrement, since above line increments.
                 drop(Weak::from_raw(w));
                 drop(Weak::from_raw(w));
             } else {
-                drop(Rc::from_raw(raw_rc));
+                Rc::decrement_strong_count(raw_rc);
             }
 
             remaining += 1;
         }
-
-        // To make sure the local Rc does not decrement the underlying count when it goes out of scope,
-        // it must be converted into a raw pointer first.
-        let _ = Rc::into_raw(rc);
     }
 }
 

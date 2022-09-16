@@ -8,7 +8,7 @@ use crate::{
     tuples::{__quantum__rt__tuple_copy, __quantum__rt__tuple_update_reference_count},
     update_counts,
 };
-use std::{cell::RefCell, rc::Rc, usize};
+use std::{cell::RefCell, mem::ManuallyDrop, rc::Rc, usize};
 
 #[derive(Clone)]
 pub struct Callable {
@@ -41,7 +41,7 @@ pub unsafe extern "C" fn __quantum__rt__callable_invoke(
     args_tup: *mut u8,
     res_tup: *mut u8,
 ) {
-    let call = Rc::from_raw(callable);
+    let call = &*callable;
     let index = (if *call.is_adj.borrow() { 1 } else { 0 })
         + (if *call.ctls_count.borrow() > 0 { 2 } else { 0 });
 
@@ -99,7 +99,6 @@ pub unsafe extern "C" fn __quantum__rt__callable_invoke(
     if !args_copy.is_null() {
         __quantum__rt__tuple_update_reference_count(args_copy, -1);
     }
-    let _ = Rc::into_raw(call);
 }
 
 #[no_mangle]
@@ -107,30 +106,26 @@ pub unsafe extern "C" fn __quantum__rt__callable_copy(
     callable: *const Callable,
     force: bool,
 ) -> *const Callable {
-    let rc = Rc::from_raw(callable);
+    let rc = ManuallyDrop::new(Rc::from_raw(callable));
     if force || Rc::weak_count(&rc) > 0 {
         let copy = rc.as_ref().clone();
-        let _ = Rc::into_raw(rc);
         Rc::into_raw(Rc::new(copy))
     } else {
-        let _ = Rc::into_raw(Rc::clone(&rc));
-        let _ = Rc::into_raw(rc);
+        Rc::into_raw(Rc::clone(&rc));
         callable
     }
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__callable_make_adjoint(callable: *const Callable) {
-    let call = Rc::from_raw(callable);
-    let _ = call.is_adj.replace_with(|&mut old| !old);
-    let _ = Rc::into_raw(call);
+    let call = &*callable;
+    call.is_adj.replace_with(|&mut old| !old);
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__callable_make_controlled(callable: *const Callable) {
-    let call = Rc::from_raw(callable);
-    let _ = call.ctls_count.replace_with(|&mut old| old + 1);
-    let _ = Rc::into_raw(call);
+    let call = &*callable;
+    call.ctls_count.replace_with(|&mut old| old + 1);
 }
 
 #[no_mangle]
@@ -154,11 +149,10 @@ pub unsafe extern "C" fn __quantum__rt__capture_update_reference_count(
     callable: *const Callable,
     update: i32,
 ) {
-    let call = Rc::from_raw(callable);
+    let call = &*callable;
     if !call.mem_table.is_null() && !(*(call.mem_table)).is_null() {
         (*call.mem_table.cast::<extern "C" fn(*mut u8, i32)>())(call.cap_tuple, update);
     }
-    let _ = Rc::into_raw(call);
 }
 
 #[no_mangle]
@@ -166,7 +160,7 @@ pub unsafe extern "C" fn __quantum__rt__capture_update_alias_count(
     callable: *const Callable,
     update: i32,
 ) {
-    let call = Rc::from_raw(callable);
+    let call = &*callable;
     if !call.mem_table.is_null() && !(*(call.mem_table.wrapping_add(1))).is_null() {
         let _val = **(call.mem_table.cast::<*mut usize>().wrapping_add(1));
         (*call
@@ -174,5 +168,4 @@ pub unsafe extern "C" fn __quantum__rt__capture_update_alias_count(
             .wrapping_add(1)
             .cast::<extern "C" fn(*mut u8, i32)>())(call.cap_tuple, update);
     }
-    let _ = Rc::into_raw(call);
 }

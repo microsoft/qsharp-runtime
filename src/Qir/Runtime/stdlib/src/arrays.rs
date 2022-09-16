@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 use crate::{__quantum__rt__fail, strings::convert, update_counts};
-use std::{rc::Rc, usize};
+use std::{mem::ManuallyDrop, rc::Rc, usize};
 
 #[derive(Debug, Clone)]
 pub struct QirArray {
@@ -27,14 +27,14 @@ pub unsafe extern "C" fn __quantum__rt__array_copy(
     arr: *const QirArray,
     force: bool,
 ) -> *const QirArray {
-    let rc = Rc::from_raw(arr);
+    // Wrap the array in a `ManuallyDrop` to effectively borrow it and ensure the array
+    // won't be dropped, refcount decremented, and cleaned up.
+    let rc = ManuallyDrop::new(Rc::from_raw(arr));
     if force || Rc::weak_count(&rc) > 0 {
         let copy = rc.as_ref().clone();
-        Rc::into_raw(rc);
         Rc::into_raw(Rc::new(copy))
     } else {
         Rc::into_raw(Rc::clone(&rc));
-        Rc::into_raw(rc);
         arr
     }
 }
@@ -44,8 +44,8 @@ pub unsafe extern "C" fn __quantum__rt__array_concatenate(
     arr1: *const QirArray,
     arr2: *const QirArray,
 ) -> *const QirArray {
-    let array1 = Rc::from_raw(arr1);
-    let array2 = Rc::from_raw(arr2);
+    let array1 = &*arr1;
+    let array2 = &*arr2;
     if array1.elem_size != array2.elem_size {
         __quantum__rt__fail(convert(&format!(
             "Cannot concatenate arrays with differing element sizes: {} vs {}",
@@ -65,16 +65,13 @@ pub unsafe extern "C" fn __quantum__rt__array_concatenate(
     copy.copy_from_slice(array2.data.as_slice());
 
     new_array.data.append(&mut copy);
-    Rc::into_raw(array1);
-    Rc::into_raw(array2);
     Rc::into_raw(Rc::new(new_array))
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn __quantum__rt__array_get_size_1d(arr: *const QirArray) -> u64 {
-    let array = Rc::from_raw(arr);
+    let array = &*arr;
     let len = array.data.len() / array.elem_size;
-    Rc::into_raw(array);
     len.try_into()
         .expect("Length of array should always fit in a 64-bit integer.")
 }
@@ -84,13 +81,11 @@ pub unsafe extern "C" fn __quantum__rt__array_get_element_ptr_1d(
     arr: *const QirArray,
     index: u64,
 ) -> *mut i8 {
-    let array = Rc::from_raw(arr);
+    let array = &*arr;
     let index: usize = index
         .try_into()
         .expect("Indices into an array should fit into the `usize` ");
-    let ptr = array.data.as_ptr().add(array.elem_size * index) as *mut i8;
-    Rc::into_raw(array);
-    ptr
+    array.data.as_ptr().add(array.elem_size * index) as *mut i8
 }
 
 #[no_mangle]

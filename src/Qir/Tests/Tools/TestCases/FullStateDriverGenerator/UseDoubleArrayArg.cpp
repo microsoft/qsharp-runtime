@@ -48,7 +48,6 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point");
 
-    // Initialize runtime.
     // Add a command line option for each entry-point parameter.
     vector<double_t> DoubleArrayArgCli;
     app.add_option("--DoubleArrayArg", DoubleArrayArgCli, "Option to provide a value for the DoubleArrayArg parameter")

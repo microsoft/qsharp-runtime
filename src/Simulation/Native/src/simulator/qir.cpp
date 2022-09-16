@@ -1,11 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-/*=============================================================================
-    QIR assumes a single global execution context.
-    To support the dispatch over the qir-bridge, the clients must register their
-    Microsoft::Quantum::IRuntimeDriver* first.
-=============================================================================*/
 #include <bitset>
 #include <cassert>
 #include <fstream>

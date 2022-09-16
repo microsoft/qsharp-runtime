@@ -116,8 +116,6 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point Inputs Reference");
 
-    // Initialize simulator.
-
     // Add the options that correspond to the parameters that the QIR entry-point needs.
     // Option for a Q# Int type.
     int64_t intValue = 0;

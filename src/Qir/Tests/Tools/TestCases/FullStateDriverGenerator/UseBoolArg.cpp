@@ -33,7 +33,6 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point");
 
-    // Initialize runtime.
     // Add a command line option for each entry-point parameter.
     char BoolArgCli;
     BoolArgCli = InteropFalseAsChar;

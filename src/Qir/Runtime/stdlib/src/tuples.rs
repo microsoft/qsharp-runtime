@@ -2,7 +2,11 @@
 // Licensed under the MIT License.
 
 use crate::update_counts;
-use std::{mem::size_of, rc::Rc, usize};
+use std::{
+    mem::{size_of, ManuallyDrop},
+    rc::Rc,
+    usize,
+};
 
 #[allow(clippy::cast_ptr_alignment)]
 #[no_mangle]
@@ -27,16 +31,14 @@ pub unsafe extern "C" fn __quantum__rt__tuple_copy(
     raw_tup: *mut *const Vec<u8>,
     force: bool,
 ) -> *mut *const Vec<u8> {
-    let rc = Rc::from_raw(*(raw_tup).wrapping_sub(1));
+    let rc = ManuallyDrop::new(Rc::from_raw(*(raw_tup).wrapping_sub(1)));
     if force || Rc::weak_count(&rc) > 0 {
         let mut copy = rc.as_ref().clone();
-        let _ = Rc::into_raw(rc);
         let header = copy.as_mut_ptr().cast::<*const Vec<u8>>();
         *header = Rc::into_raw(Rc::new(copy));
         header.wrapping_add(1)
     } else {
-        let _ = Rc::into_raw(Rc::clone(&rc));
-        let _ = Rc::into_raw(rc);
+        Rc::into_raw(Rc::clone(&rc));
         raw_tup
     }
 }
@@ -74,13 +76,12 @@ mod tests {
     fn test_tuple_update_reference_count() {
         let tup = __quantum__rt__tuple_create(size_of::<u32>() as u64);
         unsafe {
-            let rc = Rc::from_raw(*tup.cast::<*const Vec<u8>>().wrapping_sub(1));
+            let rc = ManuallyDrop::new(Rc::from_raw(*tup.cast::<*const Vec<u8>>().wrapping_sub(1)));
             assert_eq!(Rc::strong_count(&rc), 1);
             __quantum__rt__tuple_update_reference_count(tup, 2);
             assert_eq!(Rc::strong_count(&rc), 3);
             __quantum__rt__tuple_update_reference_count(tup, -2);
             assert_eq!(Rc::strong_count(&rc), 1);
-            let _ = Rc::into_raw(rc);
             __quantum__rt__tuple_update_reference_count(tup, -1);
         }
     }
@@ -89,14 +90,13 @@ mod tests {
     fn test_tuple_update_alias_count() {
         let tup = __quantum__rt__tuple_create(size_of::<u32>() as u64);
         unsafe {
-            let rc = Rc::from_raw(*tup.cast::<*const Vec<u8>>().wrapping_sub(1));
+            let rc = ManuallyDrop::new(Rc::from_raw(*tup.cast::<*const Vec<u8>>().wrapping_sub(1)));
             assert_eq!(Rc::strong_count(&rc), 1);
             assert_eq!(Rc::weak_count(&rc), 0);
             __quantum__rt__tuple_update_alias_count(tup, 2);
             assert_eq!(Rc::weak_count(&rc), 2);
             __quantum__rt__tuple_update_alias_count(tup, -2);
             assert_eq!(Rc::weak_count(&rc), 0);
-            let _ = Rc::into_raw(rc);
             __quantum__rt__tuple_update_reference_count(tup, -1);
         }
     }
