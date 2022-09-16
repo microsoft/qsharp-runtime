@@ -8,7 +8,7 @@ use crate::{
     tuples::{__quantum__rt__tuple_copy, __quantum__rt__tuple_update_reference_count},
     update_counts,
 };
-use std::{cell::RefCell, mem::ManuallyDrop, rc::Rc, usize};
+use std::{cell::RefCell, mem::ManuallyDrop, rc::Rc};
 
 #[derive(Clone)]
 pub struct Callable {
@@ -162,7 +162,6 @@ pub unsafe extern "C" fn __quantum__rt__capture_update_alias_count(
 ) {
     let call = &*callable;
     if !call.mem_table.is_null() && !(*(call.mem_table.wrapping_add(1))).is_null() {
-        let _val = **(call.mem_table.cast::<*mut usize>().wrapping_add(1));
         (*call
             .mem_table
             .wrapping_add(1)
