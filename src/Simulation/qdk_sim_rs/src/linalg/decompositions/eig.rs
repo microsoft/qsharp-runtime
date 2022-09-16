@@ -118,12 +118,14 @@ mod tests {
     use cauchy::c64;
 
     use super::{EigenvalueDecomposition, ExplicitEigenvalueDecomposition};
+    use core::f64::consts::FRAC_1_SQRT_2;
 
     #[test]
     pub fn ident_applies_to_eig_x() -> Result<(), Box<dyn std::error::Error>> {
         let eigs: ExplicitEigenvalueDecomposition<c64> = ExplicitEigenvalueDecomposition {
             values: array![c64!(-1.0), c64!(1.0)],
-            vectors: c64!(0.70710678) * array![[c64!(1.0), c64!(-1.0)], [c64!(1.0), c64!(1.0)],],
+            vectors: c64::new(FRAC_1_SQRT_2, 0.0)
+                * array![[c64!(1.0), c64!(-1.0)], [c64!(1.0), c64!(1.0)],],
         };
         let actual = eigs.apply_mtx_fn(|x| *x)?;
         let expected = array![[c64!(0.0), c64!(1.0)], [c64!(1.0), c64!(0.0),],];
@@ -137,7 +139,8 @@ mod tests {
     pub fn mtx_fn_applies_to_eig_x() -> Result<(), Box<dyn std::error::Error>> {
         let eigs: ExplicitEigenvalueDecomposition<c64> = ExplicitEigenvalueDecomposition {
             values: array![c64!(-1.0), c64!(1.0)],
-            vectors: c64!(0.70710678) * array![[c64!(1.0), c64!(-1.0)], [c64!(1.0), c64!(1.0)],],
+            vectors: c64::new(FRAC_1_SQRT_2, 0.0)
+                * array![[c64!(1.0), c64!(-1.0)], [c64!(1.0), c64!(1.0)],],
         };
         let actual = eigs.apply_mtx_fn(|x| (c64!(-1.0 i) * x).exp())?;
         let expected = array![

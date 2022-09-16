@@ -10,7 +10,7 @@ static IDEAL_NOISE_MODEL_JSON: &str = include_str!("data/ideal-noise-model.json"
 fn ideal_noise_model_serializes_correctly() {
     let noise_model = NoiseModel::ideal();
     let expected: Value =
-        serde_json::from_str(&*(serde_json::to_string(&noise_model).unwrap())).unwrap();
+        serde_json::from_str(&(serde_json::to_string(&noise_model).unwrap())).unwrap();
 
     assert_json_eq!(noise_model, expected);
 }

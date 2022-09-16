@@ -61,6 +61,7 @@ extern "C"
     );
 
     // allocate and release
+    MICROSOFT_QUANTUM_DECL unsigned allocate(unsigned sid); // NOLINT
     MICROSOFT_QUANTUM_DECL void allocateQubit(unsigned sid, unsigned qid); // NOLINT
     MICROSOFT_QUANTUM_DECL bool release(unsigned sid, unsigned q); // NOLINT
     MICROSOFT_QUANTUM_DECL unsigned num_qubits(unsigned sid); // NOLINT

@@ -25,6 +25,9 @@ Push-Location (Join-Path $PSScriptRoot ../src/Simulation/Native)
     If (Test-Path "$DROP/Microsoft.Quantum.Simulator.Runtime.dll") {
         Copy-Item -Verbose "$DROP/Microsoft.Quantum.Simulator.Runtime.dll" "win10/Microsoft.Quantum.Simulator.Runtime.dll"
     }
+    If (Test-Path "$DROP/Microsoft.Quantum.Simulator.Runtime.lib") {
+        Copy-Item -Verbose "$DROP/Microsoft.Quantum.Simulator.Runtime.lib" "win10/Microsoft.Quantum.Simulator.Runtime.lib"
+    }
 
     $DROP = "$Env:DROP_NATIVE/src/Simulation/NativeSparseSimulator/build"
     Write-Host "##[info]Copying NativeSparseSimulator files from $DROP...";

@@ -55,7 +55,7 @@ mod tests {
 
         // We expect approximate_factorial(123.0) to return 123! ≈ 1.214 × 10²⁰⁵.
         // https://www.wolframalpha.com/input?i=123%21
-        let expected = 1.214630436702533e+205;
+        let expected = 1.214630436702533e205;
         assert_abs_diff_eq!(
             approximate_factorial::<f64, f64>(123.0),
             expected,

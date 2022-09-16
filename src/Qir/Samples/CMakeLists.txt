@@ -18,11 +18,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../Common/cmake")
 
-set(public_includes "${PROJECT_SOURCE_DIR}/../Runtime/public")
 set(common_includes "${PROJECT_SOURCE_DIR}/../Common/Include")
 set(test_includes "${PROJECT_SOURCE_DIR}/../Common/Externals/catch2")
 
-set(runtime_lib_path "${PROJECT_SOURCE_DIR}/../Runtime/bin/$ENV{BUILD_CONFIGURATION}/bin")
+# set the environment path for loading shared libs the tests are using
+if(DEFINED ENV{NATIVE_SIMULATOR})
+    set(simulator_lib_path $ENV{NATIVE_SIMULATOR})
+else()
+    set(simulator_lib_path "${PROJECT_SOURCE_DIR}/../../Simulation/Native/build/drop")
+endif()
 
 include(qir_cmake_include)
 
