@@ -16,14 +16,10 @@
 
 #include "CLI11.hpp"
 
-#include "QirRuntime.hpp"
-#include "QirContext.hpp"
-
 <# foreach (var header in RuntimeInitializer.Headers) { #>
 #include "<#= header #>"
 <# } #>
 
-using namespace Microsoft::Quantum;
 using namespace std;
 <# if (EntryPoint.ContainsArgumentType(DataType.ArrayType)) { #>
 
@@ -112,17 +108,13 @@ map<string, bool> <#= QirCppInterop.CliOptionTransformerMapName(DataType.BoolTyp
 <# if (EntryPoint.ContainsArgumentType(DataType.PauliType) || EntryPoint.ContainsArrayType(DataType.PauliType)) { #>
 
 // Auxiliary functions for interop with Q# Pauli type.
-map<string, PauliId> <#= QirCppInterop.CliOptionTransformerMapName(DataType.PauliType) #>{
-    {"PauliI", PauliId::PauliId_I},
-    {"PauliX", PauliId::PauliId_X},
-    {"PauliY", PauliId::PauliId_Y},
-    {"PauliZ", PauliId::PauliId_Z}
+map<string, char> <#= QirCppInterop.CliOptionTransformerMapName(DataType.PauliType) #>{
+    {"PauliI", 0},
+    {"PauliX", 1},
+    {"PauliY", 3},
+    {"PauliZ", 2}
 };
 
-char TranslatePauliToChar(PauliId& pauli)
-{
-    return static_cast<char>(pauli);
-}
 <# } #>
 <# if (EntryPoint.ContainsArgumentType(DataType.ResultType) || EntryPoint.ContainsArrayType(DataType.ResultType)) { #>
 
@@ -157,19 +149,11 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point");
 
-    // Initialize runtime.
 <# var initializerReader = new StringReader(RuntimeInitializer.Generate());
    string line;
    while((line = initializerReader.ReadLine()) != null) { #>
     <#= line #>
 <# } #>
-
-    // Add the --simulation-output option.
-    string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
 
 <# if (EntryPoint.Parameters.Count > 0) { #>
     // Add a command line option for each entry-point parameter.
@@ -218,16 +202,6 @@ int main(int argc, char* argv[])
 <# } #>
 
 <# } #>
-    // Redirect the simulator output from std::cout if the --simulation-output option is present.
-    ostream* simulatorOutputStream = &cout;
-    ofstream simulationOutputFileStream;
-    if (!simulationOutputFileOpt->empty())
-    {
-        simulationOutputFileStream.open(simulationOutputFile);
-        SetOutputStream(simulationOutputFileStream);
-        simulatorOutputStream = &simulationOutputFileStream;
-    }
-
     // Execute the entry point operation.
     <#= EntryPoint.Name #>(
 <# for (int i = 0; i < EntryPoint.Parameters.Count; i++) {
@@ -238,11 +212,7 @@ int main(int argc, char* argv[])
     );
 
     // Flush the output of the simulation.
-    simulatorOutputStream->flush();
-    if (simulationOutputFileStream.is_open())
-    {
-        simulationOutputFileStream.close();
-    }
+    cout.flush();
 
     return 0;
 }

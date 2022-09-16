@@ -46,8 +46,7 @@ namespace Microsoft.Quantum.Qir.CommandLineTool
                     settings.QSharpDll,
                     settings.LibraryDirectories,
                     settings.IncludeDirectories,
-                    settings.ExecutablesDirectory,
-                    settings.Debug)),
+                    settings.ExecutablesDirectory)),
                 TreatUnmatchedTokensAsErrors = true
             };
 
@@ -153,11 +152,6 @@ namespace Microsoft.Quantum.Qir.CommandLineTool
             /// The path to the output directory where the created executables will be placed.
             /// </summary>
             public DirectoryInfo ExecutablesDirectory { get; set; }
-
-            /// <summary>
-            /// Enable additional debugging checks at runtime.
-            /// </summary>
-            public bool Debug { get; set; }
         }
     }
 }

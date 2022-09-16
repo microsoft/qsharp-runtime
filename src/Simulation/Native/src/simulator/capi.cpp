@@ -64,6 +64,11 @@ extern "C"
         return Microsoft::Quantum::Simulator::get(sid)->InjectState(qubits, amplitudes);
     }
 
+    MICROSOFT_QUANTUM_DECL unsigned allocate(unsigned id)
+    {
+        return Microsoft::Quantum::Simulator::get(id)->allocate();
+    }
+
     MICROSOFT_QUANTUM_DECL void allocateQubit(unsigned id, unsigned q)
     {
         Microsoft::Quantum::Simulator::get(id)->allocateQubit(q);

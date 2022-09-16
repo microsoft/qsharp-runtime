@@ -22,6 +22,7 @@
       <NativeDll Include="$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.dylib))" Dest="osx/libMicrosoft.Quantum.Simulator.Runtime.dylib" />
       <NativeDll Include="$([MSBuild]::NormalizePath($(NativeBuildPath)/libMicrosoft.Quantum.Simulator.Runtime.so))" Dest="linux/libMicrosoft.Quantum.Simulator.Runtime.so" />
       <NativeDll Include="$([MSBuild]::NormalizePath($(NativeBuildPath)/Microsoft.Quantum.Simulator.Runtime.dll))" Dest="win10/Microsoft.Quantum.Simulator.Runtime.dll" />
+      <NativeDll Include="$([MSBuild]::NormalizePath($(NativeBuildPath)/Microsoft.Quantum.Simulator.Runtime.lib))" Dest="win10/Microsoft.Quantum.Simulator.Runtime.lib" />
       
       <!-- Native Experimental simulator simulator: -->
       <NativeDll Include="$([MSBuild]::NormalizePath($(ExperimentalSimBuildPath)/libqdk_sim.dylib))" Dest="osx/Microsoft.Quantum.QdkSimRs.Runtime.dll" />

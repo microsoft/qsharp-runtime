@@ -26,10 +26,13 @@ steps:
   displayName: Windows install rust
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
+# Installs Rust nightly toolchain and components.
+# Note: the llvm-tools-preview component can be removed once QIR range support is simplified.
+# See https://github.com/microsoft/qsharp-language/issues/108
 - script: |
     rustup install nightly
-    rustup component add rustfmt clippy
-    rustup component add rustfmt clippy --toolchain nightly
+    rustup component add rustfmt clippy llvm-tools-preview
+    rustup component add rustfmt clippy llvm-tools-preview --toolchain nightly
   displayName: Enable Rust formatting and nightly options.
 
 ##
