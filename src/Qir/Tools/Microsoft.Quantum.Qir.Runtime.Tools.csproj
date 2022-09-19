@@ -22,16 +22,6 @@
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="..\..\Qir\drops\bin\**\*" Pack="true" Visible="false" PackagePath="runtimes">
-      <Link>runtimes\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
-    <None Include="..\..\Qir\drops\include\**\*" Pack="true" Visible="false" PackagePath="runtimes/any/native/include">
-      <Link>runtimes\any\native\include\%(RecursiveDir)%(FileName)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -44,10 +34,6 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>QirCppDriver.cs</LastGenOutput>
     </None>
-    <None Update="Driver\QirCppFullStateSimulatorInitializer.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>QirCppFullStateSimulatorInitializer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -59,11 +45,6 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>QirCppDriver.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Driver\QirCppFullStateSimulatorInitializer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>QirCppFullStateSimulatorInitializer.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 

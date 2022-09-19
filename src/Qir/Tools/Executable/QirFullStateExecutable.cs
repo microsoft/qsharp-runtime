@@ -20,25 +20,24 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Executable
     {
         public override string DriverFileExtension => "cpp";
 
-        public override IList<string> LinkLibraries => new List<string> {
-                "Microsoft.Quantum.Qir.Runtime",
-                "Microsoft.Quantum.Qir.QSharp.Foundation",
-                "Microsoft.Quantum.Qir.QSharp.Core"
-            };
+        public override IList<string> LinkLibraries => new List<string>
+        {
+            "Microsoft.Quantum.Simulator.Runtime"
+        };
 
         public override IList<DirectoryInfo> HeaderDirectories { get; } = new List<DirectoryInfo>();
 
         public override IList<DirectoryInfo> LibraryDirectories { get; } = new List<DirectoryInfo>();
 
-        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, bool debug, ILogger? logger = null)
-            : this(executableFile, qirBitcode, debug, new QirExecutableRunner(logger), logger)
+        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, ILogger? logger = null)
+            : this(executableFile, qirBitcode, new QirExecutableRunner(logger), logger)
         {
         }
 
-        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, bool debug, IQirExecutableRunner runner, ILogger? logger = null)
+        public QirFullStateExecutable(FileInfo executableFile, byte[] qirBitcode, IQirExecutableRunner runner, ILogger? logger = null)
             : base(executableFile,
                   qirBitcode,
-                  new QirFullStateDriverGenerator(debug),
+                  new QirFullStateDriverGenerator(),
                   new QirExecutableGenerator(new ClangClient(logger), logger),
                   runner,
                   logger)

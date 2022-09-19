@@ -1,0 +1,82 @@
+; Copyright (c) Microsoft Corporation.
+; Licensed under the MIT License.
+
+; This file lists the APIs defined by the qir_stdlib so that they can be re-exported on Windows platforms.
+; See https://docs.microsoft.com/en-us/cpp/build/exporting-from-a-dll-using-def-files
+
+EXPORTS
+    __quantum__rt__memory_allocate
+    __quantum__rt__fail
+    __quantum__rt__message
+    __quantum__rt__array_create_1d
+    __quantum__rt__array_update_reference_count
+    __quantum__rt__array_update_alias_count
+    __quantum__rt__array_copy
+    __quantum__rt__array_concatenate
+    __quantum__rt__array_get_size_1d
+    __quantum__rt__array_get_element_ptr_1d
+    __quantum__rt__array_slice_1d
+    __quantum__rt__callable_create
+    __quantum__rt__callable_update_reference_count
+    __quantum__rt__callable_update_alias_count
+    __quantum__rt__callable_copy
+    __quantum__rt__callable_invoke
+    __quantum__rt__callable_make_adjoint
+    __quantum__rt__callable_make_controlled
+    __quantum__rt__capture_update_reference_count
+    __quantum__rt__capture_update_alias_count
+    __quantum__rt__string_create
+    __quantum__rt__string_update_reference_count
+    __quantum__rt__string_concatenate
+    __quantum__rt__string_equal
+    __quantum__rt__int_to_string
+    __quantum__rt__double_to_string
+    __quantum__rt__bool_to_string
+    __quantum__rt__pauli_to_string
+    __quantum__rt__range_to_string
+    __quantum__rt__string_get_data
+    __quantum__rt__string_get_length
+    __quantum__rt__tuple_create
+    __quantum__rt__tuple_update_reference_count
+    __quantum__rt__tuple_update_alias_count
+    __quantum__rt__tuple_copy
+    __quantum__rt__bigint_to_string
+    __quantum__rt__bigint_create_i64
+    __quantum__rt__bigint_create_array
+    __quantum__rt__bigint_update_reference_count
+    __quantum__rt__bigint_negate
+    __quantum__rt__bigint_add
+    __quantum__rt__bigint_subtract
+    __quantum__rt__bigint_multiply
+    __quantum__rt__bigint_divide
+    __quantum__rt__bigint_modulus
+    __quantum__rt__bigint_power
+    __quantum__rt__bigint_bitand
+    __quantum__rt__bigint_bitor
+    __quantum__rt__bigint_bitxor
+    __quantum__rt__bigint_bitnot
+    __quantum__rt__bigint_shiftleft
+    __quantum__rt__bigint_shiftright
+    __quantum__rt__bigint_equal
+    __quantum__rt__bigint_greater
+    __quantum__rt__bigint_greater_eq
+    __quantum__qis__nan__body
+    __quantum__qis__isnan__body
+    __quantum__qis__infinity__body
+    __quantum__qis__isinf__body
+    __quantum__qis__isnegativeinfinity__body
+    __quantum__qis__sin__body
+    __quantum__qis__cos__body
+    __quantum__qis__tan__body
+    __quantum__qis__arctan2__body
+    __quantum__qis__sinh__body
+    __quantum__qis__cosh__body
+    __quantum__qis__tanh__body
+    __quantum__qis__arcsin__body
+    __quantum__qis__arccos__body
+    __quantum__qis__arctan__body
+    __quantum__qis__sqrt__body
+    __quantum__qis__log__body
+    __quantum__qis__ieeeremainder__body
+    __quantum__qis__drawrandomint__body
+    __quantum__qis__drawrandomdouble__body

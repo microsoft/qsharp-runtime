@@ -1,14 +1,16 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+#Requires -PSEdition Core
+
 $ErrorActionPreference = 'Stop'
 
 & "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
-    & "$qirRuntime/build-qir-runtime.ps1"
+    $qirStdLibPath = (Join-Path $PSScriptRoot .. src Qir Runtime build-qir-stdlib.ps1)
+    & $qirStdLibPath
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }

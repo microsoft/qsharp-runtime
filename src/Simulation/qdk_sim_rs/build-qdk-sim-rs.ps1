@@ -14,7 +14,7 @@ Push-Location $PSScriptRoot
     # If there's a false positive, that check should be explicitly disabled
     # at the point where the false positive occurs with an explanation as to
     # why it's OK.
-    cargo clippy -- -D warnings
+    cargo clippy --all-targets -- -D warnings
     $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
 
     $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();
