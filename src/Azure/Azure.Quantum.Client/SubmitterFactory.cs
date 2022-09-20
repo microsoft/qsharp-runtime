@@ -56,8 +56,8 @@ namespace Microsoft.Azure.Quantum
                 "QirPayloadGenerator",
                 ImmutableArray.Create("FullComputation")),
             new SubmitterInfo(
-                new Regex(@"\Amicrosoft\.((?!simulator\.)[\w-_]+\.)*[\w-_]+\z"), // does not match microsoft.simulator.*, but matches any other microsoft.*
-                "Microsoft.Quantum.Providers.Targets.MicrosoftQuantumSubmitter, Microsoft.Quantum.Providers.Core",
+                new Regex(@"\Amicrosoft\.estimator(\.[\w-_]+)?\z"),
+                "Microsoft.Quantum.Providers.Targets.MicrosoftEstimatorSubmitter, Microsoft.Quantum.Providers.Core",
                 "QirPayloadGenerator",
                 ImmutableArray.Create("FullComputation"))
             );
