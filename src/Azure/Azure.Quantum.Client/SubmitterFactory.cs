@@ -29,6 +29,11 @@ namespace Microsoft.Azure.Quantum
                 "QirSubmitter",
                 ImmutableArray.Create("FullComputation")),
             new SubmitterInfo(
+                new Regex(@"\Amicrosoft\.estimator(\.[\w-_]+)?\z"),
+                "Microsoft.Quantum.Providers.Targets.MicrosoftEstimatorSubmitter, Microsoft.Quantum.Providers.Core",
+                "QirSubmitter",
+                ImmutableArray.Create("FullComputation")),
+            new SubmitterInfo(
                 new Regex(@"\Aquantinuum\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
                 "QirSubmitter",
@@ -49,7 +54,13 @@ namespace Microsoft.Azure.Quantum
                 new Regex(@"\Amicrosoft\.simulator\.([\w]+\.)*[\w]+\z"),
                 "Microsoft.Quantum.Providers.Targets.MicrosoftSimulatorSubmitter, Microsoft.Quantum.Providers.Core",
                 "QirPayloadGenerator",
-                ImmutableArray.Create("FullComputation")));
+                ImmutableArray.Create("FullComputation")),
+            new SubmitterInfo(
+                new Regex(@"\Amicrosoft\.estimator(\.[\w-_]+)?\z"),
+                "Microsoft.Quantum.Providers.Targets.MicrosoftEstimatorSubmitter, Microsoft.Quantum.Providers.Core",
+                "QirPayloadGenerator",
+                ImmutableArray.Create("FullComputation"))
+            );
 
         /// <summary>
         /// Information about each supported Q# submitter.

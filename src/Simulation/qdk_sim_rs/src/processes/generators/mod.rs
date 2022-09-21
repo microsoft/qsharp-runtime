@@ -144,6 +144,7 @@ impl From<Generator> for GeneratorCoset {
 #[cfg(test)]
 mod tests {
     use approx::assert_abs_diff_eq;
+    use core::f64::consts::FRAC_1_SQRT_2;
 
     use crate::{c64, ProcessData, VariantName};
 
@@ -254,8 +255,18 @@ mod tests {
                 vectors: array![
                     [c64!(0.0), c64!(1.0), c64!(0.0), c64!(0.0)],
                     [c64!(0.0), c64!(0.0), c64!(1.0), c64!(0.0)],
-                    [c64!(-0.70710678), c64!(0.0), c64!(0.0), c64!(0.70710678)],
-                    [c64!(0.70710678), c64!(0.0), c64!(0.0), c64!(0.70710678)],
+                    [
+                        c64::new(-FRAC_1_SQRT_2, 0.0),
+                        c64!(0.0),
+                        c64!(0.0),
+                        c64::new(FRAC_1_SQRT_2, 0.0)
+                    ],
+                    [
+                        c64::new(FRAC_1_SQRT_2, 0.0),
+                        c64!(0.0),
+                        c64!(0.0),
+                        c64::new(FRAC_1_SQRT_2, 0.0)
+                    ],
                 ],
             },
         }
@@ -312,7 +323,12 @@ mod tests {
                 vectors: array![
                     [c64!(0.0), c64!(1.0), c64!(0.0), c64!(0.0)],
                     [c64!(0.0), c64!(0.0), c64!(1.0), c64!(0.0)],
-                    [c64!(-0.70710678), c64!(0.0), c64!(0.0), c64!(0.70710678)],
+                    [
+                        c64::new(-FRAC_1_SQRT_2, 0.0),
+                        c64!(0.0),
+                        c64!(0.0),
+                        c64::new(FRAC_1_SQRT_2, 0.0)
+                    ],
                 ],
             },
         }

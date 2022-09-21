@@ -39,16 +39,13 @@ namespace Microsoft.Quantum.Qir.Runtime.Tools.Driver
 
 #include ""CLI11.hpp""
 
-#include ""QirRuntime.hpp""
-#include ""QirContext.hpp""
-
 ");
  foreach (var header in RuntimeInitializer.Headers) { 
             this.Write("#include \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(header));
             this.Write("\"\r\n");
  } 
-            this.Write("\r\nusing namespace Microsoft::Quantum;\r\nusing namespace std;\r\n");
+            this.Write("\r\nusing namespace std;\r\n");
  if (EntryPoint.ContainsArgumentType(DataType.ArrayType)) { 
             this.Write(@"
 // Auxiliary functions for interop with Q# Array type.
@@ -124,12 +121,10 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
                     "InteropTrueAsChar},\r\n    {\"true\", InteropTrueAsChar}\r\n};\r\n");
  } 
  if (EntryPoint.ContainsArgumentType(DataType.PauliType) || EntryPoint.ContainsArrayType(DataType.PauliType)) { 
-            this.Write("\r\n// Auxiliary functions for interop with Q# Pauli type.\r\nmap<string, PauliId> ");
+            this.Write("\r\n// Auxiliary functions for interop with Q# Pauli type.\r\nmap<string, char> ");
             this.Write(this.ToStringHelper.ToStringWithCulture(QirCppInterop.CliOptionTransformerMapName(DataType.PauliType)));
-            this.Write("{\r\n    {\"PauliI\", PauliId::PauliId_I},\r\n    {\"PauliX\", PauliId::PauliId_X},\r\n    " +
-                    "{\"PauliY\", PauliId::PauliId_Y},\r\n    {\"PauliZ\", PauliId::PauliId_Z}\r\n};\r\n\r\nchar " +
-                    "TranslatePauliToChar(PauliId& pauli)\r\n{\r\n    return static_cast<char>(pauli);\r\n}" +
-                    "\r\n");
+            this.Write("{\r\n    {\"PauliI\", 0},\r\n    {\"PauliX\", 1},\r\n    " +
+                    "{\"PauliY\", 3},\r\n    {\"PauliZ\", 2}\r\n};\r\n\r\n");
  } 
  if (EntryPoint.ContainsArgumentType(DataType.ResultType) || EntryPoint.ContainsArrayType(DataType.ResultType)) { 
             this.Write("\r\n// Auxiliary functions for interop with Q# Result type.\r\nconst char InteropResu" +
@@ -157,7 +152,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write("\r\n");
  } 
             this.Write("); // QIR interop function.\r\n\r\nint main(int argc, char* argv[])\r\n{\r\n    CLI::App " +
-                    "app(\"QIR Standalone Entry Point\");\r\n\r\n    // Initialize runtime.\r\n");
+                    "app(\"QIR Standalone Entry Point\");\r\n\r\n");
  var initializerReader = new StringReader(RuntimeInitializer.Generate());
    string line;
    while((line = initializerReader.ReadLine()) != null) { 
@@ -165,15 +160,6 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture(line));
             this.Write("\r\n");
  } 
-            this.Write(@"
-    // Add the --simulation-output option.
-    string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt = app.add_option(
-        ""--simulation-output"",
-        simulationOutputFile,
-        ""File where the output produced during the simulation is written"");
-
-");
  if (EntryPoint.Parameters.Count > 0) { 
             this.Write("    // Add a command line option for each entry-point parameter.\r\n");
  } 
@@ -275,17 +261,7 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
  } 
             this.Write("\r\n");
  } 
-            this.Write(@"    // Redirect the simulator output from std::cout if the --simulation-output option is present.
-    ostream* simulatorOutputStream = &cout;
-    ofstream simulationOutputFileStream;
-    if (!simulationOutputFileOpt->empty())
-    {
-        simulationOutputFileStream.open(simulationOutputFile);
-        SetOutputStream(simulationOutputFileStream);
-        simulatorOutputStream = &simulationOutputFileStream;
-    }
-
-    // Execute the entry point operation.
+            this.Write(@"    // Execute the entry point operation.
     ");
             this.Write(this.ToStringHelper.ToStringWithCulture(EntryPoint.Name));
             this.Write("(\r\n");
@@ -297,9 +273,8 @@ InteropRange* TranslateRangeTupleToInteropRangePointer(RangeTuple& rangeTuple)
             this.Write(this.ToStringHelper.ToStringWithCulture((isLastArg) ? "" : ","));
             this.Write("\r\n");
  } 
-            this.Write("    );\r\n\r\n    // Flush the output of the simulation.\r\n    simulatorOutputStream->" +
-                    "flush();\r\n    if (simulationOutputFileStream.is_open())\r\n    {\r\n        simulati" +
-                    "onOutputFileStream.close();\r\n    }\r\n\r\n    return 0;\r\n}\r\n");
+            this.Write("    );\r\n\r\n    // Flush the output of the simulation.\r\n    cout." +
+                    "flush();\r\n\r\n    return 0;\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+#Requires -PSEdition Core
+
 & "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
@@ -43,8 +45,8 @@ function Test-One {
 Test-One '../Simulation.sln'
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirRuntime = (Join-Path $PSScriptRoot "../src/Qir/Runtime")
-    & "$qirRuntime/test-qir-runtime.ps1"
+    $qirStdLibPath = (Join-Path $PSScriptRoot .. src Qir Runtime test-qir-stdlib.ps1)
+    & $qirStdLibPath
     if ($LastExitCode -ne 0) {
         $script:all_ok = $False
     }

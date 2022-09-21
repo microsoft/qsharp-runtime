@@ -22,7 +22,6 @@ aspects of the code style.
   * [Clang-Tidy Checks](https://clang.llvm.org/extra/clang-tidy/checks/list.html)
 * Example of the checks used
   * [Qir/.clang-tidy](Qir/.clang-tidy)
-  * [Qir/Tests/.clang-tidy](Qir/Tests/.clang-tidy)
   * [Qir/Samples/StandaloneInputReference/.clang-tidy](Qir/Samples/StandaloneInputReference/.clang-tidy)
 * Use
   * Install: On Win and Mac is installed together with LLVM or Clang, to install on Linux search for "tidy" in
@@ -53,7 +52,3 @@ Clang-format is a tool that enforces the code style.
 * Links to the documentation, example of the options are in [Qir/.clang-format](Qir/.clang-format).
 * Installation: Search for "format" in [Qir/Runtime/prerequisites.ps1](Qir/Runtime/prerequisites.ps1).
 * Run: [Qir/check-sources-formatted.ps1](Qir/check-sources-formatted.ps1).
-
-## See also
-
-* [Coding style and conventions](Qir/Runtime/README.md#coding-style-and-conventions)

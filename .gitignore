@@ -355,6 +355,7 @@ out/
 # Ignore drops from building native simulators.
 xplat
 src/Simulation/Native/win10/Microsoft.Quantum.Simulator.Runtime.dll
+src/Simulation/Native/win10/Microsoft.Quantum.Simulator.Runtime.lib
 src/Simulation/Native/linux/libMicrosoft.Quantum.Simulator.Runtime.so
 src/Simulation/Native/osx/libMicrosoft.Quantum.Simulator.Runtime.dylib
 src/Simulation/Native/win10/Microsoft.Quantum.SparseSimulator.Runtime.dll

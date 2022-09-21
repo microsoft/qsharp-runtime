@@ -2,9 +2,11 @@
 
 members = [
     "src/Simulation/qdk_sim_rs",
+    "src/Qir/Runtime/stdlib",
 ]
 
 [profile.release]
+debug = true
 codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 opt-level = 3
 panic = 'unwind'
