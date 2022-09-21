@@ -700,7 +700,7 @@ public:
 	}
 
 	// Dumps all the states in superposition via a callback function
-    // Callback expects label in a little-endian format (ex: "001" = 4)
+	// Callback expects label in a little-endian format (ex: "001" = 4)
 	void dump_all(callback_t const& callback) {
 		_execute_queued_ops();
 		logical_qubit_id max_qubit_id = 0;
