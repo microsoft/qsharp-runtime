@@ -169,6 +169,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
 
             /// <summary>
             ///     Used by the simulator to provide states when dumping.
+            ///     Expects label (idx) in a little-endian format (ex: "001" = 4)
             ///     Not intended to be called directly.
             /// </summary>
             public override bool Callback([MarshalAs(UnmanagedType.LPStr)] string idx, double real, double img)
