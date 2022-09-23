@@ -30,10 +30,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(Microsoft.Quantum.SparseSimulator.Runtime PUBLIC -O3 -ftree-vectorize -mavx2 -mfma)
 endif()
 
-if (MSVC)
-    add_compile_options(/bigobj)
-endif()
-
 message("Compiler flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 
 
