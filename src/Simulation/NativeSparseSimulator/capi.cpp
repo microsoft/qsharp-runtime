@@ -52,45 +52,56 @@ extern "C"
         return getSimulator(sim_id)->get_num_qubits();
     }
 
-// Generic single-qubit gate
-#define FWDGATE1(G)                                                                                                    \
-    MICROSOFT_QUANTUM_DECL void G##_cpp(simulator_id_type sim_id, logical_qubit_id q)                                                   \
-    {                                                                                                                  \
-        getSimulator(sim_id)->G(q);                                                                  \
-    }
-// Generic multi-qubit gate
-#define FWDCSGATE1(G)                                                                                                  \
-    MICROSOFT_QUANTUM_DECL void MC##G##_cpp(simulator_id_type sim_id, int n, logical_qubit_id* c, logical_qubit_id q)   \
-    {                                                                                                                  \
-                                                                                                                       \
-        getSimulator(sim_id)->MC##G(std::vector<logical_qubit_id>(c, c + n), q);                                                   \
-    }
-#define FWD(G) FWDGATE1(G)
-
     // single-qubit gates
-        FWD(X)
-        FWD(Y)
-        FWD(Z)
-        FWD(H)
+    MICROSOFT_QUANTUM_DECL void X_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->X(q);
+    }
+    MICROSOFT_QUANTUM_DECL void Y_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->Y(q);
+    }
+    MICROSOFT_QUANTUM_DECL void Z_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->Z(q);
+    }
+    MICROSOFT_QUANTUM_DECL void H_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->H(q);
+    }
+    MICROSOFT_QUANTUM_DECL void S_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->S(q);
+    }
+    MICROSOFT_QUANTUM_DECL void T_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->T(q);
+    }
+    MICROSOFT_QUANTUM_DECL void AdjS_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->AdjS(q);
+    }
+    MICROSOFT_QUANTUM_DECL void AdjT_cpp(simulator_id_type sim_id, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->AdjT(q);
+    }
 
-        FWD(S)
-        FWD(T)
-        FWD(AdjS)
-        FWD(AdjT)
-
-#define MFWD(G) FWDCSGATE1(G)
-        MFWD(H)
-        MFWD(X)
-        MFWD(Y)
-        MFWD(Z)
-
-#undef FWDGATE1
-#undef FWDGATE2
-#undef FWDGATE3
-#undef FWDCSGATE1
-#undef FWD
-
-
+    MICROSOFT_QUANTUM_DECL void MCX_cpp(simulator_id_type sim_id, int n, logical_qubit_id* c, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->MCX(std::vector<logical_qubit_id>(c, c + n), q);
+    }
+    MICROSOFT_QUANTUM_DECL void MCY_cpp(simulator_id_type sim_id, int n, logical_qubit_id* c, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->MCY(std::vector<logical_qubit_id>(c, c + n), q);
+    }
+    MICROSOFT_QUANTUM_DECL void MCZ_cpp(simulator_id_type sim_id, int n, logical_qubit_id* c, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->MCZ(std::vector<logical_qubit_id>(c, c + n), q);
+    }
+    MICROSOFT_QUANTUM_DECL void MCH_cpp(simulator_id_type sim_id, int n, logical_qubit_id* c, logical_qubit_id q)
+    {
+        getSimulator(sim_id)->MCH(std::vector<logical_qubit_id>(c, c + n), q);
+    }
 
     MICROSOFT_QUANTUM_DECL void SWAP_cpp(simulator_id_type sim_id, logical_qubit_id q1, logical_qubit_id q2){
         getSimulator(sim_id)->SWAP(q1, q2);
