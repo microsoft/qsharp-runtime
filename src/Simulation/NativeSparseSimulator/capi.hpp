@@ -36,7 +36,6 @@ extern "C"
     MICROSOFT_QUANTUM_DECL void AdjS_cpp(simulator_id_type sim_id, logical_qubit_id q);
     MICROSOFT_QUANTUM_DECL void AdjT_cpp(simulator_id_type sim_id, logical_qubit_id q);
 
-
     MICROSOFT_QUANTUM_DECL void MCX_cpp(simulator_id_type sim_id, int n, logical_qubit_id* c, logical_qubit_id q);
     MICROSOFT_QUANTUM_DECL void MCY_cpp(simulator_id_type sim_id, int n, logical_qubit_id* c, logical_qubit_id q);
     MICROSOFT_QUANTUM_DECL void MCZ_cpp(simulator_id_type sim_id, int n, logical_qubit_id* c, logical_qubit_id q);
