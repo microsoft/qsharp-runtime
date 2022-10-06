@@ -3,102 +3,53 @@
 
 #Requires -PSEdition Core
 
-$ErrorActionPreference = 'Stop'
+<#
+    .SYNOPSIS
+        Build: Bootstraps psake and invokes the build.
+#>
+[cmdletbinding()]
+param(
+    [Parameter(Position = 0, Mandatory = 0)]
+    [string]$buildFile = "$(Join-Path $PSScriptRoot psakefile.ps1)",
+    [Parameter(Position = 1, Mandatory = 0)]
+    [string[]]$taskList = @(),
+    [Parameter(Position = 2, Mandatory = 0)]
+    [switch]$docs = $false,
+    [Parameter(Position = 3, Mandatory = 0)]
+    [System.Collections.Hashtable]$parameters = @{},
+    [Parameter(Position = 4, Mandatory = 0)]
+    [System.Collections.Hashtable]$properties = @{},
+    [Parameter(Position = 5, Mandatory = $false)]
+    [switch]$detailedDocs = $false
+)
 
-& "$PSScriptRoot/set-env.ps1"
-$all_ok = $True
-
-if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirStdLibPath = (Join-Path $PSScriptRoot .. src Qir Runtime build-qir-stdlib.ps1)
-    & $qirStdLibPath
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-} else {
-    Write-Host "Skipping build of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
+if ($null -eq (Import-Module -Name psake -PassThru -ErrorAction SilentlyContinue)) {    
+    Install-Module -Name Psake -Scope CurrentUser -Repository PSGallery -Force -Verbose
 }
 
-if ($Env:ENABLE_NATIVE -ne "false") {
-    $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
-    & "$nativeSimulator/build-native-simulator.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
+$scriptPath = $(Split-Path -Path $MyInvocation.MyCommand.path -Parent)
 
-    ( & (Join-Path $PSScriptRoot .. src Simulation NativeSparseSimulator build.ps1) ) || ( $script:all_ok = $False )
-} else {
-    Write-Host "Skipping build of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
+# '[p]sake' is the same as 'psake' but $Error is not polluted
+Remove-Module -Name [p]sake -Verbose:$false
+Import-Module -Name psake -Verbose:$false
+if ($help) {
+    Get-Help -Name Invoke-psake -Full
+    return
 }
 
-if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
-    if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
-        # Cargo was missing, so cannot build experimental simulators.
-        # That's fine if running locally, we'll warn the user and then skip.
-        # On CI, though, we should fail when the experimental simulator build
-        # is turned on by ENABLE_EXPERIMENTALSIM, but we can't actually
-        # proceed.
-        if ("$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true") {
-            Write-Host "##[error]Experimental simulators enabled, but cargo was not installed in CI pipeline.";
-        } else {
-            Write-Warning `
-                "Experimental simulators enabled, but cargo missing. " + `
-                "Either install cargo, or set `$Env:ENABLE_EXPERIMENTALSIM " + `
-                "to `"false`". Skipping experimental simulators.";
-        }
-    } else {
-        # Prerequisites are met, so let's go.
-        $expSim = (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
-        & "$expSim/build-qdk-sim-rs.ps1"
-        if ($LastExitCode -ne 0) {
-            $script:all_ok = $False
-        }
-    }
-} else {
-    Write-Host "Skipping build of experimental simulators because ENABLE_EXPERIMENTALSIM variable is set to: $Env:ENABLE_EXPERIMENTALSIM."
-}
-
-function Build-One {
-    param(
-        [string]$action,
-        [string]$project
-    );
-
-    Write-Host "##[info]Building $project ($action)..."
-    if ("" -ne "$Env:ASSEMBLY_CONSTANTS") {
-        $args = @("/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS");
-    }  else {
-        $args = @();
-    }
-    dotnet $action $(Join-Path $PSScriptRoot $project) `
-        -c $Env:BUILD_CONFIGURATION `
-        -v $Env:BUILD_VERBOSITY  `
-        @args `
-        /property:Version=$Env:ASSEMBLY_VERSION `
-        /property:QSharpDocsOutputPath=$Env:DOCS_OUTDIR;
-
-    if ($LastExitCode -ne 0) {
-        Write-Host "##vso[task.logissue type=error;]Failed to build $project."
-        $script:all_ok = $False
+if ($buildFile -and (-not (Test-Path -Path $buildFile))) {
+    $absoluteBuildFile = (Join-Path -Path $scriptPath -ChildPath $buildFile)
+    if (Test-path -Path $absoluteBuildFile) {
+        $buildFile = $absoluteBuildFile
     }
 }
 
-Build-One 'build' '../Simulation.sln'
+$nologo = $true
+$framework = $null
+$initialization = {}
+$notr = $false
+Invoke-psake $buildFile $taskList $framework $docs $parameters $properties $initialization $nologo $detailedDocs $notr
 
-if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-    $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests")
-    & "$qirTests/build-qir-tests.ps1" -SkipQSharpBuild
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-    $qirSamples = (Join-Path $PSScriptRoot "../src/Qir/Samples")
-    & "$qirSamples/build-qir-samples.ps1" -SkipQSharpBuild
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-} else {
-    Write-Host "Skipping build of qir tests because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
-}
-
-if (-not $all_ok) {
-    throw "At least one project failed to compile. Check the logs."
+if (!$psake.build_success) {
+    exit 1
 }

@@ -1,11 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-#Requires -Version 6.0
+#Requires -PSEdition Core
 
-Write-Host "##[info] Runtime/prerequisites.ps1"
-
-if ($Env:ENABLE_QIRRUNTIME -ne "false") {
+task qir-runtime-prerequisites -precondition { $Env:ENABLE_QIRRUNTIME -ne "false" } {
+    Write-Host "##[info] Runtime/prerequisites.ps1"
     if (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
             !(Get-Command clang-format -ErrorAction SilentlyContinue) -or `

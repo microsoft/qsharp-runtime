@@ -1,11 +1,17 @@
-& (Join-Path $PSScriptRoot ".." ".." ".." "build" "set-env.ps1");
-$IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
+#Requires -PSEdition Core
 
-Push-Location $PSScriptRoot    
+Include (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
+Include (Join-Path $PSScriptRoot "prerequisites.ps1")
+
+task default -depends build-qdk-sim-rs
+
+task build-qdk-sim-rs -depends set-env, qdk-sim-rs-prerequisites {
+ 
     # Start with the quick check first and make sure that Rust sources
     # meet formatting and style guide rules.
-    cargo fmt -- --check
-    $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
+    exec -workingDirectory $PSScriptRoot {
+        cargo fmt -- --check
+    }
 
     # Check linting rules defined by clippy, a linting tool provided with the
     # Rust toolchain. Please see https://github.com/rust-lang/rust-clippy
@@ -14,22 +20,29 @@ Push-Location $PSScriptRoot
     # If there's a false positive, that check should be explicitly disabled
     # at the point where the false positive occurs with an explanation as to
     # why it's OK.
-    cargo clippy --all-targets -- -D warnings
-    $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
+    exec -workingDirectory $PSScriptRoot {
+        cargo clippy --all-targets -- -D warnings
+    }
 
-    $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @();
+    $releaseFlag = "$Env:BUILD_CONFIGURATION" -eq "Release" ? @("--release") : @()
 
     # Actually run the build.
-    cargo build -Z unstable-options @releaseFlag --out-dir "drop";
+    exec -workingDirectory $PSScriptRoot {
+        cargo build -Z unstable-options @releaseFlag --out-dir "drop"
+    }
 
     # Make sure docs are complete.
     $Env:RUSTDOCFLAGS = "--html-in-header $(Resolve-Path docs-includes/header.html) " + `
                         "--html-after-content $(Resolve-Path docs-includes/after.html)"
-    cargo doc;
+    exec -workingDirectory $PSScriptRoot {
+        cargo doc
+    }
 
     # When building in CI, free disk space by cleaning up.
     # Note that this takes longer, but saves ~1 GB of space.
     if ($IsCI) {
-        cargo clean;
+        exec -workingDirectory $PSScriptRoot {
+            cargo clean;
+        }
     }
-Pop-Location
+}

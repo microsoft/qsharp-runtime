@@ -1,30 +1,26 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-#Requires -Version 6.0
+#Requires -PSEdition Core
 
-Write-Host "##[info]Build NativeSparseSimulator for $Env:BUILD_CONFIGURATION"
+Include (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
 
-& (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
-$FailureCommands = {
-    Write-Host "##vso[task.logissue type=error;] Failed to build NativeSparseSimulator. See errors above or below."
-    Pop-Location
-    Exit 1
-}
+task default -depends build-sparse-simulator
 
-$buildType = $Env:BUILD_CONFIGURATION
-if ($buildType -eq "Release") {
-    $buildType = "RelWithDebInfo"
-}
+task build-sparse-simulator -depends set-env {
 
-# mkdir build
-$BuildDir = (Join-Path $PSScriptRoot "build")
-if (-not (Test-Path $BuildDir)) {
-    New-Item -Path $BuildDir -ItemType "directory" | Out-Null
-}
+    Write-Host "##[info]Build NativeSparseSimulator for $Env:BUILD_CONFIGURATION"
 
-# pushd build
-Push-Location $BuildDir
+    $buildType = $Env:BUILD_CONFIGURATION
+    if ($buildType -eq "Release") {
+        $buildType = "RelWithDebInfo"
+    }
+
+    # mkdir build
+    $BuildDir = (Join-Path $PSScriptRoot "build")
+    if (-not (Test-Path $BuildDir)) {
+        New-Item -Path $BuildDir -ItemType "directory" | Out-Null
+    }
 
     $CmakeConfigCommand = "cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$buildType -S .. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
     
@@ -57,17 +53,19 @@ Push-Location $BuildDir
         }
         else {
             Write-Host "##vso[task.logissue type=error;] Failed to determine the platform."
-            $FailureCommands.Invoke()
+            Assert $false "##vso[task.logissue type=error;] Failed to build NativeSparseSimulator. See errors above or below."
         }
 
         $CmakeConfigCommand += " -D CMAKE_C_COMPILER=$CC -D CMAKE_CXX_COMPILER=$CXX "
     }
 
     # Generate the build scripts:
-    ( Invoke-Expression $CmakeConfigCommand ) || ( $FailureCommands.Invoke() )
+    exec -workingDirectory $BuildDir -errorMessage "##vso[task.logissue type=error;] Failed to build NativeSparseSimulator. See errors above or below." {
+        Invoke-Expression $CmakeConfigCommand
+    }
 
     # Invoke the build scripts:
-    ( cmake --build . ) || ( $FailureCommands.Invoke() )
-
-# popd
-Pop-Location
+    exec -workingDirectory $BuildDir -errorMessage "##vso[task.logissue type=error;] Failed to build NativeSparseSimulator. See errors above or below." {
+        cmake --build .
+    }
+}
