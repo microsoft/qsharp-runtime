@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 # Load common utils and configure cmake policies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../../Common/cmake")
+include(cache)
 include(secure_dependencies)
 set_msvc_static_runtime_policy()
 
