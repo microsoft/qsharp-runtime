@@ -5,11 +5,11 @@
 
 $ErrorActionPreference = 'Stop'
 
-include (Join-Path $PSScriptRoot "set-env.ps1")
-include (Join-Path $PSScriptRoot "utils.ps1")
-include (Join-Path $PSScriptRoot "azure-devops.ps1")
-include (Join-Path $PSScriptRoot "test.ps1")
-Include (Join-Path $PSScriptRoot "prerequisites.ps1")
+Include (Join-Path $PSScriptRoot "set-env.ps1")
+Include (Join-Path $PSScriptRoot "azure-devops.ps1")
+Include (Join-Path $PSScriptRoot "utils.ps1")
+#Include (Join-Path $PSScriptRoot "test.ps1")
+#Include (Join-Path $PSScriptRoot "prerequisites.ps1")
 Include (Join-Path $PSScriptRoot "../src/Simulation/Simulators/FindNuspecReferences.ps1")
 
 TaskSetup {
@@ -21,16 +21,20 @@ TaskSetup {
 TaskTearDown {
     param($task)
     if ($task.Success) {
-        "Task $($task.Name) - success!"
+        Write-Information "Task $($task.Name) - success!"
     } else {
-        "Task $($task.Name) - failed: $($task.ErrorMessage)"
+        Write-Information "Task $($task.Name) - failed: $($task.ErrorMessage)"
     }
     Write-GroupEnd
 }
 
 task bootstrap -depends prerequisites, find-nuspec-references
 
-task default -depends set-env, qir-runtime, native-simulation, experimental-simulator, simulator-solution, qir-verification
+task prerequisites {
+    Invoke-psake -buildFile "prerequisites.ps1"
+}
+
+task default -depends set-env, qir-runtime, full-simulator, sparse-simulator, experimental-simulator, simulator-solution, qir-verification
 
 task pack -depends set-env {
     & (Join-Path $PSScriptRoot "pack.ps1")
@@ -40,13 +44,15 @@ task manifest -depends set-env {
     & (Join-Path $PSScriptRoot "manifest.ps1")
 }
 
+task test -depends set-env {
+    Invoke-psake (Join-Path $PSScriptRoot "test.ps1")
+}
+
 task qir-runtime -precondition { $Env:ENABLE_QIRRUNTIME -ne "false" } {
     exec -workingDirectory (Join-Path $PSScriptRoot ".." "src" "Qir" "Runtime") {
         Invoke-psake -buildFile "./build-qir-stdlib.ps1"
     }
 }
-
-task native-simulation -depends full-simulator, sparse-simulator -precondition { $Env:ENABLE_NATIVE -ne "false" }
 
 task full-simulator -precondition { $Env:ENABLE_NATIVE -ne "false" } {
     exec -workingDirectory (Join-Path $PSScriptRoot ".." "src" "Simulation" "Native") {
@@ -58,10 +64,6 @@ task sparse-simulator -precondition { $Env:ENABLE_NATIVE -ne "false" } {
     exec -workingDirectory (Join-Path $PSScriptRoot ".." "src" "Simulation" "NativeSparseSimulator") {
         Invoke-psake -buildFile "./build.ps1"
     }
-}
-
-function Test-CommandExists($name) {
-    $null -ne (Get-Command $name -ErrorAction SilentlyContinue)
 }
 
 task experimental-simulator -precondition { $Env:ENABLE_EXPERIMENTALSIM -ne "false" } {

@@ -11,6 +11,10 @@ function Write-Debug([string]$message) {
     Write-DevOpsLog "debug" $message
 }
 
+function Write-Information([string]$message) {
+    Write-DevOpsLog "info" $message
+}
+
 function Write-Warning([string]$message) {
     Write-DevOpsLog "warning" $message
 }

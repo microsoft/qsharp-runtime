@@ -3,6 +3,9 @@
 
 #Requires -PSEdition Core
 
+Include (Join-Path $PSScriptRoot "set-env.ps1")
+Include (Join-Path $PSScriptRoot "azure-devops.ps1")
+
 Properties {
     $tests = @{}
     $tests.errors = @()
@@ -26,7 +29,9 @@ function Exec-Test {
 # Provide more error information when crashing during tests.
 $Env:RUST_BACKTRACE = "1";
 
-task test -depends test-native-sparse-simulator, test-simulation-solution, test-qir, test-experimental-simulator {
+task default -depends run-tests
+
+task run-tests -depends test-native-sparse-simulator, test-simulation-solution, test-qir, test-experimental-simulator {
     $msg = "At least one project failed during testing. Check the logs."
     Assert (-not $tests.all_ok) $msg
 }

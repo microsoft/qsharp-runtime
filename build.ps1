@@ -5,5 +5,5 @@
 
 #Requires -PSEdition Core
 
-pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& '$(Join-Path $pwd build build.ps1)' $args"
+pwsh -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& '$(Join-Path $pwd build build.ps1)' $args"
 exit $LASTEXITCODE

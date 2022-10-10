@@ -3,11 +3,12 @@
 
 #Requires -PSEdition Core
 
+Include (Join-Path $PSScriptRoot "set-env.ps1")
 Include (Join-Path $PSScriptRoot "../src/Qir/Runtime/prerequisites.ps1")
 Include (Join-Path $PSScriptRoot "../src/Simulation/Native/prerequisites.ps1")
 Include (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs/prerequisites.ps1")
 
-task prerequisites -depends qir-runtime-prerequisites, native-simulator-prerequisites, qdk-sim-rs-prerequisites
+task default -depends qir-runtime-prerequisites, native-simulator-prerequisites, qdk-sim-rs-prerequisites
 
 task install-rust {
     if (-not (Get-Command rustup -ErrorAction SilentlyContinue)) {
