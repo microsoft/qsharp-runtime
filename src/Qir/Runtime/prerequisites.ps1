@@ -60,7 +60,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
                 Write-Output "Installing ccache"
                 sudo apt-get install -y --no-install-recommends ccache
             }
-            sudo apt-get install -y clang-14 clang-tidy-14 clang-format-14
+            sudo apt-get install -y --no-install-recommends clang-14 clang-tidy-14 clang-format-14
         } else {
             if ($needClang) {
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
@@ -75,7 +75,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
                 Write-Output "Installing ccache"
                 apt-get install -y --no-install-recommends ccache
             }
-            apt-get install -y clang-14 clang-tidy-14 clang-format-14
+            apt-get install -y --no-install-recommends clang-14 clang-tidy-14 clang-format-14
         }
     }
 

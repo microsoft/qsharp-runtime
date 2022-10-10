@@ -50,8 +50,8 @@ else {
             Write-Output "Installing ccache"
             sudo apt-get install -y --no-install-recommends ccache
         }
-        sudo apt-get install -y libomp-14-dev
-        sudo apt-get install -y clang-14
+        sudo apt-get install -y --no-install-recommends libomp-14-dev
+        sudo apt-get install -y --no-install-recommends clang-14
     } else {
         if ($needClang) {
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
@@ -66,8 +66,8 @@ else {
             Write-Output "Installing ccache"
             apt-get install -y --no-install-recommends ccache
         }
-        apt-get install -y libomp-14-dev
-        apt-get install -y clang-14
+        apt-get install -y --no-install-recommends libomp-14-dev
+        apt-get install -y --no-install-recommends clang-14
     }
 }
 
