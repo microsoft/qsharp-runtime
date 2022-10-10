@@ -1,7 +1,3 @@
-variables:
-  CCACHE_DIR: $(Pipeline.Workspace)/ccache
-  SCCACHE_DIR: $(Pipeline.Workspace)/sccache
-
 steps:
 - task: Cache@2
   inputs:

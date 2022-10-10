@@ -22,6 +22,8 @@ variables:
   Drops.Dir: $(Build.ArtifactStagingDirectory)/drops
   Drop.Native: $(System.DefaultWorkingDirectory)/xplat
   CI: "true"
+  CCACHE_DIR: $(Pipeline.Workspace)/ccache
+  SCCACHE_DIR: $(Pipeline.Workspace)/sccache
 
 jobs:
 - job: build
