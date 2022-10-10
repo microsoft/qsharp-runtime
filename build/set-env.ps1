@@ -41,6 +41,9 @@ If (-not (Test-Path -Path $Env:WHEEL_OUTDIR)) { [IO.Directory]::CreateDirectory(
 If ($Env:DOCS_OUTDIR -eq $null) { $Env:DOCS_OUTDIR =  (Join-Path $Env:DROPS_DIR "docs") }
 If (-not (Test-Path -Path $Env:DOCS_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:DOCS_OUTDIR) }
 
+If ((Test-Path env:\CCACHE_DIR) -and (-not (Test-Path -Path $Env:CCACHE_DIR))) { [IO.Directory]::CreateDirectory($Env:CCACHE_DIR) }
+If ((Test-Path env:\SCCACHE_DIR) -and (-not (Test-Path -Path $Env:SCCACHE_DIR))) { [IO.Directory]::CreateDirectory($Env:SCCACHE_DIR) }
+
 $env:BUILD_PLATFORM = "win-x64"
 if ($IsLinux) {
     $env:BUILD_PLATFORM = "linux-x64"
