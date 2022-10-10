@@ -21,8 +21,15 @@ task build-sparse-simulator -depends set-env {
     if (-not (Test-Path $BuildDir)) {
         New-Item -Path $BuildDir -ItemType "directory" | Out-Null
     }
+    $CMAKE_C_COMPILER_LAUNCHER = ""
+    $CMAKE_CXX_COMPILER_LAUNCHER = ""
+    if(Get-Command ccache -ErrorAction SilentlyContinue) {
+        Write-Host "using ccache"
+        $CMAKE_C_COMPILER_LAUNCHER = "-DCMAKE_C_COMPILER_LAUNCHER=ccache"
+        $CMAKE_CXX_COMPILER_LAUNCHER = "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+    }
 
-    $CmakeConfigCommand = "cmake -G Ninja -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$buildType -S .. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
+    $CmakeConfigCommand = "cmake -G Ninja $CMAKE_C_COMPILER_LAUNCHER $CMAKE_CXX_COMPILER_LAUNCHER -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON -D CMAKE_BUILD_TYPE=$buildType -S .. "  # Without `-G Ninja` the compiler chosen is always `cl.exe`.
     
     if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
         Write-Host "On MacOS build using the default C/C++ compiler (should be AppleClang)"

@@ -14,26 +14,26 @@ steps:
     packageType: sdk
     version: '6.0.x'
 
-- script: |
-    curl https://sh.rustup.rs -sSf | sh -s -- -y
-    echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
-  displayName: Install rust
-  condition: ne( variables['Agent.OS'], 'Windows_NT' )
-- script: |
-    curl -sSf -o rustup-init.exe https://win.rustup.rs
-    rustup-init.exe -y
-    echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin"
-  displayName: Windows install rust
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+# - script: |
+#     curl https://sh.rustup.rs -sSf | sh -s -- -y
+#     echo "##vso[task.setvariable variable=PATH;]$PATH:$HOME/.cargo/bin"
+#   displayName: Install rust
+#   condition: ne( variables['Agent.OS'], 'Windows_NT' )
+# - script: |
+#     curl -sSf -o rustup-init.exe https://win.rustup.rs
+#     rustup-init.exe -y
+#     echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin"
+#   displayName: Windows install rust
+#   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
-# Installs Rust nightly toolchain and components.
-# Note: the llvm-tools-preview component can be removed once QIR range support is simplified.
-# See https://github.com/microsoft/qsharp-language/issues/108
-- script: |
-    rustup install nightly
-    rustup component add rustfmt clippy llvm-tools-preview
-    rustup component add rustfmt clippy llvm-tools-preview --toolchain nightly
-  displayName: Enable Rust formatting and nightly options.
+# # Installs Rust nightly toolchain and components.
+# # Note: the llvm-tools-preview component can be removed once QIR range support is simplified.
+# # See https://github.com/microsoft/qsharp-language/issues/108
+# - script: |
+#     rustup install nightly
+#     rustup component add rustfmt clippy llvm-tools-preview
+#     rustup component add rustfmt clippy llvm-tools-preview --toolchain nightly
+#   displayName: Enable Rust formatting and nightly options.
 
 ##
 # Custom pre-reqs

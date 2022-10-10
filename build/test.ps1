@@ -3,96 +3,111 @@
 
 #Requires -PSEdition Core
 
-& "$PSScriptRoot/set-env.ps1"
-$all_ok = $True
+Properties {
+    $tests = @{}
+    $tests.errors = @()
+}
+
+function Exec-Test {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [scriptblock]$cmd,
+        [string]$errorMessage
+    )
+    $global:lastexitcode = 0
+    & $cmd
+    if ($global:lastexitcode -ne 0) {
+        Write-LogIssueError "Failed to test $project"
+        $tests.all_ok = $False
+    }
+}
 
 # Provide more error information when crashing during tests.
 $Env:RUST_BACKTRACE = "1";
 
-if ($Env:ENABLE_NATIVE -ne "false") {
+task test -depends test-native-sparse-simulator, test-simulation-solution, test-qir, test-experimental-simulator {
+    $msg = "At least one project failed during testing. Check the logs."
+    Assert (-not $tests.all_ok) $msg
+}
+
+task test-native-sparse-simulator -depends set-env -precondition { ($Env:ENABLE_NATIVE -ne "false") } {
     ( & (Join-Path $PSScriptRoot .. src Simulation NativeSparseSimulator test.ps1 ) ) || ( $script:all_ok = $False )
 
     $nativeSimulator = (Join-Path $PSScriptRoot "../src/Simulation/Native")
-    & "$nativeSimulator/test-native-simulator.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
-    }
-} else {
-    Write-Host "Skipping test of native simulator because ENABLE_NATIVE variable is set to: $Env:ENABLE_NATIVE."
+    Exec-Test -errorMessage "Native simulator tests failed." {
+        & "$nativeSimulator/test-native-simulator.ps1"
+    } 
 }
+
 function Test-One {
     Param($project)
 
     Write-Host "##[info]Testing $project..."
     if ("" -ne "$Env:ASSEMBLY_CONSTANTS") {
         $args = @("/property:DefineConstants=$Env:ASSEMBLY_CONSTANTS");
-    }  else {
+    }
+    else {
         $args = @();
     }
-    dotnet test $(Join-Path $PSScriptRoot $project) `
-        -c $Env:BUILD_CONFIGURATION `
-        -v $Env:BUILD_VERBOSITY `
-        --logger trx `
-        @args `
-        /property:Version=$Env:ASSEMBLY_VERSION
-
-    if ($LastExitCode -ne 0) {
-        Write-Host "##vso[task.logissue type=error;]Failed to test $project"
-        $script:all_ok = $False
+    Exec-Test -errorMessage "Failed to test $project." {
+        dotnet test $(Join-Path $PSScriptRoot $project) `
+            -c $Env:BUILD_CONFIGURATION `
+            -v $Env:BUILD_VERBOSITY `
+            --logger trx `
+            @args `
+            /property:Version=$Env:ASSEMBLY_VERSION
     }
 }
 
-Test-One '../Simulation.sln'
+task test-simulation-solution -depends set-env {
+    Test-One '../Simulation.sln'
+}
 
-if ($Env:ENABLE_QIRRUNTIME -ne "false") {
+task test-qir -depends set-env, test-qir-stdlib, test-qir-tests, test-qir-samples -precondition { ($Env:ENABLE_QIRRUNTIME -ne "false") }
+
+task test-qir-stdlib -depends set-env -precondition { ($Env:ENABLE_QIRRUNTIME -ne "false") } {
     $qirStdLibPath = (Join-Path $PSScriptRoot .. src Qir Runtime test-qir-stdlib.ps1)
-    & $qirStdLibPath
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
+    Exec-Test -errorMessage "QIR stdlib tests failed." {
+        & $qirStdLibPath
     }
+}
 
+task test-qir-tests -depends set-env -precondition { ($Env:ENABLE_QIRRUNTIME -ne "false") } {
     $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests")
-    & "$qirTests/test-qir-tests.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
+    Exec-Test -errorMessage "QIR tests failed." {
+        & "$qirTests/test-qir-tests.ps1"
     }
+}
 
+task test-qir-samples -depends set-env -precondition { ($Env:ENABLE_QIRRUNTIME -ne "false") } {
     $qirSamples = (Join-Path $PSScriptRoot "../src/Qir/Samples")
-    & "$qirSamples/test-qir-samples.ps1"
-    if ($LastExitCode -ne 0) {
-        $script:all_ok = $False
+    Exec-Test -errorMessage "QIR samples tests failed." {
+        & "$qirSamples/test-qir-samples.ps1"
     }
-} else {
-    Write-Host "Skipping test of qir runtime because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME."
 }
 
-
-if ($Env:ENABLE_EXPERIMENTALSIM -ne "false") {
-    if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
-        # Cargo was missing, so cannot test experimental simulators.
-        # That's fine if running locally, we'll warn the user and then skip.
-        # On CI, though, we should fail when the experimental simulator build
-        # is turned on by ENABLE_EXPERIMENTALSIM, but we can't actually
-        # proceed.
-        if ("$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true") {
-            Write-Host "##[error]Experimental simulators enabled, but cargo was not installed in CI pipeline.";
-        } else {
-            Write-Warning `
-                "Experimental simulators enabled, but cargo missing. " + `
-                "Either install cargo, or set `$Env:ENABLE_EXPERIMENTALSIM " + `
-                "to `"false`". Skipping experimental simulators.";
-        }
-    } else {
-        $expSim = (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
-        & "$expSim/test-qdk-sim-rs.ps1"
-        if ($LastExitCode -ne 0) {
-            $script:all_ok = $False
-        }
+task test-experimental-simulator -depends set-env -precondition { $Env:ENABLE_EXPERIMENTALSIM -ne "false" } {
+    Exec-Test -errorMessage "Exerimental simulator tests failed." {
+        $global:LASTEXITCODE = 1
     }
-} else {
-    Write-Host "Skipping test of experimental simulators because ENABLE_EXPERIMENTALSIM variable is set to: $Env:ENABLE_EXPERIMENTALSIM."
-}
 
-if (-not $all_ok) {
-    throw "At least one project failed during testing. Check the logs."
+    # if (-not (Test-CommandExists cargo)) {
+    #     # Cargo was missing, so cannot test experimental simulators.
+    #     # That's fine if running locally, we'll warn the user and then skip.
+    #     # On CI, though, we should fail when the experimental simulator build
+    #     # is turned on by ENABLE_EXPERIMENTALSIM, but we can't actually
+    #     # proceed.
+    #     Write-Warning `
+    #         "Experimental simulators enabled, but cargo missing. " + `
+    #         "Either install cargo, or set `$Env:ENABLE_EXPERIMENTALSIM " + `
+    #         "to `"false`". Skipping experimental simulators.";
+    #     Assert $IsCI "##[error]Experimental simulators enabled, but cargo was not installed in CI pipeline."
+    # }
+    # else {
+    #     $expSim = (Join-Path $PSScriptRoot "../src/Simulation/qdk_sim_rs")
+    #     Exec-Test -errorMessage "Exerimental simulator tests failed." {
+    #         & "$expSim/test-qdk-sim-rs.ps1"
+    #     }
+    # }
 }

@@ -4,11 +4,10 @@
 #Requires -PSEdition Core
 
 Include (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
-Include (Join-Path $PSScriptRoot "prerequisites.ps1")
 
 task default -depends stdlib
 
-task stdlib -depends set-env, qir-runtime-prerequisites {
+task stdlib -depends set-env {
     # Start with the quick check first and make sure that Rust sources
     # meet formatting and style guide rules.
     exec -workingDirectory (Join-Path $PSScriptRoot stdlib) -errorMessage "Failed cargo fmt check on QIR stdlib."  {

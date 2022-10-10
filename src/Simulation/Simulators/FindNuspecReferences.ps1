@@ -19,86 +19,86 @@
 # nuget is tracking this problem at: https://github.com/NuGet/Home/issues/4491
 ########################################
 
-$target = Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec"
+task find-nuspec-references {
+    exec -workingDirectory $PSScriptRoot {
+        $target = Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec"
 
-if (Test-Path $target) { 
-    Write-Host "$target exists. Skipping generating new one."
-    exit
- }
+        if (Test-Path $target) { 
+            Write-Host "$target exists. Skipping generating new one."
+            return
+        }
 
+        # Start with the nuspec template
+        $nuspec = [xml](Get-Content (Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec.template"))
+        $dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
 
-# Start with the nuspec template
-$nuspec = [xml](Get-Content (Join-Path $PSScriptRoot "Microsoft.Quantum.Simulators.nuspec.template"))
-$dep = $nuspec.CreateElement('dependencies', $nuspec.package.metadata.NamespaceURI)
+        function Add-PackageReferenceIfNew($ref) {
+            # Identify package's id either from "Include" or "Update" attribute:
+            $id = $ref.Include
+            $version = $ref.Version
+        
+            if ($id -eq $null -or $id -eq "") {
+                $id = $ref.Update
+            }
+            if ($id.EndsWith('.csproj') -or $id.EndsWith('.fsproj')) {
+                $id = [System.IO.Path]::GetFileNameWithoutExtension($id)
+            }
 
-function Add-PackageReferenceIfNew($ref)
-{
-    # Identify package's id either from "Include" or "Update" attribute:
-    $id = $ref.Include
-    $version = $ref.Version
-    
-    if ($id -eq $null -or $id -eq "") {
-        $id = $ref.Update
-    }
-    if ($id.EndsWith('.csproj') -or $id.EndsWith('.fsproj')) 
-    {
-        $id = [System.IO.Path]::GetFileNameWithoutExtension($id)
-    }
+            if ($version -eq $null -or $version -eq "") {
+                $version = '$version$'
+            }
 
-    if ($version -eq $null -or $version -eq "") {
-        $version = '$version$'
-    }
+            # Check if package already added as dependency, only add if new:
+            $added = $dep.dependency | Where { $_.id -eq $id }
+            if (!$added) {
+                Write-Host "Adding $id (version: $version)"
+                $onedependency = $dep.AppendChild($nuspec.CreateElement('dependency', $nuspec.package.metadata.NamespaceURI))
+                $onedependency.SetAttribute('id', $id)
+                $onedependency.SetAttribute('version', $version)
+            }
+        }
 
-    # Check if package already added as dependency, only add if new:
-    $added = $dep.dependency | Where { $_.id -eq $id }
-    if (!$added) {
-        Write-Host "Adding $id (version: $version)"
-        $onedependency = $dep.AppendChild($nuspec.CreateElement('dependency', $nuspec.package.metadata.NamespaceURI))
-        $onedependency.SetAttribute('id', $id)
-        $onedependency.SetAttribute('version', $version)
+        # Recursively find PackageReferences on all ProjectReferences:
+        function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj) {
+            Write-Host "`nFinding dependencies for $PathToCsproj"
+            $csproj = [xml](Get-Content $PathToCsproj)
+
+            # Find all PackageReferences nodes:
+            $packageDependency = $csproj.Project.ItemGroup.PackageReference | Where-Object { $null -ne $_ }
+            $packageDependency | ForEach-Object {
+                $id = $_.Include
+                Write-Host "Detected package dependencies: $id"
+            }
+
+            $packageDependency | ForEach-Object {
+                Add-PackageReferenceIfNew $_ 
+            }
+
+            $projectDependency = $csproj.Project.ItemGroup.ProjectReference | Where-Object { $null -ne $_ }
+            $projectDependency | ForEach-Object {
+                $id = $_.Include
+                Write-Host "Detected project dependencies: $id"
+            }
+
+            # Assume there is a package for project references that are not tagged as to be included in the simulator package:
+            $projectDependency | Where-Object { $_.IncludeInSimulatorPackage -ne 'true' -and $_.IsQscReference -ne 'true' } | ForEach-Object {
+                Add-PackageReferenceIfNew $_ 
+            }
+
+            # Recursively check on project references if they are private:
+            $projectDependency | Where-Object { $_.IncludeInSimulatorPackage -eq 'true' -and $_.IsQscReference -ne 'true' } | ForEach-Object {
+                $id = $_.Include
+                Write-Host "Recurring for $id"
+                Add-NuGetDependencyFromCsprojToNuspec $_.Include 
+            }
+        }
+
+        # Find all dependencies packaged as part of Microsoft.Quantum.Simulators
+        Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" # has a dependency on Common, need to list this because it is listed only in an imported props file ...
+        Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.Simulators.csproj"
+
+        # Save into .nuspec file:
+        $nuspec.package.metadata.AppendChild($dep)
+        $nuspec.Save($target)
     }
 }
-
-# Recursively find PackageReferences on all ProjectReferences:
-function Add-NuGetDependencyFromCsprojToNuspec($PathToCsproj)
-{
-    Write-Host "`nFinding dependencies for $PathToCsproj"
-    $csproj = [xml](Get-Content $PathToCsproj)
-
-    # Find all PackageReferences nodes:
-    $packageDependency = $csproj.Project.ItemGroup.PackageReference | Where-Object { $null -ne $_ }
-    $packageDependency | ForEach-Object {
-        $id = $_.Include
-        Write-Host "Detected package dependencies: $id"
-    }
-
-    $packageDependency | ForEach-Object {
-        Add-PackageReferenceIfNew $_ 
-    }
-
-    $projectDependency = $csproj.Project.ItemGroup.ProjectReference | Where-Object { $null -ne $_ }
-    $projectDependency | ForEach-Object {
-        $id = $_.Include
-        Write-Host "Detected project dependencies: $id"
-    }
-
-    # Assume there is a package for project references that are not tagged as to be included in the simulator package:
-    $projectDependency | Where-Object {$_.IncludeInSimulatorPackage -ne 'true' -and $_.IsQscReference -ne 'true'} | ForEach-Object {
-        Add-PackageReferenceIfNew $_ 
-    }
-
-    # Recursively check on project references if they are private:
-    $projectDependency | Where-Object {$_.IncludeInSimulatorPackage -eq 'true' -and $_.IsQscReference -ne 'true'} | ForEach-Object {
-        $id = $_.Include
-        Write-Host "Recurring for $id"
-        Add-NuGetDependencyFromCsprojToNuspec $_.Include 
-    }
-}
-
-# Find all dependencies packaged as part of Microsoft.Quantum.Simulators
-Add-NuGetDependencyFromCsprojToNuspec "../QCTraceSimulator/Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.csproj" # has a dependency on Common, need to list this because it is listed only in an imported props file ...
-Add-NuGetDependencyFromCsprojToNuspec "Microsoft.Quantum.Simulators.csproj"
-
-# Save into .nuspec file:
-$nuspec.package.metadata.AppendChild($dep)
-$nuspec.Save($target)

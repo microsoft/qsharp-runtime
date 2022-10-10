@@ -6,10 +6,39 @@
 $ErrorActionPreference = 'Stop'
 
 include (Join-Path $PSScriptRoot "set-env.ps1")
+include (Join-Path $PSScriptRoot "utils.ps1")
+include (Join-Path $PSScriptRoot "azure-devops.ps1")
+include (Join-Path $PSScriptRoot "test.ps1")
+Include (Join-Path $PSScriptRoot "prerequisites.ps1")
+Include (Join-Path $PSScriptRoot "../src/Simulation/Simulators/FindNuspecReferences.ps1")
 
-task default -depends set-env, qir-runtime, native-simulation, experimental-simulator, simulator-solution
+TaskSetup {
+    param($task)
+    
+    Write-GroupBegin "$($task.Name)"
+}
 
-$all_ok = $True
+TaskTearDown {
+    param($task)
+    if ($task.Success) {
+        "Task $($task.Name) - success!"
+    } else {
+        "Task $($task.Name) - failed: $($task.ErrorMessage)"
+    }
+    Write-GroupEnd
+}
+
+task bootstrap -depends prerequisites, find-nuspec-references
+
+task default -depends set-env, qir-runtime, native-simulation, experimental-simulator, simulator-solution, qir-verification
+
+task pack -depends set-env {
+    & (Join-Path $PSScriptRoot "pack.ps1")
+}
+
+task manifest -depends set-env {
+    & (Join-Path $PSScriptRoot "manifest.ps1")
+}
 
 task qir-runtime -precondition { $Env:ENABLE_QIRRUNTIME -ne "false" } {
     exec -workingDirectory (Join-Path $PSScriptRoot ".." "src" "Qir" "Runtime") {
@@ -91,21 +120,18 @@ function Build-One {
     }
 }
 
-# if ($Env:ENABLE_QIRRUNTIME -ne "false") {
-#     $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests")
-#     & "$qirTests/build-qir-tests.ps1" -SkipQSharpBuild
-#     if ($LastExitCode -ne 0) {
-#         $script:all_ok = $False
-#     }
-#     $qirSamples = (Join-Path $PSScriptRoot "../src/Qir/Samples")
-#     & "$qirSamples/build-qir-samples.ps1" -SkipQSharpBuild
-#     if ($LastExitCode -ne 0) {
-#         $script:all_ok = $False
-#     }
-# } else {
-#     Write-Host "Skipping build of qir tests because ENABLE_QIRRUNTIME variable is set to: $Env:ENABLE_QIRRUNTIME"
-# }
+task qir-verification -depends qir-tests, qir-samples -precondition { ($Env:ENABLE_QIRRUNTIME -ne "false") }
 
-# if (-not $all_ok) {
-#     throw "At least one project failed to compile. Check the logs."
-# }
+task qir-tests -precondition { ($Env:ENABLE_QIRRUNTIME -ne "false") } {
+    $qirTests = (Join-Path $PSScriptRoot "../src/Qir/Tests" -Resolve)
+    exec {
+        & "$qirTests/build-qir-tests.ps1" -SkipQSharpBuild
+    }
+}
+
+task qir-samples -precondition { ($Env:ENABLE_QIRRUNTIME -ne "false") } {
+    $qirSamples = (Join-Path $PSScriptRoot "../src/Qir/Samples" -Resolve)
+    exec {
+        & "$qirSamples/build-qir-samples.ps1" -SkipQSharpBuild
+    }
+}

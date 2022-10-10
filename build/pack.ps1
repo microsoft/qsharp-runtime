@@ -3,7 +3,6 @@
 
 $ErrorActionPreference = 'Stop'
 
-& "$PSScriptRoot/set-env.ps1"
 $all_ok = $True
 
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..");

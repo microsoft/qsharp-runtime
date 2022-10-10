@@ -1,6 +1,7 @@
-#Requires -PSEdition Core
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
-& (Join-Path $PSScriptRoot .. .. build set-env.ps1)
+#Requires -PSEdition Core
 
 function Build-QirProject {
     param (
@@ -37,6 +38,14 @@ function Build-CMakeProject {
 
     $CMAKE_C_COMPILER = ""
     $CMAKE_CXX_COMPILER = ""
+    $CMAKE_C_COMPILER_LAUNCHER = ""
+    $CMAKE_CXX_COMPILER_LAUNCHER = ""
+    if(Get-Command ccache -ErrorAction SilentlyContinue) {
+        Write-Host "using ccache"
+        $CMAKE_C_COMPILER_LAUNCHER = "-DCMAKE_C_COMPILER_LAUNCHER=ccache"
+        $CMAKE_CXX_COMPILER_LAUNCHER = "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+    }
+    
     $clangTidy = ""
 
     if (($IsMacOS) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
@@ -84,7 +93,7 @@ function Build-CMakeProject {
         $buildType = "RelWithDebInfo"
     }
 
-    cmake -G Ninja $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
+    cmake -G Ninja $CMAKE_C_COMPILER_LAUNCHER $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER_LAUNCHER $CMAKE_CXX_COMPILER $clangTidy -D CMAKE_BUILD_TYPE="$buildType" ../.. | Write-Host
     if ($LastExitCode -ne 0) {
         Write-Host "##vso[task.logissue type=error;]Failed to generate $Name."
         $all_ok = $false

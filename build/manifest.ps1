@@ -14,9 +14,6 @@ param(
     [string] $OutputFormat = 'FileInfo'
 );
 
-
-& "$PSScriptRoot/set-env.ps1" | Out-Null
-
 $artifacts = @{
     Packages = @(
         "Microsoft.Azure.Quantum.Client",

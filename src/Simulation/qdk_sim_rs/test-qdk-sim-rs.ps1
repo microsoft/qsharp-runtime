@@ -1,5 +1,3 @@
-& (Join-Path $PSScriptRoot ".." ".." ".." "build" "set-env.ps1");
-$IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
 
 $script:allOk = $true;
 

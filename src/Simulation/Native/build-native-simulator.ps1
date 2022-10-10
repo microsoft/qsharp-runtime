@@ -4,11 +4,10 @@
 #Requires -PSEdition Core
 
 Include (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
-Include (Join-Path $PSScriptRoot "prerequisites.ps1")
 
 task default -depends build-native-simulator
 
-task build-native-simulator -depends set-env, native-simulator-prerequisites {
+task build-native-simulator -depends set-env {
     Write-Host "##[info]Build Native simulator for $Env:BUILD_CONFIGURATION"
 
     if ($IsMacOS) {
@@ -56,7 +55,13 @@ task build-native-simulator -depends set-env, native-simulator-prerequisites {
     if ($buildType -eq "Release") {
         $buildType = "RelWithDebInfo"
     }
-
+    $CMAKE_C_COMPILER_LAUNCHER = ""
+    $CMAKE_CXX_COMPILER_LAUNCHER = ""
+    if(Get-Command ccache -ErrorAction SilentlyContinue) {
+        Write-Host "using ccache"
+        $CMAKE_C_COMPILER_LAUNCHER = "-DCMAKE_C_COMPILER_LAUNCHER=ccache"
+        $CMAKE_CXX_COMPILER_LAUNCHER = "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+    }
     if (($IsWindows) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
         $CMAKE_C_COMPILER = "-DCMAKE_C_COMPILER=clang.exe"
         $CMAKE_CXX_COMPILER = "-DCMAKE_CXX_COMPILER=clang++.exe"
@@ -68,7 +73,7 @@ task build-native-simulator -depends set-env, native-simulator-prerequisites {
         }
 
         exec {
-            cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER `
+            cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" $CMAKE_C_COMPILER_LAUNCHER $CMAKE_C_COMPILER $CMAKE_CXX_COMPILER_LAUNCHER $CMAKE_CXX_COMPILER `
                 -D CMAKE_BUILD_TYPE="$buildType"  ..
         }
         # Without `-G Ninja` we fail to switch from MSVC to Clang.
@@ -76,7 +81,7 @@ task build-native-simulator -depends set-env, native-simulator-prerequisites {
     }
     elseif (($IsLinux) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Lin")))) {
         exec {
-            cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_C_COMPILER=clang-14 -D CMAKE_CXX_COMPILER=clang++-14 `
+            cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" $CMAKE_C_COMPILER_LAUNCHER -D CMAKE_C_COMPILER=clang-14 $CMAKE_CXX_COMPILER_LAUNCHER -D CMAKE_CXX_COMPILER=clang++-14 `
                 -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
                 -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
                 -D CMAKE_BUILD_TYPE="$buildType" ..
@@ -85,14 +90,16 @@ task build-native-simulator -depends set-env, native-simulator-prerequisites {
     elseif (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
         Write-Host "On MacOS build using the default C/C++ compiler (should be AppleClang)"
 
-        cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" `
-            -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
-            -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
-            -D CMAKE_BUILD_TYPE="$buildType" ..
+        exec {
+            cmake -G Ninja $CMAKE_C_COMPILER_LAUNCHER $CMAKE_CXX_COMPILER_LAUNCHER -D BUILD_SHARED_LIBS:BOOL="1" `
+                -D CMAKE_C_FLAGS_DEBUG="$SANITIZE_FLAGS" `
+                -D CMAKE_CXX_FLAGS_DEBUG="$SANITIZE_FLAGS" `
+                -D CMAKE_BUILD_TYPE="$buildType" ..
+        }
     }
     else {
         exec {
-            cmake -G Ninja -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$buildType" ..
+            cmake -G Ninja $CMAKE_C_COMPILER_LAUNCHER $CMAKE_CXX_COMPILER_LAUNCHER -D BUILD_SHARED_LIBS:BOOL="1" -D CMAKE_BUILD_TYPE="$buildType" ..
         }
     }
     exec {
