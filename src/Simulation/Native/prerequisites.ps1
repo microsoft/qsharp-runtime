@@ -5,7 +5,14 @@ Write-Host "##[info] Simulation/Native/prerequisites.ps1"
 
 if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
     brew update
-    brew install ninja
+    if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
+        Write-Output "Installing ninja"
+        brew install ninja
+    }
+    if (!(Get-Command ccache -ErrorAction SilentlyContinue)) {
+        Write-Output "Installing ccache"
+        brew install ccache
+    }
     brew install llvm@14
 } elseif (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
     if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
@@ -14,10 +21,16 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
         Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
     }
     if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
-        choco install ninja
+        Write-Output "Installing ninja"
+        choco install --accept-license -y ninja
     }
     if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
-        choco install cmake
+        Write-Output "Installing cmake"
+        choco install --accept-license -y cmake
+    }
+    if (!(Get-Command sccache -ErrorAction SilentlyContinue)) {
+        Write-Output "Installing sccache"
+        choco install --accept-license -y sccache
     }
     refreshenv
 }
@@ -29,7 +42,14 @@ else {
             sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
         }
         sudo apt update
-        sudo apt-get install -y ninja-build
+        if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
+            Write-Output "Installing ninja-build"
+            sudo apt-get install -y --no-install-recommends ninja-build
+        }
+        if (!(Get-Command ccache -ErrorAction SilentlyContinue)) {
+            Write-Output "Installing ccache"
+            sudo apt-get install -y --no-install-recommends ccache
+        }
         sudo apt-get install -y libomp-14-dev
         sudo apt-get install -y clang-14
     } else {
@@ -38,7 +58,14 @@ else {
             add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
         }
         apt update
-        apt-get install -y ninja-build
+        if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
+            Write-Output "Installing ninja-build"
+            apt-get install -y --no-install-recommends ninja-build
+        }
+        if (!(Get-Command ccache -ErrorAction SilentlyContinue)) {
+            Write-Output "Installing ccache"
+            apt-get install -y --no-install-recommends ccache
+        }
         apt-get install -y libomp-14-dev
         apt-get install -y clang-14
     }

@@ -7,6 +7,7 @@ message(INFO "*** build config: ${CMAKE_BUILD_TYPE}")
 
 # Load common utils and configure cmake policies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../../Common/cmake")
+include(cache)
 include(secure_dependencies)
 set_msvc_static_runtime_policy()
 
@@ -16,6 +17,7 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config)
+include(cache)
 
 set(MICROSOFT_QUANTUM_SIMULATOR_VERSION_MAJOR $ENV{BUILD_MAJOR})
 set(MICROSOFT_QUANTUM_SIMULATOR_VERSION_MINOR $ENV{BUILD_MINOR})

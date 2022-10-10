@@ -10,14 +10,21 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
             !(Get-Command clang-format -ErrorAction SilentlyContinue) -or `
             (Test-Path Env:/AGENT_OS)) {
-            choco install llvm --version=14.0.6 --allow-downgrade
+            Write-Output "Installing llvm@14"
+            choco install --accept-license -y llvm --version=14.0.6 --allow-downgrade
             Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
-            choco install ninja
+            Write-Output "Installing ninja"
+            choco install --accept-license -y ninja
         }
         if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
-            choco install cmake
+            Write-Output "Installing cmake"
+            choco install --accept-license -y cmake
+        }
+        if (!(Get-Command sccache -ErrorAction SilentlyContinue)) {
+            Write-Output "Installing sccache"
+            choco install --accept-license -y sccache
         }
         refreshenv
     } elseif ($IsMacOS) {
@@ -25,7 +32,13 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         # remove this after Homebrew is updated to 3.1.1 on MacOS image, see:
         # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md
         brew update
-        brew install ninja
+        
+        if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
+            brew install ninja
+        }
+        if (!(Get-Command ccache -ErrorAction SilentlyContinue)) {
+            brew install ccache
+        }
         brew install llvm@14
         if (!(Get-Command clang-format -ErrorAction SilentlyContinue)) {
             brew install clang-format@14    # Still needed after the LLVM is installed.
@@ -38,7 +51,15 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
                 sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
             }
             sudo apt update
-            sudo apt-get install -y ninja-build
+            
+            if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
+                Write-Output "Installing ninja-build"
+                sudo apt-get install -y --no-install-recommends ninja-build
+            }
+            if (!(Get-Command ccache -ErrorAction SilentlyContinue)) {
+                Write-Output "Installing ccache"
+                sudo apt-get install -y --no-install-recommends ccache
+            }
             sudo apt-get install -y clang-14 clang-tidy-14 clang-format-14
         } else {
             if ($needClang) {
@@ -46,7 +67,14 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
                 add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
             }
             apt update
-            apt-get install -y ninja-build
+            if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
+                Write-Output "Installing ninja-build"
+                apt-get install -y --no-install-recommends ninja-build
+            }
+            if (!(Get-Command ccache -ErrorAction SilentlyContinue)) {
+                Write-Output "Installing ccache"
+                apt-get install -y --no-install-recommends ccache
+            }
             apt-get install -y clang-14 clang-tidy-14 clang-format-14
         }
     }

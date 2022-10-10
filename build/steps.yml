@@ -3,7 +3,7 @@
 ##
 steps:
 - template: steps-init.yml
-
+- template: steps-cache.yml
 
 - pwsh: ./build.ps1
   displayName: "Building Q# runtime"
