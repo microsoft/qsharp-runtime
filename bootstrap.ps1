@@ -31,9 +31,9 @@ if (-not (Test-Path Env:/AGENT_OS)) {                                    # If no
         Pop-Location
 
         Write-Host "Build release flavor of the Sparse Simulator"
-        Invoke-Expression (Join-Path $PSScriptRoot "src" "Simulation" "NativeSparseSimulator" "build.ps1")
+        & (Join-Path $PSScriptRoot "src" "Simulation" "NativeSparseSimulator" "build.ps1")
 
-        Push-Location (Join-Path $PSScriptRoot "src/Simulation/qdk_sim_rs")
+        Push-Location (Join-Path $PSScriptRoot "src" "Simulation" "qdk_sim_rs")
             # Don't run the experimental simulator build if we're local
             # and prerequisites are missing.
             $IsCI = "$Env:TF_BUILD" -ne "" -or "$Env:CI" -eq "true";
@@ -47,5 +47,5 @@ if (-not (Test-Path Env:/AGENT_OS)) {                                    # If no
     }
 
     Write-Host "Build simulation solution"
-    dotnet build Simulation.sln
+    dotnet build (Join-Path $PSScriptRoot "Simulation.sln")
 }
