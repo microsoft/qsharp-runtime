@@ -44,8 +44,8 @@ To build on Windows:
         * **Spectre-mitigated libraries. Once Visual Studio has been installed, using the installer for the VS version of interest,
           click the"Modify" button, go to the "Individual Components" tab, search for "spectre", select the latest version of "MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs", and click the "Modify" button to install the selected components**
         * **.NET 6.0 Runtime**
-    * Install [Chocolately](https://chocolatey.org/install). This is required to download other prerequisites if not installed, such
-    as LLVM, CMake, Ninja, and Rust. (If these are already installed and on your PATH, then Chocolately may not be not needed).
+    * Install [Chocolately](https://chocolatey.org/install). This is required to download other prerequisites if not already installed, such
+    as LLVM, CMake, Ninja, and Rust. (If these are already installed and on your PATH, then Chocolately may not be needed).
 
 2. Run [bootstrap.ps1](bootstrap.ps1) from PowerShell
     * pre-req (in PowerShell): `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
