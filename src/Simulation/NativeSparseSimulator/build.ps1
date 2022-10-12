@@ -64,7 +64,6 @@ Push-Location $BuildDir
     }
 
     # Generate the build scripts:
-    # ( Invoke-Expression $CmakeConfigCommand ) || ( $FailureCommands.Invoke() )
     ( & "cmake" $CmakeConfigArgs ) || ( $FailureCommands.Invoke() )
 
     # Invoke the build scripts:
