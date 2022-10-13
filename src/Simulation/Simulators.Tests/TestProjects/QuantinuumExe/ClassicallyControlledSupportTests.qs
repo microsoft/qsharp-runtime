@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 
-namespace Microsoft.Quantum.Simulation.Testing.Honeywell.ClassicallyControlledSupportTests {
+namespace Microsoft.Quantum.Simulation.Testing.Quantinuum.ClassicallyControlledSupportTests {
 
     open Microsoft.Quantum.Intrinsic;
 

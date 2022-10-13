@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 
-namespace Microsoft.Quantum.Simulation.Testing.Honeywell.MeasurementSupportTests {
+namespace Microsoft.Quantum.Simulation.Testing.Quantinuum.MeasurementSupportTests {
 
     open Microsoft.Quantum.Intrinsic;
 

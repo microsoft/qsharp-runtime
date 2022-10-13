@@ -30,13 +30,11 @@ namespace Microsoft.Azure.Quantum
                 targetNameNormalized is null
                 ? null
                 : targetNameNormalized.StartsWith("quantinuum.")
-                ? "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQuantumMachine, Microsoft.Quantum.Providers.Honeywell"
+                ? "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQuantumMachine, Microsoft.Quantum.Providers.Quantinuum"
                 : targetNameNormalized.StartsWith("qci.")
                 ? "Microsoft.Quantum.Providers.QCI.Targets.QCIQuantumMachine, Microsoft.Quantum.Providers.QCI"
                 : targetNameNormalized.StartsWith("ionq.")
                 ? "Microsoft.Quantum.Providers.IonQ.Targets.IonQQuantumMachine, Microsoft.Quantum.Providers.IonQ"
-                : targetNameNormalized.StartsWith("honeywell.")
-                ? "Microsoft.Quantum.Providers.Honeywell.Targets.HoneywellQuantumMachine, Microsoft.Quantum.Providers.Honeywell"
                 : null;
 
             Type? machineType = null;

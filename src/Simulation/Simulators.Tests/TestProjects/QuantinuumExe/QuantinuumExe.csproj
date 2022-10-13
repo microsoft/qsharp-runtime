@@ -8,7 +8,7 @@
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <NoEntryPoint>true</NoEntryPoint>
-    <ExecutionTarget>honeywell.qpu</ExecutionTarget>
+    <ExecutionTarget>quantinuum.qpu</ExecutionTarget>
   </PropertyGroup>
 
   <ItemGroup>
