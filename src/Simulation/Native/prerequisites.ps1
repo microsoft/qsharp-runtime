@@ -8,18 +8,24 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
     brew install ninja
     brew install llvm@14
 } elseif (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
+    $ChocoRan = $false
     if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
         (Test-Path Env:/AGENT_OS)) {
         choco install llvm --version=14.0.6 --allow-downgrade
+        $ChocoRan = $true
         Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
     }
     if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
         choco install ninja
+        $ChocoRan = $true
     }
     if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
         choco install cmake
+        $ChocoRan = $true
     }
-    refreshenv
+    if ($ChocoRan) {
+        refreshenv
+    }
 }
 else {
     $needClang = !(Get-Command clang-14 -ErrorAction SilentlyContinue)

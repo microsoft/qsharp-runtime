@@ -7,19 +7,25 @@ Write-Host "##[info] Runtime/prerequisites.ps1"
 
 if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     if (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
+        $ChocoRan = $false
         if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
             !(Get-Command clang-format -ErrorAction SilentlyContinue) -or `
             (Test-Path Env:/AGENT_OS)) {
             choco install llvm --version=14.0.6 --allow-downgrade
+            $ChocoRan = $true
             Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
         }
         if (!(Get-Command ninja -ErrorAction SilentlyContinue)) {
             choco install ninja
+            $ChocoRan = $true
         }
         if (!(Get-Command cmake -ErrorAction SilentlyContinue)) {
             choco install cmake
+            $ChocoRan = $true
         }
-        refreshenv
+        if ($ChocoRan) {
+            refreshenv
+        }
     } elseif ($IsMacOS) {
         # temporary workaround for Bintray sunset
         # remove this after Homebrew is updated to 3.1.1 on MacOS image, see:
