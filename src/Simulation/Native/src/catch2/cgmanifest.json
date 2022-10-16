@@ -6,7 +6,7 @@
                 "Type": "git",
                 "Git": { 
                     "RepositoryUrl": "https://github.com/catchorg/Catch2", 
-                    "CommitHash": "87074da73ecb1c2e7c35fd14f50ca21c4c002adc" }
+                    "CommitHash": "182c910b4b63ff587a3440e08f84f70497e49a81" }
             }
         }
     ]

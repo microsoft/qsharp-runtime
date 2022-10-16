@@ -6,8 +6,8 @@
         "Type": "other",
         "Other": {
           "Name": "llvm-ar.exe",
-          "Version": "10.0.0",
-          "DownloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/LLVM-10.0.0-win64.exe"
+          "Version": "15.0.2",
+          "DownloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-15.0.2/LLVM-15.0.2-win64.exe"
         }
       }
     },
@@ -16,7 +16,7 @@
         "Type": "git",
         "Git": {
           "RepositoryUrl": "https://github.com/catchorg/Catch2",
-          "CommitHash": "87074da73ecb1c2e7c35fd14f50ca21c4c002adc"
+          "CommitHash": "182c910b4b63ff587a3440e08f84f70497e49a81"
         }
       }
     },
