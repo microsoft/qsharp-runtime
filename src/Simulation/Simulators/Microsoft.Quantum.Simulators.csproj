@@ -7,7 +7,7 @@
   <PropertyGroup>
     <LanguageVersion>10.0</LanguageVersion>
     <Nullable>enable</Nullable>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <QSharpDocsGeneration>false</QSharpDocsGeneration>
@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="6.0.3" />
-    <PackageReference Include="NumSharp" Version="0.20.5" />
+    <PackageReference Include="System.Text.Json" Version="6.0.6" />
+    <PackageReference Include="NumSharp" Version="0.30.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +44,10 @@
       <Visible>false</Visible>
     </None>
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
   </ItemGroup>
 
 </Project>

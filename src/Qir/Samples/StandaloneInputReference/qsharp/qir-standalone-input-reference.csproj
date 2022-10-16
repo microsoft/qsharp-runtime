@@ -11,4 +11,8 @@
     <ProjectReference Include="..\..\..\..\Simulation\QSharpCore\Microsoft.Quantum.QSharp.Core.csproj" /> 
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.Quantum.Standard" Version="0.26.233415" />
+  </ItemGroup>
+
 </Project>

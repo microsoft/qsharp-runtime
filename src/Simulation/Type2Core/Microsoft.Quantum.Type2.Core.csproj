@@ -7,12 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Microsoft.Quantum.Type2.Core.props" >
+    <None Include="Microsoft.Quantum.Type2.Core.props">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Pack>true</Pack>
       <PackagePath>build/</PackagePath>
       <Visible>false</Visible>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
   </ItemGroup>
 
 </Project>

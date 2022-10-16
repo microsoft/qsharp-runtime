@@ -4,17 +4,21 @@
   <Import Project="..\Simulation\Common\DebugSymbols.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.4.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Simulation\Core\Microsoft.Quantum.Runtime.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
   </ItemGroup>
 
 </Project>

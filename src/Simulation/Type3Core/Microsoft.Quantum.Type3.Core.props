@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <QscRef_Microsoft_Quantum_Type3_Core>$(MSBuildThisFileDirectory)/../lib/netstandard2.1/Microsoft.Quantum.Type3.Core.dll</QscRef_Microsoft_Quantum_Type3_Core>
+    <QscRef_Microsoft_Quantum_Type3_Core>$(MSBuildThisFileDirectory)/../lib/net6.0/Microsoft.Quantum.Type3.Core.dll</QscRef_Microsoft_Quantum_Type3_Core>
   </PropertyGroup>
 
 </Project>

@@ -10,7 +10,7 @@ namespace Microsoft.Azure.Quantum.Storage
     using System.Threading;
     using System.Threading.Tasks;
     using global::Azure.Storage.Blobs;
-    using Microsoft.WindowsAzure.Storage.Blob;
+    using Microsoft.Azure.Storage.Blob;
 
     public interface IStorageHelper
     {

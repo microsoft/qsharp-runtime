@@ -10,8 +10,8 @@ namespace Microsoft.Azure.Quantum.Storage
     using global::Azure.Storage.Blobs;
     using Microsoft.Azure.Quantum.Exceptions;
     using Microsoft.Azure.Quantum.Utility;
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Blob;
+    using Microsoft.Azure.Storage;
+    using Microsoft.Azure.Storage.Blob;
 
     public class JobStorageHelper : JobStorageHelperBase
     {

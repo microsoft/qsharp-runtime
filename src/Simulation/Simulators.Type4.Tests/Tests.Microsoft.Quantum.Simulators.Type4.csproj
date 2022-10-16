@@ -20,4 +20,14 @@
     <QSharpCompile Include="..\Simulators.Tests\Circuits\MeasureEachZTest.qs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+    <PackageReference Update="xunit" Version="2.4.2" />
+    <PackageReference Update="xunit.runner.visualstudio" Version="2.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>

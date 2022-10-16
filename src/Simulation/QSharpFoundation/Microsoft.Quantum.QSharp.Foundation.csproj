@@ -4,7 +4,7 @@
   <Import Project="..\Common\DebugSymbols.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <QSharpDocsGeneration>true</QSharpDocsGeneration>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
@@ -27,6 +27,10 @@
 
   <ItemGroup>
     <None Include="..\..\..\build\assets\qdk-nuget-icon.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
   </ItemGroup>
 
 </Project>
