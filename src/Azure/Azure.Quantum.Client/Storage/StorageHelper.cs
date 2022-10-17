@@ -12,8 +12,8 @@ namespace Microsoft.Azure.Quantum.Storage
     using global::Azure.Storage.Blobs;
     using global::Azure.Storage.Blobs.Models;
     using Microsoft.Azure.Quantum.Exceptions;
-    using Microsoft.Azure.Storage;
-    using Microsoft.Azure.Storage.Blob;
+    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.WindowsAzure.Storage.Blob;
 
     internal class StorageHelper : IStorageHelper
     {
