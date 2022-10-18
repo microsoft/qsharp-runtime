@@ -35,7 +35,7 @@ namespace Microsoft.Azure.Quantum
                 ImmutableArray.Create("FullComputation")),
             new SubmitterInfo(
                 new Regex(@"\Aquantinuum\.([\w-_]+\.)*[\w-_]+\z"),
-                "Microsoft.Quantum.Providers.Honeywell.Targets.QuantinuumQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
+                "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
                 "QirSubmitter",
                 ImmutableArray.Create("AdaptiveExecution", "BasicExecution")), // support for BasicMeasurementFeedback goes via the QSharpSubmitter
             new SubmitterInfo(
