@@ -56,6 +56,19 @@ namespace Microsoft.Quantum.Simulation.Core
 
     /// <summary>
     /// Base class containing information about an entry point 
+    /// for a Q# executable targeted for a Honeywell quantum processor.
+    /// </summary>
+    [Obsolete("Use QuantinuumEntryPointInfo instead.")]
+    public class HoneywellEntryPointInfo<I, O> 
+    : EntryPointInfo<I, O>
+    {
+        public HoneywellEntryPointInfo(Type operation) 
+        : base(operation)
+        { }
+    }
+
+    /// <summary>
+    /// Base class containing information about an entry point 
     /// for a Q# executable targeted for a Rigetti quantum processor.
     /// </summary>
     public class RigettiEntryPointInfo<I, O>

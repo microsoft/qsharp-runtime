@@ -31,6 +31,8 @@ namespace Microsoft.Azure.Quantum
                 ? null
                 : targetNameNormalized.StartsWith("quantinuum.")
                 ? "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQuantumMachine, Microsoft.Quantum.Providers.Honeywell"
+                : targetNameNormalized.StartsWith("honeywell.")
+                ? "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQuantumMachine, Microsoft.Quantum.Providers.Honeywell"
                 : targetNameNormalized.StartsWith("qci.")
                 ? "Microsoft.Quantum.Providers.QCI.Targets.QCIQuantumMachine, Microsoft.Quantum.Providers.QCI"
                 : targetNameNormalized.StartsWith("ionq.")
