@@ -8,7 +8,7 @@
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeProviderPackages>false</IncludeProviderPackages>
     <NoEntryPoint>true</NoEntryPoint>
-    <ExecutionTarget>quantinuum.qpu</ExecutionTarget>
+    <ExecutionTarget>quantinuum.qpu.h1-1</ExecutionTarget>
   </PropertyGroup>
 
   <ItemGroup>
