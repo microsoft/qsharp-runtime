@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 
-namespace Microsoft.Quantum.Simulation.Testing.Honeywell {
+namespace Microsoft.Quantum.Simulation.Testing.Quantinuum {
     open Microsoft.Quantum.Diagnostics;
-    open Microsoft.Quantum.Simulation.Testing.Honeywell.ClassicallyControlledSupportTests;
-    open Microsoft.Quantum.Simulation.Testing.Honeywell.MeasurementSupportTests;
+    open Microsoft.Quantum.Simulation.Testing.Quantinuum.ClassicallyControlledSupportTests;
+    open Microsoft.Quantum.Simulation.Testing.Quantinuum.MeasurementSupportTests;
 
     @Test("QuantumSimulator")
     @Test("ResourcesEstimator")
