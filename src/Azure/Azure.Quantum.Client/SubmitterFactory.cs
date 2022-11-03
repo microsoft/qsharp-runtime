@@ -34,6 +34,11 @@ namespace Microsoft.Azure.Quantum
                 "QirSubmitter",
                 ImmutableArray.Create("FullComputation")),
             new SubmitterInfo(
+                new Regex(@"\Aionq\.([\w-_]+\.)*[\w-_]+\z"),
+                "Microsoft.Quantum.Providers.IonQ.Targets.IonQQirSubmitter, Microsoft.Quantum.Providers.IonQ",
+                "QirSubmitter",
+                ImmutableArray.Create("BasicExecution")),
+            new SubmitterInfo(
                 new Regex(@"\Aquantinuum\.([\w-_]+\.)*[\w-_]+\z"),
                 "Microsoft.Quantum.Providers.Quantinuum.Targets.QuantinuumQirSubmitter, Microsoft.Quantum.Providers.Honeywell",
                 "QirSubmitter",
