@@ -37,20 +37,22 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
             brew install clang-format@14    # Still needed after the LLVM is installed.
         }
     } else {
-        $needClang = !(Get-Command clang-14 -ErrorAction SilentlyContinue)
+        #$needClang = !(Get-Command clang-14 -ErrorAction SilentlyContinue)
+        $UbuntuCodeName = "jammy"   # 22.04.1 LTS (Jammy Jellyfish) https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md
+        sudo apt-get purge -y clang-14 clang-tidy-14 clang-format-14
         if (Get-Command sudo -ErrorAction SilentlyContinue) {
-            if ($needClang) { 
+            #if ($needClang) { 
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-                sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
-            }
+                sudo add-apt-repository "deb https://apt.llvm.org/$UbuntuCodeName/ llvm-toolchain-$UbuntuCodeName-14 main"
+            #}
             sudo apt update
             sudo apt-get install -y ninja-build
             sudo apt-get install -y clang-14 clang-tidy-14 clang-format-14
         } else {
-            if ($needClang) {
+            #if ($needClang) {
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
-                add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
-            }
+                add-apt-repository "deb https://apt.llvm.org/$UbuntuCodeName/ llvm-toolchain-$UbuntuCodeName-14 main"
+            #}
             apt update
             apt-get install -y ninja-build
             apt-get install -y clang-14 clang-tidy-14 clang-format-14
