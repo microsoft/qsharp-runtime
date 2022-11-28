@@ -28,27 +28,27 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
     }
 }
 else {
-    #$needClang = !(Get-Command clang-14 -ErrorAction SilentlyContinue)
-    $UbuntuCodeName = "jammy"   # 22.04.1 LTS (Jammy Jellyfish) https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md
-                     #"kinetic" # https://packages.ubuntu.com/search?keywords=clang-14
-    #                 "focal"   # 20.04.5 LTS (Focal Fossa)     https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2004-Readme.md
+    $needClang = !(Get-Command clang-14 -ErrorAction SilentlyContinue)
     if (Get-Command sudo -ErrorAction SilentlyContinue) {
-        #if ($needClang) {
+        if ($needClang) {
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-            sudo add-apt-repository "deb https://apt.llvm.org/$UbuntuCodeName/ llvm-toolchain-$UbuntuCodeName-14 main"
-        #}
+            sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
+        }
         sudo apt update
         sudo apt-get install -y ninja-build
         sudo apt-get install -y libomp-14-dev
         sudo apt-get install -y clang-14
     } else {
-        #if ($needClang) {
+        if ($needClang) {
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
-            add-apt-repository "deb https://apt.llvm.org/$UbuntuCodeName/ llvm-toolchain-$UbuntuCodeName-14 main"
-        #}
+            add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"
+        }
         apt update
         apt-get install -y ninja-build
         apt-get install -y libomp-14-dev
         apt-get install -y clang-14
     }
 }
+
+
+
