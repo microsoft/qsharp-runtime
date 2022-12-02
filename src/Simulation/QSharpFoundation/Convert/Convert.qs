@@ -112,7 +112,7 @@ namespace Microsoft.Quantum.Convert {
 
         if Length(arr) % 8 != 0 {
             // Padding is needed.
-            set arr += [false, size = Length(arr) % 8];
+            set arr += [false, size = 8 - (Length(arr) % 8)];
         }
 
         let len = Length(arr);
