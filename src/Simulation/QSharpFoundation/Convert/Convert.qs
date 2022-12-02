@@ -63,20 +63,34 @@ namespace Microsoft.Quantum.Convert {
     /// Converts a given big integer to an equivalent integer, if possible.
     /// The function returns a pair of the resulting integer and a Boolean flag
     /// which is true, if and only if the conversion was possible.
-    /// # Remarks
-    /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
     function MaybeBigIntAsInt(a : BigInt) : (Int, Bool) {
-        body intrinsic;
+        let arr = BigIntAsBoolArray(a);
+        if Length(arr) > 64 {
+            return (0, false);
+        }
+
+        mutable val = 0;
+        for i in 0..(Length(arr) - 1) {
+            set val += arr[i] ? 2 ^ i | 0;
+        }
+
+        return (val, true);
     }
 
 
     /// # Summary
     /// Converts a given big integer to an array of Booleans.
     /// The 0 element of the array is the least significant bit of the big integer.
-    /// # Remarks
-    /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
     function BigIntAsBoolArray(a : BigInt) : Bool[] {
-        body intrinsic;
+        mutable val = a;
+        mutable arr = [];
+
+        while val != 0L {
+            set arr += [val % 2L == 1L];
+            set val >>>= 1;
+        }
+
+        return arr;
     }
 
 
@@ -84,8 +98,7 @@ namespace Microsoft.Quantum.Convert {
     /// Converts a given array of Booleans to an equivalent big integer.
     /// The 0 element of the array is the least significant bit of the big integer.
     /// # Remarks
-    /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
-    /// Note that the Boolean array is padded of the right with `false` values to a length that is a multiple of 8, 
+    /// Note that the Boolean array is padded on the right with `false` values to a length that is a multiple of 8, 
     /// and then treated as a little-endian notation of a positive or negative number following two's complement semantics.
     ///
     /// # Example
@@ -94,7 +107,23 @@ namespace Microsoft.Quantum.Convert {
     /// let bi2 = BoolArrayAsBigInt([false, false, false, false, false, false, false, true]); // Not padded -> -128
     /// ```
     function BoolArrayAsBigInt(a : Bool[]) : BigInt {
-        body intrinsic;
+        mutable val = 0L;
+        mutable arr = a;
+
+        if Length(arr) % 8 != 0 {
+            // Padding is needed.
+            set arr += [false, size = Length(arr) % 8];
+        }
+
+        let len = Length(arr);
+        for i in 0..(len - 2) {
+            set val += arr[i] ? 2L ^ i | 0L;
+        }
+        if arr[len - 1] {
+            set val -= 2L ^ (len - 1);
+        }
+
+        return val;
     }
 
 
@@ -144,6 +173,7 @@ namespace Microsoft.Quantum.Convert {
     ///
     /// # Remarks
     /// See [C# Int64.ToString](https://docs.microsoft.com/dotnet/api/system.int64.tostring?view=netframework-4.7.1#System_Int64_ToString_System_String_) for more details.
+    @Deprecated("")
     function IntAsStringWithFormat(a : Int, fmt : String) : String {
         body intrinsic;
     }

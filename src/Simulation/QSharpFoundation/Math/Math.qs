@@ -79,11 +79,8 @@ namespace Microsoft.Quantum.Math {
 
     /// # Summary
     /// Divides one BigInteger value by another, returns the result and the remainder as a tuple.
-    ///
-    /// # Remarks
-    /// See [System.Numerics.BigInteger.DivRem](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.divrem) for more details.
     function DivRemL(dividend : BigInt, divisor : BigInt) : (BigInt, BigInt) {
-        body intrinsic;
+        return (dividend / divisor, dividend % divisor);
     }
 
     /// # Summary

@@ -62,22 +62,6 @@ namespace Microsoft.Quantum.Math
         }
     }
 
-    public partial class DivRemL
-    {
-        public class Native : DivRemL
-        {
-            public Native(IOperationFactory m) : base(m) { }
-
-            private static (BigInteger, BigInteger) Impl((BigInteger, BigInteger) arg)
-            {
-                BigInteger rem;
-                var div = BigInteger.DivRem(arg.Item1, arg.Item2, out rem);
-                return (div, rem);
-            }
-            public override Func<(BigInteger, BigInteger), (BigInteger, BigInteger)> __Body__ => Impl;
-        }
-    }
-
     public partial class ExpD
     {
         public class Native : ExpD
