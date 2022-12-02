@@ -684,10 +684,15 @@ public:
     }
 
     // Dumps all the states in superposition via a callback function
+    // Callback expects label in a little-endian format (ex: "001" = 4)
     void dump_all(logical_qubit_id max_qubit_id, callback_t const& callback) {
-        _DumpWavefunction_base(_qubit_data, [max_qubit_id, callback](qubit_label label, amplitude val) -> bool {
-            return callback(label.to_string().substr(num_qubits-1-max_qubit_id).c_str(), val.real(), val.imag());
-        });
+        _DumpWavefunction_base(_qubit_data,
+            [max_qubit_id, callback](qubit_label label, amplitude val) -> bool {
+                std::string labelString(label.to_string().substr(num_qubits-1-max_qubit_id));
+                std::reverse(labelString.begin(), labelString.end());
+                return callback(labelString.c_str(), val.real(), val.imag());
+            }
+        );
     }
 
     // Execute a queue of phase/permutation gates

@@ -16,7 +16,6 @@ Write-Host "##[info]Compile Q# Test Projects into QIR"
 
 Build-QirProject (Join-Path $PSScriptRoot QIR-static qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 Build-QirProject (Join-Path $PSScriptRoot QIR-dynamic qsharp) -SkipQSharpBuild:$SkipQSharpBuild
-Build-QirProject (Join-Path $PSScriptRoot QIR-tracer qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 Build-QirProject (Join-Path $PSScriptRoot FullstateSimulator qsharp) -SkipQSharpBuild:$SkipQSharpBuild
 
 if (-not (Build-CMakeProject $PSScriptRoot "QIR Tests")) {

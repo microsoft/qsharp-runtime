@@ -21,29 +21,29 @@
 /src/Simulation/QCTraceSimulator/                      @DmitryVasilevsky
 /src/Simulation/QCTraceSimulator.Tests/                @DmitryVasilevsky
 /src/Simulation/qdk_sim_rs/                            @cgranade @swernli
-/src/Simulation/QSharpCore/                            @swernli
-/src/Simulation/QSharpFoundation/                      @swernli
+/src/Simulation/QSharpCore/                            @swernli @bettinaheim
+/src/Simulation/QSharpFoundation/                      @swernli @bettinaheim
 /src/Simulation/QSharpFoundation.Tests/                @swernli @kuzminrobin
 /src/Simulation/Simulators/                            @kuzminrobin
 /src/Simulation/Simulators/CommonNativeSimulator/      @kuzminrobin @DmitryVasilevsky
-/src/Simulation/Simulators/OpenSystemsSimulator/       @swernli
+/src/Simulation/Simulators/OpenSystemsSimulator/       @swernli @bettinaheim
 /src/Simulation/Simulators/Properties/
 /src/Simulation/Simulators/QCTraceSimulator/           @DmitryVasilevsky
 /src/Simulation/Simulators/QuantumSimulator/           @kuzminrobin
 /src/Simulation/Simulators/ResourcesEstimator/         @DmitryVasilevsky
 /src/Simulation/Simulators/SparseSimulator/            @kuzminrobin
 /src/Simulation/Simulators/ToffoliSimulator/           @DmitryVasilevsky
-/src/Simulation/Simulators.Tests/                      @swernli
+/src/Simulation/Simulators.Tests/                      @swernli @bettinaheim
 /src/Simulation/Simulators.Tests/QCTraceSimulatorPrimitivesTests/ @DmitryVasilevsky
-/src/Simulation/Simulators.Type1.Tests/                @swernli
-/src/Simulation/Simulators.Type2.Tests/                @swernli
-/src/Simulation/Simulators.Type3.Tests/                @swernli
-/src/Simulation/Simulators.Type4.Tests/                @swernli
-/src/Simulation/TargetDefinitions/                     @swernli
-/src/Simulation/Type1Core/                             @swernli
-/src/Simulation/Type2Core/                             @swernli
-/src/Simulation/Type3Core/                             @swernli
-/src/Simulation/Type4Core/                             @swernli
+/src/Simulation/Simulators.Type1.Tests/                @swernli @bettinaheim
+/src/Simulation/Simulators.Type2.Tests/                @swernli @bettinaheim
+/src/Simulation/Simulators.Type3.Tests/                @swernli @bettinaheim
+/src/Simulation/Simulators.Type4.Tests/                @swernli @bettinaheim
+/src/Simulation/TargetDefinitions/                     @swernli @bettinaheim
+/src/Simulation/Type1Core/                             @swernli @bettinaheim
+/src/Simulation/Type2Core/                             @swernli @bettinaheim
+/src/Simulation/Type3Core/                             @swernli @bettinaheim
+/src/Simulation/Type4Core/                             @swernli @bettinaheim
 /src/Simulation/README.md                              @kuzminrobin
 
 # Automatically tag in libraries maintainers on Q# API changes.

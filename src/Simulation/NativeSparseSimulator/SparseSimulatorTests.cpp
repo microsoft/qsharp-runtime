@@ -468,24 +468,24 @@ TEST_CASE("SWAPGateTest") {
     const qubit_label_type<num_qubits> zero(0);
     SparseSimulator sim = SparseSimulator(num_qubits);
     std::vector<logical_qubit_id> qubits{ 0,1 };
-    sim.SWAP({ qubits[0] }, qubits[1]); // 00 -> 00
+    sim.SWAP(qubits[0], qubits[1]); // 00 -> 00
     assert_amplitude_equality(sim.probe("00"), 1.0, 0.0);
     assert_amplitude_equality(sim.probe("01"), 0.0, 0.0);
     assert_amplitude_equality(sim.probe("10"), 0.0, 0.0);
     assert_amplitude_equality(sim.probe("11"), 0.0, 0.0);
     sim.X(qubits[0]);
-    sim.SWAP( qubits[0] , qubits[1]); // 10 -> 01
+    sim.SWAP(qubits[0], qubits[1]); // 10 -> 01
     assert_amplitude_equality(sim.probe("00"), 0.0, 0.0);
     assert_amplitude_equality(sim.probe("01"), 0.0, 0.0);
     assert_amplitude_equality(sim.probe("10"), 1.0, 0.0);
     assert_amplitude_equality(sim.probe("11"), 0.0, 0.0);
-    sim.SWAP( qubits[0] , qubits[1]); // 01 -> 10
+    sim.SWAP(qubits[0], qubits[1]); // 01 -> 10
     assert_amplitude_equality(sim.probe("0"), 0.0, 0.0);
     assert_amplitude_equality(sim.probe("1"), 1.0, 0.0);
     assert_amplitude_equality(sim.probe("10"), 0.0, 0.0);
     assert_amplitude_equality(sim.probe("11"), 0.0, 0.0);
     sim.X(qubits[1]);
-    sim.SWAP( qubits[0] , qubits[1]); // 11 -> 11
+    sim.SWAP(qubits[0], qubits[1]); // 11 -> 11
     assert_amplitude_equality(sim.probe("00"), 0.0, 0.0);
     assert_amplitude_equality(sim.probe("01"), 0.0, 0.0);
     assert_amplitude_equality(sim.probe("10"), 0.0, 0.0);

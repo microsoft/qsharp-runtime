@@ -36,6 +36,7 @@ class SimulatorInterface
         const std::vector<ComplexType>& amplitudes) = 0;
 
     // allocate and release
+    virtual unsigned allocate() = 0;
     virtual void allocateQubit(unsigned q) = 0;
     virtual bool release(unsigned q) = 0;
     virtual unsigned num_qubits() const = 0;

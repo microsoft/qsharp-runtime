@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+#Requires -PSEdition Core
+
 $ErrorActionPreference = 'Stop'
 
 Write-Host "Setting up build environment variables"
@@ -39,10 +41,18 @@ If (-not (Test-Path -Path $Env:WHEEL_OUTDIR)) { [IO.Directory]::CreateDirectory(
 If ($Env:DOCS_OUTDIR -eq $null) { $Env:DOCS_OUTDIR =  (Join-Path $Env:DROPS_DIR "docs") }
 If (-not (Test-Path -Path $Env:DOCS_OUTDIR)) { [IO.Directory]::CreateDirectory($Env:DOCS_OUTDIR) }
 
+$env:BUILD_PLATFORM = "win-x64"
+if ($IsLinux) {
+    $env:BUILD_PLATFORM = "linux-x64"
+} elseif ($IsMacOS) {
+    $env:BUILD_PLATFORM = "osx-x64"
+}
+
 Get-ChildItem -Path Env:/* -Include @(
     "BUILD_BUILDNUMBER",
     "BUILD_CONFIGURATION",
     "BUILD_VERBOSITY",
+    "BUILD_PLATFORM",
     "ASSEMBLY_VERSION",
     "PYTHON_VERSION",
     "NUGET_VERSION",

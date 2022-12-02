@@ -13,12 +13,6 @@
 
 #include "CLI11.hpp"
 
-#include "QirRuntime.hpp"
-#include "QirContext.hpp"
-
-#include "SimFactory.hpp"
-
-using namespace Microsoft::Quantum;
 using namespace std;
 
 // Auxiliary functions for interop with Q# Bool type.
@@ -39,17 +33,6 @@ int main(int argc, char* argv[])
 {
     CLI::App app("QIR Standalone Entry Point");
 
-    // Initialize runtime.
-    unique_ptr<IRuntimeDriver> sim = CreateFullstateSimulator();
-    QirContextScope qirctx(sim.get(), false /*trackAllocatedObjects*/);
-
-    // Add the --simulation-output option.
-    string simulationOutputFile;
-    CLI::Option* simulationOutputFileOpt = app.add_option(
-        "--simulation-output",
-        simulationOutputFile,
-        "File where the output produced during the simulation is written");
-
     // Add a command line option for each entry-point parameter.
     char BoolArgCli;
     BoolArgCli = InteropFalseAsChar;
@@ -63,27 +46,13 @@ int main(int argc, char* argv[])
     // Cast parsed arguments to its interop types.
     char BoolArgInterop = BoolArgCli;
 
-    // Redirect the simulator output from std::cout if the --simulation-output option is present.
-    ostream* simulatorOutputStream = &cout;
-    ofstream simulationOutputFileStream;
-    if (!simulationOutputFileOpt->empty())
-    {
-        simulationOutputFileStream.open(simulationOutputFile);
-        SetOutputStream(simulationOutputFileStream);
-        simulatorOutputStream = &simulationOutputFileStream;
-    }
-
     // Execute the entry point operation.
     UseBoolArg(
         BoolArgInterop
     );
 
     // Flush the output of the simulation.
-    simulatorOutputStream->flush();
-    if (simulationOutputFileStream.is_open())
-    {
-        simulationOutputFileStream.close();
-    }
+    cout.flush();
 
     return 0;
 }

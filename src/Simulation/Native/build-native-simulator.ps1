@@ -1,5 +1,7 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
+
+& (Join-Path $PSScriptRoot .. .. .. build set-env.ps1)
 
 Write-Host "##[info]Build Native simulator for $Env:BUILD_CONFIGURATION"
 

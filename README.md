@@ -28,8 +28,6 @@ You may also visit our [Quantum](https://github.com/microsoft/quantum) repositor
 
 Note that when building from source, this repository is configured so that .NET will automatically look at the [Quantum Development Kit prerelease feed](https://dev.azure.com/ms-quantum-public/Microsoft%20Quantum%20(public)/_packaging?_a=feed&feed=alpha) in addition to any other feeds you may have configured.
 
-Building **QIR Runtime** isn't enabled by default yet. Please see [its readme](./src/Qir/Runtime/README.md) for details.
-
 ### All platforms ###
 
 1. Install the pre-reqs:
@@ -46,6 +44,9 @@ To build on Windows:
         * **Spectre-mitigated libraries. Once Visual Studio has been installed, using the installer for the VS version of interest,
           click the"Modify" button, go to the "Individual Components" tab, search for "spectre", select the latest version of "MSVC v143 - VS 2022 C++ x64/x86 Spectre-mitigated libs", and click the "Modify" button to install the selected components**
         * **.NET 6.0 Runtime**
+    * Install [Chocolately](https://chocolatey.org/install). This is required to download other prerequisites if not already installed, such
+    as LLVM, CMake, Ninja, and Rust. (If these are already installed and on your PATH, then Chocolately may not be needed).
+
 2. Run [bootstrap.ps1](bootstrap.ps1) from PowerShell
     * pre-req (in PowerShell): `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
     * The script might install additional tools (a specific compiler, build tools, etc)
@@ -62,6 +63,7 @@ To build on other platforms:
 
 1. Install the pre-reqs:
     * Install [.NET 6.0](https://dotnet.microsoft.com/download) (version lower than 6.0.300 is recommended)
+    * Install [Homebrew](https://brew.sh/). This is needed to install other prerequisites such as Ninja and LLVM.
     * On [WSL](https://docs.microsoft.com/en-us/windows/wsl/)/Linux:
       * .NET 6.0: `sudo apt install dotnet-sdk-6.0 dotnet-runtime-6.0`. The possible result can be as in listing B below.  
         See also other ways [here](https://docs.microsoft.com/en-us/dotnet/core/install/linux) or [here](https://dotnet.microsoft.com/en-us/download).
