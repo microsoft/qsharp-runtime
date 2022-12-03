@@ -108,19 +108,22 @@ namespace Microsoft.Quantum.Convert {
     /// ```
     function BoolArrayAsBigInt(a : Bool[]) : BigInt {
         mutable val = 0L;
-        mutable arr = a;
 
-        if Length(arr) % 8 != 0 {
-            // Padding is needed.
-            set arr += [false, size = 8 - (Length(arr) % 8)];
-        }
+        if Length(a) > 0 {
+            mutable arr = a;
 
-        let len = Length(arr);
-        for i in 0..(len - 2) {
-            set val += arr[i] ? 2L ^ i | 0L;
-        }
-        if arr[len - 1] {
-            set val -= 2L ^ (len - 1);
+            if Length(arr) % 8 != 0 {
+                // Padding is needed.
+                set arr += [false, size = 8 - (Length(arr) % 8)];
+            }
+
+            let len = Length(arr);
+            for i in 0..(len - 2) {
+                set val += arr[i] ? 2L ^ i | 0L;
+            }
+            if arr[len - 1] {
+                set val -= 2L ^ (len - 1);
+            }
         }
 
         return val;
