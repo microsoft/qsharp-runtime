@@ -445,6 +445,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
                     true, false, false, false, false, false, false, true];    // Exactly 2 bytes, negative
         AssertEqual(-32489L, BoolArrayAsBigInt(arr3));
         AssertEqual(37L, BoolArrayAsBigInt(BigIntAsBoolArray(37L)));
+        AssertEqual(-37L, BoolArrayAsBigInt(BigIntAsBoolArray(-37L)));
         let (div, rem) = DivRemL(16L, 5L);
         AssertEqual(3L, div);
         AssertEqual(1L, rem);

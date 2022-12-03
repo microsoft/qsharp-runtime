@@ -65,13 +65,19 @@ namespace Microsoft.Quantum.Convert {
     /// which is true, if and only if the conversion was possible.
     function MaybeBigIntAsInt(a : BigInt) : (Int, Bool) {
         let arr = BigIntAsBoolArray(a);
-        if Length(arr) > 64 {
+        let len = Length(arr);
+        if len > 64 {
             return (0, false);
         }
 
+        // BigIntAsBoolArray always returns padded results with minimum length 8, so the below
+        // logic can assume the last entry is the sign bit for two's complement.
         mutable val = 0;
-        for i in 0..(Length(arr) - 1) {
+        for i in 0..(len - 2) {
             set val += arr[i] ? 2 ^ i | 0;
+        }
+        if arr[len - 1] {
+            set val -= 2 ^ (len - 1);
         }
 
         return (val, true);
@@ -82,14 +88,42 @@ namespace Microsoft.Quantum.Convert {
     /// Converts a given big integer to an array of Booleans.
     /// The 0 element of the array is the least significant bit of the big integer.
     function BigIntAsBoolArray(a : BigInt) : Bool[] {
-        mutable val = a;
-        mutable arr = [];
+        // To use two's complement, little endian representation of the integer, we fisrt need to track if the input
+        // is a negative number. If so, flip it back to positive and start tracking a carry bit.
+        let isNegative = a < 0L;
+        mutable carry = isNegative;
+        mutable val = isNegative ? -a | a;
 
+        mutable arr = [];
         while val != 0L {
-            set arr += [val % 2L == 1L];
-            set val >>>= 1;
+            let newBit = val % 2L == 1L;
+            if isNegative {
+                // For negative numbers we must invert the calculated bit, so treat "true" as "0"
+                // and "false" as "1". This means when the carry bit is set, we want to record the
+                // calculated new bit and set the carry to the opposite, otherwise record the opposite
+                // of the calculate bit.
+                if carry {
+                    set arr += [newBit];
+                    set carry = not newBit;
+                }
+                else {
+                    set arr += [not newBit];
+                }
+            }
+            else {
+                // For positive numbers just accumulate the calculated bits into the array.
+                set arr += [newBit];
+            }
+
+            set val /= 2L;
         }
 
+        // Pad to the next higher byte length (size 8) if the length is not a non-zero multiple of 8 or
+        // if the last bit does not agree with the sign bit.
+        let len = Length(arr);
+        if len == 0 or len % 8 != 0 or arr[len - 1] != isNegative {
+            set arr += [isNegative, size = 8 - (len % 8)];
+        }
         return arr;
     }
 
@@ -113,7 +147,8 @@ namespace Microsoft.Quantum.Convert {
             mutable arr = a;
 
             if Length(arr) % 8 != 0 {
-                // Padding is needed.
+                // Padding is needed when the array is not evenly divisible by 8 (byte size).
+                // Always pad with false to treat the input number as positive.
                 set arr += [false, size = 8 - (Length(arr) % 8)];
             }
 
@@ -122,6 +157,9 @@ namespace Microsoft.Quantum.Convert {
                 set val += arr[i] ? 2L ^ i | 0L;
             }
             if arr[len - 1] {
+                // In two's complement the final bit is a sign bit, meaning it corresponds to
+                // -1 * 2^i, where i is the index of the most significant bit in the nearest length
+                // evenly divisible by 8.
                 set val -= 2L ^ (len - 1);
             }
         }
