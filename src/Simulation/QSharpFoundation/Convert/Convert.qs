@@ -64,11 +64,11 @@ namespace Microsoft.Quantum.Convert {
     /// The function returns a pair of the resulting integer and a Boolean flag
     /// which is true, if and only if the conversion was possible.
     function MaybeBigIntAsInt(a : BigInt) : (Int, Bool) {
-        let arr = BigIntAsBoolArray(a);
-        let len = Length(arr);
-        if len > 64 {
+        if a > (1L <<< 63) - 1L or a < (-1L * (1L <<< 63)) {
             return (0, false);
         }
+        let arr = BigIntAsBoolArray(a);
+        let len = Length(arr);
 
         // BigIntAsBoolArray always returns padded results with minimum length 8, so the below
         // logic can assume the last entry is the sign bit for two's complement.
