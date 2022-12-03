@@ -63,20 +63,68 @@ namespace Microsoft.Quantum.Convert {
     /// Converts a given big integer to an equivalent integer, if possible.
     /// The function returns a pair of the resulting integer and a Boolean flag
     /// which is true, if and only if the conversion was possible.
-    /// # Remarks
-    /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
     function MaybeBigIntAsInt(a : BigInt) : (Int, Bool) {
-        body intrinsic;
+        if a > (1L <<< 63) - 1L or a < (-1L * (1L <<< 63)) {
+            return (0, false);
+        }
+        let arr = BigIntAsBoolArray(a);
+        let len = Length(arr);
+
+        // BigIntAsBoolArray always returns padded results with minimum length 8, so the below
+        // logic can assume the last entry is the sign bit for two's complement.
+        mutable val = 0;
+        for i in 0..(len - 2) {
+            set val += arr[i] ? 2 ^ i | 0;
+        }
+        if arr[len - 1] {
+            set val -= 2 ^ (len - 1);
+        }
+
+        return (val, true);
     }
 
 
     /// # Summary
     /// Converts a given big integer to an array of Booleans.
     /// The 0 element of the array is the least significant bit of the big integer.
-    /// # Remarks
-    /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
     function BigIntAsBoolArray(a : BigInt) : Bool[] {
-        body intrinsic;
+        // To use two's complement, little endian representation of the integer, we fisrt need to track if the input
+        // is a negative number. If so, flip it back to positive and start tracking a carry bit.
+        let isNegative = a < 0L;
+        mutable carry = isNegative;
+        mutable val = isNegative ? -a | a;
+
+        mutable arr = [];
+        while val != 0L {
+            let newBit = val % 2L == 1L;
+            if isNegative {
+                // For negative numbers we must invert the calculated bit, so treat "true" as "0"
+                // and "false" as "1". This means when the carry bit is set, we want to record the
+                // calculated new bit and set the carry to the opposite, otherwise record the opposite
+                // of the calculate bit.
+                if carry {
+                    set arr += [newBit];
+                    set carry = not newBit;
+                }
+                else {
+                    set arr += [not newBit];
+                }
+            }
+            else {
+                // For positive numbers just accumulate the calculated bits into the array.
+                set arr += [newBit];
+            }
+
+            set val /= 2L;
+        }
+
+        // Pad to the next higher byte length (size 8) if the length is not a non-zero multiple of 8 or
+        // if the last bit does not agree with the sign bit.
+        let len = Length(arr);
+        if len == 0 or len % 8 != 0 or arr[len - 1] != isNegative {
+            set arr += [isNegative, size = 8 - (len % 8)];
+        }
+        return arr;
     }
 
 
@@ -84,8 +132,7 @@ namespace Microsoft.Quantum.Convert {
     /// Converts a given array of Booleans to an equivalent big integer.
     /// The 0 element of the array is the least significant bit of the big integer.
     /// # Remarks
-    /// See [C# BigInteger constructor](https://docs.microsoft.com/dotnet/api/system.numerics.biginteger.-ctor?view=netframework-4.7.2#System_Numerics_BigInteger__ctor_System_Int64_) for more details.
-    /// Note that the Boolean array is padded of the right with `false` values to a length that is a multiple of 8, 
+    /// Note that the Boolean array is padded on the right with `false` values to a length that is a multiple of 8, 
     /// and then treated as a little-endian notation of a positive or negative number following two's complement semantics.
     ///
     /// # Example
@@ -94,7 +141,30 @@ namespace Microsoft.Quantum.Convert {
     /// let bi2 = BoolArrayAsBigInt([false, false, false, false, false, false, false, true]); // Not padded -> -128
     /// ```
     function BoolArrayAsBigInt(a : Bool[]) : BigInt {
-        body intrinsic;
+        mutable val = 0L;
+
+        if Length(a) > 0 {
+            mutable arr = a;
+
+            if Length(arr) % 8 != 0 {
+                // Padding is needed when the array is not evenly divisible by 8 (byte size).
+                // Always pad with false to treat the input number as positive.
+                set arr += [false, size = 8 - (Length(arr) % 8)];
+            }
+
+            let len = Length(arr);
+            for i in 0..(len - 2) {
+                set val += arr[i] ? 2L ^ i | 0L;
+            }
+            if arr[len - 1] {
+                // In two's complement the final bit is a sign bit, meaning it corresponds to
+                // -1 * 2^i, where i is the index of the most significant bit in the nearest length
+                // evenly divisible by 8.
+                set val -= 2L ^ (len - 1);
+            }
+        }
+
+        return val;
     }
 
 
@@ -144,6 +214,7 @@ namespace Microsoft.Quantum.Convert {
     ///
     /// # Remarks
     /// See [C# Int64.ToString](https://docs.microsoft.com/dotnet/api/system.int64.tostring?view=netframework-4.7.1#System_Int64_ToString_System_String_) for more details.
+    @Deprecated("")
     function IntAsStringWithFormat(a : Int, fmt : String) : String {
         body intrinsic;
     }
