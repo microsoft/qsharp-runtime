@@ -6,11 +6,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-num-bigint = { version = "0.4.3", default-features = false }
-rand = "0.8.5"
-
-[build-dependencies]
-llvm-tools = "0.1.1"
+qir-stdlib = { git = "https://github.com/qir-alliance/qir-runner/", rev = "54d334c0c845ebbfd4dc9512ef05cd2cbe4238c5" }
 
 [lib]
-crate-type = ["staticlib","rlib"]
+crate-type = ["staticlib"]
