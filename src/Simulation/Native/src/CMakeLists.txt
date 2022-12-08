@@ -39,7 +39,7 @@ target_include_directories(Microsoft.Quantum.Simulator.Runtime PRIVATE "${PROJEC
 if (WIN32)
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
     ${SPECTRE_LIBS}
-    "-L${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native"
+    "-L${PROJECT_BINARY_DIR}/../../../Qir/drops"
     qir_stdlib
     Ws2_32
     Bcrypt
@@ -53,7 +53,7 @@ elseif (APPLE)
   # See https://stackoverflow.com/questions/16926608/including-static-libraries-with-all-load-flag
   # and https://github.com/bioinformatics-centre/kaiju/issues/30
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
-    "-Wl,-force_load,${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native/libqir_stdlib.a"
+    "-Wl,-force_load,${PROJECT_BINARY_DIR}/../../../Qir/drops/libqir_stdlib.a"
     pthread
     dl
   )
@@ -63,7 +63,7 @@ else()
   # normal loading of other dependencies.
   # See https://www.man7.org/linux/man-pages/man1/ld.1.html
   target_link_libraries(Microsoft.Quantum.Simulator.Runtime
-    "-L${PROJECT_BINARY_DIR}/../../../Qir/drops/bin/$ENV{BUILD_PLATFORM}/native"
+    "-L${PROJECT_BINARY_DIR}/../../../Qir/drops"
     "-Wl,--whole-archive"
     qir_stdlib
     "-Wl,--no-whole-archive"
