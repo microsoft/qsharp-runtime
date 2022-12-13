@@ -45,3 +45,9 @@ foreach(TEST SparseSimulatorTests CSharpIntegrationTests)
     target_include_directories(${TEST} PRIVATE ../../Qir/Common/Externals/catch2)
     add_test(${TEST} ${TEST})
 endforeach()
+
+install(TARGETS Microsoft.Quantum.SparseSimulator.Runtime
+        RUNTIME DESTINATION "${CMAKE_BINARY_DIR}/drop"
+        LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/drop"
+        ARCHIVE DESTINATION "${CMAKE_BINARY_DIR}/drop"
+       )
