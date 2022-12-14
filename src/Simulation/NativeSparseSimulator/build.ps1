@@ -67,7 +67,7 @@ Push-Location $BuildDir
     ( & "cmake" $CmakeConfigArgs ) || ( $FailureCommands.Invoke() )
 
     # Invoke the build scripts:
-    ( cmake --build . ) || ( $FailureCommands.Invoke() )
+    ( cmake --build . --target install) || ( $FailureCommands.Invoke() )
 
 # popd
 Pop-Location

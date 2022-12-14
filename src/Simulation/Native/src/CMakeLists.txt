@@ -77,3 +77,4 @@ install(TARGETS Microsoft.Quantum.Simulator.Runtime
         LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/drop"
         ARCHIVE DESTINATION "${CMAKE_BINARY_DIR}/drop"
        )
+install(FILES "${CMAKE_BINARY_DIR}/Microsoft.Quantum.Simulator.Runtime.pdb" DESTINATION "${CMAKE_BINARY_DIR}/drop" OPTIONAL)
