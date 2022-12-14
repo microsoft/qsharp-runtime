@@ -6,7 +6,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-qir-stdlib = { git = "https://github.com/qir-alliance/qir-runner/", rev = "54d334c0c845ebbfd4dc9512ef05cd2cbe4238c5" }
+qir-stdlib = { git = "https://github.com/qir-alliance/qir-runner/", rev = "f04c90b1908a1bed7b7b21db1c2e10d84504227c" }
 
 [lib]
 crate-type = ["staticlib"]
