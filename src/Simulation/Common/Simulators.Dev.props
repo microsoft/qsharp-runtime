@@ -7,7 +7,7 @@
     <NativeRootPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/Native))</NativeRootPath>
     <NativeBuildPath>$([MSBuild]::NormalizePath($(NativeRootPath)/build/drop))</NativeBuildPath>
     <ExperimentalSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/qdk_sim_rs/drop))</ExperimentalSimBuildPath>
-    <NativeSparseSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/NativeSparseSimulator/build))</NativeSparseSimBuildPath>
+    <NativeSparseSimBuildPath>$([MSBuild]::NormalizePath($(EnlistmentRoot)src/Simulation/NativeSparseSimulator/build/drop))</NativeSparseSimBuildPath>
   </PropertyGroup>
 
   <ItemGroup>
