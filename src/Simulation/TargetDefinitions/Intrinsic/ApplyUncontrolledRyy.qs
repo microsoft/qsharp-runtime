@@ -9,7 +9,7 @@ namespace Microsoft.Quantum.Intrinsic {
     ///
     /// # Description
     /// \begin{align}
-    ///     YY(\theta) \mathrel{:=}
+    ///     R_yy(\theta) \mathrel{:=}
     ///     \begin{bmatrix}
     ///         \cos \theta & 0 & 0 & i\sin \theta  \\\\
     ///         0 & \cos \theta & -i\sin \theta & 0  \\\\
