@@ -49,8 +49,11 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ResultArrayAsInt.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RFrac.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RxFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RxxFromRzz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RyFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RyyFromRzz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RzFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RzzFromRz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\SFromSinglyControlled.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\SWAPFromSinglyControlled.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\TFromSinglyControlled.qs" />

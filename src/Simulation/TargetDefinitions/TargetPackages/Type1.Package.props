@@ -10,6 +10,7 @@
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRzz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledSAdj.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs" />
@@ -48,8 +49,11 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ResultArrayAsInt.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RFrac.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RxFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RxxFromRzz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RyFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RyyFromRzz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RzFromSinglyControlled.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RzzFromSinglyControlled.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\SFromSinglyControlled.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\SWAP.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\TFromSinglyControlled.qs" />

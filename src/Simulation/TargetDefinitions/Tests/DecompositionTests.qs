@@ -116,6 +116,27 @@ namespace DecompositionTests {
         VerifyUnitaryAndFunctors4((q0, q1, q2, q3) => Exp([PauliZ, size = 4], angle, [q0, q1, q2, q3]), (q0, q1, q2, q3) => Reference.Exp([PauliZ, size = 4], angle, [q0, q1, q2, q3]));
     }
 
+    @Test("SparseSimulator")
+    operation VerifyRxx() : Unit {
+        // Use an angle that doesn't have any symmetries as a stand-in for broader validation.
+        let angle = PI() / 7.0;
+        VerifyUnitaryAndFunctors2((q0, q1) => Rxx(angle, q0, q1), (q0, q1) => Reference.Rxx(angle, q0, q1));
+    }
+
+    @Test("SparseSimulator")
+    operation VerifyRyy() : Unit {
+        // Use an angle that doesn't have any symmetries as a stand-in for broader validation.
+        let angle = PI() / 7.0;
+        VerifyUnitaryAndFunctors2((q0, q1) => Ryy(angle, q0, q1), (q0, q1) => Reference.Ryy(angle, q0, q1));
+    }
+
+    @Test("SparseSimulator")
+    operation VerifyRzz() : Unit {
+        // Use an angle that doesn't have any symmetries as a stand-in for broader validation.
+        let angle = PI() / 7.0;
+        VerifyUnitaryAndFunctors2((q0, q1) => Rzz(angle, q0, q1), (q0, q1) => Reference.Rzz(angle, q0, q1));
+    }
+
     internal operation VerifyUnitaryAndFunctors(unitary : Qubit => Unit is Adj + Ctl, reference : Qubit => Unit is Adj + Ctl) : Unit {
         VerifyUnitary(unitary, reference, 8);
         VerifyUnitary(Adjoint unitary, Adjoint reference, 8);
