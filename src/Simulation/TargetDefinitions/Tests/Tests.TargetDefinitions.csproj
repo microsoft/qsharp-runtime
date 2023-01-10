@@ -61,6 +61,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Type1\**" />
+    <EmbeddedResource Remove="Type1\**" />
+    <QSharpCompile Remove="Type1\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
     <ProjectReference Include="..\..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
   </ItemGroup>

@@ -4,25 +4,26 @@
   <Import Project="Common.Package.props" />
 
   <ItemGroup>
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyControlledX.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyControlledZ.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledH.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRx.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRy.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRz.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledRzz.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledS.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledSAdj.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledT.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledTAdj.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledX.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledY.qs" />
-    <QSharpCompile Include="..\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\MZ.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Intrinsic\Reset.qs" />
   </ItemGroup>
 
   <ItemGroup>
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledX.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyControlledZFromRzz.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledH.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledRy.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledS.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledSAdj.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledT.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledTAdj.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledX.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledY.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\ApplyUncontrolledZ.qs" />
+
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualInPlace.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\AssertOperationsEqualReferenced.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\CCNOTFromCCZ.qs" />
