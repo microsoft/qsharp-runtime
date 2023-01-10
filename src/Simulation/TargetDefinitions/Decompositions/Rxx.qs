@@ -5,16 +5,16 @@ namespace Microsoft.Quantum.Intrinsic {
     open Microsoft.Quantum.Targeting;
 
     /// # Summary
-    /// Applies the two qubit Ising $ZZ$ rotation gate.
+    /// Applies the two qubit Ising $XX$ rotation gate.
     ///
     /// # Description
     /// \begin{align}
-    ///     R_zz(\theta) \mathrel{:=}
+    ///     R_xx(\theta) \mathrel{:=}
     ///     \begin{bmatrix}
-    ///         e^{-i \theta / 2} & 0 & 0 & 0 \\\\
-    ///         0 & e^{-i \theta / 2} & 0 & 0 \\\\
-    ///         0 & 0 & e^{-i \theta / 2} & 0 \\\\
-    ///         0 & 0 & 0 & e^{i \theta / 2}
+    ///         \cos \theta & 0 & 0 & -i\sin \theta  \\\\
+    ///         0 & \cos \theta & -i\sin \theta & 0  \\\\
+    ///         0 & -i\sin \theta & \cos \theta & 0  \\\\
+    ///         -i\sin \theta & 0 & 0 & \cos \theta
     ///     \end{bmatrix}.
     /// \end{align}
     ///
@@ -25,8 +25,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// The first qubit input to the gate.
     /// ## qubit1
     /// The second qubit input to the gate.
-    @TargetInstruction("rzz__body")
-    internal operation ApplyUncontrolledRzz (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit {
-        body intrinsic;
+    operation Rxx (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+        Exp([Paulix, PauliX], theta / -2.0, [qubit0, qubit1]);
     }
 }

@@ -26,7 +26,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// ## qubit1
     /// The second qubit input to the gate.
     @TargetInstruction("rxx__body")
-    internal operation ApplyUncontrolledRxx (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+    internal operation ApplyUncontrolledRxx (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit {
         body intrinsic;
     }
 }

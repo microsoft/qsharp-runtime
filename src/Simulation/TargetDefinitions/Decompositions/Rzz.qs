@@ -25,8 +25,7 @@ namespace Microsoft.Quantum.Intrinsic {
     /// The first qubit input to the gate.
     /// ## qubit1
     /// The second qubit input to the gate.
-    @TargetInstruction("rzz__body")
-    internal operation ApplyUncontrolledRzz (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit {
-        body intrinsic;
+    operation Rzz (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+        Exp([PauliZ, PauliZ], theta / -2.0, [qubit0, qubit1]);
     }
 }
