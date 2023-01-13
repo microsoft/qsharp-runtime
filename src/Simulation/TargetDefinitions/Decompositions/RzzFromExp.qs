@@ -12,9 +12,9 @@ namespace Microsoft.Quantum.Intrinsic {
     ///     R_zz(\theta) \mathrel{:=}
     ///     \begin{bmatrix}
     ///         e^{-i \theta / 2} & 0 & 0 & 0 \\\\
-    ///         0 & e^{-i \theta / 2} & 0 & 0 \\\\
-    ///         0 & 0 & e^{-i \theta / 2} & 0 \\\\
-    ///         0 & 0 & 0 & e^{i \theta / 2}
+    ///         0 & e^{i \theta / 2} & 0 & 0 \\\\
+    ///         0 & 0 & e^{i \theta / 2} & 0 \\\\
+    ///         0 & 0 & 0 & e^{-i \theta / 2}
     ///     \end{bmatrix}.
     /// \end{align}
     ///
