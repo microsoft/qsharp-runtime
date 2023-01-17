@@ -8,7 +8,7 @@ namespace Microsoft.Quantum.Intrinsic {
         body (...) {
             // NB: CZ is symmetric under swap, so we need for the below decomposition to
             //     treat control and target identically.
-            ApplyUncontrolledZZ(PI(), control, target);
+            ApplyUncontrolledZZ(PI() / 2.0, control, target);
             ApplyUncontrolledRz(-PI() / 2.0, control);
             ApplyUncontrolledRz(-PI() / 2.0, target);
         }
