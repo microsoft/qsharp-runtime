@@ -49,3 +49,4 @@ if (-not (Test-Path Env:/AGENT_OS)) {                                    # If no
     Write-Host "Build simulation solution"
     dotnet build (Join-Path $PSScriptRoot "Simulation.sln")
 }
+
