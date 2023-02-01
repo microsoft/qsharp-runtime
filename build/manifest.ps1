@@ -49,7 +49,7 @@ $artifacts = @{
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Simulation.Common.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",
         ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Simulators.dll",
-        ".\src\Xunit\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Xunit.dll"
+        ".\src\Xunit\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Xunit.dll"
     ) | ForEach-Object { Join-Path $PSScriptRoot (Join-Path ".." $_) };
     
     Native = @(
