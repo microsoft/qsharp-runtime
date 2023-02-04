@@ -30,40 +30,20 @@ namespace Microsoft.Quantum.EntryPointDriver
         public static async Task<int> Simulate(
             IEntryPoint entryPoint, TIn input, DriverSettings settings, string simulator)
         {
-            if (simulator == settings.ResourcesEstimatorName)
+            var (isCustom, createSimulator) =
+                simulator == settings.QuantumSimulatorName
+                    ? (false, () => new QuantumSimulator())
+                    : simulator == settings.SparseSimulatorName
+                    ? (false, () => new SparseSimulator())
+                    : simulator == settings.ToffoliSimulatorName
+                    ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
+                    : (true, settings.CreateDefaultCustomSimulator);
+            if (isCustom && simulator != settings.DefaultSimulatorName)
             {
-                // Force the explicit load of the QSharp.Core assembly so that the ResourcesEstimator
-                // can discover it dynamically at runtime and override the defined callables.
-                var coreAssemblyName = 
-                    (from aName in entryPoint.GetType().Assembly.GetReferencedAssemblies()
-                    where aName.Name == "Microsoft.Quantum.QSharp.Core"
-                    select aName).FirstOrDefault();
-                var coreAssembly = coreAssemblyName != null ? 
-                    Assembly.Load(coreAssemblyName.FullName) :
-                    null;
-
-                var resourcesEstimator = new ResourcesEstimator(coreAssembly);
-                await resourcesEstimator.Run<TCallable, TIn, TOut>(input);
-                Console.WriteLine(resourcesEstimator.ToTSV());
+                DisplayCustomSimulatorError(simulator);
+                return 1;
             }
-            else
-            {
-                var (isCustom, createSimulator) =
-                    simulator == settings.QuantumSimulatorName
-                        ? (false, () => new QuantumSimulator())
-                        : simulator == settings.SparseSimulatorName
-                        ? (false, () => new SparseSimulator())
-                        : simulator == settings.ToffoliSimulatorName
-                        ? (false, new Func<IOperationFactory>(() => new ToffoliSimulator()))
-                        : (true, settings.CreateDefaultCustomSimulator);
-                if (isCustom && simulator != settings.DefaultSimulatorName)
-                {
-                    DisplayCustomSimulatorError(simulator);
-                    return 1;
-                }
-                await RunSimulator(input, createSimulator);
-            }
-
+            await RunSimulator(input, createSimulator);
             return 0;
         }
 

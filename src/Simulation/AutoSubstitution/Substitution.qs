@@ -10,7 +10,7 @@ namespace Microsoft.Quantum.Targeting {
     /// Fully qualified name of alternative operation to substitute operation with.
     ///
     /// ## TargetName
-    /// One of `QuantumSimulator`, `ToffoliSimulator`, or `ResourcesEstimator`, or a fully qualified name
+    /// One of `QuantumSimulator`, `ToffoliSimulator`, or a fully qualified name
     /// of a custom target.
     @Attribute()
     newtype SubstitutableOnTarget = (AlternativeOperation : String, TargetName : String);

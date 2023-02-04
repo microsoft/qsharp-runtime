@@ -25,10 +25,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests.Circuits {
         AlwaysFail();
     }
 
-    operation GenericFail1() :  Unit is Adj + Ctl {
-        GenericFail(5,6);
-    }
-
     operation PartialFail( a : Int, b : Int ) : Unit is Adj + Ctl {
         AlwaysFail();
     }
