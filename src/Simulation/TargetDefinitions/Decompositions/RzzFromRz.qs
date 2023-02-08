@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 namespace Microsoft.Quantum.Intrinsic {
@@ -9,12 +9,12 @@ namespace Microsoft.Quantum.Intrinsic {
     ///
     /// # Description
     /// \begin{align}
-    ///     ZZ(\theta) \mathrel{:=}
+    ///     R_zz(\theta) \mathrel{:=}
     ///     \begin{bmatrix}
     ///         e^{-i \theta / 2} & 0 & 0 & 0 \\\\
-    ///         0 & e^{-i \theta / 2} & 0 & 0 \\\\
-    ///         0 & 0 & e^{-i \theta / 2} & 0 \\\\
-    ///         0 & 0 & 0 & e^{i \theta / 2}
+    ///         0 & e^{i \theta / 2} & 0 & 0 \\\\
+    ///         0 & 0 & e^{i \theta / 2} & 0 \\\\
+    ///         0 & 0 & 0 & e^{-i \theta / 2}
     ///     \end{bmatrix}.
     /// \end{align}
     ///
@@ -25,7 +25,12 @@ namespace Microsoft.Quantum.Intrinsic {
     /// The first qubit input to the gate.
     /// ## qubit1
     /// The second qubit input to the gate.
-    internal operation IsingZZ (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
-        body intrinsic;
+    operation Rzz (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+        within {
+            CNOT(qubit1, qubit0);
+        }
+        apply {
+            Rz(theta, qubit0);
+        }
     }
 }
