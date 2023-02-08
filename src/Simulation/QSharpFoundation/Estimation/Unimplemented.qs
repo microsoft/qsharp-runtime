@@ -11,35 +11,35 @@ namespace Microsoft.Quantum.Estimation {
     /// # Summary
     /// Indicates that the second item in a tuple passed to the `UnimplementedOperation`
     /// is the number of the T gates.
-    function TCount() : Int {
+    function TCountKey() : Int {
         return 1;
     }
 
     /// # Summary
     /// Indicates that the second item in a tuple passed to the `UnimplementedOperation`
     /// is the count of rotations.
-    function RotationCount() : Int {
+    function RotationCountKey() : Int {
         return 2;
     }
 
     /// # Summary
     /// Indicates that the second item in a tuple passed to the `UnimplementedOperation`
     /// is the rotation depth.
-    function RotationDepth() : Int {
+    function RotationDepthKey() : Int {
         return 3;
     }
 
     /// # Summary
     /// Indicates that the second item in a tuple passed to the `UnimplementedOperation`
     /// is the number of CCZ gates.
-    function CczCount() : Int {
+    function CczCountKey() : Int {
         return 4;
     }
 
     /// # Summary
     /// Indicates that the second item in a tuple passed to the `UnimplementedOperation`
     /// is the number of measurements.
-    function MeasurementCount() : Int {
+    function MeasurementCountKey() : Int {
         return 5;
     }
 
@@ -53,7 +53,7 @@ namespace Microsoft.Quantum.Estimation {
     /// Operation requires this many auxilliary qubits.
     /// ## cost
     /// Array of tuples containing costs of the operation. For example, if the operation uses there
-    /// T gates, pass tuple (TCount(), 3) as one of the array elements.
+    /// T gates, pass tuple (TCountKey(), 3) as one of the array elements.
     operation UnimplementedOperation(arguments: Qubit[], auxQubitCount: Int, cost: (Int, Int)[]): Unit is Adj {
         body intrinsic;
         adjoint self;
