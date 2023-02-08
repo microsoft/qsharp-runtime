@@ -5,9 +5,9 @@ namespace Microsoft.Quantum.Intrinsic.Interfaces
 {
     public interface IType2Core :
         IIntrinsicH,
-        IIntrinsicIsingXX,
-        IIntrinsicIsingYY,
-        IIntrinsicIsingZZ,
+        IIntrinsicApplyUncontrolledRxx,
+        IIntrinsicApplyUncontrolledRyy,
+        IIntrinsicApplyUncontrolledRzz,
         IIntrinsicMZ,
         IIntrinsicRx,
         IIntrinsicRy,

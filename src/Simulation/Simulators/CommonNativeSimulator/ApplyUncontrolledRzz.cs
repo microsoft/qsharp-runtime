@@ -8,9 +8,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
 {
     public partial class CommonNativeSimulator
     {
-        void IIntrinsicIsingXX.Body(double angle, Qubit target1, Qubit target2)
+        void IIntrinsicApplyUncontrolledRzz.Body(double angle, Qubit target1, Qubit target2)
         {
-            var paulis = new Pauli[]{ Pauli.PauliX, Pauli.PauliX };
+            var paulis = new Pauli[]{ Pauli.PauliZ, Pauli.PauliZ };
             var targets = new QArray<Qubit>(new Qubit[]{ target1, target2 });
             CheckAngle(angle);
             this.CheckQubits(targets);
@@ -18,21 +18,21 @@ namespace Microsoft.Quantum.Simulation.Simulators
             Exp((uint)targets.Length, paulis, angle / -2.0, targets.GetIds());
         }
 
-        void IIntrinsicIsingXX.AdjointBody(double angle, Qubit target1, Qubit target2)
+        void IIntrinsicApplyUncontrolledRzz.AdjointBody(double angle, Qubit target1, Qubit target2)
         {
-            ((IIntrinsicIsingXX)this).Body(-angle, target1, target2);
+            ((IIntrinsicApplyUncontrolledRzz)this).Body(-angle, target1, target2);
         }
 
-        void IIntrinsicIsingXX.ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
+        void IIntrinsicApplyUncontrolledRzz.ControlledBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
         {
             if (controls == null || controls.Length == 0)
             {
-                ((IIntrinsicIsingXX)this).Body(angle, target1, target2);
+                ((IIntrinsicApplyUncontrolledRzz)this).Body(angle, target1, target2);
             }
             else
             {
                 var targets = new QArray<Qubit>(new Qubit[]{ target1, target2 });
-                var paulis = new Pauli[]{ Pauli.PauliX, Pauli.PauliX };
+                var paulis = new Pauli[]{ Pauli.PauliZ, Pauli.PauliZ };
                 CheckAngle(angle);
                 this.CheckQubits(QArray<Qubit>.Add(controls, targets));
 
@@ -40,9 +40,9 @@ namespace Microsoft.Quantum.Simulation.Simulators
             }
         }
 
-        void IIntrinsicIsingXX.ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
+        void IIntrinsicApplyUncontrolledRzz.ControlledAdjointBody(IQArray<Qubit> controls, double angle, Qubit target1, Qubit target2)
         {
-            ((IIntrinsicIsingXX)this).ControlledBody(controls, -angle, target1, target2);
+            ((IIntrinsicApplyUncontrolledRzz)this).ControlledBody(controls, -angle, target1, target2);
         }
     }
 }
