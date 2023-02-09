@@ -35,26 +35,26 @@ $artifacts = @{
     ) | ForEach-Object { Join-Path $Env:NUGET_OUTDIR "$_.$Env:NUGET_VERSION.nupkg" };
 
     Assemblies = @(
-        ".\src\Azure\Azure.Quantum.Client\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Azure.Quantum.Client.dll",
-        ".\src\Simulation\AutoSubstitution\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.AutoSubstitution.dll",
-        ".\src\Qir\Tools\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Qir.Runtime.Tools.dll",
-        ".\src\Simulation\Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Runtime.Core.dll",
-        ".\src\Simulation\EntryPointDriver\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.EntryPointDriver.dll",
-        ".\src\Simulation\QSharpCore\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Core.dll",
-        ".\src\Simulation\Type1Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type1.Core.dll",
-        ".\src\Simulation\Type2Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type2.Core.dll",
-        ".\src\Simulation\Type3Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type3.Core.dll",
-        ".\src\Simulation\Type4Core\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Type4.Core.dll",
-        ".\src\Simulation\QSharpFoundation\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.QSharp.Foundation.dll",
-        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.Common.dll",
-        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",
-        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulators.dll",
-        ".\src\Xunit\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Xunit.dll"
+        ".\src\Azure\Azure.Quantum.Client\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Azure.Quantum.Client.dll",
+        ".\src\Simulation\AutoSubstitution\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.AutoSubstitution.dll",
+        ".\src\Qir\Tools\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Qir.Runtime.Tools.dll",
+        ".\src\Simulation\Core\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Runtime.Core.dll",
+        ".\src\Simulation\EntryPointDriver\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.EntryPointDriver.dll",
+        ".\src\Simulation\QSharpCore\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.QSharp.Core.dll",
+        ".\src\Simulation\Type1Core\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Type1.Core.dll",
+        ".\src\Simulation\Type2Core\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Type2.Core.dll",
+        ".\src\Simulation\Type3Core\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Type3.Core.dll",
+        ".\src\Simulation\Type4Core\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Type4.Core.dll",
+        ".\src\Simulation\QSharpFoundation\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.QSharp.Foundation.dll",
+        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Simulation.Common.dll",
+        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Simulation.QCTraceSimulatorRuntime.dll",
+        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Simulators.dll",
+        ".\src\Xunit\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Xunit.dll"
     ) | ForEach-Object { Join-Path $PSScriptRoot (Join-Path ".." $_) };
     
     Native = @(
-        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.Simulator.Runtime.dll",
-        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\netstandard2.1\Microsoft.Quantum.SparseSimulator.Runtime.dll"
+        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.Simulator.Runtime.dll",
+        ".\src\Simulation\Simulators\bin\$Env:BUILD_CONFIGURATION\net6.0\Microsoft.Quantum.SparseSimulator.Runtime.dll"
     ) | ForEach-Object { Join-Path $PSScriptRoot (Join-Path ".." $_) };
 }
 

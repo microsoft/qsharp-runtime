@@ -33,8 +33,11 @@
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\ResetAll.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\RFrac.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\Rx.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RxxFromExp.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\Ry.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RyyFromExp.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\Rz.qs" />
+    <QSharpCompile Include="..\TargetDefinitions\Decompositions\RzzFromExp.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\SetToBasisState.qs" />
     <QSharpCompile Include="..\TargetDefinitions\Decompositions\SWAP.qs" />
   </ItemGroup>
