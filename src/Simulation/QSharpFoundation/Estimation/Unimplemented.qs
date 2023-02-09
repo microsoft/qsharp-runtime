@@ -3,10 +3,11 @@
 
 // Functionality needed to account for costs of an operation that is not implemented.
 // Costs estimated separately and passed to the `UnimplementedOperation` become
-// incorporated into the overall program costs. This functionality can only be used
-// by the resources estimator target.
+// incorporated into the overall program costs. This functionality is only available
+// when using resources estimator execution target. `UnimplementedOperation' is not
+// defined for other execution targets.
 
-namespace Microsoft.Quantum.Estimation {
+namespace Microsoft.Quantum.ResourcesEstimation {
 
     /// # Summary
     /// Indicates that the second item in a tuple passed to the `UnimplementedOperation`
