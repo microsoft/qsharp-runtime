@@ -44,6 +44,7 @@ namespace Microsoft.Quantum.EntryPointDriver
 
                 var resourcesEstimator = new ResourcesEstimator(coreAssembly);
                 await resourcesEstimator.Run<TCallable, TIn, TOut>(input);
+                Console.WriteLine("The Resources Estimator will be removed in the March 2023 QDK release. Please use the Azure-based version instead.");
                 Console.WriteLine(resourcesEstimator.ToTSV());
             }
             else
