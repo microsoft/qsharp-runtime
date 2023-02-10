@@ -456,10 +456,18 @@ namespace Microsoft.Quantum.Simulation.Core
         ///     If both input arrays are null, it returns null.
         ///     If one of the input arrays is null, it returns the other.
         /// </summary>
-        public static QArray<T> Add(IQArray<T> arr1, IQArray<T> arr2) =>
-            arr1 == null ? arr2 == null ? null : new QArray<T>(arr2) :
-            arr2 == null ? new QArray<T>(arr1) :
-            Add(new QArray<T>(arr1), arr2);
+        public static QArray<T> Add(IQArray<T> arr1, IQArray<T> arr2)
+        {
+            if (arr1 == null)
+            {
+                return arr2 == null ? null : new QArray<T>(arr2);
+            }
+            if (arr2 == null)
+            {
+                return new QArray<T>(arr1)
+            }
+            return Add(new QArray<T>(arr1), arr2);
+        }
 
         /// <summary>
         /// Returns string that is a Q# representation of the value of the array.
