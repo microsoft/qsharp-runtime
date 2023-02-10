@@ -464,7 +464,7 @@ namespace Microsoft.Quantum.Simulation.Core
             }
             if (arr2 == null)
             {
-                return new QArray<T>(arr1)
+                return new QArray<T>(arr1);
             }
             return Add(new QArray<T>(arr1), arr2);
         }
