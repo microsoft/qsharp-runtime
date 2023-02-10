@@ -55,7 +55,11 @@ namespace Microsoft.Azure.Quantum.Authentication
             {
                 yield return CredentialFactory.CreateCredential(CredentialType.TokenFile);
                 yield return CredentialFactory.CreateCredential(CredentialType.Environment, SubscriptionId);
-                yield return CredentialFactory.CreateCredential(CredentialType.ManagedIdentity, SubscriptionId);
+                // Create a ManagedIdentityCredential with a 1-second timeout to work around delays in non-Azure environments.
+                // In non-Azure environments, ManagedIdentityCredential can cause long delays before failing to resolve.
+                // In Azure environments, in practice, 1 second seems to be enough time for the managed identity to be resolved.
+                // (See: https://github.com/Azure/azure-sdk-for-net/issues/24767)
+                yield return new ManagedIdentityCredential(options: new TokenCredentialOptions { Retry = { NetworkTimeout = TimeSpan.FromSeconds(1), MaxRetries = 0 } });
                 yield return CredentialFactory.CreateCredential(CredentialType.CLI, SubscriptionId);
                 yield return CredentialFactory.CreateCredential(CredentialType.SharedToken, SubscriptionId);
                 // Disable VS credentials until https://devdiv.visualstudio.com/DevDiv/_workitems/edit/1332071 is fixed:
