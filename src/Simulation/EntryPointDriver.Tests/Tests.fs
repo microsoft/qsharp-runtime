@@ -491,7 +491,8 @@ let ``Shadows --shots`` () =
 
 /// The expected output from the resources estimator.
 let private resourceSummary =
-    "Metric          Sum Max
+    "The local Resources Estimator will be removed in the March 2023. Use the new Azure Resource Estimator.
+     Metric          Sum Max
      CNOT            0   0
      QubitClifford   1   1
      R               0   0
