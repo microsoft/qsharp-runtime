@@ -22,7 +22,7 @@ namespace Microsoft.Quantum.Simulation.Simulators
     ///   <li>Gates width (total number of gates used for the computation)</li>
     /// </ol>
     /// </summary>
-    [Obsolete("The Resources Estimator will be removed in the March 2023 QDK release. Please use the Azure-based version instead.", false)]
+    [Obsolete("The local Resources Estimator will be removed in the March 2023. Use the new Azure Resource Estimator.", false)]
     public partial class ResourcesEstimator : QCTraceSimulator
     {
         /// <summary>
