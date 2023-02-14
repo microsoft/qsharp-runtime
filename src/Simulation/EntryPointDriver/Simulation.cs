@@ -44,7 +44,7 @@ namespace Microsoft.Quantum.EntryPointDriver
 
                 var resourcesEstimator = new ResourcesEstimator(coreAssembly);
                 await resourcesEstimator.Run<TCallable, TIn, TOut>(input);
-                Console.WriteLine("The local Resources Estimator will be removed in the March 2023. Use the new Azure Resource Estimator.");
+                Console.WriteLine("The local Resources Estimator will be removed in March 2023. The Resources Estimator is now available through Azure Quantum.");
                 Console.WriteLine(resourcesEstimator.ToTSV());
             }
             else
