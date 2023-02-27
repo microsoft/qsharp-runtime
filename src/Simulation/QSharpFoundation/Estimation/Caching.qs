@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-// Functionality needed to instruct the resources estimator to cache costs of a code fragment
+// Functionality needed to instruct the resource estimator to cache costs of a code fragment
 // and reuse these costs without executing the code fragment repeatedly. This functionality
-// is only available when using resources estimator execution target. `BeginCostCaching`
+// is only available when using resource estimator execution target. `BeginCostCaching`
 // and `EndCostCaching` are not defined for other execution targets.
 
-namespace Microsoft.Quantum.ResourcesEstimation {
+namespace Microsoft.Quantum.ResourceEstimation {
 
     /// # Summary
     /// Used to specify that there's only one execution variant in `BeginCostCaching`
@@ -16,7 +16,7 @@ namespace Microsoft.Quantum.ResourcesEstimation {
     }
 
     /// # Summary
-    /// Instructs the resources estimator of the start of the code fragment
+    /// Instructs the resource estimator of the start of the code fragment
     /// for which costs caching can be done.
     ///
     /// # Input
@@ -37,7 +37,7 @@ namespace Microsoft.Quantum.ResourcesEstimation {
     }
 
     /// # Summary
-    /// Instructs the resources estimator that the code fragment is over.
+    /// Instructs the resource estimator that the code fragment is over.
     function EndCostCaching(): Unit {
         body intrinsic;
     }
