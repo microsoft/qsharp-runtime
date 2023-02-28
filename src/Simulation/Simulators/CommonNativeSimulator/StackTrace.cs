@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
@@ -79,11 +79,11 @@ namespace Microsoft.Quantum.Simulation.Common
             return PortablePdbSymbolReader.TryFormatGitHubUrl(result, FailedLineNumber);
         }
 
-        private const string messageFormat = "{0} on {1}";
+        private const string messageFormat = "{0} on {1}:line {2}";
 
         public override string ToString()
         {
-            return string.Format(messageFormat, Callable.FullName, $"{SourceFile}:line {FailedLineNumber}");
+            return string.Format(messageFormat, Callable.FullName, SourceFile, FailedLineNumber);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// which is also more costly than <see cref="ToString"/>.
         /// </summary>
         public virtual string ToStringWithBestSourceLocation() =>
-            string.Format(messageFormat, Callable.FullName, $"{GetBestSourceLocation()}:line {FailedLineNumber}");
+            string.Format(messageFormat, Callable.FullName, GetBestSourceLocation(), FailedLineNumber);
 
         /// <summary>
         /// Finds correspondence between Q# and C# stack frames and populates Q# stack frame information from C# stack frames
