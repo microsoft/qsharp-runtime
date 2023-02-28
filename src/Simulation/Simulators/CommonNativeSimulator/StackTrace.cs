@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.
+﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
@@ -29,7 +29,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// The path to the source where operation is defined
         /// </summary>
-        public string SourceFile { get; private set; }
+        public string? SourceFile { get; private set; }
 
         /// <summary>
         /// One based line number in the operation that resulted in failure. Note that for automatically derived Adjoint and Controlled 
@@ -89,7 +89,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         ///     Gets the best possible source location for this stack frame.
         ///     If the source is not available on local machine, the source
-        //      location will be replaced by a URL pointing to GitHub repository.
+        ///     location will be replaced by a URL pointing to GitHub repository.
         /// </summary>
         /// <remarks>
         ///     This is more costly than <see cref="SourceFile"/> because it
@@ -97,10 +97,14 @@ namespace Microsoft.Quantum.Simulation.Common
         ///     If the file does not exist it calls <see cref="GetURLFromPDB"/> to get the URL
         ///     which is also more costly than <see cref="SourceFile"/>.
         /// </remarks>
-        public virtual string GetBestSourceLocation() =>
-            System.IO.File.Exists(SourceFile)
+        public virtual string GetBestSourceLocation()
+        {
+            // SourceFile should always be non-null here since StackTraceCollector sets this field before handing out StackFrame objects
+            Debug.Assert(SourceFile != null, "Expected StackTraceCollector.CallStack to have populated source locations");
+            return System.IO.File.Exists(SourceFile)
             ? SourceFile
             : GetURLFromPDB() ?? SourceFile;
+        }
 
         /// <summary>
         /// The same as <see cref="ToString"/>, but tries to point to best source location.
@@ -125,7 +129,7 @@ namespace Microsoft.Quantum.Simulation.Common
                 object[] locations = op.GetType().GetCustomAttributes(typeof(SourceLocationAttribute), true);
                 foreach (object location in locations)
                 {
-                    SourceLocationAttribute sourceLocation = (location as SourceLocationAttribute);
+                    SourceLocationAttribute? sourceLocation = (location as SourceLocationAttribute);
                     if (sourceLocation != null && sourceLocation.SpecializationKind == op.Variant)
                     {
                         currentFrame.SourceFile = System.IO.Path.GetFullPath(sourceLocation.SourceFile);
@@ -143,8 +147,8 @@ namespace Microsoft.Quantum.Simulation.Common
             // A set of Q# stack frames is assumed to be a subset of C# stack frames.
             // When a C# stack frame doesn't have enough information to match with corresponding Q# frame
             // this assumption is essentially broken, which results in missing matches.
-            System.Diagnostics.StackFrame csharpFrame = GetNextCSharpStackFrame(csharpStackFrames, ref currentCSharpFrameIndex);
-            StackFrame qsharpFrame = GetNextQSharpStackFrame(qsharpStackFrames, ref currentQSharpFrameIndex);
+            System.Diagnostics.StackFrame? csharpFrame = GetNextCSharpStackFrame(csharpStackFrames, ref currentCSharpFrameIndex);
+            StackFrame? qsharpFrame = GetNextQSharpStackFrame(qsharpStackFrames, ref currentQSharpFrameIndex);
             while (csharpFrame != null && qsharpFrame != null)
             {
                 if (IsMatch(csharpFrame, qsharpFrame))
@@ -163,7 +167,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Return next Q# stack frame that has enough information to match
         /// </summary>
-        private static StackFrame GetNextQSharpStackFrame(StackFrame[] qsharpStackFrames, ref int currentFrameIndex)
+        private static StackFrame? GetNextQSharpStackFrame(StackFrame[] qsharpStackFrames, ref int currentFrameIndex)
         {
             if (currentFrameIndex >= qsharpStackFrames.Length)
             {
@@ -185,7 +189,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// <summary>
         /// Return next C# stack frame
         /// </summary>
-        private static System.Diagnostics.StackFrame GetNextCSharpStackFrame(System.Diagnostics.StackFrame[] csharpStackFrames, ref int currentFrameIndex)
+        private static System.Diagnostics.StackFrame? GetNextCSharpStackFrame(System.Diagnostics.StackFrame[] csharpStackFrames, ref int currentFrameIndex)
         {
             if (currentFrameIndex >= csharpStackFrames.Length)
             {
@@ -204,7 +208,7 @@ namespace Microsoft.Quantum.Simulation.Common
         /// </summary>
         private static bool IsMatch(System.Diagnostics.StackFrame csharpFrame, StackFrame qsharpFrame)
         {
-            string fileName = csharpFrame.GetFileName();
+            string? fileName = csharpFrame.GetFileName();
             if (string.IsNullOrEmpty(fileName))
             {
                 return false;
@@ -245,8 +249,8 @@ namespace Microsoft.Quantum.Simulation.Common
     {
         private readonly Stack<StackFrame> callStack;
         private readonly SimulatorBase sim;
-        private System.Diagnostics.StackFrame[] frames = null;
-        StackFrame[] stackFramesWithLocations = null;
+        private System.Diagnostics.StackFrame[]? frames = null;
+        StackFrame[]? stackFramesWithLocations = null;
         bool hasFailed = false;
 
         public StackTraceCollector(SimulatorBase sim)
@@ -319,14 +323,17 @@ namespace Microsoft.Quantum.Simulation.Common
         /// If failure has happened returns the call-stack at time of failure.
         /// Returns null if the failure has not happened.
         /// </summary>
-        public StackFrame[] CallStack
+        public StackFrame[]? CallStack
         {
             get
             {
                 if (hasFailed)
                 {
-                    if( stackFramesWithLocations == null )
+                    if(stackFramesWithLocations == null)
                     {
+                        // The only way hasFailed can be set is if StackTraceCollector.OnFail was called, which also populates
+                        // the stack frames. So we should be fine here accessing frames
+                        Debug.Assert(frames != null, "Expected frames to be non-null");
                         stackFramesWithLocations = StackFrame.PopulateSourceLocations(callStack, frames);
                     }
                     return stackFramesWithLocations;
