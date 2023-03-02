@@ -11,7 +11,7 @@ namespace Microsoft.Quantum.ResourceEstimation {
 
     /// # Summary
     /// Returns a tuple that can be passed to the `EstimateUnimplementedOperation`
-    /// to specify the number of auxilliary qubits is equal to the `amount`.
+    /// to specify that the number of auxilliary qubits is equal to the `amount`.
     function AuxQubitCountCost(amount : Int) : (Int, Int) {
         return (0, amount);
     }
