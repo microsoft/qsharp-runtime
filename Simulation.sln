@@ -197,9 +197,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Intrinsics", "Intrinsics", 
 		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledZ.qs
 		src\Simulation\TargetDefinitions\Intrinsic\Exp.qs = src\Simulation\TargetDefinitions\Intrinsic\Exp.qs
 		src\Simulation\TargetDefinitions\Intrinsic\H.qs = src\Simulation\TargetDefinitions\Intrinsic\H.qs
-		src\Simulation\TargetDefinitions\Intrinsic\IsingXX.qs = src\Simulation\TargetDefinitions\Intrinsic\IsingXX.qs
-		src\Simulation\TargetDefinitions\Intrinsic\IsingYY.qs = src\Simulation\TargetDefinitions\Intrinsic\IsingYY.qs
-		src\Simulation\TargetDefinitions\Intrinsic\IsingZZ.qs = src\Simulation\TargetDefinitions\Intrinsic\IsingZZ.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRxx.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRxx.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRyy.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRyy.qs
+		src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRzz.qs = src\Simulation\TargetDefinitions\Intrinsic\ApplyUncontrolledRzz.qs
 		src\Simulation\TargetDefinitions\Intrinsic\M.qs = src\Simulation\TargetDefinitions\Intrinsic\M.qs
 		src\Simulation\TargetDefinitions\Intrinsic\Measure.qs = src\Simulation\TargetDefinitions\Intrinsic\Measure.qs
 		src\Simulation\TargetDefinitions\Intrinsic\MZ.qs = src\Simulation\TargetDefinitions\Intrinsic\MZ.qs
@@ -227,6 +227,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageDefinitions", "Packa
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Microsoft.Quantum.QSharp.Foundation", "src\Simulation\QSharpFoundation.Tests\Tests.Microsoft.Quantum.QSharp.Foundation.csproj", "{B23962F1-E6DD-4A01-B304-1D5E596117F5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{323550BD-A1D3-45CB-AAAD-A4BC0B3AD360}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulation", "Simulation", "{854C9D16-47E2-42A7-9403-ECE0E14E8E08}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TargetDefinitions", "TargetDefinitions", "{198AD45C-BA19-4735-83CB-E93D4A808A05}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FCED13C1-1653-4473-9E8C-CD3670AB2412}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Type1", "src\Simulation\TargetDefinitions\Tests\Type1\Tests.Type1.csproj", "{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -976,6 +986,22 @@ Global
 		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|Any CPU.Build.0 = Release|Any CPU
 		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|x64.ActiveCfg = Release|Any CPU
 		{B23962F1-E6DD-4A01-B304-1D5E596117F5}.RelWithDebInfo|x64.Build.0 = Release|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.Debug|x64.Build.0 = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.MinSizeRel|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.MinSizeRel|Any CPU.Build.0 = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.MinSizeRel|x64.ActiveCfg = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.MinSizeRel|x64.Build.0 = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.Release|x64.ActiveCfg = Release|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.Release|x64.Build.0 = Release|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.RelWithDebInfo|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.RelWithDebInfo|Any CPU.Build.0 = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.RelWithDebInfo|x64.ActiveCfg = Debug|Any CPU
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748}.RelWithDebInfo|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1038,6 +1064,10 @@ Global
 		{A3E68578-2DBE-4E32-84BC-9E416AF16B39} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
 		{FA7E8961-9F0E-4D9E-8D81-9B07E9DA29EE} = {93409CC3-8DF9-45FA-AE21-16A19FDEF650}
 		{B23962F1-E6DD-4A01-B304-1D5E596117F5} = {03736C2E-DB2A-46A9-B7B2-C1216BDECB4F}
+		{854C9D16-47E2-42A7-9403-ECE0E14E8E08} = {323550BD-A1D3-45CB-AAAD-A4BC0B3AD360}
+		{198AD45C-BA19-4735-83CB-E93D4A808A05} = {854C9D16-47E2-42A7-9403-ECE0E14E8E08}
+		{FCED13C1-1653-4473-9E8C-CD3670AB2412} = {198AD45C-BA19-4735-83CB-E93D4A808A05}
+		{2DB80BF7-FCD9-403D-84FF-4DAD25C76748} = {FCED13C1-1653-4473-9E8C-CD3670AB2412}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {929C0464-86D8-4F70-8835-0A5EAF930821}

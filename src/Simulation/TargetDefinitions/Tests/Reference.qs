@@ -42,6 +42,18 @@ namespace Reference {
         body intrinsic;
     }
 
+    operation Rxx (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+        Exp([PauliX, PauliX], theta / -2.0, [qubit0, qubit1]);
+    }
+
+    operation Ryy (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+        Exp([PauliY, PauliY], theta / -2.0, [qubit0, qubit1]);
+    }
+
+    operation Rzz (theta : Double, qubit0 : Qubit, qubit1 : Qubit) : Unit is Adj + Ctl {
+        Exp([PauliZ, PauliZ], theta / -2.0, [qubit0, qubit1]);
+    }
+
     operation Reset(qubit : Qubit) : Unit {
         body intrinsic;
     }

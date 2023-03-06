@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.Quantum.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <QscVerbosity>detailed</QscVerbosity>
+    <QSharpDocsGeneration>false</QSharpDocsGeneration>
+    <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
+    <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
+    <IsTargetPackage>true</IsTargetPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <QSharpCompile Include="..\..\Intrinsic\ApplyUncontrolledRx.qs" />
+    <QSharpCompile Include="..\..\Intrinsic\ApplyUncontrolledRz.qs" />
+    <QSharpCompile Include="..\..\Intrinsic\ApplyUncontrolledRzz.qs" />
+    <QSharpCompile Include="..\..\Intrinsic\MZ.qs" />
+    <QSharpCompile Include="..\..\Intrinsic\Reset.qs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <QSharpCompile Include="..\..\Decompositions\ApplyControlledX.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyControlledZFromRzz.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledH.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledRy.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledS.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledSAdj.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledT.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledTAdj.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledX.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledY.qs" />
+    <QSharpCompile Include="..\..\Decompositions\ApplyUncontrolledZ.qs" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <QsharpCompile Include="..\Reference.qs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Simulators\Microsoft.Quantum.Simulators.csproj" />
+    <ProjectReference Include="..\..\..\QSharpFoundation\Microsoft.Quantum.QSharp.Foundation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+
+</Project>

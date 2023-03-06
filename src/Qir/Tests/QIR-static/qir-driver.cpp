@@ -48,9 +48,9 @@ extern "C" int64_t Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop( // NO
     Array* array, int64_t index, int64_t val);
 TEST_CASE("QIR: Using 1D arrays", "[qir][qir.arr1d]")
 {
-    constexpr int64_t n = 5;
-    int64_t values[n]   = {0, 1, 2, 3, 4};
-    auto array          = Array{n, values};
+    constexpr int64_t itemCount = 5;
+    int64_t values[itemCount]   = {0, 1, 2, 3, 4};
+    auto array                  = Array{itemCount, values};
 
     int64_t res = Microsoft__Quantum__Testing__QIR__Test_Arrays__Interop(&array, 2, 42);
     REQUIRE(res == (0 + 42) + (42 + 3 + 4));
