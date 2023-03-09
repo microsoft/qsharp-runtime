@@ -72,7 +72,8 @@ namespace Microsoft.Quantum.EntryPointDriver
             string defaultSimulatorName,
             string defaultExecutionTarget,
             string targetCapability,
-            Func<IOperationFactory> createDefaultCustomSimulator)
+            Func<IOperationFactory> createDefaultCustomSimulator,
+            string resourcesEstimatorName = null)
         {
             SimulatorOptionAliases = simulatorOptionAliases;
             QuantumSimulatorName = quantumSimulatorName;
