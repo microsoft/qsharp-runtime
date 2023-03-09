@@ -59,7 +59,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
                     Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
 
-                    Assert.Equal(94, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(90, stackFrames[1].FailedLineNumber);
                 }
                 finally
                 {
@@ -165,8 +165,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
                     Assert.Equal(7, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(33, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(38, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(29, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(34, stackFrames[2].FailedLineNumber);
                 }
             }
 
@@ -191,8 +191,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
                     Assert.Equal(6, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(32, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(43, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(28, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(39, stackFrames[2].FailedLineNumber);
                 }
             }
 
@@ -217,8 +217,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
                     Assert.Equal(6, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(32, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(48, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(28, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(44, stackFrames[2].FailedLineNumber);
                 }
             }
         }
@@ -251,10 +251,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
                     Assert.Equal(OperationFunctor.Body, stackFrames[3].Callable.Variant);
 
-                    Assert.Equal(70, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(66, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(66, stackFrames[2].FailedLineNumber);
-                    Assert.Equal(75, stackFrames[3].FailedLineNumber);
+                    Assert.Equal(66, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(62, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(62, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(71, stackFrames[3].FailedLineNumber);
                 }
             }
         }
