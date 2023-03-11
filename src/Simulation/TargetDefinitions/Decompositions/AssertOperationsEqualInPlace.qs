@@ -118,7 +118,7 @@ namespace Microsoft.Quantum.Diagnostics {
     /// ## expectedU
     /// Reference operation on $n$ qubits that givenU is to be compared against.
     internal operation AssertEqualOnBasisVector (basis : Int[], givenU : (Qubit[] => Unit), expectedU : (Qubit[] => Unit is Adj)) : Unit {
-        let tolerance = 1e-5;
+        let tolerance = 1e-15;
 
         use qubits = Qubit[Length(basis)] {
             AssertAllZeroWithinTolerance(qubits, tolerance);
@@ -127,6 +127,7 @@ namespace Microsoft.Quantum.Diagnostics {
             Adjoint expectedU(qubits);
             Adjoint FlipToBasis(basis, qubits);
             AssertAllZeroWithinTolerance(qubits, tolerance);
+            ResetAll(qubits);
         }
     }
 
