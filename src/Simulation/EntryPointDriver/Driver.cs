@@ -199,7 +199,6 @@ namespace Microsoft.Quantum.EntryPointDriver
                     this.settings.QuantumSimulatorName,
                     this.settings.SparseSimulatorName,
                     this.settings.ToffoliSimulatorName,
-                    this.settings.ResourcesEstimatorName,
                     this.settings.DefaultSimulatorName
                 });
 

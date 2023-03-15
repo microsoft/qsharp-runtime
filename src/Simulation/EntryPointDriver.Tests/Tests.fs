@@ -453,11 +453,11 @@ let ``Shadows --simulator`` () =
     given ["--simulator"; "foo"]
     |> yields "Warning: Option --simulator is overridden by an entry point parameter name. Using default value QuantumSimulator.
                foo"
-    given ["--simulator"; AssemblyConstants.ResourcesEstimator]
+    given ["--simulator"; AssemblyConstants.ToffoliSimulator]
     |> yields (sprintf "Warning: Option --simulator is overridden by an entry point parameter name. Using default value QuantumSimulator.
                         %s"
-                       AssemblyConstants.ResourcesEstimator)
-    given ["-s"; AssemblyConstants.ResourcesEstimator; "--simulator"; "foo"] |> fails
+                       AssemblyConstants.ToffoliSimulator)
+    given ["-s"; AssemblyConstants.ToffoliSimulator; "--simulator"; "foo"] |> fails
     given ["-s"; "foo"] |> fails
 
 [<Fact>]
@@ -489,20 +489,6 @@ let ``Shadows --shots`` () =
 
 // Simulators
 
-/// The expected output from the resources estimator.
-let private resourceSummary =
-    "The local Resources Estimator will be removed in March 2023. The Resources Estimator is now available through Azure Quantum.
-     Metric          Sum Max
-     CNOT            0   0
-     QubitClifford   1   1
-     R               0   0
-     Measure         1   1
-     T               0   0
-     Depth           0   0
-     Width           1   1
-     QubitCount      1   1
-     BorrowedWidth   0   0"
-
 [<Fact>]
 let ``Supports QuantumSimulator`` () =
     let given = test "X or H"
@@ -516,21 +502,9 @@ let ``Supports ToffoliSimulator`` () =
     given ["--simulator"; AssemblyConstants.ToffoliSimulator; "--use-h"; "true"] |> fails
 
 [<Fact>]
-let ``Supports ResourcesEstimator`` () =
-    let given = test "X or H"
-    given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
-    given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "true"] |> yields resourceSummary
-
-[<Fact>]
 let ``Rejects unknown simulator`` () =
     let given = test "X or H"
     given ["--simulator"; "FooSimulator"; "--use-h"; "false"] |> fails
-
-[<Fact>]
-let ``Supports default standard simulator`` () =
-    let given = testWithSim AssemblyConstants.ResourcesEstimator "X or H"
-    given ["--use-h"; "false"] |> yields resourceSummary
-    given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
 
 [<Fact>]
 let ``Supports default custom simulator`` () =
@@ -543,7 +517,6 @@ let ``Supports default custom simulator`` () =
     given ["--simulator"; typeof<ToffoliSimulator>.FullName; "--use-h"; "true"] |> fails
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "false"] |> yields "Hello, World!"
     given ["--simulator"; AssemblyConstants.QuantumSimulator; "--use-h"; "true"] |> yields "Hello, World!"
-    given ["--simulator"; AssemblyConstants.ResourcesEstimator; "--use-h"; "false"] |> yields resourceSummary
     given ["--simulator"; typeof<QuantumSimulator>.FullName; "--use-h"; "false"] |> fails
 
 // Azure Quantum Submission
