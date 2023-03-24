@@ -59,7 +59,7 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
                     Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
 
-                    Assert.Equal(94, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(90, stackFrames[1].FailedLineNumber);
                 }
                 finally
                 {
@@ -140,87 +140,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
         }
 
         [Fact]
-        public void GenericFail1Test()
-        {
-            ResourcesEstimator sim = new ResourcesEstimator();
-
-            {
-                try
-                {
-                    QVoid res = sim.Execute<GenericFail1, QVoid, QVoid>(QVoid.Instance);
-                }
-                catch (ExecutionFailException)
-                {
-                    StackFrame[] stackFrames = sim.CallStack;
-
-                    Assert.Equal(3, stackFrames.Length);
-
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
-                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].Callable.FullName);
-                    Assert.Equal(namespacePrefix + "GenericFail1", stackFrames[2].Callable.FullName);
-
-                    Assert.Equal(OperationFunctor.Body, stackFrames[0].Callable.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[1].Callable.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
-
-                    Assert.Equal(7, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(25, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(29, stackFrames[2].FailedLineNumber);
-                }
-            }
-
-            {
-                try
-                {
-                    QVoid res = sim.Execute<GenericAdjFail1, QVoid, QVoid>(QVoid.Instance);
-                }
-                catch (ExecutionFailException)
-                {
-                    StackFrame[] stackFrames = sim.CallStack;
-
-                    Assert.Equal(3, stackFrames.Length);
-
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
-                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].Callable.FullName);
-                    Assert.Equal(namespacePrefix + "GenericAdjFail1", stackFrames[2].Callable.FullName);
-
-                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[0].Callable.Variant);
-                    Assert.Equal(OperationFunctor.Adjoint, stackFrames[1].Callable.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
-
-                    Assert.Equal(6, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(24, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(52, stackFrames[2].FailedLineNumber);
-                }
-            }
-
-            {
-                try
-                {
-                    QVoid res = sim.Execute<GenericCtlFail1, QVoid, QVoid>(QVoid.Instance);
-                }
-                catch (ExecutionFailException)
-                {
-                    StackFrame[] stackFrames = sim.CallStack;
-
-                    Assert.Equal(3, stackFrames.Length);
-
-                    Assert.Equal(namespacePrefix + "AlwaysFail", stackFrames[0].Callable.FullName);
-                    Assert.Equal(namespacePrefix + "GenericFail", stackFrames[1].Callable.FullName);
-                    Assert.Equal(namespacePrefix + "GenericCtlFail1", stackFrames[2].Callable.FullName);
-
-                    Assert.Equal(OperationFunctor.Controlled, stackFrames[0].Callable.Variant);
-                    Assert.Equal(OperationFunctor.Controlled, stackFrames[1].Callable.Variant);
-                    Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
-
-                    Assert.Equal(6, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(24, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(56, stackFrames[2].FailedLineNumber);
-                }
-            }
-        }
-        
-        [Fact]
         public void PartialFail1Test()
         {
             ToffoliSimulator sim = new ToffoliSimulator();
@@ -246,8 +165,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
                     Assert.Equal(7, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(33, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(38, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(29, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(34, stackFrames[2].FailedLineNumber);
                 }
             }
 
@@ -272,8 +191,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
                     Assert.Equal(6, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(32, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(43, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(28, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(39, stackFrames[2].FailedLineNumber);
                 }
             }
 
@@ -298,8 +217,8 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
 
                     Assert.Equal(6, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(32, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(48, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(28, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(44, stackFrames[2].FailedLineNumber);
                 }
             }
         }
@@ -332,10 +251,10 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
                     Assert.Equal(OperationFunctor.Body, stackFrames[2].Callable.Variant);
                     Assert.Equal(OperationFunctor.Body, stackFrames[3].Callable.Variant);
 
-                    Assert.Equal(70, stackFrames[0].FailedLineNumber);
-                    Assert.Equal(66, stackFrames[1].FailedLineNumber);
-                    Assert.Equal(66, stackFrames[2].FailedLineNumber);
-                    Assert.Equal(75, stackFrames[3].FailedLineNumber);
+                    Assert.Equal(66, stackFrames[0].FailedLineNumber);
+                    Assert.Equal(62, stackFrames[1].FailedLineNumber);
+                    Assert.Equal(62, stackFrames[2].FailedLineNumber);
+                    Assert.Equal(71, stackFrames[3].FailedLineNumber);
                 }
             }
         }

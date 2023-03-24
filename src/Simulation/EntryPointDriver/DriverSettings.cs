@@ -30,11 +30,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         internal string ToffoliSimulatorName { get; }
 
         /// <summary>
-        /// The name of the resources estimator.
-        /// </summary>
-        internal string ResourcesEstimatorName { get; }
-
-        /// <summary>
         /// The name of the default simulator to use when simulating the entry point.
         /// </summary>
         internal string DefaultSimulatorName { get; }
@@ -65,7 +60,6 @@ namespace Microsoft.Quantum.EntryPointDriver
         /// <param name="quantumSimulatorName">The name of the quantum simulator.</param>
         /// <param name="sparseSimulatorName">The name of the sparse simulator.</param>
         /// <param name="toffoliSimulatorName">The name of the Toffoli simulator.</param>
-        /// <param name="resourcesEstimatorName">The name of the resources estimator.</param>
         /// <param name="defaultSimulatorName">The name of the default simulator to use.</param>
         /// <param name="defaultExecutionTarget">The name of the default execution target to use.</param>
         /// <param name="targetCapability">The name of the target capability to use.</param>
@@ -75,7 +69,6 @@ namespace Microsoft.Quantum.EntryPointDriver
             string quantumSimulatorName,
             string sparseSimulatorName,
             string toffoliSimulatorName,
-            string resourcesEstimatorName,
             string defaultSimulatorName,
             string defaultExecutionTarget,
             string targetCapability,
@@ -85,7 +78,6 @@ namespace Microsoft.Quantum.EntryPointDriver
             QuantumSimulatorName = quantumSimulatorName;
             SparseSimulatorName  = sparseSimulatorName;
             ToffoliSimulatorName = toffoliSimulatorName;
-            ResourcesEstimatorName = resourcesEstimatorName;
             DefaultSimulatorName = defaultSimulatorName;
             DefaultExecutionTarget = defaultExecutionTarget;
             TargetCapability = targetCapability;

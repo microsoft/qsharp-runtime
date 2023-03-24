@@ -337,7 +337,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
             RunOne(new QCTraceSimulator());
-            RunOne(new ResourcesEstimator());
             RunOne(new QuantumSimulator());
             RunOne(new SparseSimulator());
         }
@@ -373,7 +372,6 @@ namespace Microsoft.Quantum.Simulation.Simulators.Tests
 
             OperationsTestHelper.RunWithMultipleSimulators((s) => RunOne(s as IOperationFactory));
             RunOne(new QCTraceSimulator());
-            RunOne(new ResourcesEstimator());
         }
 
         [Fact]
