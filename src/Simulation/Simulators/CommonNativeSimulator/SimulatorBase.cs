@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.ClassicalControl;
+using System.Diagnostics;
 
 #nullable enable
 
@@ -174,6 +175,9 @@ namespace Microsoft.Quantum.Simulation.Common
             catch (Exception e) // Dumps q# call-stack in case of exception if CallStack tracking was enabled
             {
                 this.CallStack = stackTraceCollector.CallStack;
+                // StackTraceCollector should have set CallStack to a non-null value in its OnFail handler,
+                // since an exception was just thrown by the simulator.
+                Debug.Assert(this.CallStack != null, "Expected CallStack to be set");
                 this.OnException?.Invoke(e, this.CallStack);
                 throw;
             }
