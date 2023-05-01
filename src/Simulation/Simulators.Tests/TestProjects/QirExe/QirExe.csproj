@@ -5,7 +5,7 @@
     <IncludeQSharpCorePackages>false</IncludeQSharpCorePackages>
     <IncludeCSharpRuntime>false</IncludeCSharpRuntime>
     <IncludeProviderPackages>false</IncludeProviderPackages>
-    <ExecutionTarget>microsoft.simulator.fullstate</ExecutionTarget>
+    <ExecutionTarget>microsoft.estimator</ExecutionTarget>
   </PropertyGroup>
  
   <ItemGroup>
