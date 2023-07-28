@@ -22,7 +22,7 @@
     <dependencies>
       <dependency id="xunit" version="2.3.1" />
       <dependency id="Microsoft.NET.Test.Sdk" version="17.4.1" />
-      <dependency id="Microsoft.Quantum.Runtime.Core" version="0.28.277227" />
+      <dependency id="Microsoft.Quantum.Runtime.Core" version="0.28.291393-beta" />
     </dependencies>
   </metadata>
 
