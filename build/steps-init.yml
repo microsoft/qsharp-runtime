@@ -35,6 +35,10 @@ steps:
     rustup component add rustfmt clippy llvm-tools-preview --toolchain nightly
   displayName: Enable Rust formatting and nightly options.
 
+- task: NuGetAuthenticate@1
+  inputs:
+    nuGetServiceConnections: 'public-alpha feed'
+
 ##
 # Custom pre-reqs
 ##
