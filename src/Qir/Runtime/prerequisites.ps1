@@ -78,9 +78,9 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
     # rustfmt and clippy is available.
     rustup install nightly
     rustup toolchain install nightly
-    rustup toolchain install nightly-2022-08-01
+    rustup toolchain install nightly-2023-08-23
     rustup component add rustfmt clippy llvm-tools-preview
     rustup component add rustfmt clippy llvm-tools-preview --toolchain nightly
-    rustup component add rustfmt clippy llvm-tools-preview --toolchain nightly-2022-08-01
+    rustup component add rustfmt clippy llvm-tools-preview --toolchain nightly-2023-08-23
     }
 
