@@ -366,5 +366,4 @@ src/Simulation/Native/linux/Microsoft.Quantum.QdkSimRs.Runtime.dll
 src/Simulation/Native/osx/Microsoft.Quantum.QdkSimRs.Runtime.dll
 
 # Temporary Rust files/dirs. 
-Cargo.lock
 target/
