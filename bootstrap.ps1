@@ -9,7 +9,7 @@ Push-Location (Join-Path $PSScriptRoot "build")
     .\prerequisites.ps1
 Pop-Location
 
-cargo install cargo-edit --version 0.11.3
+cargo install cargo-edit@0.11.0
 Push-Location (Join-Path $PSScriptRoot "./src/Simulation/qdk_sim_rs")
     cargo set-version $Env:NUGET_VERSION;
 Pop-Location
