@@ -41,7 +41,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         if (Get-Command sudo -ErrorAction SilentlyContinue) {
             if ($needClang) { 
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-                sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-16 main"
+                sudo add-apt-repository "deb https://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
             }
             sudo apt update
             sudo apt-get install -y ninja-build
@@ -49,7 +49,7 @@ if ($Env:ENABLE_QIRRUNTIME -ne "false") {
         } else {
             if ($needClang) {
                 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
-                add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-16 main"
+                add-apt-repository "deb https://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
             }
             apt update
             apt-get install -y ninja-build
