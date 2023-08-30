@@ -11,8 +11,10 @@
 #pragma clang diagnostic push
     // Temporarily disable `-Wswitch-enum`, one of the `switch`es in "CLI11.hpp" handles not all the enumerators.
     #pragma clang diagnostic ignored "-Wswitch-enum"
+#if (__clang_major__ > 14)
     // Temporarily disable `-Wunsafe-buffer-usage`, since "CLI11.hpp" uses argv to get cmdline arguments.
     #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
     #include "CLI11.hpp"
 #pragma clang diagnostic pop
 // clang-format on
