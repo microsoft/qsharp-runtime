@@ -29,7 +29,13 @@ jobs:
   strategy:
     matrix:
       linux:
-        imageName: 'ubuntu-latest'
+        # We intentionally use the previous LTS (20.04) to make sure that
+        # we don't accidentally link LLVM-produced binaries to glibc 2.35.
+        # By default, the x86_64-unknown-linux-gnu target links against the
+        # version of glibc provided with the host OS, such that compiling
+        # on 22.04 can introduce a hard requirement for users to upgrade to
+        # the latest LTS.
+        imageName: 'ubuntu-20.04'
       mac:
         imageName: 'macOS-latest'
       windows:

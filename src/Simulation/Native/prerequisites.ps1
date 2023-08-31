@@ -6,12 +6,12 @@ Write-Host "##[info] Simulation/Native/prerequisites.ps1"
 if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Darwin")))) {
     brew update
     brew install ninja
-    brew install llvm@15
+    brew install llvm@16
 } elseif (($IsWindows) -or ((Test-Path Env:/AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Win")))) {
     $ChocoRan = $false
     if (!(Get-Command clang        -ErrorAction SilentlyContinue) -or `
         (Test-Path Env:/AGENT_OS)) {
-        choco install llvm --version=15.0.7 --allow-downgrade
+        choco install llvm --version=16.0.6 --allow-downgrade
         $ChocoRan = $true
         Write-Host "##vso[task.setvariable variable=PATH;]$($env:SystemDrive)\Program Files\LLVM\bin;$Env:PATH"
     }
@@ -28,25 +28,25 @@ if (($IsMacOS) -or ((Test-Path Env:AGENT_OS) -and ($Env:AGENT_OS.StartsWith("Dar
     }
 }
 else {
-    $needClang = !(Get-Command clang-15 -ErrorAction SilentlyContinue)
+    $needClang = !(Get-Command clang-16 -ErrorAction SilentlyContinue)
     if (Get-Command sudo -ErrorAction SilentlyContinue) {
         if ($needClang) {
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-            sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"
+            sudo add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-16 main"
         }
         sudo apt update
         sudo apt-get install -y ninja-build
-        sudo apt-get install -y libomp-15-dev
-        sudo apt-get install -y clang-15
+        sudo apt-get install -y libomp-16-dev
+        sudo apt-get install -y clang-16
     } else {
         if ($needClang) {
             wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|apt-key add -
-            add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"
+            add-apt-repository "deb https://apt.llvm.org/focal/ llvm-toolchain-focal-16 main"
         }
         apt update
         apt-get install -y ninja-build
-        apt-get install -y libomp-15-dev
-        apt-get install -y clang-15
+        apt-get install -y libomp-16-dev
+        apt-get install -y clang-16
     }
 }
 
