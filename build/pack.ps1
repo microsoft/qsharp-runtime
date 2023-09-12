@@ -126,29 +126,29 @@ function Pack-Dotnet() {
 }
 
 
-function Pack-Crate() {
-    param(
-        [string]
-        $PackageDirectory,
-
-        [string]
-        $OutPath
-    );
-
-    "##[info]Packing crate at $PackageDirectory to $OutPath..." | Write-Host
-
-    # Resolve relative to where the build script is located,
-    # not the PackageDirectory.
-    if (-not [IO.Path]::IsPathRooted($OutPath)) {
-        $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
-    }
-    Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
-    cargo package --allow-dirty;
-    # Copy only the .crate file, since we don't need all the intermediate
-    # artifacts brought in by the full folder under target/package.
-    Copy-Item -Force (Join-Path $PSScriptRoot .. "target" "package" "*.crate") $OutPath;
-    Pop-Location
-}
+#function Pack-Crate() {
+#    param(
+#        [string]
+#        $PackageDirectory,
+#
+#        [string]
+#        $OutPath
+#    );
+#
+#    "##[info]Packing crate at $PackageDirectory to $OutPath..." | Write-Host
+#
+#    # Resolve relative to where the build script is located,
+#    # not the PackageDirectory.
+#    if (-not [IO.Path]::IsPathRooted($OutPath)) {
+#        $OutPath = Resolve-Path (Join-Path $PSScriptRoot $OutPath);
+#    }
+#    Push-Location (Join-Path $PSScriptRoot $PackageDirectory)
+#    cargo package --allow-dirty;
+#    # Copy only the .crate file, since we don't need all the intermediate
+#    # artifacts brought in by the full folder under target/package.
+#    Copy-Item -Force (Join-Path $PSScriptRoot .. "target" "package" "*.crate") $OutPath;
+#    Pop-Location
+#}
 
 function Pack-Wheel() {
     param(
@@ -185,7 +185,7 @@ Pack-Dotnet '../src/Simulation/Type3Core/Microsoft.Quantum.Type3.Core.csproj'
 Pack-Dotnet '../src/Simulation/Type4Core/Microsoft.Quantum.Type4.Core.csproj'
 Pack-One '../src/Simulation/Simulators/Microsoft.Quantum.Simulators.nuspec'
 Pack-One '../src/Xunit/Microsoft.Quantum.Xunit.csproj'
-Pack-Crate -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:CRATE_OUTDIR;
+# Pack-Crate -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:CRATE_OUTDIR;
 Pack-Wheel -PackageDirectory "../src/Simulation/qdk_sim_rs" -OutPath $Env:WHEEL_OUTDIR;
 Pack-Dotnet '../src/Qir/Tools/Microsoft.Quantum.Qir.Runtime.Tools.csproj' -ForcePrerelease
 Pack-Dotnet '../src/Qir/CommandLineTool/Microsoft.Quantum.Qir.CommandLineTool.csproj' -ForcePrerelease
