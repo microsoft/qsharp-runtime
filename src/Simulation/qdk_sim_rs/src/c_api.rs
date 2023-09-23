@@ -581,8 +581,7 @@ mod tests {
     fn ry_runs_without_error_or_panic() -> Result<(), (String, i64)> {
         unsafe {
             let mut sim_id: usize = 0;
-            let mixed = CString::new("mixed").unwrap();
-            as_result(c_api::init(3, mixed.as_ptr(), &mut sim_id))?;
+            as_result(c_api::init(3, "mixed\0".as_ptr() as _, &mut sim_id))?;
             as_result(c_api::ry(sim_id, 1.234, 1))?;
             as_result(c_api::destroy(sim_id))?;
             Ok(())
@@ -593,10 +592,8 @@ mod tests {
     fn teleport() -> Result<(), (String, i64)> {
         unsafe {
             let mut sim_id: usize = 0;
-            let mixed = CString::new("mixed").unwrap();
-            let ideal = CString::new("ideal").unwrap();
-            as_result(c_api::init(3, mixed.as_ptr(), &mut sim_id))?;
-            as_result(c_api::set_noise_model_by_name(sim_id, ideal.as_ptr()))?;
+            as_result(c_api::init(3, "mixed\0".as_ptr() as _, &mut sim_id))?;
+            as_result(c_api::set_noise_model_by_name(sim_id, "ideal\0".as_ptr() as _))?;
 
             let idx_msg = 0;
             let idx_here = 1;
