@@ -20,7 +20,7 @@
   </PropertyGroup>  
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.5.0" />
+    <PackageReference Include="Azure.Identity" Version="1.10.2" />
     <PackageReference Include="Azure.Quantum.Jobs" Version="1.0.0-beta.3" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.13.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
