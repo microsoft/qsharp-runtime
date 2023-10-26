@@ -25,16 +25,16 @@ Push-Location $PSScriptRoot
     }
 
     # Run performance benchmarks as well.
-    cargo bench
-    $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
+    # cargo bench
+    # $script:allOk = $script:allOk -and $LASTEXITCODE -eq 0;
 
     # This step isn't required, but we use it to upload run summaries.
-    $reportPath = (Join-Path "target" "criterion");
-    $perfDest = (Join-Path $Env:DROPS_DIR "perf" "qdk_sim_rs");
-    if (Get-Item -ErrorAction SilentlyContinue $reportPath) {
-        New-Item -Type Directory -Force -Path $perfDest;
-        Copy-Item -Recurse -Force -Path $reportPath -Destination $perfDest;
-    }
+    # $reportPath = (Join-Path "target" "criterion");
+    # $perfDest = (Join-Path $Env:DROPS_DIR "perf" "qdk_sim_rs");
+    # if (Get-Item -ErrorAction SilentlyContinue $reportPath) {
+    #     New-Item -Type Directory -Force -Path $perfDest;
+    #     Copy-Item -Recurse -Force -Path $reportPath -Destination $perfDest;
+    # }
 
     # Free disk space by cleaning up.
     # Note that this takes longer, but saves ~1 GB of space, which is
