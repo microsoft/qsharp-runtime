@@ -101,13 +101,13 @@ built = "0.5.0"
 approx = { version = "0.5.1", features = ["num-complex"] }
 assert-json-diff = "2.0.1"
 backtrace = "=0.3.65"
-criterion = { version = "0.3", features = ['html_reports', 'csv_output'] }
+# criterion = { version = "0.3", features = ['html_reports', 'csv_output'] }
 ndarray = { version = "0.15.4", features = ["approx"] }
 
-[[bench]]
-harness = false
-name = "c_api_benchmark"
+# [[bench]]
+# harness = false
+# name = "c_api_benchmark"
 
-[[bench]]
-harness = false
-name = "microbenchmark"
+# [[bench]]
+# harness = false
+# name = "microbenchmark"
