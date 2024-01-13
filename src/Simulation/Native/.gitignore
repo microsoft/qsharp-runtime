@@ -10,3 +10,4 @@ foo*
 CMakeFiles/
 CMakeCache.txt
 *.so
+*_test
