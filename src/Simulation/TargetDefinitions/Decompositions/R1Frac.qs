@@ -15,8 +15,8 @@ namespace Microsoft.Quantum.Intrinsic {
     ///
     /// > [!WARNING]
     /// > This operation uses the **opposite** sign convention from
-    /// > @"microsoft.quantum.intrinsic.r", and does not include the
-    /// > factor of $1/ 2$ included by @"microsoft.quantum.intrinsic.r1".
+    /// > <xref:Microsoft.Quantum.Intrinsic.R>, and does not include the
+    /// > factor of $1/ 2$ included by <xref:Microsoft.Quantum.Intrinsic.R1>.
     ///
     /// # Input
     /// ## numerator
