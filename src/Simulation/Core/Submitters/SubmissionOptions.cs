@@ -5,32 +5,37 @@ using System.Collections.Immutable;
 
 #nullable enable
 
+namespace System.Runtime.CompilerServices
+{
+    public class IsExternalInit {}
+}
+
 namespace Microsoft.Quantum.Runtime.Submitters
 {
     /// <summary>
     /// Options for a job submitted to Azure Quantum.
     /// </summary>
-    public class SubmissionOptions
+    public record SubmissionOptions
     {
         /// <summary>
         /// A name describing the job.
         /// </summary>
-        public string FriendlyName { get; }
+        public string FriendlyName { get; init; }
 
         /// <summary>
         /// The number of times the program will be executed.
         /// </summary>
-        public int Shots { get; }
+        public int Shots { get; init; }
 
         /// <summary>
         /// Additional target-specific parameters for the job.
         /// </summary>
-        public ImmutableDictionary<string, string> InputParams { get; }
+        public ImmutableDictionary<string, string> InputParams { get; init; }
 
         /// <summary>
         /// The target capability.
         /// </summary>
-        public string TargetCapability { get; set; }
+        public string TargetCapability { get;  init; }
 
         /// <summary>
         /// The default submission options.
@@ -60,7 +65,12 @@ namespace Microsoft.Quantum.Runtime.Submitters
             int? shots = null,
             ImmutableDictionary<string, string>? inputParams = null,
             string? targetCapability = null) =>
-            new SubmissionOptions(
-                friendlyName ?? FriendlyName, shots ?? Shots, inputParams ?? InputParams, targetCapability ?? TargetCapability);
+            this with
+            {
+                FriendlyName = friendlyName ?? FriendlyName,
+                Shots = shots ?? Shots,
+                InputParams = inputParams ?? InputParams,
+                TargetCapability = targetCapability ?? TargetCapability
+            };
     }
 }
